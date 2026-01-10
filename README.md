@@ -15,12 +15,14 @@ ReadIt is a web application designed to provide a seamless reading experience. T
 * Real-time data synchronization using WebSockets
 * Responsive design for mobile and desktop devices
 * Support for multiple reading formats (e.g., EPUB, PDF)
+* Enhanced Redis connection handling with improved error logging and retry strategy
 
 ## Tech Stack
 * Frontend: React, Tailwind CSS, Framer Motion
 * Backend: Express, MongoDB, Mongoose
 * Database: MongoDB
 * APIs: GitHub API
+* Cache: Redis
 
 ## Architecture
 The application follows a microservices architecture, with separate services for authentication, GitHub API integration, and data storage.
@@ -53,11 +55,18 @@ The application follows a microservices architecture, with separate services for
 * Node.js (>= 14.17.0)
 * MongoDB (>= 5.0.0)
 * GitHub API token
+* Redis (>= 6.2.0)
 
 ### Installation
 1. Clone the repository: `git clone https://github.com/kaihere14/ReadIt.git`
 2. Install dependencies: `npm install` (in both `client` and `server` directories)
-3. Create a `.env` file in the `server` directory with your GitHub API token: `GITHUB_TOKEN=YOUR_TOKEN_HERE`
+3. Create a `.env` file in the `server` directory with your GitHub API token and Redis connection details: 
+```makefile
+GITHUB_TOKEN=YOUR_TOKEN_HERE
+REDIS_HOST=YOUR_REDIS_HOST
+REDIS_PORT=YOUR_REDIS_PORT
+REDIS_PASSWORD=YOUR_REDIS_PASSWORD
+```
 4. Start the server: `npm run dev` (in the `server` directory)
 5. Start the client: `npm run dev` (in the `client` directory)
 
@@ -66,12 +75,18 @@ The application uses environment variables for configuration. The following vari
 * `PORT`: The port number to listen on (default: 3000)
 * `GITHUB_TOKEN`: Your GitHub API token
 * `MONGODB_URI`: The MongoDB connection string (default: `mongodb://localhost:27017`)
+* `REDIS_HOST`: The Redis host
+* `REDIS_PORT`: The Redis port
+* `REDIS_PASSWORD`: The Redis password
 
 Example `.env` file:
 ```makefile
 PORT=3000
 GITHUB_TOKEN=YOUR_TOKEN_HERE
 MONGODB_URI=mongodb://localhost:27017
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=YOUR_REDIS_PASSWORD
 ```
 
 ## Usage
@@ -122,6 +137,7 @@ If you encounter any issues, please check the following:
 * Ensure you have the latest dependencies installed
 * Check the server and client logs for errors
 * Verify your GitHub API token is valid
+* Verify your Redis connection details are correct
 
 ## Roadmap
 The following features are planned for future releases:
@@ -141,5 +157,6 @@ The application uses the following third-party libraries:
 * MongoDB
 * Mongoose
 * GitHub API
-
-Note: This README is generated based on the provided codebase and may require further modification to accurately reflect the project's purpose, architecture, and usage.
+* Redis
+* IORedis
+* BullMQ
