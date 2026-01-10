@@ -1,8 +1,10 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Github } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Navigation = () => {
+  const navigate = useNavigate();
   return (
     <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-100 z-50">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -33,6 +35,7 @@ const Navigation = () => {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => navigate("/login")}
           className="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-slate-800 transition-all shadow-lg shadow-slate-200"
         >
           <Github size={18} />

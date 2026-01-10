@@ -7,8 +7,10 @@ import {
   RefreshCw,
   Sparkles,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
   return (
     <section className="pt-40 pb-20 px-6">
       <div className="max-w-4xl mx-auto text-center">
@@ -48,7 +50,10 @@ const Hero = () => {
           transition={{ delay: 0.6 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20"
         >
-          <button className="w-full sm:w-auto bg-slate-900 text-white px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all hover:shadow-xl group">
+          <button
+            onClick={() => navigate("/login")}
+            className="w-full sm:w-auto bg-slate-900 text-white px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-slate-800 transition-all hover:shadow-xl group"
+          >
             <Github size={20} />
             Connect GitHub
             <ArrowRight
