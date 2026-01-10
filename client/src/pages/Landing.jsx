@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import Navigation from "../components/Navigation";
+import LandingNavigation from "../components/LandingNavigation";
 import Hero from "../components/Hero";
 import PainPoints from "../components/PainPoints";
 import HowItWorks from "../components/HowItWorks";
@@ -19,7 +19,7 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-slate-200 overflow-x-hidden antialiased">
-      <Navigation />
+      <LandingNavigation />
       <Hero />
       <PainPoints />
       <HowItWorks />

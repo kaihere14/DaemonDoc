@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import Navigation from "../components/Navigation";
+import AuthNavigation from "../components/AuthNavigation";
 import { useAuth } from "../context/AuthContext";
 import RepoCard from "../components/RepoCard";
 import { Loader2, Sparkles, AlertCircle, RefreshCw, ArrowRight } from "lucide-react";
@@ -50,7 +50,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-linear-to-br from-emerald-50 via-white to-slate-50 text-slate-900 font-sans selection:bg-indigo-100 overflow-x-hidden">
-      <Navigation showAuth={true} />
+      <AuthNavigation />
       
       <div className="pt-24 pb-16 px-6">
         <div className="max-w-7xl mx-auto">
