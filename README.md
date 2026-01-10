@@ -16,6 +16,7 @@ ReadIt is a web application designed to provide a seamless reading experience. T
 * Responsive design for mobile and desktop devices
 * Support for multiple reading formats (e.g., EPUB, PDF)
 * Enhanced Redis connection handling with improved error logging and retry strategy
+* Logging for health check endpoint
 
 ## Tech Stack
 * Frontend: React, Tailwind CSS, Framer Motion
@@ -94,12 +95,14 @@ The application provides the following endpoints:
 * `GET /`: Returns a welcome message
 * `POST /auth/login`: Authenticates a user
 * `GET /api/github`: Returns GitHub API data
+* `GET /health`: Returns health check data with logging
 
 Example usage:
 ```bash
 curl http://localhost:3000
 curl -X POST -H "Content-Type: application/json" -d '{"username": "john", "password": "hello"}' http://localhost:3000/auth/login
 curl http://localhost:3000/api/github
+curl http://localhost:3000/health
 ```
 
 ## Development
@@ -139,6 +142,10 @@ The application provides the following API endpoints:
 ### GitHub API
 * `GET /api/github`: Returns GitHub API data
 	+ Response: `{"data": {"login": "john", "id": 12345}}`
+
+### Health Check
+* `GET /health`: Returns health check data with logging
+	+ Response: `{"status": "ok", "timestamp": "2023-02-20T14:30:00.000Z", "uptime": 3600, "redis": "connected"}`
 
 ## Contributing
 Contributions are welcome! Please submit a pull request with your changes.
