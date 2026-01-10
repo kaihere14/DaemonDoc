@@ -152,7 +152,6 @@ export const deactivateRepoActivity = async (req, res) => {
   try {
     const { repoId } = req.body;
     const userId = req.userId;
-
     const activeRepo = await ActiveRepo.findOne({ userId, repoId, active: true });
 
     if (!activeRepo) {
