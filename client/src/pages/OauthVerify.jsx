@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const OauthVerify = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState("verifying");
+  const { login } = useAuth();
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -21,25 +23,13 @@ const OauthVerify = () => {
       }
 
       try {
-        // Verify the token with backend
-        const response = await fetch("http://localhost:3000/auth/verify", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+        const result = await login(accessToken);
 
-        if (response.ok) {
-          const data = await response.json();
-          // Store the token and user data
-          localStorage.setItem("accessToken", accessToken);
-          localStorage.setItem("user", JSON.stringify(data.user));
+        if (result.success) {
           setStatus("success");
-
           // Redirect to home page after a brief delay
           setTimeout(() => {
-            navigate("/");
+            navigate("/home");
           }, 1500);
         } else {
           setStatus("error");
@@ -57,7 +47,7 @@ const OauthVerify = () => {
     };
 
     verifyToken();
-  }, [navigate]);
+  }, [navigate, login]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
