@@ -1172,11 +1172,11 @@ Special thanks to:
 
 ## 📈 Project Stats
 
-![GitHub stars](https://img.shields.io/github/stars/yourusername/readit?style=social)
-![GitHub forks](https://img.shields.io/github/forks/yourusername/readit?style=social)
-![GitHub issues](https://img.shields.io/github/issues/yourusername/readit)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/yourusername/readit)
-![GitHub last commit](https://img.shields.io/github/last-commit/yourusername/readit)
+![GitHub stars](https://img.shields.io/github/stars/kaihere14/Readit?style=social)
+![GitHub forks](https://img.shields.io/github/forks/kaihere14/Readit?style=social)
+![GitHub issues](https://img.shields.io/github/issues/kaihere14/Readit)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/kaihere14/Readit)
+![GitHub last commit](https://img.shields.io/github/last-commit/kaihere14/Readit)
 
 ---
 
