@@ -23,6 +23,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/health", (req, res) => {
+    console.log("Health check endpoint called");
   res.status(200).json({
     status: "ok",
     timestamp: new Date().toISOString(),
