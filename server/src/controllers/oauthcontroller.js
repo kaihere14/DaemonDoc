@@ -53,7 +53,7 @@ export const githubAuthRedirect = (req, res) => {
 
 export const githubCallBack = async (req, res) => {
   const authCode = req.query.code;
-  console.log("Auth Code:", authCode);
+  let user;
   try {
     const tokenRes = await axios.post(
       "https://github.com/login/oauth/access_token",
@@ -80,9 +80,32 @@ export const githubCallBack = async (req, res) => {
     });
 
     const userInfo = userInfoRes.data;
-    const { user } = await createOAuthUser(userInfo, accessToken);
 
-    const accessTokenJWT = generateAccessToken(user._id.toString());
+    let user;
+    try {
+      const result = await createOAuthUser(userInfo, accessToken);
+      user = result.user;
+    } catch (error) {
+      console.error("Error creating OAuth user:", error);
+      return res
+        .status(500)
+        .json({ message: "Error creating OAuth user", error: error.message });
+    }
+
+    if (!user || !user._id) {
+      console.error("User creation failed: user object is invalid");
+      return res
+        .status(500)
+        .json({ message: "Failed to create or retrieve user" });
+    }
+
+    let accessTokenJWT;
+    try {
+
+      accessTokenJWT = generateAccessToken(user._id.toString());
+    } catch (error) {
+      return res.status(500).json({ message: "Error generating JWT", error });
+    }
 
     const redirectUrl = `${process.env.FRONTEND_URL}/oauth-success#accessToken=${accessTokenJWT}`;
     res.redirect(302, redirectUrl);
@@ -94,24 +117,22 @@ export const githubCallBack = async (req, res) => {
 };
 
 export const createOAuthUser = async (profile, access_token) => {
-  try {
-    let user = await User.findOne({ githubUsername: profile.login });
-    if (!user) {
-      user = new User({
-        githubId: profile.id,
-        githubUsername: profile.login,
-        avatarUrl: profile.avatar_url,
-        githubAccessToken: encrypt(access_token),
-      });
-      await user.save();
-    }
+  let user = await User.findOne({ githubUsername: profile.login });
+  if (!user) {
+    user = new User({
+      githubId: profile.id,
+      githubUsername: profile.login,
+      avatarUrl: profile.avatar_url,
+      githubAccessToken: encrypt(access_token),
+    });
+    await user.save();
+  } else {
+    console.log("User already exists. Updating access token.");
     user.githubAccessToken = encrypt(access_token);
     await user.save();
-
-    return { user };
-  } catch (error) {
-    throw error;
   }
+
+  return { user };
 };
 
 export const verifyUser = async (req, res) => {
@@ -121,16 +142,13 @@ export const verifyUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.status(200).json({ user });
+    return res.status(200).json({ user });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Verify user error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
 export const logout = async (req, res) => {
-  try {
-    res.status(200).json({ message: "Logged out successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
-  }
+  res.status(200).json({ message: "Logged out successfully" });
 };
