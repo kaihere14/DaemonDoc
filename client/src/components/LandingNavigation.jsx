@@ -91,7 +91,7 @@ const LandingNavigation = () => {
               </div>
             </motion.div>
             <span className="font-semibold text-lg tracking-tight text-slate-900 group-hover:text-slate-700 transition-colors">
-              ReadmeAI
+              ReadIt
             </span>
           </motion.div>
 
