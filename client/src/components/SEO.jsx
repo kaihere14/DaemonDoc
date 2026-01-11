@@ -1,13 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-const SEO = ({ 
+const SEO = ({
   title = "DaemonDoc - AI-Powered README Generator for GitHub | Automate Your Documentation",
   description = "Stop wasting hours on documentation. DaemonDoc automatically generates and updates your GitHub README files using AI. Connect your repos and keep documentation fresh as your code evolves.",
   keywords = "README generator, AI documentation, GitHub automation, automatic README, documentation tool",
-  ogImage = "https://daemondoc.online/og-image.png",
+  ogImage = "https://daemondoc.online/main_og.png",
   ogUrl = "https://daemondoc.online/",
   twitterHandle = "@daemondoc",
-  canonical = "https://daemondoc.online/"
+  canonical = "https://daemondoc.online/",
 }) => {
   useEffect(() => {
     // Update document title
@@ -15,43 +15,43 @@ const SEO = ({
 
     // Update or create meta tags
     const updateMetaTag = (name, content, isProperty = false) => {
-      const attribute = isProperty ? 'property' : 'name';
+      const attribute = isProperty ? "property" : "name";
       let element = document.querySelector(`meta[${attribute}="${name}"]`);
-      
+
       if (element) {
-        element.setAttribute('content', content);
+        element.setAttribute("content", content);
       } else {
-        element = document.createElement('meta');
+        element = document.createElement("meta");
         element.setAttribute(attribute, name);
-        element.setAttribute('content', content);
+        element.setAttribute("content", content);
         document.head.appendChild(element);
       }
     };
 
     // Update meta tags
-    updateMetaTag('description', description);
-    updateMetaTag('keywords', keywords);
-    
+    updateMetaTag("description", description);
+    updateMetaTag("keywords", keywords);
+
     // Open Graph tags
-    updateMetaTag('og:title', title, true);
-    updateMetaTag('og:description', description, true);
-    updateMetaTag('og:image', ogImage, true);
-    updateMetaTag('og:url', ogUrl, true);
-    
+    updateMetaTag("og:title", title, true);
+    updateMetaTag("og:description", description, true);
+    updateMetaTag("og:image", ogImage, true);
+    updateMetaTag("og:url", ogUrl, true);
+
     // Twitter Card tags
-    updateMetaTag('twitter:title', title);
-    updateMetaTag('twitter:description', description);
-    updateMetaTag('twitter:image', ogImage);
-    updateMetaTag('twitter:creator', twitterHandle);
+    updateMetaTag("twitter:title", title);
+    updateMetaTag("twitter:description", description);
+    updateMetaTag("twitter:image", ogImage);
+    updateMetaTag("twitter:creator", twitterHandle);
 
     // Update canonical link
     let canonicalLink = document.querySelector('link[rel="canonical"]');
     if (canonicalLink) {
-      canonicalLink.setAttribute('href', canonical);
+      canonicalLink.setAttribute("href", canonical);
     } else {
-      canonicalLink = document.createElement('link');
-      canonicalLink.setAttribute('rel', 'canonical');
-      canonicalLink.setAttribute('href', canonical);
+      canonicalLink = document.createElement("link");
+      canonicalLink.setAttribute("rel", "canonical");
+      canonicalLink.setAttribute("href", canonical);
       document.head.appendChild(canonicalLink);
     }
   }, [title, description, keywords, ogImage, ogUrl, twitterHandle, canonical]);
@@ -60,4 +60,3 @@ const SEO = ({
 };
 
 export default SEO;
-
