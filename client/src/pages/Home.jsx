@@ -8,7 +8,6 @@ import RepoCard from "../components/RepoCard";
 import { Loader2, Github, AlertCircle, RefreshCw, Search, X } from "lucide-react";
 import SEO from "../components/SEO";
 
-
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Home = () => {
