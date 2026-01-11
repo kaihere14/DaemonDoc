@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import SEO from "../components/SEO";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -21,32 +22,41 @@ const Login = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
-      </div>
+      <>
+        <SEO 
+          title="Login - DaemonDoc | Connect Your GitHub Account"
+          description="Sign in to DaemonDoc with your GitHub account to start automating your repository documentation with AI-powered README generation."
+          ogUrl="https://daemondoc.online/login"
+          canonical="https://daemondoc.online/login"
+        />
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+          <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+    <>
+      <SEO 
+        title="Login - DaemonDoc | Connect Your GitHub Account"
+        description="Sign in to DaemonDoc with your GitHub account to start automating your repository documentation with AI-powered README generation."
+        ogUrl="https://daemondoc.online/login"
+        canonical="https://daemondoc.online/login"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8 space-y-8">
           {/* Header */}
           <div className="text-center space-y-2">
             <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-gradient-to-br from-gray-800 to-gray-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z" />
-                </svg>
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg">
+                <img src="/logo.svg" alt="DaemonDoc Logo" className="w-10 h-10" />
               </div>
             </div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Welcome to Readit
+              Welcome to DaemonDoc
             </h1>
             <p className="text-gray-500 text-sm">
               Sign in to continue to your account
@@ -110,6 +120,7 @@ const Login = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

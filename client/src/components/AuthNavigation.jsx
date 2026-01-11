@@ -47,12 +47,15 @@ const AuthNavigation = () => {
           <motion.div 
             whileHover={{ rotate: 5, scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 15 }}
-            className="bg-slate-900 text-white w-9 h-9 rounded-lg flex items-center justify-center"
           >
-            <span className="font-bold text-base">R</span>
+            <img 
+              src="/logo.svg" 
+              alt="DaemonDoc Logo" 
+              className="w-9 h-9"
+            />
           </motion.div>
           <span className="font-semibold text-lg tracking-tight text-slate-900">
-            ReadmeAI
+            DaemonDoc
           </span>
         </motion.div>
 

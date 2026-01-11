@@ -44,24 +44,24 @@ const Features = () => {
   ];
 
   return (
-    <section id="features" className="py-32 px-6 bg-white">
+    <section id="features" className="py-20 sm:py-28 md:py-32 px-4 sm:px-6 bg-white">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="text-center mb-20"
+          className="text-center mb-12 sm:mb-16 md:mb-20"
         >
-          <h2 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4 sm:mb-6">
             Everything you need
           </h2>
-          <div className="w-16 h-1 bg-slate-900 mx-auto rounded-full" />
+          <div className="w-12 sm:w-16 h-1 bg-slate-900 mx-auto rounded-full" />
         </motion.div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {features.map((feature, i) => (
             <motion.div
               key={i}
@@ -74,19 +74,20 @@ const Features = () => {
                 ease: [0.22, 1, 0.36, 1],
               }}
               whileHover={{ y: -4 }}
-              className="group p-8 bg-white border border-slate-200 rounded-2xl hover:border-slate-300 hover:shadow-lg transition-all"
+              className="group p-6 sm:p-8 bg-white border border-slate-200 rounded-xl sm:rounded-2xl hover:border-slate-300 hover:shadow-lg transition-all"
             >
               <motion.div
                 whileHover={{ scale: 1.1, rotate: 5 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                className="w-14 h-14 bg-slate-900 text-white rounded-xl flex items-center justify-center mb-6 shadow-sm"
+                className="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900 text-white rounded-lg sm:rounded-xl flex items-center justify-center mb-4 sm:mb-6 shadow-sm"
               >
-                <feature.icon size={24} strokeWidth={1.5} />
+                <feature.icon size={20} strokeWidth={1.5} className="sm:hidden" />
+                <feature.icon size={24} strokeWidth={1.5} className="hidden sm:block" />
               </motion.div>
-              <h3 className="font-semibold text-xl text-slate-900 mb-3">
+              <h3 className="font-semibold text-lg sm:text-xl text-slate-900 mb-2 sm:mb-3">
                 {feature.title}
               </h3>
-              <p className="text-slate-600 leading-relaxed font-light">
+              <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-light">
                 {feature.desc}
               </p>
             </motion.div>
