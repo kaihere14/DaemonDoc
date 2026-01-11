@@ -5,6 +5,7 @@ import AuthNavigation from "../components/AuthNavigation";
 import { useAuth } from "../context/AuthContext";
 import RepoCard from "../components/RepoCard";
 import { Loader2, Github, AlertCircle, RefreshCw } from "lucide-react";
+import SEO from "../components/SEO";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -55,8 +56,15 @@ const Home = () => {
   const activeCount = repos.filter((r) => r.activated).length;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-white text-slate-900 font-sans selection:bg-indigo-100 overflow-x-hidden">
-      <AuthNavigation />
+    <>
+      <SEO 
+        title="Dashboard - ReadIt | Manage Your Repositories"
+        description="Manage AI-powered README updates for your GitHub repositories. View, enable, and configure automatic documentation generation."
+        ogUrl="https://readit.dev/home"
+        canonical="https://readit.dev/home"
+      />
+      <div className="min-h-screen bg-linear-to-br from-slate-50 to-white text-slate-900 font-sans selection:bg-indigo-100 overflow-x-hidden">
+        <AuthNavigation />
       
       <div className="pt-24 pb-16 px-6">
         <div className="max-w-7xl mx-auto">
@@ -207,6 +215,7 @@ const Home = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

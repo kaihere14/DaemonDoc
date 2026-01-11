@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import RepoCard from "../components/RepoCard";
 import { Loader2, Sparkles, AlertCircle, RefreshCw, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import SEO from "../components/SEO";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -49,8 +50,15 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-emerald-50 via-white to-slate-50 text-slate-900 font-sans selection:bg-indigo-100 overflow-x-hidden">
-      <AuthNavigation />
+    <>
+      <SEO 
+        title="Profile - ReadIt | Your Account Settings"
+        description="Manage your ReadIt profile, view your active repositories, and configure your AI-powered documentation settings."
+        ogUrl="https://readit.dev/profile"
+        canonical="https://readit.dev/profile"
+      />
+      <div className="min-h-screen bg-linear-to-br from-emerald-50 via-white to-slate-50 text-slate-900 font-sans selection:bg-indigo-100 overflow-x-hidden">
+        <AuthNavigation />
       
       <div className="pt-24 pb-16 px-6">
         <div className="max-w-7xl mx-auto">
@@ -184,6 +192,7 @@ const Profile = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

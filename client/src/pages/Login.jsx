@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import SEO from "../components/SEO";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -21,14 +22,29 @@ const Login = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
-      </div>
+      <>
+        <SEO 
+          title="Login - ReadIt | Connect Your GitHub Account"
+          description="Sign in to ReadIt with your GitHub account to start automating your repository documentation with AI-powered README generation."
+          ogUrl="https://readit.dev/login"
+          canonical="https://readit.dev/login"
+        />
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+          <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+    <>
+      <SEO 
+        title="Login - ReadIt | Connect Your GitHub Account"
+        description="Sign in to ReadIt with your GitHub account to start automating your repository documentation with AI-powered README generation."
+        ogUrl="https://readit.dev/login"
+        canonical="https://readit.dev/login"
+      />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8 space-y-8">
@@ -110,6 +126,7 @@ const Login = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
