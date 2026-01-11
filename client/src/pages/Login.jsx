@@ -24,10 +24,10 @@ const Login = () => {
     return (
       <>
         <SEO 
-          title="Login - ReadIt | Connect Your GitHub Account"
-          description="Sign in to ReadIt with your GitHub account to start automating your repository documentation with AI-powered README generation."
-          ogUrl="https://readit.dev/login"
-          canonical="https://readit.dev/login"
+          title="Login - DaemonDoc | Connect Your GitHub Account"
+          description="Sign in to DaemonDoc with your GitHub account to start automating your repository documentation with AI-powered README generation."
+          ogUrl="https://daemondoc.online/login"
+          canonical="https://daemondoc.online/login"
         />
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
           <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
@@ -39,10 +39,10 @@ const Login = () => {
   return (
     <>
       <SEO 
-        title="Login - ReadIt | Connect Your GitHub Account"
-        description="Sign in to ReadIt with your GitHub account to start automating your repository documentation with AI-powered README generation."
-        ogUrl="https://readit.dev/login"
-        canonical="https://readit.dev/login"
+        title="Login - DaemonDoc | Connect Your GitHub Account"
+        description="Sign in to DaemonDoc with your GitHub account to start automating your repository documentation with AI-powered README generation."
+        ogUrl="https://daemondoc.online/login"
+        canonical="https://daemondoc.online/login"
       />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">

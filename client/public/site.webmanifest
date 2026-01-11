@@ -1,6 +1,6 @@
 {
-  "name": "ReadIt - AI-Powered README Generator",
-  "short_name": "ReadIt",
+  "name": "DaemonDoc - AI-Powered README Generator",
+  "short_name": "DaemonDoc",
   "description": "Automate your GitHub documentation with AI-powered README generation",
   "start_url": "/",
   "display": "standalone",

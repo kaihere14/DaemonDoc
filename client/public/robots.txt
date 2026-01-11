@@ -1,4 +1,4 @@
-# robots.txt for ReadIt
+# robots.txt for DaemonDoc
 
 # Allow all crawlers
 User-agent: *
@@ -12,7 +12,7 @@ Disallow: /admin/
 Crawl-delay: 1
 
 # Sitemap location
-Sitemap: https://readit.dev/sitemap.xml
+Sitemap: https://daemondoc.online/sitemap.xml
 
 # Specific bot rules
 User-agent: Googlebot

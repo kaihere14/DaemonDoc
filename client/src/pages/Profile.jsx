@@ -52,10 +52,10 @@ const Profile = () => {
   return (
     <>
       <SEO 
-        title="Profile - ReadIt | Your Account Settings"
-        description="Manage your ReadIt profile, view your active repositories, and configure your AI-powered documentation settings."
-        ogUrl="https://readit.dev/profile"
-        canonical="https://readit.dev/profile"
+        title="Profile - DaemonDoc | Your Account Settings"
+        description="Manage your DaemonDoc profile, view your active repositories, and configure your AI-powered documentation settings."
+        ogUrl="https://daemondoc.online/profile"
+        canonical="https://daemondoc.online/profile"
       />
       <div className="min-h-screen bg-linear-to-br from-emerald-50 via-white to-slate-50 text-slate-900 font-sans selection:bg-indigo-100 overflow-x-hidden">
         <AuthNavigation />

@@ -1,9 +1,9 @@
-# 📚 ReadIt - AI-Powered README Generator
+# 📚 DaemonDoc - AI-Powered README Generator
 
 <div align="center">
 
-![ReadIt Banner](https://img.shields.io/badge/ReadIt-AI%20README%20Generator-4F46E5?style=for-the-badge&logo=readme&logoColor=white)
-[![Live Demo](https://img.shields.io/badge/Demo-readit--4.onrender.com-success?style=for-the-badge)](https://readit-4.onrender.com)
+![DaemonDoc Banner](https://img.shields.io/badge/DaemonDoc-AI%20README%20Generator-4F46E5?style=for-the-badge&logo=readme&logoColor=white)
+[![Live Demo](https://img.shields.io/badge/Demo-daemondoc--4.onrender.com-success?style=for-the-badge)](https://daemondoc-4.onrender.com)
 [![License](https://img.shields.io/badge/License-ISC-blue.svg?style=for-the-badge)](LICENSE)
 
 **Transform your GitHub repositories with AI-generated, always up-to-date documentation**
@@ -16,9 +16,9 @@
 
 ## 🎯 Overview
 
-**ReadIt** is an intelligent README generation platform that leverages AI to automatically create and maintain comprehensive documentation for your GitHub repositories. By analyzing your codebase structure, dependencies, and commits, ReadIt generates professional, contextual READMEs that stay synchronized with your code through GitHub webhooks.
+**DaemonDoc** is an intelligent README generation platform that leverages AI to automatically create and maintain comprehensive documentation for your GitHub repositories. By analyzing your codebase structure, dependencies, and commits, DaemonDoc generates professional, contextual READMEs that stay synchronized with your code through GitHub webhooks.
 
-### Why ReadIt?
+### Why DaemonDoc?
 
 - **⏱️ Save Time**: Stop writing boilerplate documentation manually
 - **🔄 Always Current**: Auto-updates when you push code changes
@@ -77,7 +77,7 @@
 ### Live Application
 
 **Frontend**: Coming soon (Vercel deployment)  
-**Backend API**: https://readit-4.onrender.com
+**Backend API**: https://daemondoc-4.onrender.com
 
 ### How It Works
 
@@ -209,8 +209,8 @@ Before you begin, ensure you have:
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/readit.git
-cd readit
+git clone https://github.com/yourusername/daemondoc.git
+cd daemondoc
 ```
 
 ### 2. Server Setup
@@ -224,7 +224,7 @@ Create `.env` file in `server/` directory:
 
 ```env
 # Database Configuration
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/readit
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/daemondoc
 
 # JWT Secret (generate with: openssl rand -base64 32)
 JWT_SECRET=your_super_secret_jwt_key_minimum_32_characters
@@ -299,7 +299,7 @@ Open your browser and navigate to **http://localhost:5173**
 1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
 2. Click **New OAuth App**
 3. Fill in the details:
-   - **Application name**: ReadIt (or your choice)
+   - **Application name**: DaemonDoc (or your choice)
    - **Homepage URL**: `http://localhost:5173` (dev) or production URL
    - **Authorization callback URL**: `http://localhost:3000/auth/github/callback`
 4. Click **Register application**
@@ -368,7 +368,7 @@ sudo systemctl start mongodb
 ### Base URL
 
 - **Development**: `http://localhost:3000`
-- **Production**: `https://readit-4.onrender.com`
+- **Production**: `https://daemondoc-4.onrender.com`
 
 ### Authentication
 
@@ -665,7 +665,7 @@ Health check endpoint for monitoring.
 2. **Configure Service**
 
    ```
-   Name: readit-backend
+   Name: daemondoc-backend
    Region: Choose closest to your users
    Branch: main
    Root Directory: server
@@ -696,7 +696,7 @@ Health check endpoint for monitoring.
 4. **Deploy**
    - Click **Create Web Service**
    - Wait for deployment to complete
-   - Note your service URL (e.g., `https://readit-4.onrender.com`)
+   - Note your service URL (e.g., `https://daemondoc-4.onrender.com`)
 
 ### Frontend Deployment (Vercel)
 
@@ -759,7 +759,7 @@ Health check endpoint for monitoring.
 1. Sign up at [UptimeRobot](https://uptimerobot.com)
 2. Create new monitor:
    - **Monitor Type**: HTTP(s)
-   - **URL**: `https://readit-4.onrender.com/health`
+   - **URL**: `https://daemondoc-4.onrender.com/health`
    - **Monitoring Interval**: 5 minutes
 3. Save and activate
 
@@ -767,7 +767,7 @@ Health check endpoint for monitoring.
 
 1. Sign up at [cron-job.org](https://cron-job.org)
 2. Create new cron job:
-   - **URL**: `https://readit-4.onrender.com/health`
+   - **URL**: `https://daemondoc-4.onrender.com/health`
    - **Schedule**: Every 10 minutes
 3. Activate
 
@@ -994,14 +994,14 @@ active: { type: Boolean, index: true }
 
 ```bash
 # Health check
-curl https://readit-4.onrender.com/health
+curl https://daemondoc.online/health
 
 # Get repositories (requires token)
 curl -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  https://readit-4.onrender.com/api/github/getGithubRepos
+  https://daemondoc.online/api/github/getGithubRepos
 
 # Activate repository
-curl -X POST https://readit-4.onrender.com/api/github/addRepoActivity \
+curl -X POST https://daemondoc.online/api/github/addRepoActivity \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -1032,7 +1032,7 @@ Contributions are welcome! Here's how you can help:
 1. **Fork the repository**
 
    ```bash
-   gh repo fork yourusername/readit
+   gh repo fork yourusername/daemondoc
    ```
 
 2. **Create a feature branch**
@@ -1090,7 +1090,7 @@ Contributions are welcome! Here's how you can help:
 This project is licensed under the **ISC License**.
 
 ```
-Copyright (c) 2026 ReadIt
+Copyright (c) 2026 DaemonDoc
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
@@ -1124,16 +1124,16 @@ Special thanks to:
 
 ### Get Help
 
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/yourusername/readit/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/readit/discussions)
-- 📧 **Email**: support@readit.dev
-- 🐦 **Twitter**: [@readit_ai](https://twitter.com/readit_ai)
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/yourusername/daemondoc/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/daemondoc/discussions)
+- 📧 **Email**: support@daemondoc.online
+- 🐦 **Twitter**: [@daemondoc_ai](https://twitter.com/daemondoc_ai)
 
 ### Useful Links
 
-- [Live Demo](https://readit-4.onrender.com)
-- [Documentation](https://docs.readit.dev)
-- [API Reference](https://api.readit.dev/docs)
+- [Live Demo](https://daemondoc.online)
+- [Documentation](https://docs.daemondoc.online)
+- [API Reference](https://api.daemondoc.online/docs)
 - [Changelog](CHANGELOG.md)
 
 ---
@@ -1180,8 +1180,8 @@ Special thanks to:
 
 ### ⭐ Star this repository if you find it helpful!
 
-**Built with ❤️ by the ReadIt Team**
+**Built with ❤️ by the DaemonDoc Team**
 
-[Website](https://read-it-ruby.vercel.app/home) • [Twitter](https://x.com/ArmanKiyotaka) • [Linkedin](https://www.linkedin.com/in/arman-thakur-303b47367/)
+[Website](https://daemondoc.online) • [Twitter](https://x.com/ArmanKiyotaka) • [Linkedin](https://www.linkedin.com/in/arman-thakur-303b47367/)
 
 </div>

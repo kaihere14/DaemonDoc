@@ -91,11 +91,11 @@ const LandingNavigation = () => {
               >
                 <div className="absolute inset-0 bg-slate-900 rounded-lg blur-sm opacity-20 group-hover:opacity-30 transition-opacity" />
                 <div className="relative bg-slate-900 text-white w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center">
-                  <span className="font-bold text-sm sm:text-base">R</span>
+                  <span className="font-bold text-sm sm:text-base">D</span>
                 </div>
               </motion.div>
               <span className="font-semibold text-base sm:text-lg tracking-tight text-slate-900 group-hover:text-slate-700 transition-colors">
-                ReadIt
+                DaemonDoc
               </span>
             </motion.div>
 

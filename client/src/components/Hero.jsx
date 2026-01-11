@@ -50,7 +50,7 @@ const Hero = () => {
           transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           className="text-base sm:text-lg md:text-xl lg:text-2xl text-slate-600 mb-10 sm:mb-12 max-w-3xl mx-auto leading-relaxed text-center font-light px-4"
         >
-          Stop wasting hours on boilerplate. ReadIt analyzes your code and commits to keep documentation as fresh as your codebase.
+          Stop wasting hours on boilerplate. DaemonDoc analyzes your code and commits to keep documentation as fresh as your codebase.
         </motion.p>
 
         {/* CTA */}

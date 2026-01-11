@@ -18,23 +18,23 @@ const Footer = () => {
           {/* Logo */}
           <div className="flex items-center gap-2.5">
             <div className="bg-slate-900 text-white p-2 rounded-lg">
-              <span className="font-bold text-base sm:text-lg leading-none">R</span>
+              <span className="font-bold text-base sm:text-lg leading-none">D</span>
             </div>
             <span className="font-semibold text-lg sm:text-xl tracking-tight text-slate-900">
-              ReadIt
+              DaemonDoc
             </span>
           </div>
 
           {/* Copyright */}
           <div className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-500">
-            <span>© {currentYear} ReadIt. Built with</span>
+            <span>© {currentYear} DaemonDoc. Built with</span>
             <Heart size={14} className="text-red-500 fill-red-500" />
             <span>for developers</span>
           </div>
 
           {/* GitHub Link */}
           <motion.a
-            href="https://github.com/kaihere14/readit"
+            href="https://github.com/kaihere14/daemondoc"
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.05, y: -2 }}

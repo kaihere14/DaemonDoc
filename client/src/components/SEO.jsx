@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
 
 const SEO = ({ 
-  title = "ReadIt - AI-Powered README Generator for GitHub | Automate Your Documentation",
-  description = "Stop wasting hours on documentation. ReadIt automatically generates and updates your GitHub README files using AI. Connect your repos and keep documentation fresh as your code evolves.",
+  title = "DaemonDoc - AI-Powered README Generator for GitHub | Automate Your Documentation",
+  description = "Stop wasting hours on documentation. DaemonDoc automatically generates and updates your GitHub README files using AI. Connect your repos and keep documentation fresh as your code evolves.",
   keywords = "README generator, AI documentation, GitHub automation, automatic README, documentation tool",
-  ogImage = "https://readit.dev/og-image.png",
-  ogUrl = "https://readit.dev/",
-  twitterHandle = "@readit",
-  canonical = "https://readit.dev/"
+  ogImage = "https://daemondoc.online/og-image.png",
+  ogUrl = "https://daemondoc.online/",
+  twitterHandle = "@daemondoc",
+  canonical = "https://daemondoc.online/"
 }) => {
   useEffect(() => {
     // Update document title

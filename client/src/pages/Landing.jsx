@@ -21,11 +21,11 @@ const LandingPage = () => {
   return (
     <>
       <SEO 
-        title="ReadIt - AI-Powered README Generator for GitHub | Automate Your Documentation"
-        description="Stop wasting hours on documentation. ReadIt automatically generates and updates your GitHub README files using AI. Connect your repos and keep documentation fresh as your code evolves."
+        title="DaemonDoc - AI-Powered README Generator for GitHub | Automate Your Documentation"
+        description="Stop wasting hours on documentation. DaemonDoc automatically generates and updates your GitHub README files using AI. Connect your repos and keep documentation fresh as your code evolves."
         keywords="README generator, AI documentation, GitHub automation, automatic README, documentation tool, code documentation, GitHub README, AI README generator, developer tools"
-        ogUrl="https://readit.dev/"
-        canonical="https://readit.dev/"
+        ogUrl="https://daemondoc.online/"
+        canonical="https://daemondoc.online/"
       />
       <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-slate-200 overflow-x-hidden antialiased relative">
         <LandingNavigation />
