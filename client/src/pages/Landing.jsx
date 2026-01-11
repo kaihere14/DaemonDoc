@@ -18,7 +18,7 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-slate-200 overflow-x-hidden antialiased">
+    <div className="min-h-screen bg-white text-slate-900 font-sans selection:bg-slate-200 overflow-x-hidden antialiased relative">
       <LandingNavigation />
       <Hero />
       <PainPoints />
