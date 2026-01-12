@@ -1,5 +1,10 @@
 import React from "react";
-import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
+import {
+  motion,
+  useScroll,
+  useMotionValueEvent,
+  AnimatePresence,
+} from "framer-motion";
 import { Github, Menu, X, Terminal, Cpu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -47,8 +52,6 @@ const LandingNavigation = () => {
         transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
         className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xs bg-linear-to-t from-white/10 via-white/50 to-white/95"
       >
-        
-
         <div className="max-w-[1440px] mx-auto px-6 h-16 sm:h-20 flex items-center justify-between">
           {/* Logo - Kept exactly as you provided */}
           <motion.div
@@ -57,15 +60,15 @@ const LandingNavigation = () => {
             className="flex items-center gap-3 cursor-pointer group"
             onClick={() => scrollToSection("hero")}
           >
-            <motion.div 
+            <motion.div
               whileHover={{ rotate: 8, scale: 1.05 }}
               transition={{ type: "spring", stiffness: 500, damping: 15 }}
               className="relative"
             >
               <div className="absolute inset-0  rounded-lg blur-sm opacity-20 group-hover:opacity-30 transition-opacity" />
-              <img 
-                src="/logo.svg" 
-                alt="DaemonDoc Logo" 
+              <img
+                src="/logo.svg"
+                alt="DaemonDoc Logo"
                 className="relative w-8 h-8 sm:w-9 sm:h-9"
               />
             </motion.div>
@@ -79,7 +82,7 @@ const LandingNavigation = () => {
             {[
               { label: "Logic", id: "how-it-works" },
               { label: "Engine", id: "features" },
-              { label: "Security", id: "security" }
+              { label: "Security", id: "security" },
             ].map((item) => (
               <button
                 key={item.id}
@@ -133,17 +136,33 @@ const LandingNavigation = () => {
               className="fixed right-0 top-0 bottom-0 w-3/4 max-w-xs bg-white z-50 md:hidden p-8 flex flex-col"
             >
               <div className="flex justify-between items-center mb-12">
-                <span className="font-black text-xl tracking-tighter">DAEMONDOC</span>
-                <X onClick={() => setMobileMenuOpen(false)} className="cursor-pointer" />
+                <span className="font-black text-xl tracking-tighter">
+                  DAEMONDOC
+                </span>
+                <X
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="cursor-pointer"
+                />
               </div>
-              <div className="space-y-6 flex-1">
-                {["Logic", "Engine", "Security"].map((label) => (
-                  <button key={label} className="block text-2xl font-black tracking-tighter text-slate-900">
-                    {label}
+              <div className="space-y-2 flex-1">
+                {[
+                  { label: "Logic", id: "how-it-works" },
+                  { label: "Engine", id: "features" },
+                  { label: "Security", id: "security" },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => scrollToSection(item.id)}
+                    className="w-full text-left py-4 px-4 rounded-lg text-2xl font-black tracking-tighter text-slate-900 hover:bg-slate-100 hover:text-slate-600 transition-all"
+                  >
+                    {item.label}
                   </button>
                 ))}
               </div>
-              <button className="w-full bg-slate-900 text-white py-4 rounded-xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3">
+              <button
+                onClick={() => navigate("/login")}
+                className="w-full bg-slate-900 text-white py-4 rounded-xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3"
+              >
                 <Github size={18} />
                 Connect GitHub
               </button>
