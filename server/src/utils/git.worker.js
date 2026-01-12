@@ -96,6 +96,7 @@ new Worker(
     const userLog = await UserLogModel.create({
           userId: job.data.userId,
           repoName: job.data.repoName,
+          repoOwner: job.data.repoOwner,
           action: "README_GENERATION_STARTED",
           status: "ongoing",
         });
@@ -426,12 +427,14 @@ const aihandler = async (data) => {
       `[AI Handler] ✓ README generation completed for ${repoFullName}`
     );
 
-    // Update log to success
+    // Update log to success and save commitId
     const successLog = await UserLogModel.findById(data.logId);
     if (successLog) {
       successLog.action = "README_GENERATION_SUCCESS";
       successLog.status = "success";
+      successLog.commitId = commitResult.commit.sha;
       await successLog.save();
+      console.log(`[AI Handler] Log updated with commitId: ${commitResult.commit.sha}`);
     }
 
     return {

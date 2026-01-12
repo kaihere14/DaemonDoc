@@ -13,6 +13,16 @@ const UserLogSchema = new Schema(
       required: true,
     },
 
+    repoOwner: {
+      type: String,
+      required: false,
+    },
+
+    commitId: {
+      type: String,
+      required: false,
+    },
+
     action: {
       type: String,
       required: true,

@@ -283,43 +283,76 @@ const Logs = () => {
                   )}
                   <div className="divide-y divide-slate-200">
                     <AnimatePresence>
-                      {logs.map((log, index) => (
-                        <motion.div
-                          key={log._id}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 20 }}
-                          transition={{ delay: index * 0.03 }}
-                          className={`p-6 hover:bg-slate-50 transition-colors ${getStatusColor(
-                            log.status
-                          )}`}
-                        >
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex items-start gap-4 flex-1">
-                              <div className="mt-1">
-                                {getStatusIcon(log.status)}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-3 mb-2">
-                                  <h3 className="font-semibold text-slate-900">
-                                    {getActionLabel(log.action)}
-                                  </h3>
-                                  {getStatusBadge(log.status)}
+                      {logs.map((log, index) => {
+                        // Build commit URL if commitId and repoOwner exist
+                        const commitUrl =
+                          log.commitId && log.repoOwner
+                            ? `https://github.com/${log.repoOwner}/${log.repoName}/commit/${log.commitId}`
+                            : null;
+
+                        const LogCard = (
+                          <motion.div
+                            key={log._id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            transition={{ delay: index * 0.03 }}
+                            className={`p-6 transition-all ${getStatusColor(
+                              log.status
+                            )} ${
+                              commitUrl
+                                ? "hover:bg-slate-100 cursor-pointer hover:shadow-md hover:scale-[1.01]"
+                                : "hover:bg-slate-50"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex items-start gap-4 flex-1">
+                                <div className="mt-1">
+                                  {getStatusIcon(log.status)}
                                 </div>
-                                <div className="flex items-center gap-2 text-sm text-slate-600 mb-1">
-                                  <GitBranch size={14} />
-                                  <span className="font-mono">
-                                    {log.repoName}
-                                  </span>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-3 mb-2">
+                                    <h3 className="font-semibold text-slate-900">
+                                      {getActionLabel(log.action)}
+                                    </h3>
+                                    {getStatusBadge(log.status)}
+                                    {commitUrl && (
+                                      <span className="text-xs text-indigo-600 font-semibold flex items-center gap-1">
+                                        View Commit →
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2 text-sm text-slate-600 mb-1">
+                                    <GitBranch size={14} />
+                                    <span className="font-mono">
+                                      {log.repoOwner
+                                        ? `${log.repoOwner}/${log.repoName}`
+                                        : log.repoName}
+                                    </span>
+                                  </div>
+                                  <p className="text-xs text-slate-500">
+                                    {formatTimestamp(log.createdAt)}
+                                  </p>
                                 </div>
-                                <p className="text-xs text-slate-500">
-                                  {formatTimestamp(log.createdAt)}
-                                </p>
                               </div>
                             </div>
-                          </div>
-                        </motion.div>
-                      ))}
+                          </motion.div>
+                        );
+
+                        return commitUrl ? (
+                          <a
+                            key={log._id}
+                            href={commitUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block"
+                          >
+                            {LogCard}
+                          </a>
+                        ) : (
+                          LogCard
+                        );
+                      })}
                     </AnimatePresence>
                   </div>
                 </div>
