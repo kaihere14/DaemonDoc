@@ -36,6 +36,7 @@
 - **🤖 AI-Powered Analysis**
 
   - Uses Groq's LLaMA 3.3 70B model for intelligent code understanding
+  - Uses Groq's openai/gpt-oss-120b for Readme Generation
   - Analyzes repository structure, dependencies, and file relationships
   - Generates contextual documentation based on actual implementation
 
