@@ -18,7 +18,8 @@ const Features = () => {
       icon: Key,
       title: "GitHub OAuth 2.0",
       desc: "Limited-scope authentication. We never see your password, only your public AST structure.",
-      tag: "SECURITY"
+      tag: "SECURITY",
+      className: "rounded-tl-2xl"
     },
     {
       id: "AST_02",
@@ -32,14 +33,16 @@ const Features = () => {
       icon: GitCommit,
       title: "Differential Scan",
       desc: "No full repo indexing. We only analyze changed files to keep documentation latency under 1s.",
-      tag: "PERFORMANCE"
+      tag: "PERFORMANCE",
+      className: "rounded-tr-2xl"
     },
     {
       id: "FLOW_04",
       icon: Shield,
       title: "Commit Isolation",
       desc: "Choose direct commits to main or isolated Pull Requests for manual documentation review.",
-      tag: "WORKFLOW"
+      tag: "WORKFLOW",
+      className: "rounded-bl-2xl"
     },
     {
       id: "ARCH_05",
@@ -53,7 +56,8 @@ const Features = () => {
       icon: Settings2,
       title: "Logic Exclusions",
       desc: "Fine-grained control via .daemondoc ignore. Customize templates to match your studio style.",
-      tag: "CONTROL"
+      tag: "CONTROL",
+      className: "rounded-br-2xl"
     },
   ];
 
@@ -90,7 +94,7 @@ const Features = () => {
         </div>
 
         {/* Features Matrix: Shared Border Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-t border-l border-slate-200">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-t border-l border-slate-200 rounded-2xl overflow-hidden">
           {features.map((feature, i) => (
             <motion.div
               key={i}
@@ -98,7 +102,7 @@ const Features = () => {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05 }}
-              className="group p-8 sm:p-10 border-r border-b border-slate-200 hover:bg-slate-50 transition-colors relative"
+              className={`group p-8 sm:p-10 border-r border-b border-slate-200 hover:bg-slate-50 transition-colors relative ${feature.className}`}
             >
               {/* Feature ID: Monospaced Metadata */}
               <div className="flex justify-between items-start mb-8">

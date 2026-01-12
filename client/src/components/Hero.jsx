@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 const Hero = () => {
   const navigate = useNavigate();
   return (
-    <section className="relative min-h-screen bg-white text-black selection:bg-black selection:text-white font-sans pt-24">
+    <section className="relative min-h-screen bg-white text-black selection:bg-black selection:text-white font-sans pt-24" id="hero">
       {/* The Background: Architectural Grid with Coordinates */}
       <div
         className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
@@ -69,7 +69,7 @@ const Hero = () => {
             <div className="flex flex-wrap gap-4">
               <button
                 onClick={() => navigate("/login")}
-                className="bg-black text-white px-8 py-5 rounded-none font-black text-xs uppercase flex items-center gap-4 hover:bg-slate-800 transition-all border border-black group"
+                className="bg-black text-white px-8 py-5 rounded-xl font-black text-xs uppercase flex items-center gap-4 hover:bg-slate-800 transition-all border border-black group"
               >
                 <Github size={18} />
                 <span>Initialize Git Hook</span>
@@ -78,7 +78,7 @@ const Hero = () => {
                   className="group-hover:translate-x-1 transition-transform"
                 />
               </button>
-              <div className="px-8 py-5 border border-black/20 font-mono text-xs font-bold flex items-center gap-3 bg-slate-50">
+              <div className="px-8 py-5 border rounded-xl border-black/20 font-mono text-xs font-bold flex items-center gap-3 bg-slate-50">
                 <Terminal size={18} className="text-slate-400" />
                 <span>ssh root@void.null -p 404</span>
               </div>
@@ -127,11 +127,12 @@ const Hero = () => {
         </div>
 
         {/* FOOTER: Feature Blueprint */}
-        <div className="grid md:grid-cols-3 gap-px bg-black/10 border border-black/10">
+        <div className="grid md:grid-cols-3 gap-px bg-black/10 border border-black/10 rounded-2xl">
           <FeatureCard
             title="Recursive AST Analysis"
             desc="We don't use regex. We parse your actual code structure to understand dependencies."
             icon={<GitBranch size={20} />}
+            className="rounded-tl-2xl rounded-bl-2xl"
           />
           <FeatureCard
             title="Redis-Backed Context"
@@ -142,6 +143,7 @@ const Hero = () => {
             title="Zero-Configuration"
             desc="Drops into your pre-commit hooks. No dashboard needed. Just engineering."
             icon={<Terminal size={20} />}
+            className="rounded-tr-2xl rounded-br-2xl"
           />
         </div>
       </div>
@@ -167,8 +169,8 @@ const PipelineStep = ({ icon, title, children, active }) => (
   </div>
 );
 
-const FeatureCard = ({ title, desc, icon }) => (
-  <div className="bg-white p-10 hover:bg-slate-50 transition-colors">
+const FeatureCard = ({ title, desc, icon, className }) => (
+  <div className={`bg-white p-10 hover:bg-slate-50 transition-colors ${className}`}>
     <div className="mb-6">{icon}</div>
     <h4 className="text-sm font-black uppercase tracking-tight mb-4">
       {title}

@@ -89,19 +89,6 @@ const AuthNavigation = () => {
             <motion.button
               whileHover={{ backgroundColor: "rgb(248 250 252)" }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => navigate("/profile")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-                location.pathname === "/profile"
-                  ? "bg-slate-100 text-slate-900"
-                  : "text-slate-600 hover:text-slate-900"
-              }`}
-            >
-              <FileText size={16} strokeWidth={2} />
-              <span>Active Repos</span>
-            </motion.button>
-            <motion.button
-              whileHover={{ backgroundColor: "rgb(248 250 252)" }}
-              whileTap={{ scale: 0.97 }}
               onClick={() => navigate("/logs")}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                 location.pathname === "/logs"
