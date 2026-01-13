@@ -63,13 +63,13 @@ const LandingNavigation = () => {
             <motion.div
               whileHover={{ rotate: 8, scale: 1.05 }}
               transition={{ type: "spring", stiffness: 500, damping: 15 }}
-              className="relative"
+              className="relative sm:pl-6"
             >
               <div className="absolute inset-0  rounded-lg blur-sm opacity-20 group-hover:opacity-30 transition-opacity" />
               <img
                 src="/logo.svg"
                 alt="DaemonDoc Logo"
-                className="relative w-8 h-8 sm:w-9 sm:h-9"
+                className="relative  w-8 h-8 sm:w-9 sm:h-9"
               />
             </motion.div>
             <span className="font-black text-lg sm:text-xl tracking-tighter text-slate-900">
