@@ -3,7 +3,7 @@
 <div align="center">
 
 ![DaemonDoc Banner](https://img.shields.io/badge/DaemonDoc-AI%20README%20Generator-4F46E5?style=for-the-badge&logo=readme&logoColor=white)
-[![Live Demo](https://img.shields.io/badge/Demo-daemondoc--4.onrender.com-success?style=for-the-badge)](https://daemondoc-4.onrender.com)
+[![Live Demo](https://img.shields.io/badge/Demo-daemondoc--4.onrender.com-success?style=for-the-badge)](https://www.daemondoc.online)
 [![License](https://img.shields.io/badge/License-ISC-blue.svg?style=for-the-badge)](LICENSE)
 
 **Transform your GitHub repositories with AI-generated, always up-to-date documentation**
