@@ -91,11 +91,10 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
       animate={{ opacity: 1, y: 0 }}
       whileHover={{
         y: -4,
-        boxShadow:
-          "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+        boxShadow: "0 8px 30px rgba(0,0,0,0.04)",
       }}
       onClick={handleCardClick}
-      className="bg-white border border-slate-200 rounded-xl p-6 transition-all duration-50 hover:border-slate-300 cursor-pointer group flex flex-col h-full"
+      className="bg-white/70 backdrop-blur-xl border border-slate-200/60 rounded-3xl p-6 transition-all duration-50 hover:border-slate-300 cursor-pointer group flex flex-col h-full shadow-sm"
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
@@ -140,12 +139,12 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
 
       <div className="flex items-center gap-3 text-xs text-slate-600">
         {repo.private ? (
-          <span className="flex items-center gap-1 bg-amber-50 text-amber-700 px-2 py-1 rounded-md">
+          <span className="flex items-center gap-1.5 bg-amber-50/80 text-amber-700 px-2.5 py-1 rounded-xl border border-amber-100/50 text-[11px] font-bold tracking-wide">
             <Lock size={12} />
             Private
           </span>
         ) : (
-          <span className="flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2 py-1 rounded-md">
+          <span className="flex items-center gap-1.5 bg-emerald-50/80 text-emerald-700 px-2.5 py-1 rounded-xl border border-emerald-100/50 text-[11px] font-bold tracking-wide">
             <Unlock size={12} />
             Public
           </span>

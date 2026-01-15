@@ -132,39 +132,38 @@ const Home = () => {
               </div>
 
               {/* Stats Bar */}
-              <div className="flex items-center gap-4 mt-6">
-                <div className="bg-white border border-slate-200 rounded-xl px-6 py-4 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-slate-100 p-2 rounded-lg">
-                      <Github size={20} className="text-slate-700" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-slate-900">
-                        {repos.length}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        Total Repositories
-                      </p>
-                    </div>
-                  </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                <div className="border border-slate-200/60 p-5 rounded-3xl shadow-sm bg-white">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+                    Total
+                  </p>
+                  <p className="text-2xl font-black text-slate-900">
+                    {repos.length}
+                  </p>
                 </div>
-
-                <div className="bg-white border border-emerald-200 rounded-xl px-6 py-4 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-emerald-100 p-2 rounded-lg">
-                      <div className="w-5 h-5 flex items-center justify-center">
-                        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-emerald-700">
-                        {activeCount}
-                      </p>
-                      <p className="text-xs text-emerald-600">
-                        Active AI Updates
-                      </p>
-                    </div>
-                  </div>
+                <div className="border border-slate-200/60 p-5 rounded-3xl shadow-sm bg-emerald-50/50">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+                    Active
+                  </p>
+                  <p className="text-2xl font-black text-emerald-600">
+                    {activeCount}
+                  </p>
+                </div>
+                <div className="border border-slate-200/60 p-5 rounded-3xl shadow-sm bg-slate-50/50">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+                    Inactive
+                  </p>
+                  <p className="text-2xl font-black text-slate-600">
+                    {repos.length - activeCount}
+                  </p>
+                </div>
+                <div className="border border-slate-200/60 p-5 rounded-3xl shadow-sm bg-sky-50/50">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+                    Private
+                  </p>
+                  <p className="text-2xl font-black text-sky-600">
+                    {repos.filter((r) => r.private).length}
+                  </p>
                 </div>
               </div>
             </motion.div>

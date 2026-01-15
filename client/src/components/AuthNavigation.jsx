@@ -36,7 +36,7 @@ const AuthNavigation = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-slate-200">
+    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xs bg-linear-to-t from-white/10 via-white/50 to-white/95">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <motion.div
@@ -193,7 +193,7 @@ const AuthNavigation = () => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden bg-white border-t border-slate-200 overflow-hidden"
+            className="md:hidden bg-white/80 backdrop-blur-xl border-t border-slate-200/50 overflow-hidden"
           >
             <div className="px-4 py-3 space-y-1">
               <motion.button
@@ -211,7 +211,7 @@ const AuthNavigation = () => {
                 <Home size={18} strokeWidth={2} />
                 <span>Repositories</span>
               </motion.button>
-             
+
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 onClick={() => {
