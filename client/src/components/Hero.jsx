@@ -24,7 +24,7 @@ const Hero = () => {
         }}
       />
 
-      <div className="max-w-[1400px] mx-auto px-10 relative z-10">
+      <div className="max-w-[1400px] mx-auto px-6 md:px-10 relative z-10">
         {/* HEADER: System Metadata (Density Fix) */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-black/10 pb-8 mb-12 gap-6">
           <div className="space-y-1">
