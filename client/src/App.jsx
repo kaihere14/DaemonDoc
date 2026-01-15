@@ -6,10 +6,11 @@ import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import Logs from "./pages/Logs";
-import { Analytics } from "@vercel/analytics/react";
+import { Analytics } from "@vercel/analytics/react"
 
 const App = () => {
   return (
+    <>
     <div>
       <Routes>
         <Route path="/" element={<Landing />} />
@@ -19,8 +20,9 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/logs" element={<Logs />} />
       </Routes>
-      <Analytics />
     </div>
+    <Analytics />
+    </>
   );
 };
 
