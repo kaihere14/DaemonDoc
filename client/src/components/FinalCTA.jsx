@@ -1,15 +1,20 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Github, ArrowRight, Activity, Terminal, ShieldCheck } from "lucide-react";
+import {
+  Github,
+  ArrowRight,
+  Activity,
+  Terminal,
+  ShieldCheck,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const FinalCTA = () => {
   const navigate = useNavigate();
-  
+
   return (
     <section className="py-24 sm:py-32 bg-white px-6">
       <div className="max-w-[1440px] mx-auto">
-        
         {/* The Execution Frame */}
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
@@ -30,20 +35,20 @@ const FinalCTA = () => {
               </span>
             </div>
             <div className="flex items-center gap-6 font-mono text-[10px] font-black uppercase tracking-widest">
-               <span className="hidden md:flex items-center gap-2">
-                 <Activity size={12} className="text-emerald-500" /> 
-                 Engine_Idle
-               </span>
-               <span className="text-slate-500">v0.4.2_Stable</span>
+              <span className="hidden md:flex items-center gap-2">
+                <Activity size={12} className="text-emerald-500" />
+                Engine_Idle
+              </span>
+              <span className="text-slate-500">v0.4.2_Stable</span>
             </div>
           </div>
 
           {/* Main Content Area */}
           <div className="p-8 sm:p-16 lg:p-24 text-center relative overflow-hidden">
             {/* Subtle Background Mark */}
-            <Terminal 
-              size={400} 
-              className="absolute -bottom-20 -right-20 text-slate-50 opacity-50 -rotate-12 pointer-events-none" 
+            <Terminal
+              size={400}
+              className="absolute -bottom-20 -right-20 text-slate-50 opacity-50 -rotate-12 pointer-events-none"
               strokeWidth={1}
             />
 
@@ -67,23 +72,32 @@ const FinalCTA = () => {
                 >
                   <Github size={24} />
                   <span>Initialize Engine</span>
-                  <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight
+                    size={20}
+                    className="group-hover:translate-x-1 transition-transform"
+                  />
                 </motion.button>
 
                 {/* Technical Trust Footer */}
                 <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4 opacity-40">
-                   <div className="flex items-center gap-2">
-                      <ShieldCheck size={14} />
-                      <span className="text-[10px] font-black uppercase tracking-widest font-mono text-slate-900">Zero_Creds_Stored</span>
-                   </div>
-                   <div className="flex items-center gap-2">
-                      <div className="w-1 h-1 rounded-full bg-slate-900" />
-                      <span className="text-[10px] font-black uppercase tracking-widest font-mono text-slate-900">OAuth_Standard</span>
-                   </div>
-                   <div className="flex items-center gap-2">
-                      <div className="w-1 h-1 rounded-full bg-slate-900" />
-                      <span className="text-[10px] font-black uppercase tracking-widest font-mono text-slate-900">Unlimited_Repos</span>
-                   </div>
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck size={14} />
+                    <span className="text-[10px] font-black uppercase tracking-widest font-mono text-slate-900">
+                      Zero_Creds_Stored
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-1 rounded-full bg-slate-900" />
+                    <span className="text-[10px] font-black uppercase tracking-widest font-mono text-slate-900">
+                      OAuth_Standard
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1 h-1 rounded-full bg-slate-900" />
+                    <span className="text-[10px] font-black uppercase tracking-widest font-mono text-slate-900">
+                      Unlimited_Repos
+                    </span>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -92,8 +106,8 @@ const FinalCTA = () => {
 
         {/* System Breadcrumb Footer */}
         <div className="mt-12 flex justify-between items-center px-4 opacity-20 font-mono text-[9px] font-black uppercase tracking-[0.4em]">
-           <span>Root // Landing // Final_Call</span>
-           <span className="hidden sm:block">Thread_ID: 0x842_DOCS</span>
+          <span>Root // Landing // Final_Call</span>
+          <span className="hidden sm:block">Thread_ID: 0x842_DOCS</span>
         </div>
       </div>
     </section>

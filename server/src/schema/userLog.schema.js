@@ -42,7 +42,7 @@ const UserLogSchema = new Schema(
       default: "ongoing",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const UserLogModel = model("UserLog", UserLogSchema);

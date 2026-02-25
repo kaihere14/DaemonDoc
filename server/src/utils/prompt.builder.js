@@ -109,75 +109,54 @@ export function optimizeContext(context, maxTokens = 8000) {
   // Rough estimation: 4 characters per token
   const maxChars = maxTokens * 4;
 
-  let currentSize = estimateContextSize(context);
-
-  // If already within limits, return as is
-  if (currentSize <= maxChars) {
+  if (estimateContextSize(context) <= maxChars) {
     return context;
   }
 
   const optimized = { ...context };
+  const fits = () => estimateContextSize(optimized) <= maxChars;
 
-  // Priority order for truncation:
-  // 1. Truncate full codebase (reduce files and content)
-  // 2. Truncate changed files content (keep first N lines)
-  // 3. Truncate repo structure
-  // 4. Truncate existing README
-  // 5. Truncate commit diff
+  // Priority order: fullCodebase → changedFiles → repoStructure → existingReadme → commitDiff
 
   // Step 1: Truncate full codebase
   if (optimized.fullCodebase && optimized.fullCodebase.length > 0) {
-    // First reduce content per file
     optimized.fullCodebase = optimized.fullCodebase.map((file) => ({
       ...file,
-      content: truncateText(file.content, 80), // Reduce to 80 lines
+      content: truncateText(file.content, 80),
     }));
+    if (fits()) return optimized;
 
-    currentSize = estimateContextSize(optimized);
-    if (currentSize <= maxChars) return optimized;
-
-    // If still too big, reduce number of files
     if (optimized.fullCodebase.length > 15) {
       optimized.fullCodebase = optimized.fullCodebase.slice(0, 15);
-      currentSize = estimateContextSize(optimized);
-      if (currentSize <= maxChars) return optimized;
+      if (fits()) return optimized;
     }
 
-    // Further reduce content
     optimized.fullCodebase = optimized.fullCodebase.map((file) => ({
       ...file,
-      content: truncateText(file.content, 50), // Reduce to 50 lines
+      content: truncateText(file.content, 50),
     }));
-
-    currentSize = estimateContextSize(optimized);
-    if (currentSize <= maxChars) return optimized;
+    if (fits()) return optimized;
   }
 
   // Step 2: Truncate changed files
   if (optimized.changedFiles && optimized.changedFiles.length > 0) {
     optimized.changedFiles = optimized.changedFiles.map((file) => ({
       ...file,
-      content: truncateText(file.content, 50), // Keep first 50 lines
+      content: truncateText(file.content, 50),
     }));
-
-    currentSize = estimateContextSize(optimized);
-    if (currentSize <= maxChars) return optimized;
+    if (fits()) return optimized;
   }
 
   // Step 3: Truncate repo structure
   if (optimized.repoStructure) {
     optimized.repoStructure = truncateText(optimized.repoStructure, 100);
-
-    currentSize = estimateContextSize(optimized);
-    if (currentSize <= maxChars) return optimized;
+    if (fits()) return optimized;
   }
 
   // Step 4: Truncate existing README
   if (optimized.existingReadme) {
     optimized.existingReadme = truncateText(optimized.existingReadme, 100);
-
-    currentSize = estimateContextSize(optimized);
-    if (currentSize <= maxChars) return optimized;
+    if (fits()) return optimized;
   }
 
   // Step 5: Truncate commit diff
@@ -250,13 +229,13 @@ export function validateContext(context) {
 
   if (!hasFullCodebase && !hasChangedFiles && !hasCommitDiff) {
     warnings.push(
-      "No codebase context, commit diff, or changed files - README may lack detail"
+      "No codebase context, commit diff, or changed files - README may lack detail",
     );
   }
 
   if (hasFullCodebase) {
     console.log(
-      `[Validate] Full codebase mode: ${context.fullCodebase.length} files`
+      `[Validate] Full codebase mode: ${context.fullCodebase.length} files`,
     );
   }
 
@@ -266,7 +245,7 @@ export function validateContext(context) {
 
   if (estimatedTokens > 10000) {
     warnings.push(
-      `Context is large (${estimatedTokens} tokens) - will be optimized`
+      `Context is large (${estimatedTokens} tokens) - will be optimized`,
     );
   }
 

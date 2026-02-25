@@ -1,11 +1,15 @@
 import User from "../schema/user.schema.js";
 import { decrypt } from "./oauthcontroller.js";
-import axios from "axios";
 import ActiveRepo from "../schema/activeRepo.js";
 import crypto from "node:crypto";
 import { readmeQueue } from "../utils/git.worker.js";
 import UserLogModel from "../schema/userLog.schema.js";
-
+import {
+  GITHUB_API_BASE,
+  githubGet,
+  githubPost,
+  githubDelete,
+} from "../utils/githubApiClient.js";
 
 export function verifyGithubSignature(req) {
   const signature = req.headers["x-hub-signature-256"];
@@ -34,18 +38,16 @@ export const getGithubRepos = async (req, res) => {
 
     const accessToken = decrypt(user.githubAccessToken);
 
-    const reposRes = await axios.get(
-      "https://api.github.com/user/repos?per_page=100",
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
+    const reposRes = await githubGet(
+      `${GITHUB_API_BASE}/user/repos?per_page=100`,
+      accessToken,
     );
     const activeRepos = await ActiveRepo.find({ userId: userId });
-    const activeRepoIds = activeRepos
-      .filter((repo) => repo.active == true)
-      .map((repo) => repo.repoId);
+    const activeRepoIdSet = new Set(
+      activeRepos
+        .filter((repo) => repo.active === true)
+        .map((repo) => repo.repoId),
+    );
 
     const reposData = reposRes.data
       .filter((repo) => !repo.fork && repo.permissions?.push)
@@ -56,7 +58,7 @@ export const getGithubRepos = async (req, res) => {
         private: repo.private,
         owner: repo.owner.login,
         default_branch: repo.default_branch,
-        activated: activeRepoIds.includes(repo.id),
+        activated: activeRepoIdSet.has(repo.id),
       }));
 
     res.status(200).json({ reposData });
@@ -97,8 +99,8 @@ export const addRepoActivity = async (req, res) => {
     let webhookId;
     // Create webhook for the repository
     try {
-      const webhookRes = await axios.post(
-        `https://api.github.com/repos/${repoOwner}/${repoName}/hooks`,
+      const webhookRes = await githubPost(
+        `${GITHUB_API_BASE}/repos/${repoOwner}/${repoName}/hooks`,
         {
           name: "web",
           active: true,
@@ -109,12 +111,7 @@ export const addRepoActivity = async (req, res) => {
             secret: process.env.GITHUB_WEBHOOK_SECRET,
           },
         },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: "application/vnd.github+json",
-          },
-        }
+        accessToken,
       );
       webhookId = webhookRes.data.id;
     } catch (error) {
@@ -172,14 +169,9 @@ export const deactivateRepoActivity = async (req, res) => {
     const accessToken = decrypt(user.githubAccessToken);
 
     try {
-      await axios.delete(
-        `https://api.github.com/repos/${activeRepo.repoOwner}/${activeRepo.repoName}/hooks/${activeRepo.webhookId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: "application/vnd.github+json",
-          },
-        }
+      await githubDelete(
+        `${GITHUB_API_BASE}/repos/${activeRepo.repoOwner}/${activeRepo.repoName}/hooks/${activeRepo.webhookId}`,
+        accessToken,
       );
     } catch (error) {
       console.error("Error deleting webhook:", error.message);
@@ -247,9 +239,8 @@ export const githubWebhookHandler = async (req, res) => {
 
     // 7. Queue README generation
     console.log(
-      `Received push event for repo ${activeRepo.repoFullName} at commit ${commitSha}`
+      `Received push event for repo ${activeRepo.repoFullName} at commit ${commitSha}`,
     );
-    
 
     readmeQueue.add("generate-readme", {
       userId: activeRepo.userId,
@@ -259,7 +250,6 @@ export const githubWebhookHandler = async (req, res) => {
       repoOwner: activeRepo.repoOwner,
       defaultBranch: activeRepo.defaultBranch,
       commitSha: commitSha,
-      
     });
 
     // 8. Update last processed commit
@@ -273,7 +263,6 @@ export const githubWebhookHandler = async (req, res) => {
   }
 };
 
-
 export const fetchUserLogs = async (req, res) => {
   try {
     const userId = req.userId;
@@ -286,4 +275,4 @@ export const fetchUserLogs = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Error fetching user logs", error });
   }
-}
+};

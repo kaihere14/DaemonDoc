@@ -15,7 +15,10 @@ import { useNavigate } from "react-router-dom";
 const Hero = () => {
   const navigate = useNavigate();
   return (
-    <section className="relative min-h-screen bg-white text-black selection:bg-black selection:text-white font-sans pt-24" id="hero">
+    <section
+      className="relative min-h-screen bg-white text-black selection:bg-black selection:text-white font-sans pt-24"
+      id="hero"
+    >
       {/* The Background: Architectural Grid with Coordinates */}
       <div
         className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"

@@ -1,9 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import AuthNavigation from "../components/AuthNavigation";
-import { useAuth } from "../context/AuthContext";
 import RepoCard from "../components/RepoCard";
 import {
   Loader2,
@@ -14,58 +12,20 @@ import {
   X,
 } from "lucide-react";
 import SEO from "../components/SEO";
+import { useRequireAuth } from "../hooks/useRequireAuth";
+import { useRepos } from "../hooks/useRepos";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+const FILTER_TABS = [
+  { key: "all", label: "All Repositories" },
+  { key: "active", label: "Active" },
+  { key: "inactive", label: "Inactive" },
+];
 
 const Home = () => {
-  const navigate = useNavigate();
-  const { user, isAuthenticated, isLoading } = useAuth();
-  const [repos, setRepos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { user } = useRequireAuth();
+  const { repos, loading, error, fetchRepos } = useRepos(user);
   const [filter, setFilter] = useState("all"); // all, active, inactive
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      navigate("/login");
-    }
-  }, [isAuthenticated, isLoading, navigate]);
-
-  useEffect(() => {
-    fetchRepos();
-  }, [user]);
-
-  const fetchRepos = async () => {
-    if (user) {
-      setLoading(true);
-      setError(null);
-      try {
-        const token = localStorage.getItem("accessToken");
-        const response = await fetch(
-          `${BACKEND_URL}/api/github/getGithubRepos`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch repositories");
-        }
-
-        const data = await response.json();
-        setRepos(data.reposData || []);
-      } catch (error) {
-        console.error("Error fetching repos:", error);
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
 
   const filteredRepos = repos.filter((repo) => {
     // Apply status filter
@@ -177,11 +137,7 @@ const Home = () => {
             >
               {/* Filter Tabs */}
               <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
-                {[
-                  { key: "all", label: "All Repositories" },
-                  { key: "active", label: "Active" },
-                  { key: "inactive", label: "Inactive" },
-                ].map((tab) => (
+                {FILTER_TABS.map((tab) => (
                   <button
                     key={tab.key}
                     onClick={() => setFilter(tab.key)}
@@ -320,8 +276,8 @@ const Home = () => {
                   {filter === "active"
                     ? "You haven't activated any repositories yet. Toggle the switch on a repository to enable AI updates."
                     : filter === "inactive"
-                    ? "All your repositories have AI updates enabled!"
-                    : "Connect your GitHub account to see your repositories here."}
+                      ? "All your repositories have AI updates enabled!"
+                      : "Connect your GitHub account to see your repositories here."}
                 </p>
               </motion.div>
             )}

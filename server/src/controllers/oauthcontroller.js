@@ -1,47 +1,12 @@
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import User from "../schema/user.schema.js";
-import crypto from "node:crypto";
 import ActiveRepo from "../schema/activeRepo.js";
 import UserLogModel from "../schema/userLog.schema.js";
+import { encrypt, decrypt } from "../utils/crypto.js";
+import { GITHUB_API_BASE, githubDelete } from "../utils/githubApiClient.js";
 
-const ALGORITHM = "aes-256-gcm";
-const KEY = Buffer.from(process.env.GITHUB_TOKEN_SECRET, "hex");
-
-export function encrypt(text) {
-  const iv = crypto.randomBytes(12); // 96-bit IV for GCM
-  const cipher = crypto.createCipheriv(ALGORITHM, KEY, iv);
-
-  const encrypted = Buffer.concat([
-    cipher.update(text, "utf8"),
-    cipher.final(),
-  ]);
-
-  const tag = cipher.getAuthTag();
-
-  return {
-    iv: iv.toString("hex"),
-    content: encrypted.toString("hex"),
-    tag: tag.toString("hex"),
-  };
-}
-
-export function decrypt(encrypted) {
-  const decipher = crypto.createDecipheriv(
-    ALGORITHM,
-    KEY,
-    Buffer.from(encrypted.iv, "hex")
-  );
-
-  decipher.setAuthTag(Buffer.from(encrypted.tag, "hex"));
-
-  const decrypted = Buffer.concat([
-    decipher.update(Buffer.from(encrypted.content, "hex")),
-    decipher.final(),
-  ]);
-
-  return decrypted.toString("utf8");
-}
+export { encrypt, decrypt };
 
 const generateAccessToken = (userId) =>
   jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
@@ -59,7 +24,6 @@ export const githubAuthRedirect = (req, res) => {
 
 export const githubCallBack = async (req, res) => {
   const authCode = req.query.code;
-  let user;
   try {
     const tokenRes = await axios.post(
       "https://github.com/login/oauth/access_token",
@@ -74,7 +38,7 @@ export const githubCallBack = async (req, res) => {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     const accessToken = tokenRes.data.access_token;
@@ -171,27 +135,22 @@ export const deleteAccount = async (req, res) => {
     // Delete webhooks - ignore 404 errors as the webhook may already be deleted
     for (const repo of activeRepos) {
       try {
-        await axios.delete(
-          `https://api.github.com/repos/${repo.repoOwner}/${repo.repoName}/hooks/${repo.webhookId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              Accept: "application/vnd.github+json",
-            },
-          }
+        await githubDelete(
+          `${GITHUB_API_BASE}/repos/${repo.repoOwner}/${repo.repoName}/hooks/${repo.webhookId}`,
+          accessToken,
         );
       } catch (webhookError) {
         // Ignore 404 errors - webhook may have already been deleted
         if (webhookError.response?.status !== 404) {
           console.warn(
             `Failed to delete webhook for ${repo.repoName}:`,
-            webhookError.message
+            webhookError.message,
           );
         }
       }
     }
     await User.deleteOne({ _id: userId });
-    await UserLogModel.deleteMany({userId});
+    await UserLogModel.deleteMany({ userId });
     await ActiveRepo.deleteMany({ userId });
     return res.status(200).json({ message: "Account deleted successfully" });
   } catch (error) {

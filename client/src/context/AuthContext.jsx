@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { api, ENDPOINTS } from "../lib/api";
 
 const AuthContext = createContext(null);
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -24,22 +23,15 @@ export const AuthProvider = ({ children }) => {
 
       if (token) {
         try {
-          const response = await fetch(`${BACKEND_URL}/auth/verify`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            setUser(data.user);
-            setIsAuthenticated(true);
-          } else {
-            // Token is invalid
-            logout();
-          }
+          // Pass token explicitly — interceptor only attaches stored tokens,
+          // and at this point it may not be stored yet on first run.
+          const { data } = await api.post(
+            ENDPOINTS.AUTH_VERIFY,
+            {},
+            { headers: { Authorization: `Bearer ${token}` } },
+          );
+          setUser(data.user);
+          setIsAuthenticated(true);
         } catch (error) {
           console.error("Token verification error:", error);
           logout();
@@ -54,23 +46,15 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (accessToken) => {
     try {
-      const response = await fetch(`${BACKEND_URL}/auth/verify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("accessToken", accessToken);
-        setUser(data.user);
-        setIsAuthenticated(true);
-        return { success: true };
-      } else {
-        return { success: false, error: "Invalid token" };
-      }
+      const { data } = await api.post(
+        ENDPOINTS.AUTH_VERIFY,
+        {},
+        { headers: { Authorization: `Bearer ${accessToken}` } },
+      );
+      localStorage.setItem("accessToken", accessToken);
+      setUser(data.user);
+      setIsAuthenticated(true);
+      return { success: true };
     } catch (error) {
       console.error("Login error:", error);
       return { success: false, error: error.message };

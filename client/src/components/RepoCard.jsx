@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { GitBranch, Lock, Unlock, Loader2, ExternalLink } from "lucide-react";
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import { api, ENDPOINTS } from "../lib/api";
 
 const RepoCard = ({ repo, showToggle = true, onToggle }) => {
   const [isActive, setIsActive] = useState(repo.activated);
@@ -15,74 +14,32 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
   };
 
   const handleToggle = async (e) => {
-    // Prevent card click when toggling
     e.stopPropagation();
     setLoading(true);
-    const token = localStorage.getItem("accessToken");
-    if (!isActive) {
-      try {
-        const response = await fetch(
-          `${BACKEND_URL}/api/github/addRepoActivity`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              repoId: repo.id,
-              repoName: repo.name,
-              repoFullName: repo.full_name,
-              repoOwner: repo.owner,
-              defaultBranch: repo.default_branch,
-            }),
-          }
-        );
-        if (response.ok) {
-          setIsActive(true);
-          // Notify parent component to refresh the list
-          if (onToggle) {
-            onToggle();
-          }
-        } else {
-          const error = await response.json();
-          alert(error.message || "Failed to activate repository");
-        }
-      } catch (error) {
-        console.error("Error activating repo:", error);
-        alert("Failed to activate repository");
-      }
-    } else {
-      try {
-        const response = await fetch(
-          `${BACKEND_URL}/api/github/deactivateRepoActivity`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              repoId: repo.id,
-            }),
-          }
-        );
-        if (response.ok) {
-          setIsActive(false);
-          // Notify parent component to refresh the list
-          if (onToggle) {
-            onToggle();
-          }
-        } else {
-          const error = await response.json();
-          alert(error.message || "Failed to deactivate repository");
-        }
-      } catch (error) {
-        console.error("Error deactivating repo:", error);
-        alert("Failed to deactivate repository");
-      }
+
+    const endpoint = isActive ? ENDPOINTS.DEACTIVATE_REPO : ENDPOINTS.ADD_REPO;
+    const body = isActive
+      ? { repoId: repo.id }
+      : {
+          repoId: repo.id,
+          repoName: repo.name,
+          repoFullName: repo.full_name,
+          repoOwner: repo.owner,
+          defaultBranch: repo.default_branch,
+        };
+
+    try {
+      await api.post(endpoint, body);
+      setIsActive(!isActive);
+      if (onToggle) onToggle();
+    } catch (err) {
+      alert(
+        err.response?.data?.message ||
+          `Failed to ${isActive ? "deactivate" : "activate"} repository`,
+      );
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (

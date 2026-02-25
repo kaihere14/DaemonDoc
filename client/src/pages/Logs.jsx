@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import {
-  Activity, CheckCircle2, XCircle, Clock, GitBranch, 
-  RefreshCw, Loader2, ChevronRight, History
+  Activity,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  GitBranch,
+  RefreshCw,
+  Loader2,
+  ChevronRight,
+  History,
 } from "lucide-react";
 import AuthNavigation from "../components/AuthNavigation";
-import { useAuth } from "../context/AuthContext";
 import SEO from "../components/SEO";
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import { useRequireAuth } from "../hooks/useRequireAuth";
+import { api, ENDPOINTS } from "../lib/api";
 
 const Logs = () => {
-  const navigate = useNavigate();
-  const { isAuthenticated, isLoading } = useAuth();
+  useRequireAuth();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) navigate("/login");
-  }, [isAuthenticated, isLoading, navigate]);
 
   useEffect(() => {
     fetchLogs();
@@ -33,12 +33,7 @@ const Logs = () => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
     try {
-      const token = localStorage.getItem("accessToken");
-      const response = await fetch(`${BACKEND_URL}/api/github/fetchUserLogs`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Failed to fetch logs");
-      const data = await response.json();
+      const { data } = await api.get(ENDPOINTS.FETCH_LOGS);
       setLogs(data.logs || []);
     } catch (err) {
       setError(err.message);
@@ -79,9 +74,13 @@ const Logs = () => {
     const s = config[status] || config.ongoing;
 
     return (
-      <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border transition-all ${s.bg} ${s.border} ${s.color} ${s.glow}`}>
+      <div
+        className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border transition-all ${s.bg} ${s.border} ${s.color} ${s.glow}`}
+      >
         {s.icon}
-        <span className="text-[11px] font-bold tracking-wider uppercase">{s.label}</span>
+        <span className="text-[11px] font-bold tracking-wider uppercase">
+          {s.label}
+        </span>
       </div>
     );
   };
@@ -98,16 +97,24 @@ const Logs = () => {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <div className="h-1 w-6 bg-slate-900 rounded-full" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Activity System</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                  Activity System
+                </span>
               </div>
-              <h1 className="text-4xl font-[900] text-slate-900 tracking-tighter">Event Logs</h1>
+              <h1 className="text-4xl font-[900] text-slate-900 tracking-tighter">
+                Event Logs
+              </h1>
             </div>
 
             <button
               onClick={() => fetchLogs(true)}
               className="flex items-center gap-2.5 bg-white border border-slate-200 px-6 py-3 rounded-2xl text-sm font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition-all active:scale-95"
             >
-              <RefreshCw size={16} strokeWidth={2.5} className={refreshing ? "animate-spin" : ""} />
+              <RefreshCw
+                size={16}
+                strokeWidth={2.5}
+                className={refreshing ? "animate-spin" : ""}
+              />
               Refresh Feed
             </button>
           </div>
@@ -115,14 +122,41 @@ const Logs = () => {
           {/* Stats Bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {[
-              { label: 'Total', val: logs.length, color: 'text-slate-900', bg: 'bg-white' },
-              { label: 'Success', val: logs.filter(l => l.status === 'success').length, color: 'text-emerald-600', bg: 'bg-emerald-50/50' },
-              { label: 'Failed', val: logs.filter(l => l.status === 'failed').length, color: 'text-rose-600', bg: 'bg-rose-50/50' },
-              { label: 'Active', val: logs.filter(l => l.status === 'ongoing').length, color: 'text-sky-600', bg: 'bg-sky-50/50' }
+              {
+                label: "Total",
+                val: logs.length,
+                color: "text-slate-900",
+                bg: "bg-white",
+              },
+              {
+                label: "Success",
+                val: logs.filter((l) => l.status === "success").length,
+                color: "text-emerald-600",
+                bg: "bg-emerald-50/50",
+              },
+              {
+                label: "Failed",
+                val: logs.filter((l) => l.status === "failed").length,
+                color: "text-rose-600",
+                bg: "bg-rose-50/50",
+              },
+              {
+                label: "Active",
+                val: logs.filter((l) => l.status === "ongoing").length,
+                color: "text-sky-600",
+                bg: "bg-sky-50/50",
+              },
             ].map((stat, i) => (
-              <div key={i} className={`border border-slate-200/60 p-5 rounded-3xl shadow-sm ${stat.bg}`}>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">{stat.label}</p>
-                <p className={`text-2xl font-black ${stat.color}`}>{stat.val}</p>
+              <div
+                key={i}
+                className={`border border-slate-200/60 p-5 rounded-3xl shadow-sm ${stat.bg}`}
+              >
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+                  {stat.label}
+                </p>
+                <p className={`text-2xl font-black ${stat.color}`}>
+                  {stat.val}
+                </p>
               </div>
             ))}
           </div>
@@ -133,12 +167,19 @@ const Logs = () => {
               {loading && logs.length === 0 ? (
                 <div className="py-24 flex flex-col items-center gap-4">
                   <Loader2 className="animate-spin text-slate-300" size={40} />
-                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Loading Logs</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                    Loading Logs
+                  </p>
                 </div>
               ) : (
                 <AnimatePresence>
                   {logs.map((log, index) => (
-                    <LogItem key={log._id} log={log} index={index} StatusBadge={StatusBadge} />
+                    <LogItem
+                      key={log._id}
+                      log={log}
+                      index={index}
+                      StatusBadge={StatusBadge}
+                    />
                   ))}
                 </AnimatePresence>
               )}
@@ -151,9 +192,10 @@ const Logs = () => {
 };
 
 const LogItem = ({ log, index, StatusBadge }) => {
-  const commitUrl = log.commitId && log.repoOwner 
-    ? `https://github.com/${log.repoOwner}/${log.repoName}/commit/${log.commitId}` 
-    : null;
+  const commitUrl =
+    log.commitId && log.repoOwner
+      ? `https://github.com/${log.repoOwner}/${log.repoName}/commit/${log.commitId}`
+      : null;
 
   return (
     <motion.div
@@ -162,33 +204,47 @@ const LogItem = ({ log, index, StatusBadge }) => {
       transition={{ delay: index * 0.02 }}
       className="group"
     >
-      <div className={`flex flex-col sm:flex-row sm:items-center justify-between p-6 gap-4 transition-colors ${commitUrl ? 'cursor-pointer hover:bg-slate-50/80' : ''}`}
-           onClick={() => commitUrl && window.open(commitUrl, '_blank')}>
-        
+      <div
+        className={`flex flex-col sm:flex-row sm:items-center justify-between p-6 gap-4 transition-colors ${commitUrl ? "cursor-pointer hover:bg-slate-50/80" : ""}`}
+        onClick={() => commitUrl && window.open(commitUrl, "_blank")}
+      >
         <div className="flex items-start gap-5">
-          <div className={`mt-1 p-3 rounded-2xl border transition-all ${
-            log.status === 'failed' ? 'bg-rose-50 border-rose-100 text-rose-500' : 'bg-slate-50 border-slate-100 text-slate-400 group-hover:bg-white'
-          }`}>
+          <div
+            className={`mt-1 p-3 rounded-2xl border transition-all ${
+              log.status === "failed"
+                ? "bg-rose-50 border-rose-100 text-rose-500"
+                : "bg-slate-50 border-slate-100 text-slate-400 group-hover:bg-white"
+            }`}
+          >
             <GitBranch size={20} />
           </div>
-          
+
           <div className="min-w-0">
             <h3 className="text-[15px] font-bold text-slate-800 tracking-tight mb-1">
-              {log.action.replace(/_/g, ' ')}
+              {log.action.replace(/_/g, " ")}
             </h3>
             <div className="flex items-center gap-3">
               <span className="text-xs font-bold text-slate-400 tracking-tight">
-                {log.repoOwner ? `${log.repoOwner}/${log.repoName}` : log.repoName}
+                {log.repoOwner
+                  ? `${log.repoOwner}/${log.repoName}`
+                  : log.repoName}
               </span>
               <span className="w-1 h-1 rounded-full bg-slate-200" />
-              <span className="text-xs font-medium text-slate-400">{formatTimestamp(log.createdAt)}</span>
+              <span className="text-xs font-medium text-slate-400">
+                {formatTimestamp(log.createdAt)}
+              </span>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-4 self-end sm:self-center">
           <StatusBadge status={log.status} />
-          {commitUrl && <ChevronRight size={18} className="text-slate-300 group-hover:text-slate-600 transition-all group-hover:translate-x-1" />}
+          {commitUrl && (
+            <ChevronRight
+              size={18}
+              className="text-slate-300 group-hover:text-slate-600 transition-all group-hover:translate-x-1"
+            />
+          )}
         </div>
       </div>
     </motion.div>
@@ -203,7 +259,7 @@ const formatTimestamp = (timestamp) => {
   if (diffMins < 60) return `${diffMins}m ago`;
   const diffHours = Math.floor(diffMins / 60);
   if (diffHours < 24) return `${diffHours}h ago`;
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 };
 
 export default Logs;

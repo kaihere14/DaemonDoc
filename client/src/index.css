@@ -12,13 +12,13 @@ html {
 }
 
 body {
-  font-feature-settings: "kern" 1, "liga" 1;
+  font-feature-settings:
+    "kern" 1,
+    "liga" 1;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
   position: relative;
 }
-
-
 
 /* Prevent horizontal scroll on mobile */
 #root {

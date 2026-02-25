@@ -12,15 +12,15 @@ import SEO from "../components/SEO";
 const LandingPage = () => {
   // Smooth scroll behavior
   useEffect(() => {
-    document.documentElement.style.scrollBehavior = 'smooth';
+    document.documentElement.style.scrollBehavior = "smooth";
     return () => {
-      document.documentElement.style.scrollBehavior = 'auto';
+      document.documentElement.style.scrollBehavior = "auto";
     };
   }, []);
 
   return (
     <>
-      <SEO 
+      <SEO
         title="DaemonDoc - AI-Powered README Generator for GitHub | Automate Your Documentation"
         description="Stop wasting hours on documentation. DaemonDoc automatically generates and updates your GitHub README files using AI. Connect your repos and keep documentation fresh as your code evolves."
         keywords="README generator, AI documentation, GitHub automation, automatic README, documentation tool, code documentation, GitHub README, AI README generator, developer tools"

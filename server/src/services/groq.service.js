@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getLanguageFromExtension } from "../utils/langMap.js";
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const GROQ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
@@ -59,7 +60,7 @@ async function getFileRecommendations(context, apiKey) {
 
   const totalEstimatedTokens = fileMetadata.reduce(
     (sum, f) => sum + f.estimatedTokens,
-    0
+    0,
   );
   const hasExistingReadme = !!existingReadme;
   const existingReadmeTokens = estimateTokens(existingReadme);
@@ -117,7 +118,7 @@ Respond with ONLY a JSON object (no markdown, no explanation):
         Authorization: `Bearer ${apiKey}`,
       },
       timeout: 30000,
-    }
+    },
   );
 
   const content = response.data?.choices?.[0]?.message?.content;
@@ -128,16 +129,13 @@ Respond with ONLY a JSON object (no markdown, no explanation):
   // Parse JSON response
   try {
     // Clean up response - remove markdown code blocks if present
-    const cleanContent = content
-      .replaceAll(/```json\n?/g, "")
-      .replaceAll(/```\n?/g, "")
-      .trim();
+    const cleanContent = content.replace(/```(?:json)?\n?/g, "").trim();
     return JSON.parse(cleanContent);
   } catch (parseError) {
     console.error(
       "Failed to parse AI recommendation:",
       content,
-      parseError.message
+      parseError.message,
     );
     // Fallback: include most important files by convention
     const sortedFiles = [...fileMetadata].sort((a, b) => {
@@ -191,7 +189,7 @@ export async function generateReadme(context) {
 
       // STEP 1: Get AI recommendations on which files to include
       console.log(
-        "Step 1: Analyzing files to determine optimal content selection..."
+        "Step 1: Analyzing files to determine optimal content selection...",
       );
       const recommendations = await getFileRecommendations(context, apiKey);
       console.log("AI Recommendations:", recommendations.reasoning);
@@ -227,7 +225,7 @@ export async function generateReadme(context) {
             Authorization: `Bearer ${apiKey}`,
           },
           timeout: 60000,
-        }
+        },
       );
 
       if (!response.data?.choices?.[0]?.message?.content) {
@@ -248,7 +246,7 @@ export async function generateReadme(context) {
         // Rate limit, auth error, or request too large - try next key
         if ([429, 401, 413].includes(error.response.status)) {
           console.log(
-            `Key ${i + 1} failed (${error.response.status}), trying next key...`
+            `Key ${i + 1} failed (${error.response.status}), trying next key...`,
           );
           continue;
         }
@@ -256,7 +254,7 @@ export async function generateReadme(context) {
         throw new Error(
           `Groq API error: ${error.response.status} - ${
             error.response.data?.error?.message || "Unknown error"
-          }`
+          }`,
         );
       } else if (error.request) {
         console.error(`Network error with key ${i + 1}:`, error.message);
@@ -275,7 +273,7 @@ export async function generateReadme(context) {
     throw new Error(
       `All API keys failed. Last error: ${lastError.response.status} - ${
         lastError.response.data?.error?.message || "Unknown error"
-      }`
+      }`,
     );
   } else if (lastError?.request) {
     throw new Error("Network error: Unable to reach Groq API with any key");
@@ -295,24 +293,25 @@ function buildOptimizedContext(context, recommendations) {
     recommendations;
   const { fullCodebase, changedFiles, existingReadme, ...rest } = context;
 
-  // Filter files based on AI selection
+  // Filter files based on AI selection — use Set for O(1) lookups
+  const selectedSet = new Set(selectedFiles);
   const selectedCodebase = [];
   const selectedChangedFiles = [];
 
   if (fullCodebase) {
     fullCodebase.forEach((file) => {
-      if (selectedFiles.includes(file.path)) {
+      if (selectedSet.has(file.path)) {
         selectedCodebase.push(file);
       }
     });
   }
 
+  // Build a set of paths already in selectedCodebase for dedup check
+  const codebasePaths = new Set(selectedCodebase.map((f) => f.path));
+
   if (changedFiles) {
     changedFiles.forEach((file) => {
-      if (
-        selectedFiles.includes(file.path) &&
-        !selectedCodebase.some((f) => f.path === file.path)
-      ) {
+      if (selectedSet.has(file.path) && !codebasePaths.has(file.path)) {
         selectedChangedFiles.push(file);
       }
     });
@@ -507,7 +506,7 @@ export function analyzeReadmeDepth(existingReadme) {
   const hasInstallation = /install|setup|getting started/i.test(existingReadme);
   const hasUsage = /usage|example|how to use/i.test(existingReadme);
   const hasArchitecture = /architecture|structure|design|component/i.test(
-    existingReadme
+    existingReadme,
   );
   const hasAPI = /api|endpoint|route/i.test(existingReadme);
 
@@ -608,7 +607,7 @@ function buildUserPrompt(context, recommendations = {}) {
   if (fullCodebase && fullCodebase.length > 0) {
     prompt += `## KEY SOURCE FILES\n\n`;
     fullCodebase.forEach((file) => {
-      const lang = getLanguageFromPath(file.path);
+      const lang = getLanguageFromExtension(file.path);
       prompt += `### \`${file.path}\`\n`;
       prompt += `\`\`\`${lang}\n${file.content}\n\`\`\`\n\n`;
     });
@@ -618,7 +617,7 @@ function buildUserPrompt(context, recommendations = {}) {
   if (changedFiles && changedFiles.length > 0) {
     prompt += `## CHANGED FILES\n\n`;
     changedFiles.forEach((file) => {
-      const lang = file.language || getLanguageFromPath(file.path);
+      const lang = file.language || getLanguageFromExtension(file.path);
       prompt += `### \`${file.path}\`\n`;
       prompt += `\`\`\`${lang}\n${file.content}\n\`\`\`\n\n`;
     });
@@ -641,49 +640,6 @@ function buildUserPrompt(context, recommendations = {}) {
   prompt += `Generate a complete, professional README.md. Include: Overview, Features, Tech Stack, Installation, Usage, API (if applicable), Contributing, License. Output ONLY the README markdown.`;
 
   return prompt;
-}
-
-/**
- * Get language identifier from file path
- * @param {string} filePath - File path
- * @returns {string} Language identifier for code blocks
- */
-function getLanguageFromPath(filePath) {
-  const ext = filePath.split(".").pop()?.toLowerCase();
-  const langMap = {
-    js: "javascript",
-    jsx: "jsx",
-    ts: "typescript",
-    tsx: "tsx",
-    py: "python",
-    rb: "ruby",
-    go: "go",
-    rs: "rust",
-    java: "java",
-    kt: "kotlin",
-    swift: "swift",
-    php: "php",
-    cs: "csharp",
-    cpp: "cpp",
-    c: "c",
-    h: "c",
-    hpp: "cpp",
-    md: "markdown",
-    json: "json",
-    yaml: "yaml",
-    yml: "yaml",
-    xml: "xml",
-    html: "html",
-    css: "css",
-    scss: "scss",
-    sql: "sql",
-    sh: "bash",
-    bash: "bash",
-    zsh: "bash",
-    dockerfile: "dockerfile",
-    prisma: "prisma",
-  };
-  return langMap[ext] || ext || "";
 }
 
 /**

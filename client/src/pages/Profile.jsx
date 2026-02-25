@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -14,69 +14,26 @@ import {
   Check,
   RefreshCw,
 } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
-import axios from "axios";
 import AuthNavigation from "../components/AuthNavigation";
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import { useRequireAuth } from "../hooks/useRequireAuth";
+import { useRepos } from "../hooks/useRepos";
+import { api, ENDPOINTS } from "../lib/api";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, isLoading } = useAuth();
-  const [repos, setRepos] = useState([]);
-  const [statsLoading, setStatsLoading] = useState(true);
+  const { user, isLoading } = useRequireAuth();
+  const { repos, loading: statsLoading } = useRepos(user);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      navigate("/login");
-    }
-  }, [isAuthenticated, isLoading, navigate]);
-
-  // Fetch repository stats
-  useEffect(() => {
-    const fetchRepos = async () => {
-      if (user) {
-        try {
-          const token = localStorage.getItem("accessToken");
-          const response = await fetch(
-            `${BACKEND_URL}/api/github/getGithubRepos`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-
-          if (response.ok) {
-            const data = await response.json();
-            setRepos(data.reposData || []);
-          }
-        } catch (error) {
-          console.error("Error fetching repos:", error);
-        } finally {
-          setStatsLoading(false);
-        }
-      }
-    };
-
-    fetchRepos();
-  }, [user]);
 
   // Delete handle function
   const HandleDelete = async () => {
     if (deleteConfirmText.toLowerCase() !== "delete") return;
     setIsDeleting(true);
     try {
-      await axios.delete(`${BACKEND_URL}/auth/delete`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
+      await api.delete(ENDPOINTS.AUTH_DELETE);
       localStorage.removeItem("accessToken");
       navigate("/");
     } catch {

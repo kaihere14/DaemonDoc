@@ -8,7 +8,7 @@ import {
   Settings2,
   Shield,
   Activity,
-  ChevronRight
+  ChevronRight,
 } from "lucide-react";
 
 const Features = () => {
@@ -19,14 +19,14 @@ const Features = () => {
       title: "GitHub OAuth 2.0",
       desc: "Limited-scope authentication. We never see your password, only your public AST structure.",
       tag: "SECURITY",
-      className: "rounded-tl-2xl"
+      className: "rounded-tl-2xl",
     },
     {
       id: "AST_02",
       icon: FileSearch,
       title: "Context Synthesis",
       desc: "Goes beyond regex. Understands project hierarchy, exported modules, and internal dependencies.",
-      tag: "ENGINE"
+      tag: "ENGINE",
     },
     {
       id: "SCAN_03",
@@ -34,7 +34,7 @@ const Features = () => {
       title: "Differential Scan",
       desc: "No full repo indexing. We only analyze changed files to keep documentation latency under 1s.",
       tag: "PERFORMANCE",
-      className: "rounded-tr-2xl"
+      className: "rounded-tr-2xl",
     },
     {
       id: "FLOW_04",
@@ -42,14 +42,14 @@ const Features = () => {
       title: "Commit Isolation",
       desc: "Choose direct commits to main or isolated Pull Requests for manual documentation review.",
       tag: "WORKFLOW",
-      className: "rounded-bl-2xl"
+      className: "rounded-bl-2xl",
     },
     {
       id: "ARCH_05",
       icon: FolderTree,
       title: "Monorepo Native",
       desc: "Detects multi-package structures automatically. Maps cross-package dependencies with precision.",
-      tag: "SCALING"
+      tag: "SCALING",
     },
     {
       id: "CONF_06",
@@ -57,14 +57,16 @@ const Features = () => {
       title: "Logic Exclusions",
       desc: "Fine-grained control via .daemondoc ignore. Customize templates to match your studio style.",
       tag: "CONTROL",
-      className: "rounded-br-2xl"
+      className: "rounded-br-2xl",
     },
   ];
 
   return (
-    <section id="features" className="py-24 sm:py-32 bg-white overflow-hidden border-t border-slate-200">
+    <section
+      id="features"
+      className="py-24 sm:py-32 bg-white overflow-hidden border-t border-slate-200"
+    >
       <div className="max-w-[1440px] mx-auto px-6 sm:px-10">
-        
         {/* Section Header: Brutalist Logic */}
         <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between mb-16 gap-8">
           <div className="max-w-3xl">
@@ -85,11 +87,11 @@ const Features = () => {
             </h2>
           </div>
           <div className="hidden lg:block text-right pb-4">
-             <Activity size={40} className="text-slate-100 mb-4 ml-auto" />
-             <p className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
-               [ Protocol: High_Fidelity_Documentation ] <br />
-               [ Status: All_Systems_Operational ]
-             </p>
+            <Activity size={40} className="text-slate-100 mb-4 ml-auto" />
+            <p className="font-mono text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
+              [ Protocol: High_Fidelity_Documentation ] <br />[ Status:
+              All_Systems_Operational ]
+            </p>
           </div>
         </div>
 
@@ -140,10 +142,10 @@ const Features = () => {
         {/* Technical Footer Log */}
         <div className="mt-12 flex flex-col sm:flex-row justify-between items-center py-6 border-b border-slate-100 gap-4">
           <div className="flex items-center gap-4">
-             <div className="w-2 h-2 rounded-full bg-emerald-500" />
-             <span className="font-mono text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-               All features strictly adherent to AST_Spec 2026.1
-             </span>
+            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="font-mono text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              All features strictly adherent to AST_Spec 2026.1
+            </span>
           </div>
         </div>
       </div>

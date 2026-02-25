@@ -3,7 +3,7 @@ import { Queue } from "bullmq";
 import { Worker } from "bullmq";
 import User from "../schema/user.schema.js";
 import ActiveRepo from "../schema/activeRepo.js";
-import { decrypt } from "../controllers/oauthcontroller.js";
+import { decrypt } from "./crypto.js";
 import {
   generateReadme,
   analyzeReadmeDepth,
@@ -23,7 +23,7 @@ import {
   optimizeContext,
   validateContext,
 } from "./prompt.builder.js";
-import  UserLogModel  from "../schema/userLog.schema.js";
+import UserLogModel from "../schema/userLog.schema.js";
 
 export const connection = new IORedis({
   host: process.env.REDIS_HOST || "localhost",
@@ -81,7 +81,7 @@ connection.on("end", () => {
 connection.connect().catch((err) => {
   console.error("Failed to connect to Redis:", err.message);
   console.log(
-    "Redis is optional. Server will continue without queue functionality."
+    "Redis is optional. Server will continue without queue functionality.",
   );
 });
 
@@ -94,12 +94,12 @@ new Worker(
   async (job) => {
     console.log("Processing job:", job.data);
     const userLog = await UserLogModel.create({
-          userId: job.data.userId,
-          repoName: job.data.repoName,
-          repoOwner: job.data.repoOwner,
-          action: "README_GENERATION_STARTED",
-          status: "ongoing",
-        });
+      userId: job.data.userId,
+      repoName: job.data.repoName,
+      repoOwner: job.data.repoOwner,
+      action: "README_GENERATION_STARTED",
+      status: "ongoing",
+    });
     job.data.logId = userLog._id.toString();
     console.log("Updated job data with logId:", job.data.logId);
     await aihandler(job.data);
@@ -108,7 +108,7 @@ new Worker(
     connection,
     removeOnComplete: { count: 100 },
     removeOnFail: { count: 50 },
-  }
+  },
 );
 
 /**
@@ -127,7 +127,7 @@ const aihandler = async (data) => {
   } = data;
 
   console.log(
-    `[AI Handler] Starting README generation for ${repoFullName} at commit ${commitSha}`
+    `[AI Handler] Starting README generation for ${repoFullName} at commit ${commitSha}`,
   );
 
   try {
@@ -155,7 +155,7 @@ const aihandler = async (data) => {
       accessToken,
       repoOwner,
       repoName,
-      commitSha
+      commitSha,
     );
 
     // Step 4: Fetch repository structure
@@ -166,7 +166,7 @@ const aihandler = async (data) => {
         accessToken,
         repoOwner,
         repoName,
-        defaultBranch
+        defaultBranch,
       );
       repoStructure = formatRepoTree(treeData.tree, 3);
     } catch (error) {
@@ -186,19 +186,19 @@ const aihandler = async (data) => {
         repoOwner,
         repoName,
         readmeFileName,
-        defaultBranch
+        defaultBranch,
       );
 
       if (readmeData) {
         existingReadme = readmeData.content;
         existingReadmeSha = readmeData.sha;
         console.log(
-          `[AI Handler] Found existing README (${readmeData.size} bytes)`
+          `[AI Handler] Found existing README (${readmeData.size} bytes)`,
         );
       }
     } catch (error) {
       console.log(
-        `[AI Handler] No existing README found or error fetching: ${error.message}`
+        `[AI Handler] No existing README found or error fetching: ${error.message}`,
       );
     }
     const log = await UserLogModel.findById(data.logId);
@@ -223,132 +223,56 @@ const aihandler = async (data) => {
     if (readmeAnalysis.needsFullCodebase) {
       // README doesn't exist or is poor quality - scan entire repo
       console.log(
-        `[AI Handler] Strategy: ${readmeAnalysis.strategy.toUpperCase()} - scanning entire repository`
+        `[AI Handler] Strategy: ${readmeAnalysis.strategy.toUpperCase()} - scanning entire repository`,
       );
 
       try {
-        const treeData = await getRepoTree(
+        fullCodebase = await fetchFilesFromTree(
           accessToken,
           repoOwner,
           repoName,
-          defaultBranch
+          defaultBranch,
+          25,
         );
-
-        // Get important files from the repo
-        const importantFiles = getImportantFiles(treeData.tree);
-
-        // Fetch content of important files (limit to 25 for full scan)
-        const filesToFetch = importantFiles.slice(0, 25);
-
-        for (const filePath of filesToFetch) {
-          try {
-            const fileData = await getFileContent(
-              accessToken,
-              repoOwner,
-              repoName,
-              filePath,
-              defaultBranch
-            );
-
-            if (fileData) {
-              fullCodebase.push({
-                path: filePath,
-                content: truncateContent(fileData.content, 200), // More content for full analysis
-                language: getFileLanguage(filePath),
-              });
-            }
-          } catch (error) {
-            console.warn(
-              `[AI Handler] Could not fetch file ${filePath}: ${error.message}`
-            );
-          }
-        }
-
         console.log(
-          `[AI Handler] Scanned ${fullCodebase.length} important files from repository`
+          `[AI Handler] Scanned ${fullCodebase.length} important files from repository`,
         );
       } catch (error) {
         console.error(
-          `[AI Handler] Error scanning repository: ${error.message}`
+          `[AI Handler] Error scanning repository: ${error.message}`,
         );
       }
 
-      // Also fetch changed files for context
-      const relevantFiles = commitData.files.filter(
-        (file) =>
-          shouldIncludeFile(file.filename) &&
-          (file.status === "added" || file.status === "modified")
+      // Also fetch changed files for context (skip ones already in fullCodebase)
+      const fullCodebasePathSet = new Set(fullCodebase.map((f) => f.path));
+      changedFilesContent = await fetchChangedFiles(
+        accessToken,
+        repoOwner,
+        repoName,
+        defaultBranch,
+        commitData.files,
+        10,
+        150,
+        fullCodebasePathSet,
       );
-
-      for (const file of relevantFiles.slice(0, 10)) {
-        try {
-          // Skip if already in fullCodebase
-          if (fullCodebase.some((f) => f.path === file.filename)) continue;
-
-          const fileData = await getFileContent(
-            accessToken,
-            repoOwner,
-            repoName,
-            file.filename,
-            defaultBranch
-          );
-
-          if (fileData) {
-            changedFilesContent.push({
-              path: file.filename,
-              content: truncateContent(fileData.content, 150),
-              language: getFileLanguage(file.filename),
-              status: file.status,
-            });
-          }
-        } catch (error) {
-          console.warn(
-            `[AI Handler] Could not fetch changed file ${file.filename}: ${error.message}`
-          );
-        }
-      }
     } else {
       // README is comprehensive - only fetch changed files (incremental update)
       console.log(
-        `[AI Handler] Strategy: INCREMENTAL - fetching only changed files`
+        `[AI Handler] Strategy: INCREMENTAL - fetching only changed files`,
       );
 
-      const relevantFiles = commitData.files.filter(
-        (file) =>
-          shouldIncludeFile(file.filename) &&
-          (file.status === "added" || file.status === "modified")
+      changedFilesContent = await fetchChangedFiles(
+        accessToken,
+        repoOwner,
+        repoName,
+        defaultBranch,
+        commitData.files,
+        10,
+        100,
       );
-
-      // Limit to first 10 files for incremental updates
-      const filesToFetch = relevantFiles.slice(0, 10);
-
-      for (const file of filesToFetch) {
-        try {
-          const fileData = await getFileContent(
-            accessToken,
-            repoOwner,
-            repoName,
-            file.filename,
-            defaultBranch
-          );
-
-          if (fileData) {
-            changedFilesContent.push({
-              path: file.filename,
-              content: truncateContent(fileData.content, 100),
-              language: getFileLanguage(file.filename),
-              status: file.status,
-            });
-          }
-        } catch (error) {
-          console.warn(
-            `[AI Handler] Could not fetch file ${file.filename}: ${error.message}`
-          );
-        }
-      }
 
       console.log(
-        `[AI Handler] Fetched ${changedFilesContent.length} changed files`
+        `[AI Handler] Fetched ${changedFilesContent.length} changed files`,
       );
     }
 
@@ -379,7 +303,7 @@ const aihandler = async (data) => {
     // Optimize if needed
     if (validation.estimatedTokens > 8000) {
       console.log(
-        `[AI Handler] Optimizing context (${validation.estimatedTokens} tokens)`
+        `[AI Handler] Optimizing context (${validation.estimatedTokens} tokens)`,
       );
       context = optimizeContext(context, 8000);
     }
@@ -393,7 +317,7 @@ const aihandler = async (data) => {
     }
 
     console.log(
-      `[AI Handler] Generated README (${generatedReadme.length} characters)`
+      `[AI Handler] Generated README (${generatedReadme.length} characters)`,
     );
 
     // Step 9: Commit README back to repository
@@ -408,12 +332,12 @@ const aihandler = async (data) => {
       generatedReadme,
       commitMessage,
       defaultBranch,
-      existingReadmeSha
+      existingReadmeSha,
     );
 
     console.log(
       `[AI Handler] README committed successfully:`,
-      commitResult.commit.sha
+      commitResult.commit.sha,
     );
 
     // Step 10: Update active repo metadata
@@ -424,7 +348,7 @@ const aihandler = async (data) => {
     await activeRepo.save();
 
     console.log(
-      `[AI Handler] ✓ README generation completed for ${repoFullName}`
+      `[AI Handler] ✓ README generation completed for ${repoFullName}`,
     );
 
     // Update log to success and save commitId
@@ -434,7 +358,9 @@ const aihandler = async (data) => {
       successLog.status = "success";
       successLog.commitId = commitResult.commit.sha;
       await successLog.save();
-      console.log(`[AI Handler] Log updated with commitId: ${commitResult.commit.sha}`);
+      console.log(
+        `[AI Handler] Log updated with commitId: ${commitResult.commit.sha}`,
+      );
     }
 
     return {
@@ -445,7 +371,7 @@ const aihandler = async (data) => {
   } catch (error) {
     console.error(
       `[AI Handler] ✗ Error generating README for ${repoFullName}:`,
-      error.message
+      error.message,
     );
     console.error(error.stack);
 
@@ -465,6 +391,107 @@ const aihandler = async (data) => {
     throw error;
   }
 };
+
+/**
+ * Fetch important files from the full repo tree
+ * @param {string} accessToken
+ * @param {string} owner
+ * @param {string} repo
+ * @param {string} branch
+ * @param {number} limit - max files to fetch
+ * @returns {Promise<Array>}
+ */
+async function fetchFilesFromTree(
+  accessToken,
+  owner,
+  repo,
+  branch,
+  limit = 25,
+) {
+  const treeData = await getRepoTree(accessToken, owner, repo, branch);
+  const filePaths = getImportantFiles(treeData.tree).slice(0, limit);
+  const results = [];
+  for (const filePath of filePaths) {
+    try {
+      const fileData = await getFileContent(
+        accessToken,
+        owner,
+        repo,
+        filePath,
+        branch,
+      );
+      if (fileData) {
+        results.push({
+          path: filePath,
+          content: truncateContent(fileData.content, 200),
+          language: getFileLanguage(filePath),
+        });
+      }
+    } catch (err) {
+      console.warn(
+        `[AI Handler] Could not fetch file ${filePath}: ${err.message}`,
+      );
+    }
+  }
+  return results;
+}
+
+/**
+ * Fetch content of changed/added files from a commit
+ * @param {string} accessToken
+ * @param {string} owner
+ * @param {string} repo
+ * @param {string} branch
+ * @param {Array} commitFiles - files array from commit data
+ * @param {number} limit - max files to fetch
+ * @param {number} maxLines - line limit per file
+ * @param {Set} excludePaths - paths to skip (already fetched)
+ * @returns {Promise<Array>}
+ */
+async function fetchChangedFiles(
+  accessToken,
+  owner,
+  repo,
+  branch,
+  commitFiles,
+  limit,
+  maxLines,
+  excludePaths = new Set(),
+) {
+  const relevant = commitFiles
+    .filter(
+      (f) =>
+        shouldIncludeFile(f.filename) &&
+        (f.status === "added" || f.status === "modified") &&
+        !excludePaths.has(f.filename),
+    )
+    .slice(0, limit);
+  const results = [];
+  for (const file of relevant) {
+    try {
+      const fileData = await getFileContent(
+        accessToken,
+        owner,
+        repo,
+        file.filename,
+        branch,
+      );
+      if (fileData) {
+        results.push({
+          path: file.filename,
+          content: truncateContent(fileData.content, maxLines),
+          language: getFileLanguage(file.filename),
+          status: file.status,
+        });
+      }
+    } catch (err) {
+      console.warn(
+        `[AI Handler] Could not fetch changed file ${file.filename}: ${err.message}`,
+      );
+    }
+  }
+  return results;
+}
 
 /**
  * Check if README is substantial and well-formed
@@ -493,7 +520,7 @@ function isReadmeSubstantial(readme) {
   ];
 
   const sectionsFound = commonSections.filter((pattern) =>
-    pattern.test(readme)
+    pattern.test(readme),
   ).length;
 
   // If it has at least 2 sections, consider it good
@@ -511,7 +538,7 @@ function isReadmeSubstantial(readme) {
   ];
 
   const hasPlaceholder = placeholderPatterns.some((pattern) =>
-    pattern.test(readme)
+    pattern.test(readme),
   );
 
   // If it has placeholder text and few sections, it's not good
@@ -597,7 +624,7 @@ function getImportantFiles(tree) {
 
       // Check if it matches important directory patterns
       const matchesPattern = importantDirPatterns.some((pattern) =>
-        pattern.test(item.path)
+        pattern.test(item.path),
       );
 
       return {
