@@ -1,370 +1,1157 @@
+# 📚 DaemonDoc - AI-Powered README Generator
 
-# DaemonDoc  
-**A modern full‑stack documentation platform powered by React, Vite, Tailwind CSS, and Express.**  
+<div align="center">
 
-![DaemonDoc Banner](https://raw.githubusercontent.com/kaihere14/DaemonDoc/main/client/public/logo.svg)
+![DaemonDoc Banner](https://img.shields.io/badge/DaemonDoc-AI%20README%20Generator-4F46E5?style=for-the-badge&logo=readme&logoColor=white)
+[![Live Demo](https://img.shields.io/badge/www.daemondoc.online-success?style=for-the-badge)](https://www.daemondoc.online)
+[![License](https://img.shields.io/badge/License-ISC-blue.svg?style=for-the-badge)](LICENSE)
+
+**Transform your GitHub repositories with AI-generated, always up-to-date documentation**
+
+[Features](#-features) • [Demo](#-demo) • [Installation](#-installation) • [Tech Stack](#-tech-stack) • [API Docs](#-api-documentation) • [Deployment](#-deployment)
+</div>
+
 
 ---
 
-## Badges
-| | |
-|---|---|
-| ![Node.js](https://img.shields.io/badge/Node.js-20%2B-339933?logo=node.js) | ![React](https://img.shields.io/badge/React-19.2-61DAFB?logo=react) |
-| ![Express](https://img.shields.io/badge/Express-5.2-000000?logo=express) | ![MongoDB](https://img.shields.io/badge/MongoDB-9.1-47A248?logo=mongodb) |
-| ![Redis](https://img.shields.io/badge/Redis-6%2B-DC382D?logo=redis) | ![Vite](https://img.shields.io/badge/Vite-7.2-646CFF?logo=vite) |
-| ![License](https://img.shields.io/badge/License-ISC-3DA639) | ![GitHub Actions](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF?logo=github) |
+## 🎯 Overview
 
-*Quick links:*  
-[Demo (coming soon)](#) • [Documentation](#) • [Issues](https://github.com/kaihere14/DaemonDoc/issues) • [Pull Requests](https://github.com/kaihere14/DaemonDoc/pulls)
+**DaemonDoc** is an intelligent README generation platform that leverages AI to automatically create and maintain comprehensive documentation for your GitHub repositories. By analyzing your codebase structure, dependencies, and commits, DaemonDoc generates professional, contextual READMEs that stay synchronized with your code through GitHub webhooks.
+
+### Why DaemonDoc?
+
+- **⏱️ Save Time**: Stop writing boilerplate documentation manually
+- **🔄 Always Current**: Auto-updates when you push code changes
+- **🧠 Context-Aware**: Analyzes actual code, not just file names
+- **🎨 Professional**: Generates well-structured, comprehensive docs
+- **🔐 Secure**: OAuth authentication with encrypted token storage
+- **⚡ Fast**: Background processing with Redis-powered job queues
+
+---
+
+## ✨ Features
+
+### Core Capabilities
+
+- **🤖 AI-Powered Analysis**
+
+  - Uses Groq's LLaMA 3.3 70B model for intelligent code understanding
+  - Uses Groq's openai/gpt-oss-120b for Readme Generation
+  - Analyzes repository structure, dependencies, and file relationships
+  - Generates contextual documentation based on actual implementation
+
+- **🔄 Automatic Updates**
+
+  - GitHub webhook integration for real-time updates
+  - Regenerates README on every push event
+  - Smart diff analysis to focus on changed files
+
+- **📊 Intelligent Context Building**
+
+  - Identifies and prioritizes important files
+  - Extracts metadata from package managers (npm, pip, maven, etc.)
+  - Builds optimal prompts with code snippets and structure
+
+- **🎯 Repository Management**
+
+  - Select specific repositories to activate
+  - Dashboard to manage all your projects
+  - One-click activation/deactivation
+
+- **🔒 Enterprise-Grade Security**
+
+  - GitHub OAuth 2.0 authentication
+  - AES-256-GCM token encryption
+  - HMAC-SHA256 webhook signature verification
+  - JWT-based session management
+
+- **⚡ High Performance**
+  - BullMQ-powered background job processing
+  - Redis queue for async operations
+  - Optimized context building (70% size reduction)
+  - Handles large repositories efficiently
 
 ---
 
-## Overview
-DaemonDoc is a **single‑page web application** that lets developers create, edit, and publish technical documentation directly from their GitHub repositories.  
-- **Live preview** powered by React + Framer Motion.  
-- **Secure authentication** with JWT and refresh‑token flow.  
-- **Background job processing** (e.g., markdown rendering) via BullMQ + Redis.  
+## 🎬 Demo
 
-Targeted at **software teams, open‑source maintainers, and anyone who wants a fast, self‑hosted docs site**.
+### Live Application
 
-Current version: **v1.0.0** (first stable release).
+**Frontend**: Coming soon (Vercel deployment)  
+**Backend API**: https://daemondoc-4.onrender.com
 
----
-## Features
-| Feature | Description | Status |
-|---|---|---|
-| **GitHub Integration** | Pull markdown files, repo metadata, and contributors via the GitHub API. | ✅ Stable |
-| **JWT Authentication** | Sign‑up / sign‑in with email + password, protected routes, token refresh. | ✅ Stable |
-| **Rich Text Editor** | WYSIWYG markdown editor with live preview (React + Framer Motion). | ✅ Stable |
-| **Background Rendering** | Convert markdown to HTML in a BullMQ worker (Redis‑backed). | ✅ Stable |
-| **Responsive UI** | Tailwind‑CSS powered, mobile‑first layout. | ✅ Stable |
-| **API Rate‑limit handling** | Automatic back‑off & retry for GitHub API limits. | ✅ Stable |
-| **Docker Support** | One‑command containerised dev & prod environments. | ✅ Stable |
-| **Vercel / Netlify Ready** | `vercel.json` included for zero‑config deployments. | ✅ Stable |
-| **Health & Metrics** | `/health` endpoint reports uptime, DB & Redis status. | ✅ Stable |
-| **Extensible Plugin System** *(planned)* | Hooks for custom renderers, theming, and CI integration. | ⚙️ Beta |
+### How It Works
 
----
-## Tech Stack
-| Layer | Technology | Reason |
-|---|---|---|
-| **Frontend** | React 19, Vite 7, TailwindCSS 4, Framer Motion, Zustand, Axios | Fast HMR, utility‑first styling, smooth animations, simple state management |
-| **Backend** | Express 5, Node.js 20, MongoDB 9 (via Mongoose), Redis 6 (BullMQ), JWT, Axios | Scalable REST API, document storage, background job queue |
-| **DevOps** | Docker, Vercel (frontend), GitHub Actions (CI) | Consistent environments, easy deployments |
-| **Testing / Linting** | ESLint, Prettier (via Vite plugin) | Code quality & consistency |
-| **Analytics** | @vercel/analytics | Usage insights (optional) |
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  1. Connect GitHub Account → OAuth Authentication                │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  2. Select Repository → Creates Webhook & Activates              │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  3. Push Code → Webhook Triggers → Job Queued                    │
+└─────────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────────┐
+│  4. AI Analyzes Codebase → Generates README → Commits to Repo   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Screenshots
+
+_(Add screenshots of your landing page, dashboard, and repository selection UI here)_
 
 ---
-## Architecture
 
-root
-├─ client/                # React SPA (Vite)
-│   ├─ src/
-│   │   ├─ components/    # UI primitives
-│   │   ├─ pages/         # Route‑level views
-│   │   ├─ context/       # React context providers
-│   │   ├─ hooks/         # Custom hooks (auth, API)
-│   │   └─ lib/           # Utility functions
-│   └─ public/            # Static assets (logo, OG images)
-│
-├─ server/                # Express API
-│   ├─ src/
-│   │   ├─ controllers/   # Request handlers (auth, github)
-│   │   ├─ routes/        # Express routers
-│   │   ├─ services/      # Business logic (JWT, GitHub client)
-│   │   ├─ db/            # Mongoose connection helper
-│   │   ├─ utils/         # Shared helpers (error handling)
-│   │   └─ middlewares/   # CORS, auth guard, error middleware
-│   └─ .env.example       # Sample environment variables
-│
-├─ .github/workflows/     # CI pipelines
-└─ docker-compose.yml     # Multi‑container dev setup (optional)
+## 🏗️ Architecture
 
+```
+                        ┌──────────────────┐
+                        │   React Client   │
+                        │   (Vite + TW)    │
+                        └────────┬─────────┘
+                                 │ REST API
+                                 ↓
+┌────────────────────────────────────────────────────────────────┐
+│                      Express Backend                            │
+│  ┌──────────────┐  ┌──────────────┐  ┌───────────────────┐   │
+│  │   Auth       │  │   GitHub     │  │   Worker          │   │
+│  │  Controller  │  │  Controller  │  │   Controller      │   │
+│  └──────────────┘  └──────────────┘  └───────────────────┘   │
+└────────┬──────────────────┬──────────────────┬────────────────┘
+         │                  │                  │
+         ↓                  ↓                  ↓
+  ┌────────────┐   ┌─────────────────┐  ┌──────────────┐
+  │  MongoDB   │   │  GitHub API     │  │   Redis      │
+  │   (User    │   │  (Repos, Trees, │  │  (BullMQ)    │
+  │   Repos)   │   │   Webhooks)     │  │              │
+  └────────────┘   └─────────────────┘  └──────┬───────┘
+                                                │
+                                                ↓
+                                      ┌──────────────────┐
+                                      │  Background      │
+                                      │  Worker Process  │
+                                      └────────┬─────────┘
+                                               │
+                                               ↓
+                                      ┌──────────────────┐
+                                      │   Groq AI API    │
+                                      │  (LLaMA 3.3 70B) │
+                                      └──────────────────┘
+```
 
-**Data Flow**  
-1. Browser → **React SPA** (Axios) → **Express API** (`/auth`, `/api/github`).  
-2. API validates JWT, forwards GitHub requests, stores markdown in MongoDB.  
-3. When a new doc is saved, a BullMQ job is queued; a Redis‑backed worker renders markdown → HTML → saved back to DB.  
-4. Frontend polls the rendered HTML endpoint for live preview.
+### Data Flow
+
+1. **User Authentication**: GitHub OAuth → Encrypted Token Storage → JWT Generation
+2. **Repository Activation**: Create Webhook → Store in MongoDB → Initial README Generation
+3. **Push Event**: GitHub Webhook → Verify Signature → Queue Job in Redis
+4. **Background Processing**:
+   - Fetch repository tree and changed files
+   - Build intelligent context with code analysis
+   - Generate README using Groq AI
+   - Commit README back to repository
+   - Update job status
 
 ---
-## Getting Started
+
+## 🛠️ Tech Stack
+
+### Frontend (`/client`)
+
+| Technology        | Purpose                 | Version |
+| ----------------- | ----------------------- | ------- |
+| **React**         | UI framework            | 19.2.0  |
+| **Vite**          | Build tool & dev server | 7.2.4   |
+| **React Router**  | Client-side routing     | 7.12.0  |
+| **Tailwind CSS**  | Utility-first styling   | 4.1.18  |
+| **Framer Motion** | Animation library       | 12.25.0 |
+| **Zustand**       | State management        | 5.0.9   |
+| **Lucide React**  | Icon library            | 0.562.0 |
+
+### Backend (`/server`)
+
+| Technology   | Purpose               | Version |
+| ------------ | --------------------- | ------- |
+| **Node.js**  | Runtime environment   | 18+     |
+| **Express**  | Web framework         | 5.2.1   |
+| **MongoDB**  | Primary database      | -       |
+| **Mongoose** | ODM for MongoDB       | 9.1.2   |
+| **Redis**    | Job queue & caching   | -       |
+| **IORedis**  | Redis client          | 5.9.1   |
+| **BullMQ**   | Job queue management  | 5.66.4  |
+| **JWT**      | Authentication tokens | 9.0.3   |
+| **Axios**    | HTTP client           | 1.13.2  |
+
+### AI & External Services
+
+- **Groq AI** - LLaMA 3.3 70B model for README generation
+- **GitHub API** - Repository access, webhooks, commits
+- **Redis Labs** - Managed Redis instance
+- **MongoDB Atlas** - Cloud database
+
+---
+
+## 📦 Installation
 
 ### Prerequisites
-| Tool | Minimum version |
-|------|-----------------|
-| Node.js | **20** |
-| npm (or Yarn) | **9** |
-| Docker (optional) | **20.10** |
-| MongoDB | **6** (local or Atlas) |
-| Redis | **6** (local or managed) |
-| GitHub OAuth App | *Client ID & Secret* (for GitHub integration) |
 
-### Clone the repository
-bash
-git clone https://github.com/kaihere14/DaemonDoc.git
-cd DaemonDoc
+Before you begin, ensure you have:
 
+- **Node.js** 18.x or higher ([Download](https://nodejs.org/))
+- **npm** or **yarn** package manager
+- **MongoDB** instance ([MongoDB Atlas](https://www.mongodb.com/cloud/atlas) for cloud)
+- **Redis** instance ([Redis Labs](https://redis.com/) for cloud or local)
+- **GitHub OAuth App** ([Create one](https://github.com/settings/developers))
+- **Groq API Key** ([Get free key](https://console.groq.com))
 
-### Environment variables
-Create a `.env` file in the **server** folder (copy from the example):
-bash
-
-
----
-# server/.env
-PORT=3000
-MONGODB_URI=mongodb://localhost:27017/daemondoc
-REDIS_URL=redis://localhost:6379
-JWT_SECRET=super-secret-key
-JWT_EXPIRES_IN=1h
-REFRESH_TOKEN_SECRET=another-super-secret
-GITHUB_CLIENT_ID=your_github_client_id
-GITHUB_CLIENT_SECRET=your_github_client_secret
-FRONTEND_URL=http://localhost:5173   # Vite dev server
-```
-
-> **Tip:** Keep `.env` out of version control (`.gitignore` already includes it).
-
-### Install dependencies
+### 1. Clone Repository
 
 ```bash
-# Install server deps
-cd server
-npm ci
+git clone https://github.com/yourusername/daemondoc.git
+cd daemondoc
+```
 
-# Install client deps
+### 2. Server Setup
+
+```bash
+cd server
+npm install
+```
+
+Create `.env` file in `server/` directory:
+
+```env
+# Database Configuration
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/daemondoc
+
+# JWT Secret (generate with: openssl rand -base64 32)
+JWT_SECRET=your_super_secret_jwt_key_minimum_32_characters
+
+# GitHub OAuth App Configuration
+GITHUB_CLIENT_ID=your_github_oauth_client_id
+GITHUB_CLIENT_SECRET=your_github_oauth_client_secret
+GITHUB_CALLBACK_URL=http://localhost:3000/auth/github/callback
+
+# Token Encryption (generate with: openssl rand -hex 32)
+GITHUB_TOKEN_SECRET=64_character_hex_string_for_aes256_encryption
+
+# Webhook Security
+GITHUB_WEBHOOK_SECRET=your_custom_webhook_secret_string
+
+# Redis Configuration
+REDIS_HOST=your-redis-host.cloud.redislabs.com
+REDIS_PORT=17140
+REDIS_PASSWORD=your_redis_password
+
+# Application URLs
+FRONTEND_URL=http://localhost:5173
+BACKEND_URL=http://localhost:3000
+
+# Groq AI Configuration
+GROQ_API_KEY=gsk_your_groq_api_key_here
+GROQ_MODEL=llama-3.3-70b-versatile
+README_FILE_NAME=README.md
+```
+
+### 3. Client Setup
+
+```bash
 cd ../client
-npm ci
+npm install
 ```
 
-### Development mode (hot‑reload)
+Create `.env` file in `client/` directory:
+
+```env
+VITE_BACKEND_URL=http://localhost:3000
+```
+
+### 4. Start Development Servers
+
+**Terminal 1 - Backend:**
 
 ```bash
-# Terminal 1 – start the API
 cd server
-npm run dev   # nodemon watches src/**/*.js
-
-# Terminal 2 – start the frontend
-cd ../client
-npm run dev   # Vite dev server (http://localhost:5173)
+npm run dev
+# Server starts on http://localhost:3000
 ```
 
-Open `http://localhost:5173` in your browser. The frontend proxies API calls to `http://localhost:3000` (configured via Vite's proxy in `vite.config.js`).
-
-### Build for production
+**Terminal 2 - Frontend:**
 
 ```bash
-# Build the client
 cd client
-npm run build   # outputs to client/dist
-
-# (Optional) Create a Docker image
-docker build -t daemondoc .
+npm run dev
+# Client starts on http://localhost:5173
 ```
 
-### Run the production bundle
+### 5. Access Application
 
-```bash
-# Using Node directly
-cd server
-npm start   # expects compiled client assets in ../client/dist
-```
-
-Or deploy the `client` folder to Vercel/Netlify and the `server` folder to any Node‑compatible host (Heroku, Railway, Render, etc.).
+Open your browser and navigate to **http://localhost:5173**
 
 ---
 
-## Usage
+## ⚙️ Configuration
 
-### Authentication (REST)
+### GitHub OAuth App Setup
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/auth/register` | Register a new user (email + password). Returns JWT + refresh token. |
-| `POST` | `/auth/login` | Login with credentials. Returns JWT + refresh token. |
-| `POST` | `/auth/refresh` | Exchange a valid refresh token for a new JWT. |
-| `GET` | `/auth/me` | Returns the authenticated user profile (requires `Authorization: Bearer <jwt>`). |
+1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
+2. Click **New OAuth App**
+3. Fill in the details:
+   - **Application name**: DaemonDoc (or your choice)
+   - **Homepage URL**: `http://localhost:5173` (dev) or production URL
+   - **Authorization callback URL**: `http://localhost:3000/auth/github/callback`
+4. Click **Register application**
+5. Copy **Client ID** and generate **Client Secret**
+6. Add to your `server/.env` file
 
-**Example (login)**
+### Groq API Setup
+
+1. Visit [Groq Console](https://console.groq.com)
+2. Sign up for a free account
+3. Navigate to **API Keys** section
+4. Click **Create API Key**
+5. Copy the key and add to `server/.env` as `GROQ_API_KEY`
+
+### Redis Setup
+
+**Local Development:**
+
 ```bash
-curl -X POST http://localhost:3000/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"you@example.com","password":"secret"}'
+# macOS with Homebrew
+brew install redis
+brew services start redis
+
+# Ubuntu/Debian
+sudo apt-get install redis-server
+sudo systemctl start redis-server
+
+# Verify installation
+redis-cli ping  # Should return PONG
 ```
 
-### GitHub Docs API
+**Production (Redis Labs):**
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/github/repos/:owner/:repo/contents/:path` | Fetch raw markdown file from a repo. |
-| `GET` | `/api/github/repos/:owner/:repo/commits` | List recent commits (used for change detection). |
-| `POST` | `/api/github/render` | Submit markdown to be rendered by the background worker. Returns job ID. |
-| `GET` | `/api/github/render/:jobId/status` | Poll job status (`queued`, `processing`, `completed`). |
-| `GET` | `/api/github/render/:jobId/result` | Retrieve rendered HTML once the job is complete. |
+1. Sign up at [Redis Cloud](https://redis.com/try-free/)
+2. Create a new database
+3. Copy connection details (host, port, password)
+4. Add to `server/.env`
 
-**Example (fetch a markdown file)**
+### MongoDB Setup
+
+**Local Development:**
+
 ```bash
-curl -H "Authorization: Bearer <jwt>" \
-  http://localhost:3000/api/github/repos/facebook/react/contents/README.md
+# macOS
+brew tap mongodb/brew
+brew install mongodb-community
+brew services start mongodb-community
+
+# Ubuntu
+sudo apt-get install mongodb
+sudo systemctl start mongodb
 ```
 
-### Health Check
-```bash
-curl http://localhost:3000/health
-# => { status: "ok", uptime: 123.45, redis: "connected", ... }
-```
+**Production (MongoDB Atlas):**
+
+1. Sign up at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+2. Create a free cluster
+3. Add a database user
+4. Whitelist your IP address (or 0.0.0.0/0 for all)
+5. Get connection string and add to `server/.env`
 
 ---
 
-## Development
+## 📡 API Documentation
 
-### Code style & linting
-bash
-# Lint the server code
-npm run lint:server
-# Lint the client code
-npm run lint:client
-# Fix linting issues automatically (where possible)
-npm run lint:fix
+### Base URL
 
-
-### Schema changes
-- The `sectionHashes` field in `ActiveRepo` is now stored as a plain object using Mongoose `Schema.Types.Mixed`.
-- When updating hashes, the model explicitly calls `doc.markModified('sectionHashes')` to ensure changes are persisted.
-
----
-# Run ESLint on the client
-cd client
-npm run lint
-
-# Server uses standard Node.js linting (no custom script yet)
-```
-
-### Testing
-> No automated test suite is currently bundled. Contributions that add Jest/Mocha tests are welcome.
-
-### Debugging
-- **Server**: `npm run dev` uses `nodemon` – set `DEBUG=server:*` to get verbose logs.  
-- **Client**: Vite's dev console shows HMR errors; open Chrome DevTools → Network to inspect API calls.
-
-### Docker development (optional)
-
-```yaml
-# docker-compose.yml (example)
-version: "3.9"
-services:
-  mongo:
-    image: mongo:7
-    ports: ["27017:27017"]
-    volumes: ["mongo-data:/data/db"]
-  redis:
-    image: redis:7
-    ports: ["6379:6379"]
-  server:
-    build: ./server
-    env_file: ./server/.env
-    ports: ["3000:3000"]
-    depends_on: [mongo, redis]
-  client:
-    build: ./client
-    ports: ["5173:5173"]
-    depends_on: [server]
-volumes:
-  mongo-data:
-```
-
-Run with `docker compose up --build`.
-
----
-
-## API Documentation
-For a full OpenAPI (Swagger) spec, see `server/openapi.yaml` (to be added). Below is a concise reference.
+- **Development**: `http://localhost:3000`
+- **Production**: `https://daemondoc-4.onrender.com`
 
 ### Authentication
 
-| Endpoint | Method | Request Body | Response |
-|---|---|---|---|
-| `/auth/register` | POST | `{ email: string, password: string }` | `{ accessToken: string, refreshToken: string, user: { id, email } }` |
-| `/auth/login` | POST | `{ email: string, password: string }` | Same as register |
-| `/auth/refresh` | POST | `{ refreshToken: string }` | `{ accessToken: string }` |
-| `/auth/me` | GET | — | `{ id, email, createdAt }` |
+All protected routes require a JWT token in the Authorization header:
 
-### GitHub Integration
-
-| Endpoint | Method | Params | Response |
-|---|---|---|---|
-| `/api/github/repos/:owner/:repo/contents/:path` | GET | `owner`, `repo`, `path` | `{ content: string, sha: string, url: string }` |
-| `/api/github/render` | POST | `{ markdown: string, repo: string, path: string }` | `{ jobId: string }` |
-| `/api/github/render/:jobId/status` | GET | `jobId` | `{ status: "queued" \| "processing" \| "completed" \| "failed" }` |
-| `/api/github/render/:jobId/result` | GET | `jobId` | `{ html: string }` |
-
-**Authentication** – All `/api/github/*` routes require the `Authorization: Bearer <jwt>` header.
-
-**Rate limits** – The server respects GitHub’s `X-RateLimit-Remaining` header; if exhausted, a `429 Too Many Requests` response is returned with a `retry-after` field.
-
-**Patch‑mode support** – The server now stores per‑section hashes in the `ActiveRepo` document (`sectionHashes` field) as a plain object (MongoDB `Mixed` type). This enables efficient README patch generation. The field is automatically marked as modified when hashes are updated, ensuring proper persistence.
-
----
-## Contributing
-
-1. **Fork** the repository.  
-2. **Create a feature branch**: `git checkout -b feat/awesome-feature`.  
-3. **Install dependencies** (see *Getting Started*).  
-4. **Make your changes**. Keep code style consistent (`npm run lint`).  
-5. **Commit** with a clear message: `git commit -m "feat: add live markdown preview"`  
-6. **Push** and open a **Pull Request** against `main`.  
-
-### Development workflow
-- **Backend**: run `npm run dev` in `server/`.  
-- **Frontend**: run `npm run dev` in `client/`.  
-- **Pull request checklist**  
-  - [ ] Lint passes (`npm run lint`).  
-  - [ ] New/updated endpoints documented in the API section.  
-  - [ ] Tests added (if applicable).  
-  - [ ] README updated for any new public behavior.
-
-### Code of Conduct
-We follow the [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/). Be respectful and inclusive.
+```
+Authorization: Bearer <your_jwt_token>
+```
 
 ---
 
-## Troubleshooting & FAQ
+### Auth Endpoints
 
-| Issue | Solution |
-|---|---|
-| **CORS error when calling API** | Ensure `FRONTEND_URL` in `.env` matches the Vite dev URL (`http://localhost:5173`). |
-| **MongoDB connection fails** | Verify `MONGODB_URI` is reachable; check that the DB server is running. |
-| **Redis not connected** | Make sure Redis is running on the host/port defined in `REDIS_URL`. |
-| **GitHub API returns 401** | Confirm that `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` belong to a valid OAuth App and that the token exchange flow is implemented correctly. |
-| **Background job never finishes** | Check Redis logs; ensure BullMQ worker process is running (you may need to start a separate worker script). |
-| **`npm run dev` crashes on Windows** | Use WSL2 or Git Bash; the project expects a POSIX‑compatible environment. |
+#### `GET /auth/github`
 
-For further help, open an issue or join the discussion in the repository's **Discussions** tab.
+Initiates GitHub OAuth flow.
+
+**Response**: Redirects to GitHub authorization page
 
 ---
 
-## Roadmap
-- **v1.1** – Add full-text search (ElasticSearch) for docs.  
-- **v2.0** – Plugin system for custom renderers (PDF, DOCX).  
-- **v2.1** – Real‑time collaborative editing (WebSocket + Yjs).  
-- **v3.0** – Multi‑tenant SaaS mode with billing integration.
+#### `GET /auth/github/callback`
+
+GitHub OAuth callback handler.
+
+**Query Parameters:**
+
+- `code` (string, required) - Authorization code from GitHub
+
+**Response:**
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "507f1f77bcf86cd799439011",
+    "githubId": "12345678",
+    "username": "octocat",
+    "avatar": "https://avatars.githubusercontent.com/u/583231"
+  }
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Successful authentication
+- `400 Bad Request` - Invalid or missing code
+- `500 Internal Server Error` - Server error
 
 ---
 
-## License & Credits
-**License:** ISC – see the [LICENSE](LICENSE) file.  
+#### `POST /auth/verify`
 
-### Authors & Contributors
-- **Kai Here** – Project founder & lead developer ([@kaihere14](https://github.com/kaihere14))  
-- **Contributors** – See the [GitHub contributors graph](https://github.com/kaihere14/DaemonDoc/graphs/contributors).
+Verifies JWT token and returns user information.
 
-### Acknowledgments
-- **Tailwind Labs** – Tailwind CSS framework.  
-- **Vite Team** – Fast bundler & dev server.  
-- **BullMQ** – Redis‑based job queue.  
-- **Express** – Minimalist web framework.  
+**Headers:**
 
---- 
+```
+Authorization: Bearer <jwt_token>
+```
 
-*Happy documenting!* 🚀
+**Response:**
+
+```json
+{
+  "user": {
+    "id": "507f1f77bcf86cd799439011",
+    "githubId": "12345678",
+    "username": "octocat"
+  }
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Token valid
+- `401 Unauthorized` - Invalid or expired token
+- `404 Not Found` - User not found
+
+---
+
+### GitHub Repository Endpoints
+
+#### `GET /api/github/getGithubRepos`
+
+Fetches all repositories accessible to the authenticated user.
+
+**Headers:**
+
+```
+Authorization: Bearer <jwt_token>
+```
+
+**Response:**
+
+```json
+{
+  "reposData": [
+    {
+      "id": 123456789,
+      "name": "my-awesome-project",
+      "full_name": "octocat/my-awesome-project",
+      "private": false,
+      "owner": "octocat",
+      "default_branch": "main",
+      "activated": true
+    },
+    {
+      "id": 987654321,
+      "name": "another-repo",
+      "full_name": "octocat/another-repo",
+      "private": true,
+      "owner": "octocat",
+      "default_branch": "master",
+      "activated": false
+    }
+  ]
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Success
+- `401 Unauthorized` - Invalid token
+- `404 Not Found` - GitHub access token not found
+- `500 Internal Server Error` - Failed to fetch repositories
+
+---
+
+#### `POST /api/github/addRepoActivity`
+
+Activates README generation for a repository.
+
+**Headers:**
+
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+**Body:**
+
+```json
+{
+  "repoId": 123456789,
+  "repoName": "my-awesome-project",
+  "repoFullName": "octocat/my-awesome-project",
+  "repoOwner": "octocat",
+  "defaultBranch": "main"
+}
+```
+
+**Response:**
+
+```json
+{
+  "message": "Repository activity added successfully"
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Successfully activated
+- `400 Bad Request` - Missing required fields or already activated
+- `401 Unauthorized` - Invalid token
+- `422 Unprocessable Entity` - Webhook already exists
+- `500 Internal Server Error` - Failed to create webhook
+
+**Actions Performed:**
+
+1. Creates GitHub webhook for push events
+2. Stores repository activation in database
+3. Queues initial README generation job
+
+---
+
+#### `POST /api/github/deactivateRepoActivity`
+
+Deactivates README generation for a repository.
+
+**Headers:**
+
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+**Body:**
+
+```json
+{
+  "repoId": 123456789
+}
+```
+
+**Response:**
+
+```json
+{
+  "message": "Repository deactivated successfully"
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Successfully deactivated
+- `401 Unauthorized` - Invalid token
+- `404 Not Found` - Active repository not found
+- `500 Internal Server Error` - Failed to delete webhook
+
+**Actions Performed:**
+
+1. Deletes GitHub webhook
+2. Marks repository as inactive in database
+
+---
+
+#### `POST /api/github/webhookhandler`
+
+Receives GitHub webhook events for push notifications.
+
+**Headers:**
+
+```
+X-Hub-Signature-256: sha256=<hmac_signature>
+Content-Type: application/json
+```
+
+**Body:** Standard GitHub push event payload
+
+**Response:**
+
+```json
+{
+  "message": "Webhook received and job queued"
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Webhook processed successfully
+- `403 Forbidden` - Invalid webhook signature
+- `400 Bad Request` - Invalid payload
+- `500 Internal Server Error` - Processing error
+
+**Webhook Event Processing:**
+
+1. Verifies HMAC-SHA256 signature
+2. Extracts repository and commit information
+3. Checks if repository is activated
+4. Queues README generation job in Redis
+
+---
+
+### Health Check
+
+#### `GET /health`
+
+Health check endpoint for monitoring.
+
+**Response:**
+
+```json
+{
+  "status": "ok",
+  "timestamp": "2026-01-11T10:30:00.000Z",
+  "uptime": 3600.5,
+  "redis": "connected"
+}
+```
+
+**Status Codes:**
+
+- `200 OK` - Service healthy
+
+**Use Cases:**
+
+- Uptime monitoring
+- Load balancer health checks
+- Keepalive pings for Render free tier
+
+---
+
+## 🚀 Deployment
+
+### Backend Deployment (Render)
+
+1. **Create Web Service**
+
+   - Go to [Render Dashboard](https://dashboard.render.com/)
+   - Click **New +** → **Web Service**
+   - Connect your GitHub repository
+
+2. **Configure Service**
+
+   ```
+   Name: daemondoc-backend
+   Region: Choose closest to your users
+   Branch: main
+   Root Directory: server
+   Runtime: Node
+   Build Command: npm install
+   Start Command: npm start
+   ```
+
+3. **Environment Variables**
+   Add all variables from your `server/.env`:
+
+   - `MONGO_URI`
+   - `JWT_SECRET`
+   - `GITHUB_CLIENT_ID`
+   - `GITHUB_CLIENT_SECRET`
+   - `GITHUB_CALLBACK_URL` (update with Render URL)
+   - `GITHUB_TOKEN_SECRET`
+   - `GITHUB_WEBHOOK_SECRET`
+   - `REDIS_HOST`
+   - `REDIS_PORT`
+   - `REDIS_PASSWORD`
+   - `FRONTEND_URL` (your Vercel URL)
+   - `BACKEND_URL` (your Render URL)
+   - `GROQ_API_KEY`
+   - `GROQ_MODEL`
+   - `README_FILE_NAME`
+
+4. **Deploy**
+   - Click **Create Web Service**
+   - Wait for deployment to complete
+   - Note your service URL (e.g., `https://daemondoc-4.onrender.com`)
+
+### Frontend Deployment (Vercel)
+
+1. **Import Project**
+
+   - Go to [Vercel Dashboard](https://vercel.com/dashboard)
+   - Click **Add New** → **Project**
+   - Import your GitHub repository
+
+2. **Configure Project**
+
+   ```
+   Framework Preset: Vite
+   Root Directory: client
+   Build Command: npm run build
+   Output Directory: dist
+   Install Command: npm install
+   ```
+
+3. **Environment Variables**
+   Add environment variable:
+
+   - `VITE_BACKEND_URL` = Your Render backend URL
+
+4. **Deploy**
+   - Click **Deploy**
+   - Vercel will automatically deploy
+   - Note your deployment URL
+
+### Post-Deployment Steps
+
+1. **Update GitHub OAuth App**
+
+   - Go to GitHub OAuth App settings
+   - Update **Homepage URL** to your Vercel URL
+   - Update **Callback URL** to `https://your-render-app.onrender.com/auth/github/callback`
+
+2. **Update Environment Variables**
+
+   - Update `GITHUB_CALLBACK_URL` in Render
+   - Update `FRONTEND_URL` in Render
+   - Update `BACKEND_URL` in Render and Vercel
+
+3. **Test the Application**
+   - Visit your Vercel URL
+   - Test GitHub login
+   - Activate a test repository
+   - Make a commit and verify README generation
+
+### Keepalive Setup (Prevent Render Free Tier Sleep)
+
+**Option 1: GitHub Actions** (Already configured)
+
+- File: `.github/workflows/keepalive.yml`
+- Pings every 10 minutes
+- Note: May have delays during high GitHub load
+
+**Option 2: External Monitoring (Recommended)**
+
+1. Sign up at [UptimeRobot](https://uptimerobot.com)
+2. Create new monitor:
+   - **Monitor Type**: HTTP(s)
+   - **URL**: `https://daemondoc-4.onrender.com/health`
+   - **Monitoring Interval**: 5 minutes
+3. Save and activate
+
+**Option 3: Cron-job.org**
+
+1. Sign up at [cron-job.org](https://cron-job.org)
+2. Create new cron job:
+   - **URL**: `https://daemondoc-4.onrender.com/health`
+   - **Schedule**: Every 10 minutes
+3. Activate
+
+---
+
+## 🔐 Security
+
+### Implemented Security Measures
+
+1. **Authentication**
+
+   - OAuth 2.0 with GitHub
+   - JWT tokens with 7-day expiration
+   - Secure token storage in localStorage
+
+2. **Encryption**
+
+   - AES-256-GCM encryption for GitHub access tokens
+   - Random IV generation for each encryption
+   - Authentication tags for data integrity
+
+3. **Webhook Security**
+
+   - HMAC-SHA256 signature verification
+   - Timing-safe equal comparison
+   - Secret key validation
+
+4. **Database Security**
+
+   - Mongoose schema validation
+   - MongoDB connection with authentication
+   - Encrypted sensitive fields
+
+5. **API Security**
+   - CORS configuration
+   - Rate limiting (recommended to add)
+   - Input validation and sanitization
+
+### Security Best Practices
+
+1. **Never commit `.env` files** - Add to `.gitignore`
+2. **Rotate secrets regularly** - Especially JWT and encryption keys
+3. **Use HTTPS in production** - Both Render and Vercel provide free SSL
+4. **Whitelist IPs for databases** - Restrict MongoDB and Redis access
+5. **Monitor logs** - Watch for suspicious activity
+6. **Update dependencies** - Run `npm audit` regularly
+
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+#### Redis Connection Errors
+
+**Problem**: `Redis connection failed` or `ECONNREFUSED`
+
+**Solutions**:
+
+```bash
+# Check if Redis is running locally
+redis-cli ping  # Should return PONG
+
+# Check Redis credentials in .env
+echo $REDIS_HOST
+echo $REDIS_PORT
+
+# For cloud Redis, verify:
+# 1. IP whitelist includes your server IP
+# 2. Credentials are correct
+# 3. Firewall allows connections on Redis port
+```
+
+#### MongoDB Connection Issues
+
+**Problem**: `MongoServerError: bad auth` or connection timeout
+
+**Solutions**:
+
+```bash
+# Test connection with mongosh
+mongosh "your_connection_string"
+
+# For MongoDB Atlas:
+# 1. Check network access (IP whitelist)
+# 2. Verify database user credentials
+# 3. Ensure user has read/write permissions
+# 4. Check if connection string includes database name
+```
+
+#### GitHub Webhook Not Firing
+
+**Problem**: README not updating after push
+
+**Solutions**:
+
+1. **Check webhook exists**:
+
+   - Go to repo → Settings → Webhooks
+   - Verify webhook URL matches your backend
+   - Check recent deliveries for errors
+
+2. **Verify webhook secret**:
+
+   - Ensure `GITHUB_WEBHOOK_SECRET` matches webhook configuration
+   - Check server logs for signature verification errors
+
+3. **Test webhook manually**:
+   ```bash
+   curl -X POST https://your-render-app.onrender.com/api/github/webhookhandler \
+     -H "Content-Type: application/json" \
+     -H "X-Hub-Signature-256: sha256=test" \
+     -d '{"ref":"refs/heads/main"}'
+   ```
+
+#### AI Generation Timeout
+
+**Problem**: README generation takes too long or times out
+
+**Solutions**:
+
+- **Large repositories**: Generation may take 1-3 minutes
+- **Check Groq API limits**: Verify you haven't exceeded rate limits
+- **Review context size**: Check if repository is extremely large
+- **Check worker logs**: Look for specific errors in Render logs
+
+```bash
+# Monitor job queue
+redis-cli
+> KEYS bullmq:*
+> LLEN bullmq:readme-generation:wait
+```
+
+#### OAuth Callback Error
+
+**Problem**: `redirect_uri_mismatch` or callback fails
+
+**Solutions**:
+
+1. **Verify callback URL**:
+
+   - GitHub OAuth App settings must match exactly
+   - Include protocol (http:// or https://)
+   - No trailing slash
+
+2. **Update environment variables**:
+
+   ```env
+   GITHUB_CALLBACK_URL=https://your-actual-domain.com/auth/github/callback
+   ```
+
+3. **Clear browser cache**: Old redirect URIs may be cached
+
+---
+
+## 📊 Performance Optimization
+
+### Context Building Optimization
+
+The system implements intelligent file filtering:
+
+```javascript
+// Files automatically excluded:
+- node_modules/, vendor/, dist/, build/
+- .git/, .github/workflows/
+- Binary files, images, fonts
+- Lock files (package-lock.json, yarn.lock)
+- Log files
+
+// Files prioritized:
+- Package.json, requirements.txt, pom.xml
+- Main source files (src/, lib/)
+- Configuration files
+- Documentation files
+```
+
+### Redis Queue Management
+
+```javascript
+// Job configuration
+{
+  removeOnComplete: { count: 100 },  // Keep last 100 completed
+  removeOnFail: { count: 50 },       // Keep last 50 failed
+  attempts: 3,                        // Retry failed jobs 3 times
+  backoff: {
+    type: 'exponential',
+    delay: 2000                       // Start with 2s delay
+  }
+}
+```
+
+### Database Indexing
+
+Ensure indexes are created for optimal query performance:
+
+```javascript
+// User schema
+username: { type: String, index: true }
+githubId: { type: String, unique: true, index: true }
+
+// ActiveRepo schema
+userId: { type: ObjectId, index: true }
+repoId: { type: Number, index: true }
+active: { type: Boolean, index: true }
+```
+
+---
+
+## 🧪 Testing
+
+### Manual Testing Checklist
+
+- [ ] GitHub OAuth login flow
+- [ ] Repository list fetches correctly
+- [ ] Repository activation creates webhook
+- [ ] Push event triggers README generation
+- [ ] Generated README commits to repository
+- [ ] Repository deactivation removes webhook
+- [ ] Health endpoint responds
+- [ ] Error handling for invalid tokens
+- [ ] Error handling for missing environment variables
+
+### API Testing with cURL
+
+```bash
+# Health check
+curl https://daemondoc.online/health
+
+# Get repositories (requires token)
+curl -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  https://daemondoc.online/api/github/getGithubRepos
+
+# Activate repository
+curl -X POST https://daemondoc.online/api/github/addRepoActivity \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "repoId": 123456,
+    "repoName": "test-repo",
+    "repoFullName": "username/test-repo",
+    "repoOwner": "username",
+    "defaultBranch": "main"
+  }'
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Here's how you can help:
+
+### Ways to Contribute
+
+1. **Report Bugs** - Open an issue with details
+2. **Suggest Features** - Propose new functionality
+3. **Submit PRs** - Fix bugs or add features
+4. **Improve Docs** - Enhance documentation
+5. **Share Feedback** - Tell us what you think
+
+### Development Workflow
+
+1. **Fork the repository**
+
+   ```bash
+   gh repo fork yourusername/daemondoc
+   ```
+
+2. **Create a feature branch**
+
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+
+3. **Make your changes**
+
+   - Follow existing code style
+   - Add comments for complex logic
+   - Update documentation if needed
+
+4. **Test your changes**
+
+   ```bash
+   # Run server
+   cd server && npm run dev
+
+   # Run client
+   cd client && npm run dev
+   ```
+
+5. **Commit with meaningful message**
+
+   ```bash
+   git commit -m "feat: add amazing feature"
+   ```
+
+6. **Push to your fork**
+
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+
+7. **Open a Pull Request**
+   - Describe what you changed
+   - Reference any related issues
+   - Add screenshots if UI changes
+
+### Code Style Guidelines
+
+- Use ES6+ features
+- Follow existing naming conventions
+- Add JSDoc comments for functions
+- Keep functions small and focused
+- Use async/await over promises
+- Handle errors gracefully
+
+---
+
+## 📜 License
+
+This project is licensed under the **ISC License**.
+
+```
+Copyright (c) 2026 DaemonDoc
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+```
+
+---
+
+## 🙏 Acknowledgments
+
+Special thanks to:
+
+- **[Groq](https://groq.com)** - For providing lightning-fast LLaMA inference
+- **[GitHub](https://github.com)** - For comprehensive API and OAuth support
+- **[BullMQ](https://docs.bullmq.io/)** - For robust job queue management
+- **[Render](https://render.com)** - For reliable and simple deployment
+- **[Vercel](https://vercel.com)** - For seamless frontend hosting
+- **Open Source Community** - For the amazing tools and libraries
+
+---
+
+## 📞 Support & Contact
+
+### Get Help
+
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/yourusername/daemondoc/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/yourusername/daemondoc/discussions)
+- 📧 **Email**: support@daemondoc.online
+- 🐦 **Twitter**: [@daemondoc_ai](https://twitter.com/daemondoc_ai)
+
+### Useful Links
+
+- [Live Demo](https://daemondoc.online)
+- [Documentation](https://docs.daemondoc.online)
+- [API Reference](https://api.daemondoc.online/docs)
+- [Changelog](CHANGELOG.md)
+
+
+---
+
+## 📈 Project Stats
+
+![GitHub stars](https://img.shields.io/github/stars/kaihere14/Readit?style=social) ![GitHub forks](https://img.shields.io/github/forks/kaihere14/Readit?style=social)![GitHub issues](https://img.shields.io/github/issues/kaihere14/Readit) ![GitHub pull requests](https://img.shields.io/github/issues-pr/kaihere14/Readit) ![GitHub last commit](https://img.shields.io/github/last-commit/kaihere14/Readit)
+
+---
+
+<div align="center">
+
+### ⭐ Star this repository if you find it helpful!
+
+**Built with ❤️ by the DaemonDoc Team**
+
+[Website](https://daemondoc.online) • [Twitter](https://x.com/ArmanKiyotaka) • [Linkedin](https://www.linkedin.com/in/arman-thakur-303b47367/)
+
+</div>
