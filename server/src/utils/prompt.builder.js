@@ -274,3 +274,131 @@ export function createMinimalContext(repoName, repoOwner) {
     changedFiles: [],
   };
 }
+
+// ─── Patch-mode prompt builders ──────────────────────────────────────────────
+
+/**
+ * Build the user prompt for LLaMA 70B impact-mapping (Step 1 of patch mode).
+ * Passes only file metadata and section names — no file content.
+ * @param {Object} params
+ * @param {string} params.repoName
+ * @param {string} params.repoOwner
+ * @param {string} params.commitDiff      - Formatted commit summary
+ * @param {Array}  params.changedFiles    - Objects with { path, status }
+ * @param {string[]} params.sectionNames  - All section keys from the existing README
+ * @returns {string}
+ */
+export function buildImpactMappingPrompt({
+  repoName,
+  repoOwner,
+  commitDiff,
+  changedFiles,
+  sectionNames,
+}) {
+  const fileList = changedFiles
+    .map((f) => `  - ${f.path} (${f.status})`)
+    .join("\n");
+
+  const sectionList = sectionNames
+    .filter((n) => n !== "__preamble__")
+    .map((n) => `  - ${n}`)
+    .join("\n");
+
+  return `You are analyzing a GitHub commit to determine which README sections need updating.
+
+## Repository: ${repoOwner}/${repoName}
+
+## Commit Changes:
+${commitDiff || "No diff available"}
+
+## Changed Files (paths and status only):
+${fileList || "  (none)"}
+
+## Current README Sections:
+${sectionList}
+
+Based on the commit changes above, identify which README sections are genuinely affected and need to be updated. Only include sections that are directly relevant to the code changes.
+
+Respond with ONLY a JSON object (no markdown fences, no explanation):
+{
+  "affectedSections": ["Section Name 1", "Section Name 2"],
+  "reasoning": "brief explanation of why these sections are affected"
+}`;
+}
+
+/**
+ * Build the system prompt for GPT-OSS patch generation (Step 2 of patch mode).
+ * @param {string[]} uneditableSectionNames - Section keys that must not be modified
+ * @param {boolean}  strictMode             - If true, adds minimum-change instruction
+ * @returns {string}
+ */
+export function buildPatchSystemPrompt(uneditableSectionNames, strictMode = false) {
+  const uneditableList =
+    uneditableSectionNames.length > 0
+      ? uneditableSectionNames.join(", ")
+      : "(none)";
+
+  let rules = `You are a README patch generator. Your task is to update specific sections of a README based on recent code changes.
+
+## RULES:
+1. Only include the sections you are explicitly asked to patch — do not add or remove sections
+2. Never modify these uneditable sections (do not include them in your output): ${uneditableList}
+3. Do not speculate about features not present in the provided code
+4. Output ONLY valid JSON — no markdown fences, no explanation outside the JSON object
+5. Each value must start with the section's full heading line (e.g., "## Installation\\n\\ncontent...")`;
+
+  if (strictMode) {
+    rules +=
+      "\n6. If uncertain about any change, copy the existing section content verbatim — make minimum changes only";
+  }
+
+  return rules;
+}
+
+/**
+ * Build the user prompt for GPT-OSS patch generation (Step 2 of patch mode).
+ * Includes repo structure, commit diff, changed file contents, and editable section text.
+ * @param {Object} params
+ * @param {string} params.repoName
+ * @param {string} params.repoOwner
+ * @param {string} params.repoStructure
+ * @param {string} params.commitDiff
+ * @param {Array}  params.changedFiles      - Objects with { path, content, language }
+ * @param {Object.<string,string>} params.editableSections - Section name → current markdown
+ * @returns {string}
+ */
+export function buildPatchUserPrompt({
+  repoName,
+  repoOwner,
+  repoStructure,
+  commitDiff,
+  changedFiles,
+  editableSections,
+}) {
+  let prompt = `## Repository: ${repoOwner}/${repoName}\n\n`;
+
+  if (repoStructure) {
+    prompt += `## Repository Structure\n\`\`\`\n${repoStructure}\n\`\`\`\n\n`;
+  }
+
+  if (commitDiff) {
+    prompt += `## Recent Commit Changes\n\`\`\`\n${commitDiff}\n\`\`\`\n\n`;
+  }
+
+  if (changedFiles && changedFiles.length > 0) {
+    prompt += `## Changed File Contents\n\n`;
+    for (const file of changedFiles) {
+      const lang = file.language || "";
+      prompt += `### \`${file.path}\`\n\`\`\`${lang}\n${file.content}\n\`\`\`\n\n`;
+    }
+  }
+
+  prompt += `## Sections to Update\n\nUpdate ONLY the following sections. Your JSON output must contain exactly these keys:\n\n`;
+  for (const [name, content] of Object.entries(editableSections)) {
+    prompt += `**${name}**\nCurrent content:\n\`\`\`markdown\n${content}\n\`\`\`\n\n`;
+  }
+
+  prompt += `---\n\nOutput JSON where each key is a section name and each value is the complete updated markdown for that section (starting with its heading line):\n{"SectionName": "## SectionName\\n\\nupdated content..."}`;
+
+  return prompt;
+}

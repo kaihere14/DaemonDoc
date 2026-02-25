@@ -20,6 +20,10 @@ const activeRepoSchema = new Schema(
     lastReadmeGeneratedAt: { type: Date, default: null },
     readmeGenerationCount: { type: Number, default: 0 },
     lastReadmeSha: { type: String, default: null },
+
+    // Section-level hashes for patch mode
+    sectionHashes: { type: Map, of: String, default: {} },
+    lastSectionHashesUpdatedAt: { type: Date, default: null },
   },
   { timestamps: true },
 );

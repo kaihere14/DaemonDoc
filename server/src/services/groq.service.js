@@ -1,5 +1,12 @@
 import axios from "axios";
 import { getLanguageFromExtension } from "../utils/langMap.js";
+import { parseReadmeSections, hashSections, mergePatchedSections } from "../utils/readme.parser.js";
+import { validatePatches, FORBIDDEN_SECTIONS } from "../utils/readme.validator.js";
+import {
+  buildImpactMappingPrompt,
+  buildPatchSystemPrompt,
+  buildPatchUserPrompt,
+} from "../utils/prompt.builder.js";
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const GROQ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
@@ -490,7 +497,7 @@ Output ONLY the complete README in Markdown format. No explanations, no preamble
  * @param {string} existingReadme - Existing README content
  * @returns {Object} Analysis result with strategy ('full', 'enhance', 'incremental')
  */
-export function analyzeReadmeDepth(existingReadme) {
+function analyzeReadmeDepth(existingReadme) {
   if (!existingReadme) {
     return {
       strategy: "full",
@@ -651,4 +658,326 @@ export function estimateTokenCount(context) {
   const text = JSON.stringify(context);
   // Rough estimation: ~4 characters per token
   return Math.ceil(text.length / 4);
+}
+
+// ─── Patch-mode functions ─────────────────────────────────────────────────────
+
+/**
+ * Determine whether to run full generation or surgical patch mode.
+ * "full" is used only when no README exists or it is too short to section-parse.
+ * @param {string|null} existingReadme
+ * @returns {{ mode: "full"|"patch", reason: string }}
+ */
+export function determineGenerationMode(existingReadme) {
+  if (!existingReadme || existingReadme.trim().length < 500) {
+    return {
+      mode: "full",
+      reason: existingReadme
+        ? "README is too short for patch mode (< 500 chars)"
+        : "No README exists",
+    };
+  }
+  return {
+    mode: "patch",
+    reason: "README is substantial enough for surgical patching",
+  };
+}
+
+/**
+ * Step 1 of patch mode — ask LLaMA 70B which README sections are affected.
+ * Only file metadata (paths + statuses) is sent, not file contents.
+ * @param {Object} params
+ * @param {string}   params.repoName
+ * @param {string}   params.repoOwner
+ * @param {string}   params.commitDiff
+ * @param {Array}    params.changedFiles  - Objects with { path, status }
+ * @param {string[]} params.sectionNames  - All section keys from the existing README
+ * @param {string} apiKey
+ * @returns {Promise<{ affectedSections: string[], reasoning: string }>}
+ */
+async function mapSectionImpact(
+  { repoName, repoOwner, commitDiff, changedFiles, sectionNames },
+  apiKey,
+) {
+  const prompt = buildImpactMappingPrompt({
+    repoName,
+    repoOwner,
+    commitDiff,
+    changedFiles,
+    sectionNames,
+  });
+
+  const response = await axios.post(
+    GROQ_API_URL,
+    {
+      model: GROQ_MODEL_MINI,
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.1,
+      max_tokens: 400,
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      timeout: 30000,
+    },
+  );
+
+  const content = response.data?.choices?.[0]?.message?.content;
+  if (!content) throw new Error("Invalid response from impact mapping");
+
+  try {
+    const clean = content.replace(/```(?:json)?\n?/g, "").trim();
+    const parsed = JSON.parse(clean);
+    return {
+      affectedSections: Array.isArray(parsed.affectedSections)
+        ? parsed.affectedSections
+        : [],
+      reasoning: parsed.reasoning || "",
+    };
+  } catch {
+    // Fallback: treat all non-forbidden sections as affected
+    const nonForbidden = sectionNames.filter(
+      (n) => !FORBIDDEN_SECTIONS.includes(n),
+    );
+    return {
+      affectedSections: nonForbidden,
+      reasoning: "Fallback: failed to parse impact-mapping response",
+    };
+  }
+}
+
+/**
+ * Step 2 of patch mode — ask GPT-OSS to patch specific sections.
+ * @param {Object} params
+ * @param {string}   params.repoName
+ * @param {string}   params.repoOwner
+ * @param {string}   params.repoStructure
+ * @param {string}   params.commitDiff
+ * @param {Array}    params.changedFiles        - Objects with { path, content, language }
+ * @param {Object}   params.editableSections    - { [name]: currentMarkdown }
+ * @param {string[]} params.uneditableSectionNames
+ * @param {boolean}  params.strictMode
+ * @param {string} apiKey
+ * @returns {Promise<Object.<string, string>>} Section patches
+ */
+async function generateSectionPatches(
+  {
+    repoName,
+    repoOwner,
+    repoStructure,
+    commitDiff,
+    changedFiles,
+    editableSections,
+    uneditableSectionNames,
+    strictMode,
+  },
+  apiKey,
+) {
+  const systemPrompt = buildPatchSystemPrompt(uneditableSectionNames, strictMode);
+  const userPrompt = buildPatchUserPrompt({
+    repoName,
+    repoOwner,
+    repoStructure,
+    commitDiff,
+    changedFiles,
+    editableSections,
+  });
+
+  const response = await axios.post(
+    GROQ_API_URL,
+    {
+      model: GROQ_MODEL,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      temperature: 0.3,
+      max_tokens: 3000,
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      timeout: 60000,
+    },
+  );
+
+  const content = response.data?.choices?.[0]?.message?.content;
+  if (!content) throw new Error("Invalid response from patch generation");
+
+  const clean = content.replace(/```(?:json)?\n?/g, "").trim();
+  return JSON.parse(clean); // let parse error propagate — caller handles it
+}
+
+/**
+ * Main entry point for patch mode. Orchestrates impact mapping → patch generation
+ * → validation (with one strictMode retry) → merge → hash.
+ *
+ * Returns null if validation fails after retry or all API keys are exhausted.
+ * Never throws — the worker should skip the commit on null.
+ *
+ * @param {Object} params
+ * @param {string}   params.repoName
+ * @param {string}   params.repoOwner
+ * @param {string}   params.repoStructure
+ * @param {string}   params.commitDiff
+ * @param {Array}    params.changedFiles     - Full content objects from fetchChangedFiles
+ * @param {Object}   params.originalSections - Parsed sections of the existing README
+ * @param {string[]} params.orderedKeys      - Section order
+ * @param {Object}   params.originalHashes  - SHA-256 hashes of original sections
+ * @returns {Promise<{ finalReadme: string, newHashes: Object }|null>}
+ */
+export async function generateReadmePatch({
+  repoName,
+  repoOwner,
+  repoStructure,
+  commitDiff,
+  changedFiles,
+  originalSections,
+  orderedKeys,
+  originalHashes,
+}) {
+  const apiKeys = [
+    process.env.GROQ_API_KEY1,
+    process.env.GROQ_API_KEY2,
+    process.env.GROQ_API_KEY3,
+  ].filter(Boolean);
+
+  if (apiKeys.length === 0) {
+    console.error("[Patch] No API keys configured");
+    return null;
+  }
+
+  // Metadata-only list for impact mapping
+  const changedFilesMeta = changedFiles.map((f) => ({
+    path: f.path,
+    status: f.status || "modified",
+  }));
+
+  for (let i = 0; i < apiKeys.length; i++) {
+    const apiKey = apiKeys[i];
+    try {
+      console.log(`[Patch] Attempting with API key ${i + 1}/${apiKeys.length}`);
+
+      // Step 1: Identify affected sections (LLaMA 70B)
+      const { affectedSections, reasoning } = await mapSectionImpact(
+        {
+          repoName,
+          repoOwner,
+          commitDiff,
+          changedFiles: changedFilesMeta,
+          sectionNames: orderedKeys,
+        },
+        apiKey,
+      );
+      console.log(`[Patch] Impact mapping: ${reasoning}`);
+      console.log(`[Patch] Affected sections: ${affectedSections.join(", ")}`);
+
+      // Filter to editable keys only
+      const editableKeys = affectedSections.filter(
+        (k) => !FORBIDDEN_SECTIONS.includes(k) && originalSections[k] !== undefined,
+      );
+
+      if (editableKeys.length === 0) {
+        console.log("[Patch] No editable sections affected — skipping commit");
+        return null;
+      }
+
+      const editableSections = {};
+      for (const k of editableKeys) {
+        editableSections[k] = originalSections[k];
+      }
+      const uneditableSectionNames = orderedKeys.filter(
+        (k) => !editableKeys.includes(k),
+      );
+
+      // Step 2: Generate patches (GPT-OSS)
+      let patches = await generateSectionPatches(
+        {
+          repoName,
+          repoOwner,
+          repoStructure,
+          commitDiff,
+          changedFiles,
+          editableSections,
+          uneditableSectionNames,
+          strictMode: false,
+        },
+        apiKey,
+      );
+
+      // Validate
+      let validation = validatePatches({
+        originalSections,
+        originalHashes,
+        patches,
+        affectedKeys: editableKeys,
+      });
+
+      if (validation.decision === "retry") {
+        console.log(
+          `[Patch] Validation failed (${validation.reason}), retrying with strictMode`,
+        );
+        patches = await generateSectionPatches(
+          {
+            repoName,
+            repoOwner,
+            repoStructure,
+            commitDiff,
+            changedFiles,
+            editableSections,
+            uneditableSectionNames,
+            strictMode: true,
+          },
+          apiKey,
+        );
+        validation = validatePatches({
+          originalSections,
+          originalHashes,
+          patches,
+          affectedKeys: editableKeys,
+        });
+      }
+
+      if (validation.decision !== "commit") {
+        console.log(
+          `[Patch] Validation failed after strictMode retry (${validation.reason}) — returning null`,
+        );
+        return null;
+      }
+
+      // Merge and hash
+      const finalReadme = mergePatchedSections(originalSections, orderedKeys, patches);
+      const mergedSections = { ...originalSections, ...patches };
+      const newHashes = hashSections(mergedSections);
+
+      console.log(
+        `[Patch] Successfully generated patch for sections: ${editableKeys.join(", ")}`,
+      );
+      return { finalReadme, newHashes };
+    } catch (error) {
+      if (error.response) {
+        console.error(`[Patch] API error with key ${i + 1}:`, {
+          status: error.response.status,
+          message: error.response.data?.error?.message,
+        });
+        if ([429, 401, 413].includes(error.response.status)) {
+          console.log(`[Patch] Key ${i + 1} failed (${error.response.status}), trying next...`);
+          continue;
+        }
+      } else if (error.request) {
+        console.error(`[Patch] Network error with key ${i + 1}:`, error.message);
+        continue;
+      }
+      // Non-retriable error
+      console.error(`[Patch] Non-retriable error:`, error.message);
+      return null;
+    }
+  }
+
+  console.error("[Patch] All API keys exhausted");
+  return null;
 }

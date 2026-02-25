@@ -6,8 +6,10 @@ import ActiveRepo from "../schema/activeRepo.js";
 import { decrypt } from "./crypto.js";
 import {
   generateReadme,
-  analyzeReadmeDepth,
+  generateReadmePatch,
+  determineGenerationMode,
 } from "../services/groq.service.js";
+import { parseReadmeSections, hashSections } from "./readme.parser.js";
 import {
   getCommit,
   getRepoTree,
@@ -112,6 +114,28 @@ new Worker(
 );
 
 /**
+ * Update a UserLog document in place.
+ * Silently swallows errors so a log failure never kills the job.
+ * @param {string} logId
+ * @param {string} action
+ * @param {string} status - "ongoing" | "success" | "failed"
+ * @param {string|null} commitId
+ */
+async function updateLogStatus(logId, action, status, commitId = null) {
+  try {
+    const log = await UserLogModel.findById(logId);
+    if (log) {
+      log.action = action;
+      log.status = status;
+      if (commitId) log.commitId = commitId;
+      await log.save();
+    }
+  } catch (err) {
+    console.error("[AI Handler] Failed to update log:", err.message);
+  }
+}
+
+/**
  * AI Handler - Processes README generation jobs
  * @param {Object} data - Job data from webhook
  */
@@ -201,31 +225,19 @@ const aihandler = async (data) => {
         `[AI Handler] No existing README found or error fetching: ${error.message}`,
       );
     }
-    const log = await UserLogModel.findById(data.logId);
-    if (log) {
-      log.action = "GITHUB_REPO_CONNECTED";
-      await log.save();
-    }
 
-    // Step 6: Analyze README depth to determine strategy
-    const readmeAnalysis = analyzeReadmeDepth(existingReadme);
-    console.log(`[AI Handler] README Analysis:`, {
-      strategy: readmeAnalysis.strategy,
-      reason: readmeAnalysis.reason,
-      depthScore: readmeAnalysis.depthScore,
-      needsFullCodebase: readmeAnalysis.needsFullCodebase,
-    });
+    await updateLogStatus(data.logId, "GITHUB_REPO_CONNECTED", "ongoing");
 
-    // Step 7: Fetch files based on analysis strategy
-    let changedFilesContent = [];
-    let fullCodebase = [];
+    // Step 6: Determine generation mode
+    const { mode, reason } = determineGenerationMode(existingReadme);
+    console.log(`[AI Handler] Generation mode: ${mode} — ${reason}`);
 
-    if (readmeAnalysis.needsFullCodebase) {
-      // README doesn't exist or is poor quality - scan entire repo
-      console.log(
-        `[AI Handler] Strategy: ${readmeAnalysis.strategy.toUpperCase()} - scanning entire repository`,
-      );
+    // Step 7: Branch on mode
+    if (mode === "full") {
+      // ── Full generation path ───────────────────────────────────────────────
+      console.log(`[AI Handler] FULL mode — scanning entire repository`);
 
+      let fullCodebase = [];
       try {
         fullCodebase = await fetchFilesFromTree(
           accessToken,
@@ -243,9 +255,8 @@ const aihandler = async (data) => {
         );
       }
 
-      // Also fetch changed files for context (skip ones already in fullCodebase)
       const fullCodebasePathSet = new Set(fullCodebase.map((f) => f.path));
-      changedFilesContent = await fetchChangedFiles(
+      const changedFilesContent = await fetchChangedFiles(
         accessToken,
         repoOwner,
         repoName,
@@ -255,13 +266,97 @@ const aihandler = async (data) => {
         150,
         fullCodebasePathSet,
       );
-    } else {
-      // README is comprehensive - only fetch changed files (incremental update)
+
+      let context = buildReadmeContext({
+        repoName,
+        repoOwner,
+        repoStructure,
+        existingReadme,
+        commitData,
+        changedFilesContent,
+        fullCodebase,
+      });
+
+      const validation = validateContext(context);
+      console.log(`[AI Handler] Context validation:`, validation);
+
+      if (!validation.valid) {
+        throw new Error(`Invalid context: ${validation.errors.join(", ")}`);
+      }
+
+      if (validation.warnings.length > 0) {
+        console.warn(`[AI Handler] Context warnings:`, validation.warnings);
+      }
+
+      if (validation.estimatedTokens > 8000) {
+        console.log(
+          `[AI Handler] Optimizing context (${validation.estimatedTokens} tokens)`,
+        );
+        context = optimizeContext(context, 8000);
+      }
+
+      console.log(`[AI Handler] Calling Groq API to generate README`);
+      const generatedReadme = await generateReadme(context);
+
+      if (!generatedReadme || generatedReadme.trim().length === 0) {
+        throw new Error("Groq API returned empty README");
+      }
+
       console.log(
-        `[AI Handler] Strategy: INCREMENTAL - fetching only changed files`,
+        `[AI Handler] Generated README (${generatedReadme.length} characters)`,
       );
 
-      changedFilesContent = await fetchChangedFiles(
+      const commitResult = await commitFile(
+        accessToken,
+        repoOwner,
+        repoName,
+        readmeFileName,
+        generatedReadme,
+        "chore: auto-update README [skip ci]",
+        defaultBranch,
+        existingReadmeSha,
+      );
+
+      console.log(
+        `[AI Handler] README committed successfully: ${commitResult.commit.sha}`,
+      );
+
+      // Seed section hashes so the next push uses patch mode
+      const { sections: newSections } = parseReadmeSections(generatedReadme);
+      const newHashes = hashSections(newSections);
+
+      activeRepo.sectionHashes = new Map(Object.entries(newHashes));
+      activeRepo.lastSectionHashesUpdatedAt = new Date();
+      activeRepo.lastReadmeGeneratedAt = new Date();
+      activeRepo.readmeGenerationCount =
+        (activeRepo.readmeGenerationCount || 0) + 1;
+      activeRepo.lastReadmeSha = commitResult.commit.sha;
+      await activeRepo.save();
+
+      await updateLogStatus(
+        data.logId,
+        "README_GENERATION_SUCCESS",
+        "success",
+        commitResult.commit.sha,
+      );
+
+      console.log(
+        `[AI Handler] ✓ Full README generation completed for ${repoFullName}`,
+      );
+      return {
+        success: true,
+        commitSha: commitResult.commit.sha,
+        readmeLength: generatedReadme.length,
+      };
+    } else {
+      // ── Patch mode ─────────────────────────────────────────────────────────
+      console.log(`[AI Handler] PATCH mode — surgical section update`);
+
+      const { sections: originalSections, orderedKeys } =
+        parseReadmeSections(existingReadme);
+      const originalHashes = hashSections(originalSections);
+
+      const changedFilesContent = await fetchChangedFiles(
         accessToken,
         repoOwner,
         repoName,
@@ -270,104 +365,84 @@ const aihandler = async (data) => {
         10,
         100,
       );
-
       console.log(
         `[AI Handler] Fetched ${changedFilesContent.length} changed files`,
       );
-    }
 
-    // Step 8: Build context for Groq API
-    console.log(`[AI Handler] Building context for README generation`);
-    let context = buildReadmeContext({
-      repoName,
-      repoOwner,
-      repoStructure,
-      existingReadme,
-      commitData,
-      changedFilesContent,
-      fullCodebase: readmeAnalysis.needsFullCodebase ? fullCodebase : undefined,
-    });
+      // Build commitDiff for the patch prompt
+      const { commitDiff } = buildReadmeContext({
+        repoName,
+        repoOwner,
+        repoStructure: "",
+        existingReadme: null,
+        commitData,
+        changedFilesContent: [],
+      });
 
-    // Validate and optimize context
-    const validation = validateContext(context);
-    console.log(`[AI Handler] Context validation:`, validation);
+      const patchResult = await generateReadmePatch({
+        repoName,
+        repoOwner,
+        repoStructure,
+        commitDiff,
+        changedFiles: changedFilesContent,
+        originalSections,
+        orderedKeys,
+        originalHashes,
+      });
 
-    if (!validation.valid) {
-      throw new Error(`Invalid context: ${validation.errors.join(", ")}`);
-    }
+      if (!patchResult) {
+        console.log(
+          `[AI Handler] Patch generation returned null — skipping commit`,
+        );
+        await updateLogStatus(
+          data.logId,
+          "README_GENERATION_FAILED",
+          "failed",
+        );
+        return { skipped: true };
+      }
 
-    if (validation.warnings.length > 0) {
-      console.warn(`[AI Handler] Context warnings:`, validation.warnings);
-    }
+      const { finalReadme, newHashes } = patchResult;
 
-    // Optimize if needed
-    if (validation.estimatedTokens > 8000) {
-      console.log(
-        `[AI Handler] Optimizing context (${validation.estimatedTokens} tokens)`,
+      const commitResult = await commitFile(
+        accessToken,
+        repoOwner,
+        repoName,
+        readmeFileName,
+        finalReadme,
+        "chore: auto-update README [skip ci]",
+        defaultBranch,
+        existingReadmeSha,
       );
-      context = optimizeContext(context, 8000);
-    }
 
-    // Step 8: Generate README using Groq API
-    console.log(`[AI Handler] Calling Groq API to generate README`);
-    const generatedReadme = await generateReadme(context);
-
-    if (!generatedReadme || generatedReadme.trim().length === 0) {
-      throw new Error("Groq API returned empty README");
-    }
-
-    console.log(
-      `[AI Handler] Generated README (${generatedReadme.length} characters)`,
-    );
-
-    // Step 9: Commit README back to repository
-    console.log(`[AI Handler] Committing README to repository`);
-    const commitMessage = "chore: auto-update README [skip ci]";
-
-    const commitResult = await commitFile(
-      accessToken,
-      repoOwner,
-      repoName,
-      readmeFileName,
-      generatedReadme,
-      commitMessage,
-      defaultBranch,
-      existingReadmeSha,
-    );
-
-    console.log(
-      `[AI Handler] README committed successfully:`,
-      commitResult.commit.sha,
-    );
-
-    // Step 10: Update active repo metadata
-    activeRepo.lastReadmeGeneratedAt = new Date();
-    activeRepo.readmeGenerationCount =
-      (activeRepo.readmeGenerationCount || 0) + 1;
-    activeRepo.lastReadmeSha = commitResult.commit.sha;
-    await activeRepo.save();
-
-    console.log(
-      `[AI Handler] ✓ README generation completed for ${repoFullName}`,
-    );
-
-    // Update log to success and save commitId
-    const successLog = await UserLogModel.findById(data.logId);
-    if (successLog) {
-      successLog.action = "README_GENERATION_SUCCESS";
-      successLog.status = "success";
-      successLog.commitId = commitResult.commit.sha;
-      await successLog.save();
       console.log(
-        `[AI Handler] Log updated with commitId: ${commitResult.commit.sha}`,
+        `[AI Handler] README patch committed successfully: ${commitResult.commit.sha}`,
       );
-    }
 
-    return {
-      success: true,
-      commitSha: commitResult.commit.sha,
-      readmeLength: generatedReadme.length,
-    };
+      activeRepo.sectionHashes = new Map(Object.entries(newHashes));
+      activeRepo.lastSectionHashesUpdatedAt = new Date();
+      activeRepo.lastReadmeGeneratedAt = new Date();
+      activeRepo.readmeGenerationCount =
+        (activeRepo.readmeGenerationCount || 0) + 1;
+      activeRepo.lastReadmeSha = commitResult.commit.sha;
+      await activeRepo.save();
+
+      await updateLogStatus(
+        data.logId,
+        "README_GENERATION_SUCCESS",
+        "success",
+        commitResult.commit.sha,
+      );
+
+      console.log(
+        `[AI Handler] ✓ Patch README generation completed for ${repoFullName}`,
+      );
+      return {
+        success: true,
+        commitSha: commitResult.commit.sha,
+        mode: "patch",
+      };
+    }
   } catch (error) {
     console.error(
       `[AI Handler] ✗ Error generating README for ${repoFullName}:`,
@@ -375,19 +450,9 @@ const aihandler = async (data) => {
     );
     console.error(error.stack);
 
-    // Update log to failed
-    try {
-      const errorLog = await UserLogModel.findById(data.logId);
-      if (errorLog) {
-        errorLog.action = "README_GENERATION_FAILED";
-        errorLog.status = "failed";
-        await errorLog.save();
-      }
-    } catch (logError) {
-      console.error("Failed to update error log:", logError.message);
-    }
+    await updateLogStatus(data.logId, "README_GENERATION_FAILED", "failed");
 
-    // Log error but don't throw - let BullMQ handle retries
+    // Re-throw so BullMQ can retry
     throw error;
   }
 };
@@ -491,71 +556,6 @@ async function fetchChangedFiles(
     }
   }
   return results;
-}
-
-/**
- * Check if README is substantial and well-formed
- * @param {string} readme - README content
- * @returns {boolean} True if README is good quality
- */
-function isReadmeSubstantial(readme) {
-  if (!readme || readme.trim().length === 0) {
-    return false;
-  }
-
-  // Check minimum length (at least 200 characters for a decent README)
-  if (readme.length < 200) {
-    return false;
-  }
-
-  // Check for common README sections (at least 2 should be present)
-  const commonSections = [
-    /##?\s*(about|overview|description|introduction)/i,
-    /##?\s*(installation|install|setup|getting started)/i,
-    /##?\s*(usage|how to use|examples)/i,
-    /##?\s*(features|functionality)/i,
-    /##?\s*(api|documentation|docs)/i,
-    /##?\s*(contributing|contribution)/i,
-    /##?\s*(license)/i,
-  ];
-
-  const sectionsFound = commonSections.filter((pattern) =>
-    pattern.test(readme),
-  ).length;
-
-  // If it has at least 2 sections, consider it good
-  if (sectionsFound >= 2) {
-    return true;
-  }
-
-  // Check if it's just a placeholder or very basic
-  const placeholderPatterns = [
-    /^#\s*[\w-]+\s*$/m, // Just a title
-    /TODO/i,
-    /coming soon/i,
-    /under construction/i,
-    /work in progress/i,
-  ];
-
-  const hasPlaceholder = placeholderPatterns.some((pattern) =>
-    pattern.test(readme),
-  );
-
-  // If it has placeholder text and few sections, it's not good
-  if (hasPlaceholder && sectionsFound < 2) {
-    return false;
-  }
-
-  // Check for code blocks or examples (indicates detailed documentation)
-  const hasCodeBlocks = /```[\s\S]*?```/.test(readme);
-
-  // If it has code blocks and reasonable length, it's probably good
-  if (hasCodeBlocks && readme.length > 300) {
-    return true;
-  }
-
-  // Default: if it's long enough and has some structure, consider it okay
-  return readme.length > 500 && sectionsFound >= 1;
 }
 
 /**
