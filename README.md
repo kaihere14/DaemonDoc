@@ -30,7 +30,6 @@ Targeted at **software teams, open‑source maintainers, and anyone who wants a 
 Current version: **v1.0.0** (first stable release).
 
 ---
-
 ## Features
 | Feature | Description | Status |
 |---|---|---|
@@ -46,7 +45,6 @@ Current version: **v1.0.0** (first stable release).
 | **Extensible Plugin System** *(planned)* | Hooks for custom renderers, theming, and CI integration. | ⚙️ Beta |
 
 ---
-
 ## Tech Stack
 | Layer | Technology | Reason |
 |---|---|---|
@@ -57,9 +55,8 @@ Current version: **v1.0.0** (first stable release).
 | **Analytics** | @vercel/analytics | Usage insights (optional) |
 
 ---
-
 ## Architecture
-```
+
 root
 ├─ client/                # React SPA (Vite)
 │   ├─ src/
@@ -82,7 +79,7 @@ root
 │
 ├─ .github/workflows/     # CI pipelines
 └─ docker-compose.yml     # Multi‑container dev setup (optional)
-```
+
 
 **Data Flow**  
 1. Browser → **React SPA** (Axios) → **Express API** (`/auth`, `/api/github`).  
@@ -91,7 +88,6 @@ root
 4. Frontend polls the rendered HTML endpoint for live preview.
 
 ---
-
 ## Getting Started
 
 ### Prerequisites
@@ -105,15 +101,17 @@ root
 | GitHub OAuth App | *Client ID & Secret* (for GitHub integration) |
 
 ### Clone the repository
-```bash
+bash
 git clone https://github.com/kaihere14/DaemonDoc.git
 cd DaemonDoc
-```
+
 
 ### Environment variables
 Create a `.env` file in the **server** folder (copy from the example):
+bash
 
-```bash
+
+---
 # server/.env
 PORT=3000
 MONGODB_URI=mongodb://localhost:27017/daemondoc
