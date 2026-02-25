@@ -794,14 +794,14 @@ async function generateSectionPatches(
         { role: "user", content: userPrompt },
       ],
       temperature: 0.3,
-      max_tokens: 3000,
+      max_tokens: 6000,
     },
     {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      timeout: 60000,
+      timeout: 90000,
     },
   );
 
@@ -876,10 +876,10 @@ export async function generateReadmePatch({
       console.log(`[Patch] Impact mapping: ${reasoning}`);
       console.log(`[Patch] Affected sections: ${affectedSections.join(", ")}`);
 
-      // Filter to editable keys only
-      const editableKeys = affectedSections.filter(
-        (k) => !FORBIDDEN_SECTIONS.includes(k) && originalSections[k] !== undefined,
-      );
+      // Filter to editable keys only — cap at 5 to stay within token budget
+      const editableKeys = affectedSections
+        .filter((k) => !FORBIDDEN_SECTIONS.includes(k) && originalSections[k] !== undefined)
+        .slice(0, 5);
 
       if (editableKeys.length === 0) {
         console.log("[Patch] No editable sections affected — skipping commit");
