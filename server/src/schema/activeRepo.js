@@ -21,8 +21,8 @@ const activeRepoSchema = new Schema(
     readmeGenerationCount: { type: Number, default: 0 },
     lastReadmeSha: { type: String, default: null },
 
-    // Section-level hashes for patch mode
-    sectionHashes: { type: Map, of: String, default: {} },
+    // Section-level hashes for patch mode (plain object — Mixed avoids Map cast errors)
+    sectionHashes: { type: Schema.Types.Mixed, default: {} },
     lastSectionHashesUpdatedAt: { type: Date, default: null },
   },
   { timestamps: true },

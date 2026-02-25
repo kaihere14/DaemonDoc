@@ -325,7 +325,8 @@ const aihandler = async (data) => {
       const { sections: newSections } = parseReadmeSections(generatedReadme);
       const newHashes = hashSections(newSections);
 
-      activeRepo.sectionHashes = new Map(Object.entries(newHashes));
+      activeRepo.sectionHashes = newHashes;
+      activeRepo.markModified("sectionHashes");
       activeRepo.lastSectionHashesUpdatedAt = new Date();
       activeRepo.lastReadmeGeneratedAt = new Date();
       activeRepo.readmeGenerationCount =
@@ -419,7 +420,8 @@ const aihandler = async (data) => {
         `[AI Handler] README patch committed successfully: ${commitResult.commit.sha}`,
       );
 
-      activeRepo.sectionHashes = new Map(Object.entries(newHashes));
+      activeRepo.sectionHashes = newHashes;
+      activeRepo.markModified("sectionHashes");
       activeRepo.lastSectionHashesUpdatedAt = new Date();
       activeRepo.lastReadmeGeneratedAt = new Date();
       activeRepo.readmeGenerationCount =
