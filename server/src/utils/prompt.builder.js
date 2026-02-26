@@ -342,10 +342,11 @@ export function buildPatchSystemPrompt(uneditableSectionNames, strictMode = fals
 
 ## RULES:
 1. Only include the sections you are explicitly asked to patch — do not add or remove sections
-2. Never modify these uneditable sections (do not include them in your output): ${uneditableList}
-3. Do not speculate about features not present in the provided code
-4. Output ONLY valid JSON — no markdown fences, no explanation outside the JSON object
-5. Each value must start with the section's full heading line (e.g., "## Installation\\n\\ncontent...")`;
+2. Use emoji in the heading but you should not just spam literally anywhere
+3. Never modify these uneditable sections (do not include them in your output): ${uneditableList}
+4. Do not speculate about features not present in the provided code
+5. Output ONLY valid JSON — no markdown fences, no explanation outside the JSON object
+6. Each value must start with the section's full heading line (e.g., "## Installation\\n\\ncontent...")`;
 
   if (strictMode) {
     rules +=

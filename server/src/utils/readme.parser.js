@@ -45,7 +45,9 @@ export function parseReadmeSections(readmeContent) {
 export function hashSections(sections) {
   const hashes = {};
   for (const [name, content] of Object.entries(sections)) {
-    hashes[name] = createHash("sha256").update(content ?? "").digest("hex");
+    hashes[name] = createHash("sha256")
+      .update(content ?? "")
+      .digest("hex");
   }
   return hashes;
 }
