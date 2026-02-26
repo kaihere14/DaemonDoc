@@ -14,7 +14,6 @@
 
 
 ---
-
 ## 🎯 Overview
 
 **DaemonDoc** is an intelligent README generation platform that leverages AI to automatically create and maintain comprehensive documentation for your GitHub repositories. By analyzing your codebase structure, dependencies, and commits, DaemonDoc generates professional, contextual READMEs that stay synchronized with your code through GitHub webhooks.
