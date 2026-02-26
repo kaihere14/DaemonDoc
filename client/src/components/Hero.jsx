@@ -1,183 +1,263 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useRef } from "react";
 import {
-  Github,
-  Terminal,
-  ChevronRight,
-  Code2,
-  Cpu,
-  FileText,
-  GitBranch,
-  Share2,
+  Play,
+  ArrowRight,
+  Lock,
+  PlugZap,
+  GitCommit,
+  FileCheck,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+
+// Positioned relative to the max-w-7xl container (not the viewport)
+const FLOATING_ICONS = [
+  {
+    id: "java",
+    bg: "#ffffff",
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg",
+    pos: "top-20 left-4",
+    rotate: "-rotate-6",
+    anim: "animate-float",
+  },
+  {
+    id: "cpp",
+    bg: "#00599c",
+    logo: "https://cdn.simpleicons.org/cplusplus/ffffff",
+    pos: "top-60 left-24",
+    rotate: "rotate-12",
+    anim: "animate-float-delayed",
+  },
+  {
+    id: "go",
+    bg: "#00acd7",
+    logo: "https://cdn.simpleicons.org/go/ffffff",
+    pos: "top-96 left-10",
+    rotate: "-rotate-3",
+    anim: "animate-float",
+  },
+  {
+    id: "js",
+    bg: "#ffffff",
+    logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
+    pos: "top-24 right-12",
+    rotate: "rotate-6",
+    anim: "animate-float-delayed",
+  },
+  {
+    id: "ts",
+    bg: "#3178c6",
+    logo: "https://cdn.simpleicons.org/typescript/ffffff",
+    pos: "top-64 right-32",
+    rotate: "-rotate-12",
+    anim: "animate-float",
+  },
+  {
+    id: "react",
+    bg: "#20232a",
+    logo: "https://cdn.simpleicons.org/react/61dafb",
+    pos: "top-96 right-8",
+    rotate: "rotate-3",
+    anim: "animate-float-delayed",
+  },
+];
+
+const STEPS = [
+  {
+    Icon: PlugZap,
+    title: "Connect Repo",
+    desc: "Link your GitHub repository once",
+    iconClass: "bg-blue-100 text-blue-600 border-blue-200",
+  },
+  {
+    Icon: GitCommit,
+    title: "Push Code",
+    desc: "Just code & commit as usual",
+    iconClass: "bg-sky-100 text-sky-600 border-sky-200",
+  },
+  {
+    Icon: FileCheck,
+    title: "README Updates",
+    desc: "Docs sync automatically instantly",
+    iconClass: "bg-emerald-100 text-emerald-600 border-emerald-200",
+  },
+];
 
 const Hero = () => {
-  const navigate = useNavigate();
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = React.useState(false);
+
+  const handleMouseEnter = () => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(console.error);
+      setIsPlaying(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const handleClick = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      videoRef.current.play().catch(console.error);
+      setIsPlaying(true);
+    }
+  };
+
   return (
-    <section
-      className="relative min-h-screen bg-white text-black selection:bg-black selection:text-white font-sans pt-24"
+    <main
+      className="relative pt-50 pb-16 lg:pt-50 lg:pb-0 overflow-hidden"
       id="hero"
     >
-      {/* The Background: Architectural Grid with Coordinates */}
-      <div
-        className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M100 100H0V0h100v100zM50 0v100M0 50h100' fill='none' stroke='%23000' stroke-width='1'/%3E%3C/svg%3E")`,
-        }}
-      />
+      <div className="absolute inset-0 hero-gradient z-0 pointer-events-none" />
 
-      <div className="max-w-[1400px] mx-auto px-6 md:px-10 relative z-10">
-        {/* HEADER: System Metadata (Density Fix) */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-black/10 pb-8 mb-12 gap-6">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-black animate-pulse" />
-              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.3em]">
-                DaemonDoc_Sys_Link
-              </span>
-            </div>
-            <h2 className="text-sm font-mono text-slate-400 italic">
-              Project: AI-Powered README Generator
-            </h2>
-          </div>
-          <div className="grid grid-cols-3 gap-8 font-mono text-[10px] uppercase font-bold tracking-tighter">
-            <div>
-              <p className="text-slate-400 mb-1">Engine</p>
-              <p>v0.4.2_AST</p>
-            </div>
-            <div>
-              <p className="text-slate-400 mb-1">Latency</p>
-              <p>842ms</p>
-            </div>
-            <div>
-              <p className="text-slate-400 mb-1">Uptime</p>
-              <p>99.98%</p>
-            </div>
-          </div>
-        </div>
-
-        {/* HERO CONTENT: Brutalist Typography */}
-        <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-20 mb-24">
-          <div className="max-w-4xl">
-            <motion.h1
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="text-[clamp(3.5rem,10vw,9rem)] leading-[0.82] font-[1000] tracking-[-0.06em] uppercase mb-12"
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        {/* Floating tech icon chips — absolute inside the container so they hug content edges */}
+        {FLOATING_ICONS.map((icon) => (
+          <div
+            key={icon.id}
+            className={`hidden lg:block absolute ${icon.pos} ${icon.anim}`}
+          >
+            <div
+              className={`bg-white/60 backdrop-blur-md border border-white/70 p-3 rounded-2xl shadow-lg shadow-slate-200/40 ${icon.rotate}`}
             >
-              Ship logic. <br />
-              <span className="text-slate-200">Docs follow.</span>
-            </motion.h1>
-
-            <div className="flex flex-wrap gap-4">
-              <button
-                onClick={() => navigate("/login")}
-                className="bg-black text-white px-8 py-5 rounded-xl font-black text-xs uppercase flex items-center gap-4 hover:bg-slate-800 transition-all border border-black group"
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{ background: icon.bg }}
               >
-                <Github size={18} />
-                <span>Initialize Git Hook</span>
-                <ChevronRight
-                  size={16}
-                  className="group-hover:translate-x-1 transition-transform"
-                />
-              </button>
-              <div className="px-8 py-5 border rounded-xl border-black/20 font-mono text-xs font-bold flex items-center gap-3 bg-slate-50">
-                <Terminal size={18} className="text-slate-400" />
-                <span>ssh root@void.null -p 404</span>
+                <img src={icon.logo} alt={icon.id} className="w-5 h-5" />
               </div>
             </div>
           </div>
+        ))}
+        {/* Headline + CTAs */}
+        <div className="max-w-4xl mx-auto space-y-8">
+          <h1
+            className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight text-slate-900"
+            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+          >
+            Where your code turns into{" "}
+            <span className="text-[#1d4ed8]">documentation</span> with a click
+          </h1>
 
-          {/* THE VISUAL: The "Vertical Pipeline" (Real Engineering) */}
-          <div className="relative border-l border-black/10 pl-12 py-4 hidden lg:block">
-            <div className="space-y-16 relative">
-              {/* Step 1: Code Input */}
-              <PipelineStep
-                icon={<Code2 size={20} />}
-                title="Source Extraction"
-                active
-              >
-                <div className="font-mono text-[11px] text-slate-500 space-y-1 mt-4">
-                  <p>&gt; Scanning ./src/dns-server.ts</p>
-                  <p>&gt; Extracting AST nodes (Function: resolveQuery)</p>
-                </div>
-              </PipelineStep>
+          <p className="text-xl md:text-2xl text-slate-600 font-light max-w-2xl mx-auto leading-relaxed">
+            Connect once. We handle the rest. Your README updates automatically
+            with every git push.
+          </p>
 
-              {/* Step 2: AI Comprehension */}
-              <PipelineStep icon={<Cpu size={20} />} title="Logic Synthesis">
-                <div className="mt-4 flex gap-2">
-                  <div className="px-2 py-1 bg-black text-white text-[9px] font-black uppercase">
-                    Redis_Cache
-                  </div>
-                  <div className="px-2 py-1 bg-slate-100 text-slate-500 text-[9px] font-black uppercase">
-                    Recursive_DNS
-                  </div>
-                </div>
-              </PipelineStep>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 pt-4">
+            <button
+              onClick={() => {
+                location.href = "/login";
+              }}
+              className="group bg-[#1d4ed8] cursor-pointer text-white px-8 py-3.5 rounded-full font-medium flex items-center gap-3 hover:scale-98 transition-transform shadow-xl"
+            >
+              <span>Try Now</span>
+              <span className="bg-white text-slate-900  rounded-full p-1">
+                <ArrowRight size={14} />
+              </span>
+            </button>
 
-              {/* Step 3: Markdown Generation */}
-              <PipelineStep icon={<FileText size={20} />} title="README Sync">
-                <div className="mt-4 border-t border-black/10 pt-4">
-                  <div className="h-2 w-full bg-slate-100 mb-2" />
-                  <div className="h-2 w-2/3 bg-slate-100" />
-                </div>
-              </PipelineStep>
-
-              {/* Connecting Line */}
-              <div className="absolute top-0 left-[-49px] bottom-0 w-[1px] bg-black/10 z-0" />
-            </div>
+            <a
+              href="#features"
+              className="text-slate-600 font-medium hover:text-[#1d4ed8] transition-colors flex items-center gap-1"
+            >
+              View Capabilities
+              <ArrowRight size={16} />
+            </a>
           </div>
         </div>
 
-        {/* FOOTER: Feature Blueprint */}
-        <div className="grid md:grid-cols-3 gap-px bg-black/10 border border-black/10 rounded-2xl overflow-hidden">
-          <FeatureCard
-            title="Recursive AST Analysis"
-            desc="We don't use regex. We parse your actual code structure to understand dependencies."
-            icon={<GitBranch size={20} />}
-          />
-          <FeatureCard
-            title="Redis-Backed Context"
-            desc="Instant documentation updates powered by high-speed state management."
-            icon={<Share2 size={20} />}
-          />
-          <FeatureCard
-            title="Zero-Configuration"
-            desc="Drops into your pre-commit hooks. No dashboard needed. Just engineering."
-            icon={<Terminal size={20} />}
-          />
+        {/* 3-step flow */}
+        <div className="max-w-4xl mx-auto mt-16 mb-8 px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center relative">
+            {/* Connecting line (desktop only) */}
+            <div className="hidden md:block absolute top-[38px] left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent z-0" />
+
+            {STEPS.map((step, i) => (
+              <div
+                key={i}
+                className="relative z-10 bg-white/60 backdrop-blur-sm p-4 rounded-xl"
+              >
+                <div
+                  className={`w-12 h-12 ${step.iconClass} rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border`}
+                >
+                  <step.Icon size={20} />
+                </div>
+                <h3 className="font-bold text-slate-900">
+                  {i + 1}. {step.title}
+                </h3>
+                <p className="text-sm text-slate-500 mt-1">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* README Preview Card */}
+        <div className="mt-12 relative mx-auto max-w-5xl">
+          {/* Gradient glow */}
+          <div className="absolute top-0 left-0 right-0 -inset-1 bg-gradient-to-r from-blue-500 to-sky-500 rounded-2xl blur opacity-20 animate-pulse-slow" />
+
+          {/* Browser card */}
+          <div className="relative bg-white rounded-xl shadow-2xl overflow-hidden border border-slate-200">
+            {/* Browser chrome */}
+            <div className="bg-slate-100 px-4 py-3 border-b border-slate-200 flex items-center gap-4">
+              <div className="flex gap-2 shrink-0">
+                <div className="w-3 h-3 rounded-full bg-red-400" />
+                <div className="w-3 h-3 rounded-full bg-amber-400" />
+                <div className="w-3 h-3 rounded-full bg-emerald-400" />
+              </div>
+              <div className="flex-1 bg-white rounded-md py-1 pr-20 text-xs text-slate-400 flex items-center justify-center gap-1 font-mono">
+                <Lock size={10} className="shrink-0" />
+                daemondoc.io/repo/readme-preview
+              </div>
+            </div>
+
+            {/* Video content */}
+            <div
+              className="relative w-full aspect-video bg-slate-900 overflow-hidden cursor-pointer"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+              onClick={handleClick}
+            >
+              <video
+                ref={videoRef}
+                src="https://pub-e788e87cb08043ab80dcbe889ea20c84.r2.dev/uploads/6938711c1aafcfa552a1d8ef/a8d02d2e4014e0ffadda5db81f6d1a989149753a9e5c6e92b8d2c3b12eaa1416+23"
+                loop
+                muted
+                playsInline
+                preload="metadata"
+                className="w-full h-full object-cover"
+              />
+              {/* Image thumbnail overlay */}
+              <img
+                src="/landing.png"
+                alt="Demo thumbnail"
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 z-10 ${isPlaying ? "opacity-0" : "opacity-100"}`}
+              />
+
+              {/* Play/pause icon overlay */}
+              <div className={`absolute inset-0 flex items-center justify-center bg-black/10 transition-opacity duration-300 pointer-events-none z-20 ${isPlaying ? "opacity-0" : "opacity-100"}`}>
+                <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg border border-white/20">
+                  <Play
+                    size={28}
+                    className="text-white ml-1"
+                    fill="currentColor"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+    </main>
   );
 };
-
-// Internal Components for Precision
-const PipelineStep = ({ icon, title, children, active }) => (
-  <div className="relative z-10">
-    <div
-      className={`absolute left-[-60px] top-0 w-6 h-6 rounded-full border border-black flex items-center justify-center bg-white ${
-        active ? "border-black" : "border-slate-200"
-      }`}
-    >
-      {React.cloneElement(icon, {
-        size: 12,
-        className: active ? "text-black" : "text-slate-300",
-      })}
-    </div>
-    <h3 className="text-xs font-black uppercase tracking-widest">{title}</h3>
-    {children}
-  </div>
-);
-
-const FeatureCard = ({ title, desc, icon }) => (
-  <div className={`bg-white p-10 hover:bg-slate-50 transition-colors`}>
-    <div className="mb-6">{icon}</div>
-    <h4 className="text-sm font-black uppercase tracking-tight mb-4">
-      {title}
-    </h4>
-    <p className="text-xs text-slate-500 leading-relaxed font-medium">{desc}</p>
-  </div>
-);
 
 export default Hero;

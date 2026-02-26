@@ -1,5 +1,70 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --color-primary: #1d4ed8;
+  --color-secondary: #3b82f6;
+}
+
+/* Custom utility classes */
+.glass-effect {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.hero-gradient {
+  background: radial-gradient(
+    circle at 50% 120%,
+    rgba(29, 78, 216, 0.2) 0%,
+    rgba(56, 189, 248, 0.15) 30%,
+    rgba(251, 191, 36, 0.1) 55%,
+    rgba(255, 255, 255, 0) 70%
+  );
+}
+
+.feature-gradient-1 {
+  background: radial-gradient(circle at top right, rgba(29, 78, 216, 0.07) 0%, transparent 60%);
+}
+
+.feature-gradient-2 {
+  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.08) 0%, transparent 60%);
+}
+
+.feature-gradient-3 {
+  background: radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.08) 0%, transparent 60%);
+}
+
+@keyframes float-anim {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes ping-slow-anim {
+  75%, 100% { transform: scale(2); opacity: 0; }
+}
+
+@keyframes pulse-slow-anim {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-float {
+  animation: float-anim 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-anim 6s ease-in-out 3s infinite;
+}
+
+.animate-ping-slow {
+  animation: ping-slow-anim 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow-anim 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
 /* Premium typography and smooth rendering */
 * {
   -webkit-font-smoothing: antialiased;
