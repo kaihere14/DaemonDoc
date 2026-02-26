@@ -139,7 +139,7 @@ const Hero = () => {
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Where your code turns into{" "}
-            <span className="text-primary">documentation</span> with a click
+            <span className="text-primary ">documentation</span> with a click
           </h1>
 
           <p className="text-xl md:text-2xl text-slate-600 font-light max-w-2xl mx-auto leading-relaxed">
@@ -174,7 +174,7 @@ const Hero = () => {
         <div className="max-w-4xl mx-auto mt-16 mb-8 px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center relative">
             {/* Connecting line (desktop only) */}
-            <div className="hidden md:block absolute top-[38px] left-0 w-full h-px bg-linear-to-r from-transparent via-slate-200 to-transparent z-0" />
+            <div className="hidden md:block absolute top-[68px] left-0 w-full h-px bg-linear-to-r from-transparent via-slate-200 to-transparent z-0" />
 
             {STEPS.map((step, i) => (
               <div

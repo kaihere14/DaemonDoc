@@ -1,8 +1,15 @@
 import React from "react";
 
-const PRODUCT_LINKS = ["Features", "Workflow", "Demo", "GitHub App"];
-const COMPANY_LINKS = ["About", "Careers", "Security"];
-const RESOURCE_LINKS = ["Documentation", "API Reference", "Changelog"];
+const PRODUCT_LINKS = [
+  { label: "Solutions", href: "#features" },
+  { label: "Product Engine", href: "#engine" },
+  { label: "Pricing", href: "#pricing" },
+];
+
+const LEGAL_LINKS = [
+  { label: "Privacy Policy", href: "#" },
+  { label: "Terms of Service", href: "#" },
+];
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -13,12 +20,12 @@ const Footer = () => {
         {/* Top grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16 pb-16">
           {/* Brand column */}
-          <div className="md:col-span-4 flex flex-col gap-6">
+          <div className="md:col-span-8 flex flex-col gap-6">
             <div className="flex items-center gap-2">
               <img
                 src="/DaemonLogo.png"
                 alt="DaemonDoc"
-                className="w-60 self-center pt-2"
+                className="w-48 sm:w-60"
               />
             </div>
             <p className="text-slate-600 leading-relaxed font-light max-w-xs text-sm">
@@ -27,19 +34,19 @@ const Footer = () => {
           </div>
 
           {/* Link columns */}
-          <div className="md:col-span-5 grid grid-cols-3 gap-8">
+          <div className="md:col-span-4 grid grid-cols-2 gap-8">
             <div>
               <h4 className="text-slate-900 font-semibold mb-6 text-xs uppercase tracking-wider">
                 Product
               </h4>
               <ul className="space-y-4">
                 {PRODUCT_LINKS.map((link) => (
-                  <li key={link}>
+                  <li key={link.label}>
                     <a
-                      href="#"
+                      href={link.href}
                       className="text-slate-600 hover:text-primary transition-colors text-sm"
                     >
-                      {link}
+                      {link.label}
                     </a>
                   </li>
                 ))}
@@ -47,57 +54,20 @@ const Footer = () => {
             </div>
             <div>
               <h4 className="text-slate-900 font-semibold mb-6 text-xs uppercase tracking-wider">
-                Company
+                Legal
               </h4>
               <ul className="space-y-4">
-                {COMPANY_LINKS.map((link) => (
-                  <li key={link}>
+                {LEGAL_LINKS.map((link) => (
+                  <li key={link.label}>
                     <a
-                      href="#"
+                      href={link.href}
                       className="text-slate-600 hover:text-primary transition-colors text-sm"
                     >
-                      {link}
+                      {link.label}
                     </a>
                   </li>
                 ))}
               </ul>
-            </div>
-            <div>
-              <h4 className="text-slate-900 font-semibold mb-6 text-xs uppercase tracking-wider">
-                Resources
-              </h4>
-              <ul className="space-y-4">
-                {RESOURCE_LINKS.map((link) => (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      className="text-slate-600 hover:text-primary transition-colors text-sm"
-                    >
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          {/* Subscribe column */}
-          <div className="md:col-span-3">
-            <h4 className="text-slate-900 font-semibold mb-6 text-xs uppercase tracking-wider">
-              Subscribe to Updates
-            </h4>
-            <p className="text-slate-500 text-sm mb-6 leading-relaxed">
-              Get the latest technical releases and news directly in your inbox.
-            </p>
-            <div className="flex flex-col gap-3">
-              <input
-                type="email"
-                placeholder="Email address"
-                className="w-full bg-slate-50 border border-slate-200 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400"
-              />
-              <button className="w-full bg-primary hover:bg-[#1e40af] text-white font-semibold py-3 px-6 rounded-lg transition-all shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 text-sm">
-                Join
-              </button>
             </div>
           </div>
         </div>
@@ -108,20 +78,6 @@ const Footer = () => {
             <span className="text-slate-500 text-sm">
               © {currentYear} DaemonDoc Inc.
             </span>
-            <div className="flex gap-6">
-              <a
-                href="#"
-                className="text-slate-500 hover:text-[#1d4ed8] transition-colors text-sm"
-              >
-                Privacy
-              </a>
-              <a
-                href="#"
-                className="text-slate-500 hover:text-[#1d4ed8] transition-colors text-sm"
-              >
-                Terms
-              </a>
-            </div>
           </div>
 
           <div className="flex items-center gap-6">
