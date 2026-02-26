@@ -16,7 +16,7 @@ const FLOATING_ICONS = [
     logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg",
     pos: "top-20 left-4",
     rotate: "-rotate-6",
-    anim: "animate-float",
+    anim: "",
   },
   {
     id: "cpp",
@@ -24,7 +24,7 @@ const FLOATING_ICONS = [
     logo: "https://cdn.simpleicons.org/cplusplus/ffffff",
     pos: "top-60 left-24",
     rotate: "rotate-12",
-    anim: "animate-float-delayed",
+    anim: "",
   },
   {
     id: "go",
@@ -32,7 +32,7 @@ const FLOATING_ICONS = [
     logo: "https://cdn.simpleicons.org/go/ffffff",
     pos: "top-96 left-10",
     rotate: "-rotate-3",
-    anim: "animate-float",
+    anim: "",
   },
   {
     id: "js",
@@ -40,7 +40,7 @@ const FLOATING_ICONS = [
     logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
     pos: "top-24 right-12",
     rotate: "rotate-6",
-    anim: "animate-float-delayed",
+    anim: "",
   },
   {
     id: "ts",
@@ -48,7 +48,7 @@ const FLOATING_ICONS = [
     logo: "https://cdn.simpleicons.org/typescript/ffffff",
     pos: "top-64 right-32",
     rotate: "-rotate-12",
-    anim: "animate-float",
+    anim: "",
   },
   {
     id: "react",
@@ -56,7 +56,7 @@ const FLOATING_ICONS = [
     logo: "https://cdn.simpleicons.org/react/61dafb",
     pos: "top-96 right-8",
     rotate: "rotate-3",
-    anim: "animate-float-delayed",
+    anim: "",
   },
 ];
 
