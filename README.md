@@ -1,3 +1,4 @@
+
 # 📚 DaemonDoc - AI-Powered README Generator
 
 <div align="center">
@@ -236,32 +237,20 @@ REDIS_PASSWORD=your_redis_password
 FRONTEND_URL=http://localhost:5173
 BACKEND_URL=http://localhost:3000
 
-# Groq AI Configuration
+## 🤖 Groq AI Configuration
+
+# Groq Configuration
 GROQ_API_KEY=gsk_your_groq_api_key_here
 GROQ_MODEL=llama-3.3-70b-versatile
+
+# Gemini Configuration
+GEMINI_API_KEY1=your_gemini_api_key_1
+# GEMINI_API_KEY2=your_gemini_api_key_2 # Optional, for redundancy
+# GEMINI_API_KEY3=your_gemini_api_key_3 # Optional, for redundancy
+GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL_MINI=gemini-2.5-flash-lite
+
 README_FILE_NAME=README.md
-```
-
-### 3. Client Setup
-
-```bash
-cd ../client
-npm install
-```
-
-Create `.env` file in `client/` directory:
-
-```env
-VITE_BACKEND_URL=http://localhost:3000
-```
-
-### 4. Start Development Servers
-
-**Terminal 1 - Backend:**
-
-```bash
-cd server
-npm run dev
 # Server starts on http://localhost:3000
 ```
 
@@ -301,11 +290,19 @@ Open your browser and navigate to **http://localhost:5173**
 4. Click **Create API Key**
 5. Copy the key and add to `server/.env` as `GROQ_API_KEY`
 
+### Gemini API Setup
+
+1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey) or [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Create or select a project.
+3. Generate an API key.
+4. Add to `server/.env` as `GEMINI_API_KEY1`. You can add up to three keys (`GEMINI_API_KEY2`, `GEMINI_API_KEY3`) for rate limiting and redundancy.
+
 ### Redis Setup
 
 **Local Development:**
 
-```bash
+bash
+
 # macOS with Homebrew
 brew install redis
 brew services start redis
