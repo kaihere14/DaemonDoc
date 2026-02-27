@@ -12,7 +12,7 @@ jobs:
       - name: Ping Render Health Endpoint
         run: |
           echo "🔄 Pinging Render at $(date)"
-          response=$(curl -s -o /dev/null -w "%{http_code}" https://readit-4.onrender.com/health)
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://api.daemondoc.online/health)
           if [ $response -eq 200 ]; then
             echo "✓ Server is alive (HTTP $response)"
           else
