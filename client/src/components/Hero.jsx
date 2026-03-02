@@ -227,7 +227,7 @@ const Hero = () => {
             >
               <video
                 ref={videoRef}
-                src="https://pub-e788e87cb08043ab80dcbe889ea20c84.r2.dev/uploads/6938711c1aafcfa552a1d8ef/a8d02d2e4014e0ffadda5db81f6d1a989149753a9e5c6e92b8d2c3b12eaa1416+23"
+                src="https://pub-e788e87cb08043ab80dcbe889ea20c84.r2.dev/uploads/6938711c1aafcfa552a1d8ef/0e27fe3948b7dddab65cd51143e7212f40ba6efaad7c1282d1527cbe3fde92fb%2B27"
                 loop
                 muted
                 playsInline
