@@ -107,7 +107,7 @@ export const createOAuthUser = async (profile, access_token) => {
 export const verifyUser = async (req, res) => {
   const userId = req.userId;
   try {
-    const user = await User.findById(userId).select("-__v");
+    const user = await User.findById(userId).select("-__v -githubAccessToken");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
