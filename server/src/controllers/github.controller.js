@@ -136,6 +136,42 @@ export const addRepoActivity = async (req, res) => {
 
     await activeRepo.save();
 
+    // On first-ever activation, immediately trigger README generation
+    // so users don't have to make a commit themselves to see it work.
+    const hasBeenActivatedBefore = await ActiveRepo.findOne({
+      userId,
+      repoId,
+      active: false,
+    });
+    if (!hasBeenActivatedBefore) {
+      try {
+        const refRes = await githubGet(
+          `${GITHUB_API_BASE}/repos/${repoOwner}/${repoName}/git/ref/heads/${defaultBranch}`,
+          accessToken,
+        );
+        const headSha = refRes.data.object.sha;
+
+        await readmeQueue.add("generate-readme", {
+          userId,
+          repoId,
+          repoName,
+          repoFullName,
+          repoOwner,
+          defaultBranch,
+          commitSha: headSha,
+        });
+
+        activeRepo.lastProcessedSha = headSha;
+        await activeRepo.save();
+      } catch (err) {
+        console.error(
+          "Failed to trigger initial README generation:",
+          err.message,
+        );
+        // Non-fatal: repo is still activated, pipeline just won't auto-start
+      }
+    }
+
     res.status(200).json({ message: "Repository activity added successfully" });
   } catch (error) {
     res
