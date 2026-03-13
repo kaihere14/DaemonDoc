@@ -25,6 +25,7 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 ## ✨ Features
 
 - **Smart README generation** — Analyzes actual code, not just file names. Understands structure, dependencies, and intent.
+- **Immediate first-time generation** — README is generated instantly upon first repository activation, no need to wait for a push.
 - **Incremental patch mode** — On subsequent pushes, only the sections affected by your changes are updated, not the whole README.
 - **Multi-key AI fallback** — Up to 3 Gemini keys tried in order, then up to 3 Groq keys. Generation continues as long as any key works.
 - **Large context scanning** — Gemini's 1M token window allows scanning up to 50 files at 500 lines each, vs Groq's conservative 25 files / 200 lines.
@@ -35,7 +36,7 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 
 
 1. Connect GitHub Account  →  OAuth login, encrypted token stored
-2. Activate a Repo         →  Webhook created, initial README generated
+2. Activate a Repo         →  Webhook created. If it's the first activation, an initial README is generated immediately.
 3. Push Code               →  Webhook fires, job queued in Redis
 4. AI Scans Codebase       →  Step 1: file selection (mini model)
                                Step 2: README generation (main model)
