@@ -135,13 +135,13 @@ const Hero = () => {
         {/* Headline + CTAs */}
         <div className="max-w-4xl mx-auto space-y-8">
           <h1
-            className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight text-slate-900"
+            className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight text-slate-900 overflow-visible"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Where your code turns into{" "}
-            <span className="inline-block text-primary font-extrabold ml-5 transform-[perspective(800px)_rotateY(15deg)_rotateX(5deg)] bg-blue-50/50 px-2 rounded-lg border border-blue-100 shadow-sm ">
+            <span className="inline-block text-primary font-extrabold mx-1 sm:ml-5 sm:mr-0 transform-[perspective(800px)_rotateY(15deg)_rotateX(5deg)] bg-blue-50/50 px-2 rounded-lg border border-blue-100 shadow-sm leading-tight whitespace-nowrap">
               documentation
-            </span>
+            </span>{" "}
             with a click
           </h1>
 

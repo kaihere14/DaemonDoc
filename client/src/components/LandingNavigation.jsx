@@ -14,14 +14,14 @@ const LandingNavigation = () => {
 
   return (
     <nav className="fixed w-full z-50 bg-white/80 glass-effect border-b border-slate-100 transition-all duration-300">
-      <div className="max-w-[1400px] sm:mx-auto  px-4 sm:px-0 lg:pr-22 lg:pl-6">
-        <div className="flex justify-between items-center h-20">
+      <div className="max-w-[1400px] sm:mx-auto px-4 sm:px-6 lg:pr-22 lg:pl-6 w-full">
+        <div className="flex justify-between items-center h-20 w-full">
           {/* Logo */}
           <a href="#" className="flex items-center gap-2 justify-center">
             <img
               src="/DaemonLogo.png"
               alt="DaemonDoc"
-              className="w-45 md:w-60 self-center pt-2 mr-55 md:mr-0"
+              className="w-40 sm:w-45 md:w-60 self-center pt-2"
             />
           </a>
 
