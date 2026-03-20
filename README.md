@@ -33,6 +33,8 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 - **GitHub OAuth** — Secure login, AES-256-GCM encrypted token storage, HMAC-SHA256 webhook verification.
 - **Activity logs** — Dashboard shows every job: repo, timestamp, success/failed/in-progress status.
 - **Toast notifications** — Provides instant, non-intrusive feedback for user actions like activating/deactivating repositories.
+- **Animated UI elements** — Dynamic and engaging animations for key sections like the Hero.
+- **Modernized Login Page** — Redesigned login experience with a sleek split-layout and user testimonials.
 ## ⚙️ How It Works
 
 
@@ -67,8 +69,13 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 | React Router | Client-side routing | 7.x |
 | Tailwind CSS | Styling | 4.x |
 | Framer Motion | Animations | 12.x |
+| Motion | Declarative animations | 12.x |
 | Zustand | State management | 5.x |
-| Lucide React | Icons | — |
+| Lucide React | Icons | 0.562.0 |
+| Sonner | Toast notifications | 2.x |
+| @base-ui/react | UI primitives | 1.x |
+| @fontsource-variable/geist | Fonts | 5.x |
+| tw-animate-css | Tailwind animations | 1.x |
 
 ### Backend (`/server`)
 
