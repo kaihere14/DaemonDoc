@@ -32,6 +32,7 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 - **Async job queue** — BullMQ + Redis handles all generation in the background; webhooks return instantly.
 - **GitHub OAuth** — Secure login, AES-256-GCM encrypted token storage, HMAC-SHA256 webhook verification.
 - **Activity logs** — Dashboard shows every job: repo, timestamp, success/failed/in-progress status.
+- **Toast notifications** — Provides instant, non-intrusive feedback for user actions like activating/deactivating repositories.
 ## ⚙️ How It Works
 
 
@@ -93,7 +94,6 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 | **Redis** | BullMQ job queue |
 
 ---
-
 ## Architecture
 
 ```
@@ -144,21 +144,22 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 
 ### 1. Clone
 
-```bash
+bash
 git clone https://github.com/yourusername/daemondoc.git
 cd daemondoc
-```
+
 
 ### 2. Server setup
 
-```bash
+bash
 cd server
 npm install
-```
+
 
 Create `server/.env`:
 
-```env
+env
+
 # Database
 MONGO_URI=mongodb+srv://user:password@cluster.mongodb.net/daemondoc
 
@@ -219,12 +220,11 @@ cd server && npm run dev
 
 # Terminal 2 — frontend
 cd client && npm run dev
-```
+
 
 Open **http://localhost:5173**
 
 ---
-
 ## Configuration
 
 ### GitHub OAuth App
@@ -248,7 +248,10 @@ Open **http://localhost:5173**
 ### Redis
 
 **Local:**
-```bash
+bash
+
+
+---
 # macOS
 brew install redis && brew services start redis
 
