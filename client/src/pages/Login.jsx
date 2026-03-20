@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import SEO from "../components/SEO";
+import { Github, ArrowLeft, Star } from "lucide-react";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -21,22 +22,14 @@ const Login = () => {
 
   if (isLoading) {
     return (
-      <>
-        <SEO
-          title="Login - DaemonDoc | Connect Your GitHub Account"
-          description="Sign in to DaemonDoc with your GitHub account to start automating your repository documentation with AI-powered README generation."
-          ogUrl="https://daemondoc.online/login"
-          canonical="https://daemondoc.online/login"
-        />
-        <div className="min-h-screen flex items-center justify-center bg-white">
-          <div className="w-10 h-10 border-4 border-blue-200 border-t-[#1d4ed8] rounded-full animate-spin" />
-        </div>
-      </>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="w-10 h-10 border-4 border-slate-100 border-t-primary rounded-full animate-spin" />
+      </div>
     );
   }
 
   return (
-    <>
+    <div className="h-dvh w-full bg-white flex flex-col md:flex-row overflow-hidden relative selection:bg-primary selection:text-white font-sans">
       <SEO
         title="Login - DaemonDoc | Connect Your GitHub Account"
         description="Sign in to DaemonDoc with your GitHub account to start automating your repository documentation with AI-powered README generation."
@@ -44,84 +37,92 @@ const Login = () => {
         canonical="https://daemondoc.online/login"
       />
 
-      <div className="min-h-screen bg-white flex items-center justify-center px-4">
-        <div className="w-full max-w-md">
-          {/* Card */}
-          <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-200 p-8 space-y-7">
-            {/* Logo + headline */}
-            <div className="text-center space-y-3">
-              <a href="/">
-                <img
-                  src="/DaemonLogo.png"
-                  alt="DaemonDoc"
-                  className="w-52 mx-auto"
-                />
-              </a>
+      {/* Subtle landing-page style blobs, much lower opacity */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/5 rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-100/10 rounded-full blur-[160px] pointer-events-none" />
+
+      {/* Top Left Navigation Bar */}
+      <div className="absolute top-0 left-0 w-full p-4 lg:p-6 flex justify-between items-center z-50 pointer-events-none">
+        <a href="/" className="pointer-events-auto">
+          <img 
+            src="/DaemonLogo.png" 
+            alt="DaemonDoc" 
+            className="h-12 lg:h-16 w-auto scale-300 pl-3 sm:scale-190 sm:pl-9" 
+          />
+        </a>
+        <button
+          onClick={() => navigate("/")}
+          className="pointer-events-auto flex items-center gap-2 text-slate-400 hover:text-primary transition-colors text-xs font-bold uppercase tracking-widest cursor-pointer group"
+        >
+          <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
+          Back to site
+        </button>
+      </div>
+
+      {/* Auth Side (Split 45/55) */}
+      <div className="w-full md:w-[45%] lg:w-[40%] h-full flex flex-col justify-center px-10 lg:px-24 bg-white relative">
+        <div className="max-w-sm w-full animate-in fade-in slide-in-from-bottom-6 duration-700">
+          <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-bold uppercase tracking-widest mb-6 border border-primary/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+            Secure Authentication
+          </div>
+          
+          <h1 className="text-5xl lg:text-7xl font-bold tracking-tighter text-slate-900 mb-6 font-display">
+            Welcome.
+          </h1>
+          <p className="text-slate-500 mb-12 text-xl leading-relaxed font-sans font-medium">
+            Documentation is the silent killer of productivity. We fixed that.
+          </p>
+
+          <button
+            onClick={handleGitHubLogin}
+            className="w-full h-18 text-shadow-md drop-shadow-2xl rounded-2xl bg-primary hover:bg-primary/95 text-white font-bold transition-all duration-300 flex items-center justify-center gap-4 group shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30  cursor-pointer"
+          >
+            <Github size={24}  />
+            <span className="text-xl font-display tracking-tight">Continue with GitHub</span>
+          </button>
+
+          <p className="mt-8 text-[11px] text-slate-400 font-bold uppercase tracking-[0.25em] leading-relaxed">
+            SYNC REQUIRES READ & WRITE ACCESS. ALWAYS SECURE.
+          </p>
+        </div>
+      </div>
+
+      {/* Visual Side (Split 55/45) */}
+      <div className="hidden md:flex flex-1 h-full bg-[#fcfcfd] relative items-center justify-center p-12 lg:p-24 overflow-hidden border-l border-slate-100">
+        <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
+        
+        <div className="relative z-10 max-w-xl animate-in fade-in zoom-in-95 duration-1000">
+          {/* Testimonial Card with Landing Page Dashed-Border and Primary Accents */}
+          <div className="bg-white/80 backdrop-blur-md p-12 lg:p-16 rounded-[48px] shadow-[0_32px_64px_-16px_rgba(29,78,216,0.08)] border-2 border-dashed border-slate-200 relative group">
+            {/* Primary Accent Stripe - Matching Landing workflow step cards */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-primary rounded-b-full shadow-[0_0_20px_rgba(29,78,216,0.3)]" />
+            
+            <h2 className="text-3xl lg:text-5xl font-bold text-slate-900 mb-12 leading-[1.1] font-display tracking-tight">
+              "Finally, I can focus on building instead of writing docs."
+            </h2>
+            
+            <div className="flex items-center gap-5 pt-8 border-t border-slate-50">
+              <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-primary/10 shadow-md">
+                <img src="https://i.pravatar.cc/150?u=48" alt="Developer" className="w-full h-full object-cover" />
+              </div>
               <div>
-                <h1
-                  className="text-2xl font-bold text-slate-900"
-                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                >
-                  Welcome back
-                </h1>
-                <p className="text-slate-500 text-sm mt-1">
-                  Connect your GitHub to automate your docs
-                </p>
+                <div className="font-bold text-slate-900 text-lg">Alex Rivers</div>
+                <div className="text-sm text-primary font-bold tracking-tight uppercase">Lead Engineer @ TechFlow</div>
               </div>
             </div>
-
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200" />
-              </div>
-              <div className="relative flex justify-center">
-                <span className="px-4 bg-white text-xs text-slate-400 font-medium tracking-wide uppercase">
-                  Continue with
-                </span>
-              </div>
-            </div>
-
-            {/* GitHub button */}
-            <button
-              onClick={handleGitHubLogin}
-              className="w-full bg-[#24292e] hover:bg-[#1a1e22] text-white font-semibold py-3.5 px-4 rounded-full transition-all duration-200 flex items-center justify-center gap-3 shadow-lg shadow-slate-900/20 hover:shadow-xl hover:shadow-slate-900/25 hover:scale-[1.01] cursor-pointer"
-            >
-              <svg
-                className="w-5 h-5 shrink-0"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span>Continue with GitHub</span>
-            </button>
-
-            {/* Terms */}
-            <p className="text-center text-xs text-slate-400">
-              By continuing, you agree to our{" "}
-              <a
-                href="#"
-                className="text-slate-600 hover:text-slate-900 font-medium transition-colors"
-              >
-                Terms of Service
-              </a>{" "}
-              and{" "}
-              <a
-                href="#"
-                className="text-slate-600 hover:text-slate-900 font-medium transition-colors"
-              >
-                Privacy Policy
-              </a>
-            </p>
+          </div>
+          
+          <div className="mt-16 flex justify-center gap-10 text-slate-400 font-bold text-[10px] uppercase tracking-[0.3em] opacity-60">
+            <span className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-primary" /> SOC2 Ready</span>
+            <span className="text-slate-200">•</span>
+            <span className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-primary" /> AES-256</span>
+            <span className="text-slate-200">•</span>
+            <span className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-primary" /> GDPR Ready</span>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
