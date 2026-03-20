@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
 import Login from "./pages/Login";
 import OauthVerify from "./pages/OauthVerify";
 import Landing from "./pages/Landing";
@@ -10,6 +11,7 @@ import Logs from "./pages/Logs";
 const App = () => {
   return (
     <div>
+      <Toaster position="bottom-right" richColors closeButton />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />

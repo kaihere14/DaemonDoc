@@ -24,5 +24,5 @@ export function useRepos(user) {
     fetchRepos();
   }, [user]);
 
-  return { repos, loading, error, fetchRepos };
+  return { repos, setRepos, loading, error, fetchRepos };
 }
