@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { GitBranch, Lock, Unlock, Loader2, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
 import { api, ENDPOINTS } from "../lib/api";
 
 const RepoCard = ({ repo, showToggle = true, onToggle }) => {
@@ -18,6 +19,8 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
     setLoading(true);
 
     const endpoint = isActive ? ENDPOINTS.DEACTIVATE_REPO : ENDPOINTS.ADD_REPO;
+    const action = isActive ? "Deactivated" : "Activated";
+    
     const body = isActive
       ? { repoId: repo.id }
       : {
@@ -31,9 +34,10 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
     try {
       await api.post(endpoint, body);
       setIsActive(!isActive);
+      toast.success(`${action} ${repo.name} Successfully`);
       if (onToggle) onToggle();
     } catch (err) {
-      alert(
+      toast.error(
         err.response?.data?.message ||
           `Failed to ${isActive ? "deactivate" : "activate"} repository`,
       );
@@ -50,19 +54,21 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
         y: -4,
         boxShadow: "0 8px 30px rgba(0,0,0,0.04)",
       }}
-      onClick={handleCardClick}
-      className="bg-white/70 backdrop-blur-xl border border-slate-200/60 rounded-3xl p-6 transition-all duration-50 hover:border-slate-300 cursor-pointer group flex flex-col h-full shadow-sm"
+      className="bg-white/70 backdrop-blur-xl border border-slate-200/60 rounded-3xl p-6 transition-all duration-50 hover:border-slate-300 group flex flex-col h-full shadow-sm"
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <GitBranch size={16} className="text-slate-400 shrink-0" />
-            <h3 className="text-lg font-bold text-slate-900 truncate group-hover:text-slate-700 transition-colors">
+          <div 
+            className="flex items-center gap-2 mb-1 cursor-pointer group/title w-fit"
+            onClick={handleCardClick}
+          >
+            <GitBranch size={16} className="text-slate-400 shrink-0 group-hover/title:text-primary transition-colors" />
+            <h3 className="text-lg font-bold text-slate-900 truncate group-hover/title:text-primary transition-colors decoration-primary/30 underline-offset-4 hover:underline">
               {repo.name}
             </h3>
             <ExternalLink
               size={14}
-              className="text-slate-400 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="text-slate-400 shrink-0 opacity-50 group-hover/title:opacity-100 transition-all group-hover/title:text-primary"
             />
           </div>
           <p className="text-xs text-slate-500 truncate">{repo.full_name}</p>
@@ -79,7 +85,7 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
               <button
                 onClick={handleToggle}
                 disabled={loading}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 ${
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 cursor-pointer ${
                   isActive ? "bg-emerald-500" : "bg-slate-300"
                 }`}
               >

@@ -3,10 +3,14 @@ import {
   Play,
   ArrowRight,
   Lock,
-  PlugZap,
   GitCommit,
   FileCheck,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Unplug } from "@/components/animate-ui/icons/unplug";
+import { Activity } from "@/components/animate-ui/icons/activity";
+import { ClipboardCheck } from "@/components/animate-ui/icons/clipboard-check";
+import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 
 // Positioned relative to the max-w-7xl container (not the viewport)
 const FLOATING_ICONS = [
@@ -16,7 +20,7 @@ const FLOATING_ICONS = [
     logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg",
     pos: "top-20 left-4",
     rotate: "-rotate-6",
-    anim: "",
+    anim: "animate-float-slow",
   },
   {
     id: "cpp",
@@ -24,7 +28,7 @@ const FLOATING_ICONS = [
     logo: "https://cdn.simpleicons.org/cplusplus/ffffff",
     pos: "top-60 left-24",
     rotate: "rotate-12",
-    anim: "",
+    anim: "animate-float-slow-delayed",
   },
   {
     id: "go",
@@ -32,7 +36,7 @@ const FLOATING_ICONS = [
     logo: "https://cdn.simpleicons.org/go/ffffff",
     pos: "top-96 left-10",
     rotate: "-rotate-3",
-    anim: "",
+    anim: "animate-float-slow",
   },
   {
     id: "js",
@@ -40,7 +44,7 @@ const FLOATING_ICONS = [
     logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
     pos: "top-24 right-12",
     rotate: "rotate-6",
-    anim: "",
+    anim: "animate-float-slow-delayed",
   },
   {
     id: "ts",
@@ -48,33 +52,33 @@ const FLOATING_ICONS = [
     logo: "https://cdn.simpleicons.org/typescript/ffffff",
     pos: "top-64 right-32",
     rotate: "-rotate-12",
-    anim: "",
+    anim: "animate-float-slow",
   },
   {
     id: "react",
     bg: "#20232a",
     logo: "https://cdn.simpleicons.org/react/61dafb",
-    pos: "top-96 right-8",
+    pos: "top-96 right-10",
     rotate: "rotate-3",
-    anim: "",
+    anim: "animate-float-slow-delayed",
   },
 ];
 
 const STEPS = [
   {
-    Icon: PlugZap,
+    Icon: (props) => <Unplug {...props} />,
     title: "Connect Repo",
     desc: "Link your GitHub repository once",
     iconClass: "bg-blue-100 text-blue-600 border-blue-200",
   },
   {
-    Icon: GitCommit,
+    Icon: (props) => <Activity {...props} />,
     title: "Push Code",
     desc: "Just code & commit as usual",
     iconClass: "bg-sky-100 text-sky-600 border-sky-200",
   },
   {
-    Icon: FileCheck,
+    Icon: (props) => <ClipboardCheck {...props} />,
     title: "README Updates",
     desc: "Docs sync automatically instantly",
     iconClass: "bg-emerald-100 text-emerald-600 border-emerald-200",
@@ -112,12 +116,34 @@ const Hero = () => {
 
   return (
     <main
-      className="relative pt-36 pb-20 lg:pt-50 lg:pb-24 overflow-hidden"
+      className="relative  pt-36 pb-20 lg:pt-50 lg:pb-24 overflow-hidden"
       id="hero"
     >
-      <div className="absolute inset-0 hero-gradient z-0 pointer-events-none" />
+      {/* Subtle SVG Grid Background */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.15] mask-[radial-gradient(100%_100%_at_50%_0%,white,transparent)]">
+        <svg className="h-full w-full" aria-hidden="true">
+          <defs>
+            <pattern
+              id="hero-grid"
+              width="60"
+              height="60"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M.5 60V.5H60"
+                fill="none"
+                stroke="currentColor"
+                className="text-blue-500"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#hero-grid)" />
+        </svg>
+      </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+      <div className="absolute inset-0  bg-linear-to-b from-transparent via-cyan-50/30  to-white  z-0 pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8  relative z-10 text-center">
         {/* Floating tech icon chips — absolute inside the container so they hug content edges */}
         {FLOATING_ICONS.map((icon) => (
           <div
@@ -139,8 +165,28 @@ const Hero = () => {
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Where your code turns into{" "}
-            <span className="inline-block text-primary font-extrabold mx-1 sm:ml-5 sm:mr-0 transform-[perspective(800px)_rotateY(15deg)_rotateX(5deg)] bg-blue-50/50 px-2 rounded-lg border border-blue-100 shadow-sm leading-tight whitespace-nowrap">
+            <span className="relative inline-block text-shadow-md drop-shadow-2xl text-primary font-extrabold mx-1 sm:ml-5 sm:mr-0 transform-[perspective(800px)_rotateY(15deg)_rotateX(5deg)] bg-blue-50/50 px-2 rounded-lg border border-blue-100 shadow-sm leading-tight whitespace-nowrap">
               documentation
+              <svg
+                className="absolute -bottom-2 left-0 w-full h-3 text-primary/40"
+                viewBox="0 0 200 10"
+                preserveAspectRatio="none"
+              >
+                <motion.path
+                  d="M0 5 Q 50 1 100 5 T 200 5"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  fill="none"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1 }}
+                  transition={{
+                    duration: 1.5,
+                    delay: 0.5,
+                    ease: "easeOut",
+                  }}
+                />
+              </svg>
             </span>{" "}
             with a click
           </h1>
@@ -150,22 +196,22 @@ const Hero = () => {
             with every git push.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 pt-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <button
               onClick={() => {
                 location.href = "/login";
               }}
-              className="group bg-primary cursor-pointer text-white px-8 py-3.5 rounded-full font-medium flex items-center gap-3 hover:bg-primary/90 transition-colors ease-in-out duration-200 shadow-xl"
+              className="group bg-primary group text-shadow-md drop-shadow-2xl cursor-pointer text-white px-8 py-3.5 rounded-full font-medium flex items-center gap-3 hover:bg-primary/90 transition-colors ease-in-out duration-200 shadow-xl"
             >
               <span>Try Now</span>
-              <span className="bg-white text-slate-900  rounded-full p-1">
+              <span className="bg-white group-hover:-rotate-23 drop-shadow-2xl transition-all duration-300 ease-out text-slate-900  rounded-full p-1">
                 <ArrowRight size={14} />
               </span>
             </button>
 
             <a
               href="#features"
-              className="text-slate-600 font-medium hover:text-primary transition-colors flex items-center gap-1"
+              className="text-slate-600 hover:bg-neutral-300/30 p-4 rounded-full font-medium transition duration-300 flex items-center justify-center gap-1"
             >
               View Capabilities
               <ArrowRight size={16} />
@@ -176,24 +222,64 @@ const Hero = () => {
         {/* 3-step flow */}
         <div className="max-w-4xl mx-auto mt-16 mb-8 px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center relative">
-            {/* Connecting line (desktop only) */}
-            <div className="hidden md:block absolute top-[68px] left-0 w-full h-px bg-linear-to-r from-transparent via-slate-200 to-transparent z-0" />
+            {/* Connecting SVG Flow (desktop only) */}
+            <div className="hidden md:block absolute top-[28px] left-0 w-full h-[80px] z-0 overflow-visible pointer-events-none">
+              <svg
+                width="100%"
+                height="80"
+                viewBox="0 0 1000 80"
+                fill="none"
+                preserveAspectRatio="none"
+              >
+                {/* More visible base path with 'live' flow */}
+                <motion.path
+                  d="M 120 40 L 880 40"
+                  stroke="#3b82f6" 
+                  strokeWidth="1.5"
+                  strokeDasharray="10 10"
+                  className="opacity-40" 
+                  animate={{ strokeDashoffset: [0, -20] }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "linear",
+                  }}
+                />
+
+                {/* Bright Travelling Data Packet */}
+                <motion.circle
+                  r="4"
+                  fill="#1d4ed8"
+                  className="shadow-[0_0_12px_rgba(29,78,216,0.8)]"
+                  animate={{
+                    cx: [120, 500, 500, 880, 880, 120],
+                    opacity: [0, 1, 1, 1, 0, 0],
+                  }}
+                  transition={{
+                    duration: 8,
+                    repeat: Infinity,
+                    times: [0, 0.1, 0.45, 0.9, 0.95, 1],
+                    ease: "easeInOut",
+                  }}
+                  cy="40"
+                />
+              </svg>
+            </div>
 
             {STEPS.map((step, i) => (
-              <div
-                key={i}
-                className="relative z-10 bg-white/60 backdrop-blur-sm p-4 rounded-xl"
-              >
-                <div
-                  className={`w-12 h-12 ${step.iconClass} rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border`}
-                >
-                  <step.Icon size={20} />
+              <AnimateIcon key={i} animateOnHover asChild>
+                <div className="relative border-dashed border border-neutral-200 drop-shadow-xl z-10 bg-white/60 backdrop-blur-sm p-4 rounded-xl group hover:bg-white transition-colors duration-300">
+                  <div
+                    className={`w-12 h-12 ${step.iconClass} rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border transition-shadow group-hover:shadow-md`}
+                  >
+                    <step.Icon size={24} />
+                  </div>
+                  <h3 className="font-bold text-slate-900">
+                    {i + 1}. {step.title}
+                  </h3>
+                  <p className="text-sm text-slate-500 mt-1">{step.desc}</p>
                 </div>
-                <h3 className="font-bold text-slate-900">
-                  {i + 1}. {step.title}
-                </h3>
-                <p className="text-sm text-slate-500 mt-1">{step.desc}</p>
-              </div>
+              </AnimateIcon>
             ))}
           </div>
         </div>

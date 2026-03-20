@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,17 +11,38 @@ const NAV_LINKS = [
 const LandingNavigation = () => {
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <nav className="fixed w-full z-50 bg-white/80 glass-effect border-b border-slate-100 transition-all duration-300">
+    <nav
+      className={`fixed w-full z-50 transition-all duration-500 ease-in-out ${
+        scrolled
+          ? "py-2 bg-white/70 backdrop-blur-md border-b border-slate-200/50 shadow-sm"
+          : " bg-transparent border-b border-transparent"
+      }`}
+    >
       <div className="max-w-[1400px] sm:mx-auto px-4 sm:px-6 lg:pr-22 lg:pl-6 w-full">
-        <div className="flex justify-between items-center h-20 w-full">
+        <div
+          className={`flex justify-between items-center transition-all duration-500 ${
+            scrolled ? "h-14" : "h-20"
+          } w-full`}
+        >
           {/* Logo */}
           <a href="#" className="flex items-center gap-2 justify-center">
             <img
               src="/DaemonLogo.png"
               alt="DaemonDoc"
-              className="w-40 sm:w-45 md:w-60 self-center pt-2"
+              className={`transition-all duration-500 absolute left-0 sm:relative  ${
+                scrolled ? "w-32 sm:w-36 md:w-48 scale-148 sm:scale-100" : "w-40 sm:w-45 md:w-60 scale-150 sm:scale-100"
+              } self-center pt-2`}
             />
           </a>
 
@@ -42,7 +63,7 @@ const LandingNavigation = () => {
           <div className="hidden md:flex">
             <button
               onClick={() => navigate("/login")}
-              className="bg-[#1d4ed8] cursor-pointer hover:bg-[#1e40af] text-white px-6 py-2.5 rounded-full font-medium text-sm transition-all shadow-lg shadow-blue-500/30"
+              className="bg-[#1d4ed8] text-shadow-sm cursor-pointer hover:bg-[#1e40af] text-white px-6 py-2.5 rounded-full font-medium text-sm transition-all shadow-lg shadow-blue-500/30"
             >
               Get Started
             </button>
@@ -75,7 +96,7 @@ const LandingNavigation = () => {
           <div className="pt-2">
             <button
               onClick={() => navigate("/login")}
-              className="w-full bg-[#1d4ed8] text-white px-6 py-3 rounded-full font-medium"
+              className="w-full bg-[#1d4ed8]  text-white px-6 py-3 rounded-full font-medium"
             >
               Get Started
             </button>

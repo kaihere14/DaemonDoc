@@ -23,9 +23,17 @@ const FILTER_TABS = [
 
 const Home = () => {
   const { user } = useRequireAuth();
-  const { repos, loading, error, fetchRepos } = useRepos(user);
+  const { repos, setRepos, loading, error, fetchRepos } = useRepos(user);
   const [filter, setFilter] = useState("all"); // all, active, inactive
   const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSilentToggle = (repoId) => {
+    setRepos((prevRepos) =>
+      prevRepos.map((repo) =>
+        repo.id === repoId ? { ...repo, activated: !repo.activated } : repo,
+      ),
+    );
+  };
 
   const filteredRepos = repos.filter((repo) => {
     // Apply status filter
@@ -68,10 +76,10 @@ const Home = () => {
             >
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h1 className="text-4xl font-bold text-slate-900 mb-2">
-                    Your Repositories
+                  <h1 className="text-4xl font-bold text-slate-900 mb-2 font-display uppercase tracking-tighter">
+                    Repositories
                   </h1>
-                  <p className="text-slate-600">
+                  <p className="text-slate-500 font-medium tracking-tight">
                     Manage AI-powered README updates for your GitHub
                     repositories
                   </p>
@@ -81,13 +89,13 @@ const Home = () => {
                   whileTap={{ scale: 0.95 }}
                   onClick={fetchRepos}
                   disabled={loading}
-                  className="bg-white border border-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
+                  className="bg-white border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
                 >
                   <RefreshCw
                     size={16}
                     className={loading ? "animate-spin" : ""}
                   />
-                  Refresh
+                  Refresh list
                 </motion.button>
               </div>
 
@@ -141,7 +149,7 @@ const Home = () => {
                   <button
                     key={tab.key}
                     onClick={() => setFilter(tab.key)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                       filter === tab.key
                         ? "bg-slate-900 text-white shadow-sm"
                         : "text-slate-600 hover:text-slate-900"
@@ -177,34 +185,6 @@ const Home = () => {
                 )}
               </div>
             </motion.div>
-
-            {/* Results Counter */}
-            {!loading && !error && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="mb-4 text-sm text-slate-600"
-              >
-                Showing{" "}
-                <span className="font-semibold text-slate-900">
-                  {filteredRepos.length}
-                </span>{" "}
-                of{" "}
-                <span className="font-semibold text-slate-900">
-                  {repos.length}
-                </span>{" "}
-                repositories
-                {searchQuery && (
-                  <span className="ml-1">
-                    matching "
-                    <span className="font-medium text-slate-900">
-                      {searchQuery}
-                    </span>
-                    "
-                  </span>
-                )}
-              </motion.div>
-            )}
 
             {/* Content */}
             {loading ? (
@@ -257,7 +237,7 @@ const Home = () => {
                     <RepoCard
                       repo={repo}
                       showToggle={true}
-                      onToggle={fetchRepos}
+                      onToggle={() => handleSilentToggle(repo.id)}
                     />
                   </motion.div>
                 ))}
