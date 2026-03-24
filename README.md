@@ -24,17 +24,26 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 
 ## ✨ Features
 
-- **Smart README generation** — Analyzes actual code, not just file names. Understands structure, dependencies, and intent.
-- **Immediate first-time generation** — README is generated instantly upon first repository activation, no need to wait for a push.
-- **Incremental patch mode** — On subsequent pushes, only the sections affected by your changes are updated, not the whole README.
-- **Multi-key AI fallback** — Up to 3 Gemini keys tried in order, then up to 3 Groq keys. Generation continues as long as any key works.
-- **Large context scanning** — Gemini's 1M token window allows scanning up to 50 files at 500 lines each, vs Groq's conservative 25 files / 200 lines.
-- **Async job queue** — BullMQ + Redis handles all generation in the background; webhooks return instantly.
-- **GitHub OAuth** — Secure login, AES-256-GCM encrypted token storage, HMAC-SHA256 webhook verification.
-- **Activity logs** — Dashboard shows every job: repo, timestamp, success/failed/in-progress status.
-- **Toast notifications** — Provides instant, non-intrusive feedback for user actions like activating/deactivating repositories.
-- **Animated UI elements** — Dynamic and engaging animations for key sections like the Hero.
-- **Modernized Login Page** — Redesigned login experience with a sleek split-layout and user testimonials.
+- **Intelligent Code Analysis** — Powered by `Gemini 3.1 Flash Lite` for deep understanding of codebase structure, logic, and intent. Includes:
+    - **Advanced Context Synthesis**: RAG-based engine aggregates cross-file dependencies for holistic documentation.
+    - **Efficient Differential Scan**: Compute-efficient audits processing only modified AST nodes.
+    - **Granular Commit Isolation**: Tracks change-sets to provide accurate version histories within your README.
+    - **Monorepo Native Support**: Seamlessly handles complex workspaces including Turborepo, Lerna, and Nx structures.
+    - **Smart Logic Exclusions**: Filters out boilerplate, tests, and sensitive configuration from public documentation.
+- **Real-time Webhook Integration** — "Push once, sync forever" promise, listening for git events to keep your README always up-to-date.
+- **Enterprise-Grade Security** — Bank-level AES-256 encryption protects GitHub tokens and repository access keys at rest and in transit.
+- **Immediate First-Time Generation** — README is generated instantly upon first repository activation.
+- **Incremental Patch Mode** — On subsequent pushes, only affected sections are updated, minimizing compute and latency.
+- **Multi-Key AI Fallback** — Up to 3 Gemini keys, then up to 3 Groq keys, ensuring continuous generation.
+- **Large Context Scanning** — Gemini's 1M token window enables scanning up to 50 files (500 lines each) for comprehensive context.
+- **Async Job Queue** — BullMQ + Redis handles all generation in the background; webhooks return instantly.
+- **GitHub OAuth 2.0** — Secure handshake protocols ensuring precise permission scoping for private repositories.
+- **Animated Testimonials** — Engaging, dynamic testimonials showcasing real user experiences.
+- **Comprehensive Landing Page Sections** — Dedicated sections for Core Capabilities, Engine Features, Social Proof, and Pricing.
+- **Activity Logs** — Dashboard shows every job: repo, timestamp, success/failed/in-progress status.
+- **Toast Notifications** — Provides instant, non-intrusive feedback for user actions.
+- **Animated UI Elements** — Dynamic and engaging animations for key sections like the Hero.
+- **Modernized Login Page** — Redesigned login experience with a sleek split-layout.
 ## ⚙️ How It Works
 
 
@@ -193,14 +202,14 @@ BACKEND_URL=http://localhost:3000
 GEMINI_API_KEY1=your_gemini_key_1
 GEMINI_API_KEY2=your_gemini_key_2
 GEMINI_API_KEY3=your_gemini_key_3
-GEMINI_MODEL=gemini-2.5-flash
-GEMINI_MODEL_MINI=gemini-2.5-flash-lite
+GEMINI_MODEL=gemini-3-flash-preview
+GEMINI_MODEL_MINI=gemini-3-flash-preview
 
 # Groq (fallback — add up to 3 keys)
 GROQ_API_KEY1=your_groq_key_1
 GROQ_API_KEY2=your_groq_key_2
 GROQ_API_KEY3=your_groq_key_3
-GROQ_MODEL=llama-3.3-70b-versatile
+GROQ_MODEL=openai/gpt-oss-120b
 
 # Output
 README_FILE_NAME=README.md
