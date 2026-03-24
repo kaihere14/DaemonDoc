@@ -7,6 +7,7 @@ import Landing from "./pages/Landing";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import Logs from "./pages/Logs";
+import Admin from "./pages/Admin";
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
         <Route path="/home" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/logs" element={<Logs />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </div>
   );

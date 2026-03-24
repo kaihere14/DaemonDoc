@@ -82,17 +82,8 @@ export const renderFeatureAnnouncementTemplate = (data) => {
     );
   }
 
-  html = applyToken(
-    html,
-    "CTA_PRIMARY_URL",
-    data?.primaryURL || "https://daemondoc.online",
-  );
+  html = applyToken(html, "CTA_PRIMARY_URL", "https://daemondoc.online");
   html = applyToken(html, "CTA_PRIMARY_TEXT", data?.primaryCTA || "Try Now");
-  html = applyToken(
-    html,
-    "UNSUBSCRIBE_TOKEN",
-    data?.unsubscribeToken || "temp-unsubscribe-token",
-  );
   html = applyToken(
     html,
     "YEAR",

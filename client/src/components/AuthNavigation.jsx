@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, LogOut, Home, FileText, Activity, Menu, X } from "lucide-react";
+import {
+  User,
+  LogOut,
+  Home,
+  FileText,
+  Activity,
+  Menu,
+  X,
+  Shield,
+} from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -97,6 +106,21 @@ const AuthNavigation = () => {
               <Activity size={16} strokeWidth={2} />
               <span>Activity Logs</span>
             </motion.button>
+            {user?.admin && (
+              <motion.button
+                whileHover={{ backgroundColor: "rgb(248 250 252)" }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => navigate("/admin")}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
+                  location.pathname === "/admin"
+                    ? "bg-slate-100 text-slate-900"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                <Shield size={16} strokeWidth={2} />
+                <span>Admin</span>
+              </motion.button>
+            )}
           </div>
 
           {/* User Dropdown */}
@@ -221,6 +245,24 @@ const AuthNavigation = () => {
                 <Activity size={18} strokeWidth={2} />
                 <span>Activity Logs</span>
               </motion.button>
+
+              {user?.admin && (
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    navigate("/admin");
+                    setShowMobileMenu(false);
+                  }}
+                  className={`w-full px-4 py-3 rounded-lg text-sm font-medium transition-all flex items-center gap-3 ${
+                    location.pathname === "/admin"
+                      ? "bg-slate-100 text-slate-900"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
+                >
+                  <Shield size={18} strokeWidth={2} />
+                  <span>Admin</span>
+                </motion.button>
+              )}
             </div>
           </motion.div>
         )}
