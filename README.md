@@ -13,15 +13,15 @@
 </div>
 
 ---
-
 ## Overview
 
 DaemonDoc hooks into your GitHub repositories via webhooks. Every time you push, it scans your codebase, runs it through AI, and commits an up-to-date README back to your repo — no manual writing required.
 
+Beyond documentation, the platform features a built-in **Feature Announcement System** that allows for professional, categorized email updates (New, Improved, Fixed, Security) to be sent to users, ensuring they stay informed about the latest repository changes.
+
 The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with automatic fallback to **Groq** if all Gemini keys are exhausted. You can configure up to 3 API keys per provider for rate limit resilience.
 
 ---
-
 ## ✨ Features
 
 - **Intelligent Code Analysis** — Powered by `Gemini 3.1 Flash Lite` for deep understanding of codebase structure, logic, and intent. Includes:
@@ -30,6 +30,8 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
     - **Granular Commit Isolation**: Tracks change-sets to provide accurate version histories within your README.
     - **Monorepo Native Support**: Seamlessly handles complex workspaces including Turborepo, Lerna, and Nx structures.
     - **Smart Logic Exclusions**: Filters out boilerplate, tests, and sensitive configuration from public documentation.
+- **Professional Feature Announcements** — Integrated email system with categorized update tags (`New`, `Improved`, `Fixed`, `Security`) and dual-action CTAs for user engagement.
+- **Robust Email Fallback** — Resilient HTML template rendering ensures users receive updates even if primary templates encounter issues.
 - **Real-time Webhook Integration** — "Push once, sync forever" promise, listening for git events to keep your README always up-to-date.
 - **Enterprise-Grade Security** — Bank-level AES-256 encryption protects GitHub tokens and repository access keys at rest and in transit.
 - **Immediate First-Time Generation** — README is generated instantly upon first repository activation.
@@ -46,14 +48,13 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 - **Modernized Login Page** — Redesigned login experience with a sleek split-layout.
 ## ⚙️ How It Works
 
-
 1. Connect GitHub Account  →  OAuth login, encrypted token stored
 2. Activate a Repo         →  Webhook created. If it's the first activation, an initial README is generated immediately.
 3. Push Code               →  Webhook fires, job queued in Redis
 4. AI Scans Codebase       →  Step 1: file selection (mini model)
                                Step 2: README generation (main model)
 5. README Committed        →  Pushed back to your repo automatically
-
+6. Feature Announcement    →  (Optional) Categorized email updates sent to users via the integrated template renderer
 
 ### Full vs Patch Mode
 
@@ -62,9 +63,7 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 
 ### AI Provider Chain
 
-
 Gemini key 1 → Gemini key 2 → Gemini key 3 → Groq key 1 → Groq key 2 → Groq key 3
-
 
 Retriable errors (429 rate limit, 503 overload, network errors) move to the next key. Auth failures (401/403) and payload errors (413) also fall through.
 ## Tech Stack
@@ -97,6 +96,7 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 | BullMQ | Job queue | 5.x |
 | JWT | Auth tokens | — |
 | Axios | HTTP client | — |
+| HTML Templates | Email announcement rendering | — |
 
 ### AI & External Services
 
@@ -112,7 +112,7 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 ---
 ## Architecture
 
-```
+
 ┌─────────────────────────┐
 │      React Client       │
 │   (Vite + Tailwind)     │
@@ -143,10 +143,9 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
                             │  Gemini 2.5 Flash      │
                             │  (→ Groq fallback)     │
                             └───────────────────────┘
-```
+
 
 ---
-
 ## Installation
 
 ### Prerequisites
@@ -178,17 +177,14 @@ env
 
 # Database
 MONGO_URI=mongodb+srv://user:password@cluster.mongodb.net/daemondoc
-
 # Auth
 JWT_SECRET=your_jwt_secret_minimum_32_chars
 GITHUB_TOKEN_SECRET=64_char_hex_for_aes256_encryption
-
 # GitHub OAuth App
 GITHUB_CLIENT_ID=your_oauth_client_id
 GITHUB_CLIENT_SECRET=your_oauth_client_secret
 GITHUB_CALLBACK_URL=http://localhost:3000/auth/github/callback
 GITHUB_WEBHOOK_SECRET=your_webhook_secret
-
 # Redis (omit REDIS_* vars to use localhost:6379 with no auth)
 REDIS_HOST=your-redis-host
 REDIS_PORT=6379
