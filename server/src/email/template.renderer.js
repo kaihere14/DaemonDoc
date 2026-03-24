@@ -29,8 +29,6 @@ const escapeHtml = (value = "") =>
 const applyToken = (html, token, value) =>
   html.split(`{{${token}}}`).join(escapeHtml(value ?? ""));
 
-
-
 export const renderFeatureAnnouncementTemplate = (data) => {
   let html = readTemplate();
 

@@ -11,6 +11,8 @@ import {
   ChevronLeft,
   AlertCircle,
   Check,
+  Shield,
+  X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -187,109 +189,95 @@ const Admin = () => {
   ];
 
   return (
-    <div>
+    <div className="min-h-screen bg-slate-50 relative overflow-hidden">
       <AuthNavigation />
-      <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 pt-24 pb-12">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      
+      {/* Background Decorations */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-400/10 blur-[120px] rounded-full animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-slate-400/10 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-[20%] right-[10%] w-[20%] h-[20%] bg-indigo-400/5 blur-[80px] rounded-full" />
+      </div>
+
+      <div className="relative z-10 pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
           {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-12"
+            className="mb-16 text-center sm:text-left"
           >
-            <h1 className="text-5xl font-bold text-slate-900 mb-2">
-              Admin Dashboard
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-blue-600 text-xs font-bold uppercase tracking-wider mb-4">
+              <Shield size={14} />
+              <span>Admin Access Only</span>
+            </div>
+            <h1 className="text-4xl sm:text-6xl font-black text-slate-900 mb-4 tracking-tight">
+              Control <span className="text-blue-600">Center</span>
             </h1>
-            <p className="text-lg text-slate-600">
-              Manage your application settings and communications
+            <p className="text-lg sm:text-xl text-slate-500 max-w-2xl leading-relaxed">
+              Elevate your workspace with advanced administration tools and seamless communication.
             </p>
           </motion.div>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             {/* Send Email Card */}
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ scale: 1.02, shadowLg: true }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setShowEmailModal(true)}
-              className="relative h-80 rounded-2xl shadow-lg overflow-hidden group text-left hover:shadow-2xl transition-shadow"
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="group relative"
             >
-              {/* Background Gradient */}
-              <div className="absolute inset-0 bg-linear-to-br from-blue-50 to-slate-50 z-0" />
-
-              {/* Accent Bar */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-blue-500 to-blue-400" />
-
-              {/* Content */}
-              <div className="relative h-full p-8 flex flex-col justify-between z-10 bg-white/80 backdrop-blur-sm">
-                <div>
-                  <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-200 transition">
-                    <Send
-                      className="text-blue-600"
-                      size={28}
-                      strokeWidth={1.5}
-                    />
-                  </div>
-                  <h2 className="text-3xl font-bold text-slate-900 mb-2">
-                    Send Email
-                  </h2>
-                  <p className="text-slate-600 text-base leading-relaxed">
-                    Broadcast feature announcements to all users with
-                    notifications enabled.
-                  </p>
+              <div className="absolute -inset-0.5 bg-linear-to-r from-blue-600 to-indigo-600 rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
+              <button
+                onClick={() => setShowEmailModal(true)}
+                className="relative flex flex-col h-full w-full bg-white rounded-3xl p-8 text-left shadow-sm border border-slate-100 overflow-hidden"
+              >
+                <div className="mb-8 w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                  <Send size={32} strokeWidth={1.5} />
                 </div>
+                
+                <h2 className="text-3xl font-bold text-slate-900 mb-3">Broadcast</h2>
+                <p className="text-slate-500 text-lg mb-8 leading-relaxed">
+                  Compose and dispatch feature updates to your entire user base with one click.
+                </p>
 
-                <div className="flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition-all">
-                  <span>Get Started</span>
+                <div className="mt-auto flex items-center gap-2 text-blue-600 font-bold">
+                  <span className="text-sm uppercase tracking-widest">New Update</span>
+                  <div className="h-0.5 w-12 bg-blue-600/20 group-hover:w-20 transition-all duration-300" />
                   <ChevronRight size={20} />
                 </div>
-              </div>
 
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-linear-to-r from-blue-500/0 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
-            </motion.button>
+                {/* Decorative background element */}
+                <div className="absolute top-[-20%] right-[-10%] w-40 h-40 bg-blue-50 rounded-full opacity-50 transition-transform duration-700" />
+              </button>
+            </motion.div>
 
             {/* Analytics Card (Coming Soon) */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1 }}
-              className="relative h-80 rounded-2xl shadow-lg overflow-hidden"
+              className="group relative"
             >
-              {/* Background Gradient */}
-              <div className="absolute inset-0 bg-linear-to-br from-slate-100 to-slate-50 z-0" />
-
-              {/* Accent Bar */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-slate-400 to-slate-300" />
-
-              {/* Content */}
-              <div className="relative h-full p-8 flex flex-col justify-between z-10 bg-white/60 backdrop-blur-sm">
-                <div>
-                  <div className="w-14 h-14 bg-slate-200 rounded-xl flex items-center justify-center mb-4">
-                    <BarChart3
-                      className="text-slate-500"
-                      size={28}
-                      strokeWidth={1.5}
-                    />
-                  </div>
-                  <h2 className="text-3xl font-bold text-slate-500 mb-2">
-                    Analytics
-                  </h2>
-                  <p className="text-slate-500 text-base leading-relaxed">
-                    Track email performance, user engagement, and campaign
-                    metrics.
-                  </p>
+              <div className="relative flex flex-col h-full w-full bg-slate-50/50 backdrop-blur-sm rounded-3xl p-8 text-left border border-dashed border-slate-200 overflow-hidden cursor-not-allowed">
+                <div className="mb-8 w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
+                  <BarChart3 size={32} strokeWidth={1.5} />
                 </div>
+                
+                <h2 className="text-3xl font-bold text-slate-400 mb-3">Analytics</h2>
+                <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+                  Advanced insights and engagement metrics to track the heartbeat of your app.
+                </p>
 
-                {/* Coming Soon Badge */}
-                <div className="inline-flex px-4 py-2 bg-slate-200 text-slate-600 rounded-lg font-semibold text-sm w-fit">
-                  Coming Soon
+                <div className="mt-auto">
+                  <span className="inline-flex px-4 py-2 bg-slate-100 text-slate-500 rounded-xl font-bold text-xs uppercase tracking-widest">
+                    Coming Soon
+                  </span>
                 </div>
               </div>
             </motion.div>
           </div>
+
         </div>
       </div>
 
@@ -300,369 +288,226 @@ const Admin = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4 sm:p-6"
             onClick={closeEmailModal}
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-[32px] shadow-2xl max-w-3xl w-full h-[90vh] overflow-hidden flex flex-col sm:flex-row"
             >
-              {/* Modal Header */}
-              <div className="sticky top-0 bg-linear-to-r from-blue-50 to-slate-50 border-b border-slate-200 p-6 flex items-center justify-between z-10">
-                <div>
-                  <h2 className="text-2xl font-bold text-slate-900">
-                    Send Email Broadcast
-                  </h2>
-                  <p className="text-sm text-slate-600 mt-1">
-                    Step {currentStep} of 4
-                  </p>
+              {/* Sidebar/Progress */}
+              <div className="sm:w-64 bg-slate-50 p-8 border-b sm:border-b-0 sm:border-r border-slate-100">
+                <div className="mb-10 hidden sm:block">
+                  <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white mb-4">
+                    <Send size={24} />
+                  </div>
+                  <h3 className="font-bold text-slate-900">Broadcast</h3>
+                  <p className="text-xs text-slate-500">Configure your update</p>
                 </div>
-                <button
-                  onClick={closeEmailModal}
-                  className="text-slate-500 hover:text-slate-900 transition text-2xl leading-none"
-                >
-                  ×
-                </button>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="px-6 pt-4">
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4].map((step) => (
-                    <div
-                      key={step}
-                      className={`flex-1 h-1 rounded-full transition-all ${
-                        step <= currentStep ? "bg-blue-500" : "bg-slate-200"
-                      }`}
-                    />
+                
+                <div className="flex sm:flex-col gap-4 sm:gap-6 justify-between sm:justify-start">
+                  {steps.map((step) => (
+                    <div key={step.number} className="flex items-center gap-3">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                        currentStep >= step.number ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-slate-200 text-slate-400'
+                      }`}>
+                        {currentStep > step.number ? <Check size={14} /> : step.number}
+                      </div>
+                      <div className="hidden sm:block">
+                        <p className={`text-sm font-bold ${currentStep >= step.number ? 'text-slate-900' : 'text-slate-400'}`}>
+                          {step.title}
+                        </p>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
 
-              {/* Modal Content */}
-              <div className="p-6 space-y-6">
-                {/* Step 1: Email Basics */}
-                {currentStep === 1 && (
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    className="space-y-6"
-                  >
-                    <div>
-                      <h3 className="text-xl font-bold text-slate-900 mb-1">
-                        Email Basics
-                      </h3>
-                      <p className="text-slate-600">
-                        Set the subject and main feature name
-                      </p>
-                    </div>
+              {/* Form Area */}
+              <div className="flex-1 flex flex-col min-h-0">
+                <div className="p-8 pb-4 flex items-center justify-between">
+                  <h2 className="text-2xl font-black text-slate-900">{steps[currentStep-1].title}</h2>
+                  <button onClick={closeEmailModal} className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-colors">
+                    <X size={16} />
+                  </button>
+                </div>
 
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-slate-900 mb-2">
-                          Email Subject <span className="text-red-500">*</span>
-                        </label>
+                <div className="flex-1 overflow-y-auto px-8 py-4">
+                  {/* Step 1: Email Basics */}
+                  {currentStep === 1 && (
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                      <div className="group">
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 group-focus-within:text-blue-600 transition-colors">Email Subject</label>
                         <input
                           type="text"
                           value={subject}
                           onChange={(e) => setSubject(e.target.value)}
-                          placeholder="e.g., New Feature: Patch Mode Available"
-                          className="w-full px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                          placeholder="What's this update about?"
+                          className="w-full px-5 py-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-blue-600 focus:bg-white text-slate-900 transition-all outline-none"
                         />
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-semibold text-slate-900 mb-2">
-                          Feature Name <span className="text-red-500">*</span>
-                        </label>
+                      <div className="group">
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 group-focus-within:text-blue-600 transition-colors">Feature Name</label>
                         <input
                           type="text"
                           value={featureName}
                           onChange={(e) => setFeatureName(e.target.value)}
-                          placeholder="e.g., Patch Mode"
-                          className="w-full px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                          placeholder="The name of the highlight"
+                          className="w-full px-5 py-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-blue-600 focus:bg-white text-slate-900 transition-all outline-none"
                         />
                       </div>
-                    </div>
-                  </motion.div>
-                )}
+                    </motion.div>
+                  )}
 
-                {/* Step 2: Description */}
-                {currentStep === 2 && (
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    className="space-y-6"
-                  >
-                    <div>
-                      <h3 className="text-xl font-bold text-slate-900 mb-1">
-                        Feature Description
-                      </h3>
-                      <p className="text-slate-600">
-                        Write the hook and detailed description
-                      </p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-slate-900 mb-2">
-                          Hook / Intro <span className="text-red-500">*</span>
-                        </label>
+                  {/* Step 2: Description */}
+                  {currentStep === 2 && (
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                      <div className="group">
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 group-focus-within:text-blue-600 transition-colors">Hook / Intro</label>
                         <textarea
                           value={intro}
                           onChange={(e) => setIntro(e.target.value)}
-                          placeholder="1-2 sentence hook. Why does this matter?"
-                          className="w-full px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition resize-none h-20"
+                          placeholder="Capture their attention..."
+                          className="w-full px-5 py-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-blue-600 focus:bg-white text-slate-900 transition-all outline-none resize-none h-24"
                         />
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-semibold text-slate-900 mb-2">
-                          Feature Description{" "}
-                          <span className="text-red-500">*</span>
-                        </label>
+                      <div className="group">
+                        <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 group-focus-within:text-blue-600 transition-colors">Detailed Description</label>
                         <textarea
                           value={heroDescription}
                           onChange={(e) => setHeroDescription(e.target.value)}
-                          placeholder="How does it work? What problem does it solve?"
-                          className="w-full px-4 py-2.5 rounded-lg bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition resize-none h-24"
+                          placeholder="Go into the details..."
+                          className="w-full px-5 py-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-blue-600 focus:bg-white text-slate-900 transition-all outline-none resize-none h-32"
                         />
                       </div>
-                    </div>
-                  </motion.div>
-                )}
+                    </motion.div>
+                  )}
 
-                {/* Step 3: Changes */}
-                {currentStep === 3 && (
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    className="space-y-6"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-xl font-bold text-slate-900 mb-1">
-                          Additional Changes
-                        </h3>
-                        <p className="text-slate-600">
-                          Add other improvements (optional)
-                        </p>
+                  {/* Step 3: Changes */}
+                  {currentStep === 3 && (
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm text-slate-500">Add granular changes to this update</p>
+                        <button onClick={addChangeBlock} className="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all">
+                          Add Change
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={addChangeBlock}
-                        className="px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg font-medium transition text-sm"
-                      >
-                        + Add
-                      </button>
-                    </div>
 
-                    <div className="space-y-3 max-h-96 overflow-y-auto">
-                      {changes.map((change, index) => (
-                        <div
-                          key={index}
-                          className="p-4 bg-slate-50 border border-slate-300 rounded-lg space-y-3"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm font-semibold text-slate-900">
-                              Change {index + 1}
-                            </span>
+                      <div className="space-y-4">
+                        {changes.map((change, index) => (
+                          <div key={index} className="p-5 bg-slate-50 rounded-2xl border border-slate-100 relative group/item">
                             {changes.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => removeChangeBlock(index)}
-                                className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-600 rounded transition"
-                              >
-                                Remove
+                              <button onClick={() => removeChangeBlock(index)} className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors">
+                                <X size={16} />
                               </button>
                             )}
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-3">
-                            <div>
-                              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                                Type
-                              </label>
-                              <select
-                                value={change.tagClass}
-                                onChange={(e) =>
-                                  handleChangeUpdate(
-                                    index,
-                                    "tagClass",
-                                    e.target.value,
-                                  )
-                                }
-                                className="w-full px-3 py-1.5 text-sm rounded-lg bg-white border border-slate-300 text-slate-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                              >
-                                <option value="tag-new">New</option>
-                                <option value="tag-improved">Improved</option>
-                                <option value="tag-fixed">Fixed</option>
-                                <option value="tag-security">Security</option>
-                              </select>
+                            
+                            <div className="grid grid-cols-2 gap-4 mb-4">
+                              <div>
+                                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Type</label>
+                                <select
+                                  value={change.tagClass}
+                                  onChange={(e) => handleChangeUpdate(index, "tagClass", e.target.value)}
+                                  className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-sm outline-none focus:border-blue-600 transition-all"
+                                >
+                                  <option value="tag-new">New</option>
+                                  <option value="tag-improved">Improved</option>
+                                  <option value="tag-fixed">Fixed</option>
+                                  <option value="tag-security">Security</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Label</label>
+                                <input
+                                  type="text"
+                                  value={change.tag}
+                                  onChange={(e) => handleChangeUpdate(index, "tag", e.target.value)}
+                                  placeholder="e.g. HOT"
+                                  className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-sm outline-none focus:border-blue-600 transition-all"
+                                />
+                              </div>
                             </div>
-
-                            <div>
-                              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                                Label
-                              </label>
+                            
+                            <div className="space-y-4">
                               <input
                                 type="text"
-                                value={change.tag}
-                                onChange={(e) =>
-                                  handleChangeUpdate(
-                                    index,
-                                    "tag",
-                                    e.target.value,
-                                  )
-                                }
-                                placeholder="NEW"
-                                className="w-full px-3 py-1.5 text-sm rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                                value={change.title}
+                                onChange={(e) => handleChangeUpdate(index, "title", e.target.value)}
+                                placeholder="Change title"
+                                className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-sm outline-none focus:border-blue-600 transition-all font-bold"
+                              />
+                              <textarea
+                                value={change.description}
+                                onChange={(e) => handleChangeUpdate(index, "description", e.target.value)}
+                                placeholder="Short explanation"
+                                className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-sm outline-none focus:border-blue-600 transition-all resize-none h-16"
                               />
                             </div>
                           </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
 
-                          <div>
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              Title
-                            </label>
-                            <input
-                              type="text"
-                              value={change.title}
-                              onChange={(e) =>
-                                handleChangeUpdate(
-                                  index,
-                                  "title",
-                                  e.target.value,
-                                )
-                              }
-                              placeholder="e.g., Better Performance"
-                              className="w-full px-3 py-1.5 text-sm rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                            />
-                          </div>
-
-                          <div>
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              Description
-                            </label>
-                            <textarea
-                              value={change.description}
-                              onChange={(e) =>
-                                handleChangeUpdate(
-                                  index,
-                                  "description",
-                                  e.target.value,
-                                )
-                              }
-                              placeholder="Brief description"
-                              className="w-full px-3 py-1.5 text-sm rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition resize-none h-12"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Step 4: Review */}
-                {currentStep === 4 && (
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    className="space-y-6"
-                  >
-                    <div>
-                      <h3 className="text-xl font-bold text-slate-900 mb-1">
-                        Customize & Review
-                      </h3>
-                      <p className="text-slate-600">
-                        Finalize your broadcast settings
-                      </p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-3 gap-4">
-                        <div>
-                          <label className="block text-xs font-semibold text-slate-700 mb-2">
-                            CTA Button Text
-                          </label>
+                  {/* Step 4: Review */}
+                  {currentStep === 4 && (
+                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
+                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div className="group">
+                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">CTA Label</label>
                           <input
                             type="text"
                             value={primaryCTA}
                             onChange={(e) => setPrimaryCTA(e.target.value)}
-                            placeholder="Try Now"
-                            className="w-full px-3 py-2 text-sm rounded-lg bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                            className="w-full px-5 py-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-blue-600 focus:bg-white text-slate-900 transition-all outline-none"
                           />
                         </div>
-
-                        <div>
-                          <label className="block text-xs font-semibold text-slate-700 mb-2">
-                            Date
-                          </label>
+                        <div className="group">
+                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Display Date</label>
                           <input
                             type="text"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
-                            placeholder={new Date().toDateString()}
-                            className="w-full px-3 py-2 text-sm rounded-lg bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                            className="w-full px-5 py-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-blue-600 focus:bg-white text-slate-900 transition-all outline-none"
                           />
                         </div>
+                      </div>
 
+                      <div className="p-6 bg-blue-50/50 rounded-3xl border border-blue-100 flex gap-4">
+                        <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-200">
+                          <AlertCircle size={24} />
+                        </div>
                         <div>
-                          <label className="block text-xs font-semibold text-slate-700 mb-2">
-                            Year
-                          </label>
-                          <input
-                            type="text"
-                            value={year}
-                            onChange={(e) => setYear(e.target.value)}
-                            placeholder={new Date().getFullYear().toString()}
-                            className="w-full px-3 py-2 text-sm rounded-lg bg-slate-50 border border-slate-300 text-slate-900 placeholder-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                          />
+                          <p className="font-bold text-blue-900 text-lg">Almost there!</p>
+                          <p className="text-blue-700/70 text-sm">You are about to broadcast this update to all subscribed users. Double check for any typos!</p>
                         </div>
                       </div>
+                    </motion.div>
+                  )}
+                </div>
 
-                      <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex gap-3">
-                        <AlertCircle
-                          size={20}
-                          className="text-blue-600 shrink-0 mt-0.5"
-                        />
-                        <div className="text-sm text-blue-900">
-                          <p className="font-semibold mb-1">Ready to Send?</p>
-                          <p>
-                            This will broadcast to all users with notifications
-                            enabled.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </div>
-
-              {/* Modal Footer */}
-              <div className="sticky bottom-0 bg-slate-50 border-t border-slate-200 p-6 flex gap-3 justify-end">
-                <button
-                  onClick={goToPrevStep}
-                  disabled={currentStep === 1}
-                  className="px-6 py-2.5 text-slate-900 font-semibold border border-slate-300 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
-                >
-                  <ChevronLeft size={18} />
-                  Back
-                </button>
-                <button
-                  onClick={goToNextStep}
-                  className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition flex items-center gap-2"
-                >
-                  {currentStep === 4 ? "Review & Send" : "Next"}
-                  {currentStep < 4 && <ChevronRight size={18} />}
-                </button>
+                {/* Footer */}
+                <div className="p-8 pt-4 flex gap-4">
+                  <button
+                    onClick={goToPrevStep}
+                    disabled={currentStep === 1}
+                    className="flex-1 px-6 py-4 rounded-2xl border-2 border-slate-100 text-slate-600 font-bold hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                  >
+                    Back
+                  </button>
+                  <button
+                    onClick={goToNextStep}
+                    className="flex-2 px-6 py-4 rounded-2xl bg-blue-600 text-white font-bold shadow-xl shadow-blue-200 hover:bg-blue-700 hover:shadow-blue-300 transition-all flex items-center justify-center gap-2"
+                  >
+                    {currentStep === 4 ? "Review Broadcast" : "Continue"}
+                    {currentStep < 4 && <ChevronRight size={20} />}
+                  </button>
+                </div>
               </div>
             </motion.div>
           </motion.div>
@@ -676,77 +521,43 @@ const Admin = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-60 p-4"
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center"
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="bg-white rounded-[32px] shadow-2xl max-w-md w-full p-10 text-center"
             >
-              {/* Icon */}
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Check className="text-blue-600" size={32} strokeWidth={1.5} />
+              <div className="w-20 h-20 bg-green-50 text-green-600 rounded-3xl flex items-center justify-center mx-auto mb-8 animate-bounce">
+                <Check size={40} strokeWidth={2.5} />
               </div>
 
-              {/* Content */}
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                Confirm Broadcast?
-              </h2>
-              <p className="text-slate-600 mb-6">
-                You're about to send emails to all users with notifications
-                enabled. This action cannot be undone.
+              <h2 className="text-3xl font-black text-slate-900 mb-4">Ready for Launch?</h2>
+              <p className="text-slate-500 mb-10 leading-relaxed">
+                You're about to dispatch <span className="text-slate-900 font-bold">"{subject}"</span> to all users. This action is irreversible.
               </p>
 
-              {/* Summary */}
-              <div className="bg-slate-50 rounded-lg p-4 mb-6 text-left space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Subject:</span>
-                  <span className="font-semibold text-slate-900">
-                    {subject}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-slate-600">Feature:</span>
-                  <span className="font-semibold text-slate-900">
-                    {featureName}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm border-t border-slate-200 pt-2">
-                  <span className="text-slate-600">Changes:</span>
-                  <span className="font-semibold text-slate-900">
-                    {
-                      changes.filter((c) => c.tag && c.title && c.description)
-                        .length
-                    }
-                  </span>
-                </div>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowConfirmModal(false)}
-                  className="flex-1 px-4 py-2.5 text-slate-900 font-semibold border border-slate-300 rounded-lg hover:bg-slate-50 transition"
-                >
-                  Cancel
-                </button>
+              <div className="space-y-3">
                 <button
                   onClick={handleSubmit}
                   disabled={isLoading}
-                  className="flex-1 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2"
+                  className="w-full px-6 py-4 rounded-2xl bg-slate-900 text-white font-bold shadow-xl shadow-slate-200 hover:bg-black transition-all flex items-center justify-center gap-2"
                 >
                   {isLoading ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Sending...
-                    </>
+                    <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
                   ) : (
                     <>
-                      <Send size={18} />
-                      Send Now
+                      <Send size={20} />
+                      Confirm & Send
                     </>
                   )}
+                </button>
+                <button
+                  onClick={() => setShowConfirmModal(false)}
+                  className="w-full px-6 py-4 rounded-2xl bg-white border-2 border-slate-100 text-slate-400 font-bold hover:bg-slate-50 transition-all"
+                >
+                  Go Back
                 </button>
               </div>
             </motion.div>
