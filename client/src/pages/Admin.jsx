@@ -114,7 +114,7 @@ const Admin = () => {
         primaryCTA: primaryCTA.trim() || "Try Now",
         date: date || new Date().toDateString(),
         year: year || new Date().getFullYear().toString(),
-        ...(validChanges.length > 0 && { changes: validChanges.slice(0, 2) }),
+        ...(validChanges.length > 0 && { changes: validChanges }),
       },
     };
 
@@ -189,7 +189,7 @@ const Admin = () => {
   return (
     <div>
       <AuthNavigation />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 pt-24 pb-12">
+      <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 pt-24 pb-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           {/* Header */}
           <motion.div
@@ -217,10 +217,10 @@ const Admin = () => {
               className="relative h-80 rounded-2xl shadow-lg overflow-hidden group text-left hover:shadow-2xl transition-shadow"
             >
               {/* Background Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-slate-50 z-0" />
+              <div className="absolute inset-0 bg-linear-to-br from-blue-50 to-slate-50 z-0" />
 
               {/* Accent Bar */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-400" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-blue-500 to-blue-400" />
 
               {/* Content */}
               <div className="relative h-full p-8 flex flex-col justify-between z-10 bg-white/80 backdrop-blur-sm">
@@ -248,7 +248,7 @@ const Admin = () => {
               </div>
 
               {/* Hover Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
+              <div className="absolute inset-0 bg-linear-to-r from-blue-500/0 to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity z-0" />
             </motion.button>
 
             {/* Analytics Card (Coming Soon) */}
@@ -259,10 +259,10 @@ const Admin = () => {
               className="relative h-80 rounded-2xl shadow-lg overflow-hidden"
             >
               {/* Background Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-100 to-slate-50 z-0" />
+              <div className="absolute inset-0 bg-linear-to-br from-slate-100 to-slate-50 z-0" />
 
               {/* Accent Bar */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-slate-400 to-slate-300" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-slate-400 to-slate-300" />
 
               {/* Content */}
               <div className="relative h-full p-8 flex flex-col justify-between z-10 bg-white/60 backdrop-blur-sm">
@@ -311,7 +311,7 @@ const Admin = () => {
               className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             >
               {/* Modal Header */}
-              <div className="sticky top-0 bg-gradient-to-r from-blue-50 to-slate-50 border-b border-slate-200 p-6 flex items-center justify-between z-10">
+              <div className="sticky top-0 bg-linear-to-r from-blue-50 to-slate-50 border-b border-slate-200 p-6 flex items-center justify-between z-10">
                 <div>
                   <h2 className="text-2xl font-bold text-slate-900">
                     Send Email Broadcast
@@ -631,7 +631,7 @@ const Admin = () => {
                       <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl flex gap-3">
                         <AlertCircle
                           size={20}
-                          className="text-blue-600 flex-shrink-0 mt-0.5"
+                          className="text-blue-600 shrink-0 mt-0.5"
                         />
                         <div className="text-sm text-blue-900">
                           <p className="font-semibold mb-1">Ready to Send?</p>

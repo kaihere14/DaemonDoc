@@ -29,13 +29,7 @@ const escapeHtml = (value = "") =>
 const applyToken = (html, token, value) =>
   html.split(`{{${token}}}`).join(escapeHtml(value ?? ""));
 
-const removeChangeBlock = (html, index) => {
-  const pattern = new RegExp(
-    `<div class="change-block">[\\s\\S]*?\\{\\{CHANGE_${index}_TAG\\}\\}[\\s\\S]*?<\\/div>\\s*`,
-    "i",
-  );
-  return html.replace(pattern, "");
-};
+
 
 export const renderFeatureAnnouncementTemplate = (data) => {
   let html = readTemplate();
@@ -60,27 +54,24 @@ export const renderFeatureAnnouncementTemplate = (data) => {
     data?.heroDescription || "This update improves stability and performance.",
   );
 
-  for (let i = 1; i <= 2; i += 1) {
-    const change = changes[i - 1];
+  const changeListHtml = changes
+    .map((change) => {
+      const tagClass = allowedTagClasses.has(change.tagClass)
+        ? change.tagClass
+        : "tag-improved";
 
-    if (!change) {
-      html = removeChangeBlock(html, i);
-      continue;
-    }
+      return `
+        <div class="change-block">
+          <div class="change-header">
+            <span class="change-tag ${tagClass}">${escapeHtml(change.tag || "IMPROVED")}</span>
+            <span class="change-title">${escapeHtml(change.title || "Update")}</span>
+          </div>
+          <div class="change-body">${escapeHtml(change.description || "General improvements.")}</div>
+        </div>`;
+    })
+    .join("\n");
 
-    const tagClass = allowedTagClasses.has(change.tagClass)
-      ? change.tagClass
-      : "tag-improved";
-
-    html = applyToken(html, `CHANGE_${i}_TAG_CLASS`, tagClass);
-    html = applyToken(html, `CHANGE_${i}_TAG`, change.tag || "IMPROVED");
-    html = applyToken(html, `CHANGE_${i}_TITLE`, change.title || "Update");
-    html = applyToken(
-      html,
-      `CHANGE_${i}_DESCRIPTION`,
-      change.description || "General improvements and bug fixes.",
-    );
-  }
+  html = html.split("{{CHANGE_LIST}}").join(changeListHtml);
 
   html = applyToken(html, "CTA_PRIMARY_URL", "https://daemondoc.online");
   html = applyToken(html, "CTA_PRIMARY_TEXT", data?.primaryCTA || "Try Now");
