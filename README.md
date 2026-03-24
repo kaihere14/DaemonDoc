@@ -17,13 +17,15 @@
 
 DaemonDoc hooks into your GitHub repositories via webhooks. Every time you push, it scans your codebase, runs it through AI, and commits an up-to-date README back to your repo — no manual writing required.
 
-Beyond documentation, the platform features a built-in **Feature Announcement System** that allows for professional, categorized email updates (New, Improved, Fixed, Security) to be sent to users, ensuring they stay informed about the latest repository changes.
+Beyond documentation, the platform features a **revamped Admin Dashboard** with a modern, interactive UI for the **Feature Announcement System**. This system utilizes a multi-step wizard to craft professional, categorized email updates (New, Improved, Fixed, Security) to be sent to users, ensuring they stay informed about the latest repository changes.
 
 The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with automatic fallback to **Groq** if all Gemini keys are exhausted. You can configure up to 3 API keys per provider for rate limit resilience.
 
 ---
 ## ✨ Features
 
+- **Modern Admin Dashboard** — Revamped UI with interactive cards, background decorations, and a sleek, professional aesthetic powered by Framer Motion.
+- **Multi-Step Announcement Wizard** — A guided 4-step process for creating feature announcements, including email basics, descriptions, change lists, and final review.
 - **Intelligent Code Analysis** — Powered by `Gemini 3.1 Flash Lite` for deep understanding of codebase structure, logic, and intent. Includes:
     - **Advanced Context Synthesis**: RAG-based engine aggregates cross-file dependencies for holistic documentation.
     - **Efficient Differential Scan**: Compute-efficient audits processing only modified AST nodes.
@@ -33,7 +35,7 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 - **Professional Feature Announcements** — Integrated email system with categorized update tags (`New`, `Improved`, `Fixed`, `Security`) and dual-action CTAs for user engagement.
 - **Dynamic Change Lists** — Unlimited change entries in announcement emails with validated tag classes, enabling rich, structured updates.
 - **Robust Email Fallback** — Resilient HTML template rendering ensures users receive updates even if primary templates encounter issues.
-- **Real-time Webhook Integration** — \"Push once, sync forever\" promise, listening for git events to keep your README always up-to-date.
+- **Real-time Webhook Integration** — "Push once, sync forever" promise, listening for git events to keep your README always up-to-date.
 - **Enterprise-Grade Security** — Bank-level AES-256 encryption protects GitHub tokens and repository access keys at rest and in transit.
 - **Immediate First-Time Generation** — README is generated instantly upon first repository activation.
 - **Incremental Patch Mode** — On subsequent pushes, only affected sections are updated, minimizing compute and latency.
@@ -47,7 +49,6 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 - **Toast Notifications** — Provides instant, non-intrusive feedback for user actions.
 - **Animated UI Elements** — Dynamic and engaging animations for key sections like the Hero.
 - **Modernized Login Page** — Redesigned login experience with a sleek split-layout.
-
 ## ⚙️ How It Works
 
 1. Connect GitHub Account  →  OAuth login, encrypted token stored
@@ -56,7 +57,7 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 4. AI Scans Codebase       →  Step 1: file selection (mini model)
                                Step 2: README generation (main model)
 5. README Committed        →  Pushed back to your repo automatically
-6. Feature Announcement    →  (Optional) Categorized email updates with dynamic change list support, unlimited entries, and validated tag classes via the integrated template renderer
+6. Feature Announcement    →  (Optional) Craft updates via a **4-step guided wizard** in the Admin dashboard, featuring categorized tags, unlimited change entries, and real-time validation.
 
 ### Full vs Patch Mode
 
@@ -68,7 +69,6 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 Gemini key 1 → Gemini key 2 → Gemini key 3 → Groq key 1 → Groq key 2 → Groq key 3
 
 Retriable errors (429 rate limit, 503 overload, network errors) move to the next key. Auth failures (401/403) and payload errors (413) also fall through.
-
 ## Tech Stack
 
 ### Frontend (`/client`)
@@ -177,7 +177,6 @@ npm install
 Create `server/.env`:
 
 env
-
 # Database
 MONGO_URI=mongodb+srv://user:password@cluster.mongodb.net/daemondoc
 # Auth
