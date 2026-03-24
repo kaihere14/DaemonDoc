@@ -52,7 +52,7 @@ export const renderFeatureAnnouncementTemplate = (data) => {
   html = applyToken(
     html,
     "INTRO_TEXT",
-    data?.intro || "We have released a new update for your workflow.",
+    data?.intro || "We have released an update for your workflow.",
   );
   html = applyToken(
     html,
@@ -87,21 +87,7 @@ export const renderFeatureAnnouncementTemplate = (data) => {
     "CTA_PRIMARY_URL",
     data?.primaryURL || "https://daemondoc.online",
   );
-  html = applyToken(
-    html,
-    "CTA_PRIMARY_TEXT",
-    data?.primaryCTA || "Open Dashboard",
-  );
-  html = applyToken(
-    html,
-    "CTA_SECONDARY_URL",
-    data?.secondaryURL || "https://daemondoc.online/docs",
-  );
-  html = applyToken(
-    html,
-    "CTA_SECONDARY_TEXT",
-    data?.secondaryCTA || "Read Docs",
-  );
+  html = applyToken(html, "CTA_PRIMARY_TEXT", data?.primaryCTA || "Try Now");
   html = applyToken(
     html,
     "UNSUBSCRIBE_TOKEN",
