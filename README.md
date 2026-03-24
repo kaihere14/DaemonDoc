@@ -31,8 +31,9 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
     - **Monorepo Native Support**: Seamlessly handles complex workspaces including Turborepo, Lerna, and Nx structures.
     - **Smart Logic Exclusions**: Filters out boilerplate, tests, and sensitive configuration from public documentation.
 - **Professional Feature Announcements** — Integrated email system with categorized update tags (`New`, `Improved`, `Fixed`, `Security`) and dual-action CTAs for user engagement.
+- **Dynamic Change Lists** — Unlimited change entries in announcement emails with validated tag classes, enabling rich, structured updates.
 - **Robust Email Fallback** — Resilient HTML template rendering ensures users receive updates even if primary templates encounter issues.
-- **Real-time Webhook Integration** — "Push once, sync forever" promise, listening for git events to keep your README always up-to-date.
+- **Real-time Webhook Integration** — \"Push once, sync forever\" promise, listening for git events to keep your README always up-to-date.
 - **Enterprise-Grade Security** — Bank-level AES-256 encryption protects GitHub tokens and repository access keys at rest and in transit.
 - **Immediate First-Time Generation** — README is generated instantly upon first repository activation.
 - **Incremental Patch Mode** — On subsequent pushes, only affected sections are updated, minimizing compute and latency.
@@ -46,6 +47,7 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 - **Toast Notifications** — Provides instant, non-intrusive feedback for user actions.
 - **Animated UI Elements** — Dynamic and engaging animations for key sections like the Hero.
 - **Modernized Login Page** — Redesigned login experience with a sleek split-layout.
+
 ## ⚙️ How It Works
 
 1. Connect GitHub Account  →  OAuth login, encrypted token stored
@@ -54,7 +56,7 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 4. AI Scans Codebase       →  Step 1: file selection (mini model)
                                Step 2: README generation (main model)
 5. README Committed        →  Pushed back to your repo automatically
-6. Feature Announcement    →  (Optional) Categorized email updates sent to users via the integrated template renderer
+6. Feature Announcement    →  (Optional) Categorized email updates with dynamic change list support, unlimited entries, and validated tag classes via the integrated template renderer
 
 ### Full vs Patch Mode
 
@@ -66,6 +68,7 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 Gemini key 1 → Gemini key 2 → Gemini key 3 → Groq key 1 → Groq key 2 → Groq key 3
 
 Retriable errors (429 rate limit, 503 overload, network errors) move to the next key. Auth failures (401/403) and payload errors (413) also fall through.
+
 ## Tech Stack
 
 ### Frontend (`/client`)
