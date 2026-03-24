@@ -50,10 +50,11 @@ export const githubCallBack = async (req, res) => {
     });
 
     const userInfo = userInfoRes.data;
+    const primaryEmail = await getGithubPrimaryEmail(accessToken);
 
     let user;
     try {
-      const result = await createOAuthUser(userInfo, accessToken);
+      const result = await createOAuthUser(userInfo, accessToken, primaryEmail);
       user = result.user;
     } catch (error) {
       console.error("Error creating OAuth user:", error);
@@ -85,12 +86,38 @@ export const githubCallBack = async (req, res) => {
   }
 };
 
-export const createOAuthUser = async (profile, access_token) => {
+const getGithubPrimaryEmail = async (accessToken) => {
+  try {
+    const emailRes = await axios.get("https://api.github.com/user/emails", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/vnd.github+json",
+      },
+    });
+
+    const emails = Array.isArray(emailRes.data) ? emailRes.data : [];
+    const primaryVerified = emails.find((e) => e.primary && e.verified);
+    const verified = emails.find((e) => e.verified);
+    const first = emails[0];
+
+    return primaryVerified?.email || verified?.email || first?.email || null;
+  } catch (error) {
+    // Some accounts may not expose email even with scope; continue without blocking login.
+    return null;
+  }
+};
+
+export const createOAuthUser = async (
+  profile,
+  access_token,
+  primaryEmail = null,
+) => {
   let user = await User.findOne({ githubUsername: profile.login });
   if (!user) {
     user = new User({
       githubId: profile.id,
       githubUsername: profile.login,
+      email: profile.email || primaryEmail,
       avatarUrl: profile.avatar_url,
       githubAccessToken: encrypt(access_token),
     });
@@ -98,6 +125,9 @@ export const createOAuthUser = async (profile, access_token) => {
   } else {
     console.log("User already exists. Updating access token.");
     user.githubAccessToken = encrypt(access_token);
+    if (profile.email || primaryEmail) {
+      user.email = profile.email || primaryEmail;
+    }
     await user.save();
   }
 
