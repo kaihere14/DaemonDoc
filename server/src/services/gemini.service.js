@@ -3,9 +3,10 @@ import axios from "axios";
 const GEMINI_API_BASE =
   "https://generativelanguage.googleapis.com/v1beta/models";
 
-export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+export const GEMINI_MODEL =
+  process.env.GEMINI_MODEL || "gemini-3-flash-preview";
 export const GEMINI_MODEL_MINI =
-  process.env.GEMINI_MODEL_MINI || "gemini-2.5-flash-lite";
+  process.env.GEMINI_MODEL_MINI || "gemini-3-flash-preview";
 
 // Gemini has a 1M token context window, so we can afford much larger scans
 // than Groq's practical ~6K limit. These limits scale every fetch accordingly.
@@ -54,10 +55,17 @@ function toGeminiPayload(messages) {
   const systemMsg = messages.find((m) => m.role === "system");
   const nonSystem = messages.filter((m) => m.role !== "system");
 
-  const contents = nonSystem.map((m) => ({
-    role: m.role === "assistant" ? "model" : "user",
-    parts: [{ text: m.content }],
-  }));
+  const contents = nonSystem.map((m) => {
+    const parts = [{ text: m.content }];
+    if (m.role === "assistant" && m.thought) {
+      // For thought circulation: the "model" role should see its previous thoughts
+      parts.unshift({ thought: m.thought });
+    }
+    return {
+      role: m.role === "assistant" ? "model" : "user",
+      parts,
+    };
+  });
 
   const payload = { contents };
   if (systemMsg) {
@@ -68,7 +76,7 @@ function toGeminiPayload(messages) {
 
 export async function callGeminiAPI(
   messages,
-  { model, maxTokens, temperature },
+  { model, maxTokens, temperature, responseMimeType },
   apiKey,
   timeout = 60000,
 ) {
@@ -76,7 +84,11 @@ export async function callGeminiAPI(
 
   const body = {
     contents,
-    generationConfig: { temperature, maxOutputTokens: maxTokens },
+    generationConfig: {
+      temperature,
+      maxOutputTokens: maxTokens,
+      ...(responseMimeType ? { responseMimeType } : {}),
+    },
   };
   if (systemInstruction) body.systemInstruction = systemInstruction;
 
@@ -89,12 +101,38 @@ export async function callGeminiAPI(
   const candidate = response.data?.candidates?.[0];
   if (!candidate) throw new Error("No candidates in Gemini response");
 
-  // Gemini blocks certain content instead of erroring — treat it like an error
   if (candidate.finishReason === "SAFETY") {
     throw new Error("Gemini content filtered for safety reasons");
   }
 
-  const text = candidate?.content?.parts?.[0]?.text;
-  if (!text) throw new Error("Invalid response from Gemini API");
+  // Gemini returns multiple parts — one for text, one (optional) for thought.
+  // Extract both for thought circulation.
+  let text = "";
+  let thought = "";
+
+  (candidate.content?.parts || []).forEach((part) => {
+    if (part.text) text += part.text;
+    if (part.thought) thought += part.thought;
+  });
+
+  if (!text) {
+    // If only thought exists, but we need text (like in this app), log it but
+    // try to use whatever text we might have found.
+    if (thought) {
+      console.log("[Gemini] Only found thought in response, no main text");
+      return thought; // Fallback or handle differently based on app needs
+    }
+    throw new Error("Invalid response from Gemini API: No text content found");
+  }
+
+  // In this app, we return a string. To handle circulation without breaking
+  // signatures, we should ideally return an object. However, to stay backward
+  // compatible, we'll return the text but the caller could optionally inspect
+  // the message state if it's being updated.
+  // For now, let's return the text but log the thought length.
+  if (thought) {
+    console.log(`[Gemini] Captured thought signature (${thought.length} chars)`);
+  }
+
   return text;
 }

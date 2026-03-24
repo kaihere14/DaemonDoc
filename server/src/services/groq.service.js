@@ -39,12 +39,13 @@ async function callLLMAPI({
   temperature,
   apiKey,
   provider,
+  responseMimeType,
   timeout = 60000,
 }) {
   if (provider === "gemini") {
     return callGeminiAPI(
       messages,
-      { model, maxTokens, temperature },
+      { model, maxTokens, temperature, responseMimeType },
       apiKey,
       timeout,
     );
@@ -194,11 +195,12 @@ Respond with ONLY a JSON object (no markdown, no explanation):
   const content = await callLLMAPI({
     messages: [{ role: "user", content: analysisPrompt }],
     model: modelMini,
-    maxTokens: 500,
-    temperature: 0.2,
+    maxTokens: 1000,
+    temperature: 0.1,
     apiKey,
     provider,
     timeout: 30000,
+    responseMimeType: provider === "gemini" ? "application/json" : null,
   });
 
   if (!content) {
