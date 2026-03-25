@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { motion } from "framer-motion";
 import LandingNavigation from "../components/LandingNavigation";
 import Hero from "../components/Hero";
 import Features from "../components/Features";
@@ -22,14 +23,19 @@ const LandingPage = () => {
         ogUrl="https://daemondoc.online/"
         canonical="https://daemondoc.online/"
       />
-      <div className="min-h-screen bg-white text-slate-900 selection:bg-indigo-100 overflow-x-hidden antialiased">
+      <motion.div
+        className="min-h-screen bg-white text-slate-900 selection:bg-indigo-100 overflow-x-hidden antialiased"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
         <LandingNavigation />
         <Hero />
         <Features />
         <Footer />
-      </div>
-    </>
-  );
-};
+      </motion.div>
+      </>
+    );
+  };
 
 export default LandingPage;

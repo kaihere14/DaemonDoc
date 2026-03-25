@@ -1,15 +1,23 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { GitBranch, Lock, Unlock, Loader2, ExternalLink } from "lucide-react";
+import {
+  GitBranch,
+  Lock,
+  Unlock,
+  Loader2,
+  ExternalLink,
+} from "lucide-react";
 import { toast } from "sonner";
 import { api, ENDPOINTS } from "../lib/api";
 
 const RepoCard = ({ repo, showToggle = true, onToggle }) => {
   const [isActive, setIsActive] = useState(repo.activated);
   const [loading, setLoading] = useState(false);
+  const ownerLabel =
+    repo.owner || repo.full_name?.split("/")?.[0] || "Repository";
+  const branchLabel = repo.default_branch || "main";
 
   const handleCardClick = () => {
-    // Open GitHub repository in new tab
     const githubUrl = `https://github.com/${repo.full_name}`;
     window.open(githubUrl, "_blank", "noopener,noreferrer");
   };
@@ -20,7 +28,6 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
 
     const endpoint = isActive ? ENDPOINTS.DEACTIVATE_REPO : ENDPOINTS.ADD_REPO;
     const action = isActive ? "Deactivated" : "Activated";
-    
     const body = isActive
       ? { repoId: repo.id }
       : {
@@ -52,87 +59,104 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
       animate={{ opacity: 1, y: 0 }}
       whileHover={{
         y: -4,
-        boxShadow: "0 8px 30px rgba(0,0,0,0.04)",
+        boxShadow: "0 18px 40px rgba(29,78,216,0.08)",
       }}
-      className="bg-white/70 backdrop-blur-xl border border-slate-200/60 rounded-3xl p-6 transition-all duration-50 hover:border-slate-300 group flex flex-col h-full shadow-sm"
+      className="relative flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-slate-200/80 bg-white/90 p-4 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.25)] transition-all duration-200 hover:border-blue-200 group backdrop-blur-xl sm:rounded-[2rem] sm:p-6"
     >
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1 min-w-0">
-          <div 
-            className="flex items-center gap-2 mb-1 cursor-pointer group/title w-fit"
+      <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="flex items-start justify-between gap-3 sm:gap-4">
+          <div
+            className="flex min-w-0 items-start gap-2.5 cursor-pointer group/title sm:gap-3"
             onClick={handleCardClick}
           >
-            <GitBranch size={16} className="text-slate-400 shrink-0 group-hover/title:text-primary transition-colors" />
-            <h3 className="text-lg font-bold text-slate-900 truncate group-hover/title:text-primary transition-colors decoration-primary/30 underline-offset-4 hover:underline">
-              {repo.name}
-            </h3>
-            <ExternalLink
-              size={14}
-              className="text-slate-400 shrink-0 opacity-50 group-hover/title:opacity-100 transition-all group-hover/title:text-primary"
-            />
+            <div className="flex items-center justify-center rounded-2xl border border-blue-100 bg-blue-50/80 p-2 shadow-inner shadow-blue-200/50">
+              <GitBranch size={16} className="text-blue-600 sm:size-[18px]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1">
+                <h3 className="min-w-0 flex-1 truncate text-base font-black uppercase tracking-tight text-slate-900 group-hover/title:text-blue-600 sm:text-lg">
+                  {repo.name}
+                </h3>
+                <ExternalLink
+                  size={14}
+                  className="text-slate-400 shrink-0 opacity-60 group-hover/title:opacity-100 transition-all group-hover/title:text-blue-600"
+                />
+              </div>
+              <p className="max-w-[220px] truncate font-mono text-[11px] text-slate-500 sm:max-w-[240px]">
+                {repo.full_name}
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-slate-500 truncate">{repo.full_name}</p>
+          {showToggle && (
+            <div
+              className="flex shrink-0 items-center gap-2 self-start"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {loading ? (
+                <Loader2 size={20} className="text-slate-400 animate-spin" />
+              ) : (
+                <button
+                  onClick={handleToggle}
+                  disabled={loading}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 cursor-pointer ${
+                    isActive ? "bg-blue-600" : "bg-slate-300"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      isActive ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
-        {showToggle && (
+        <div className="flex flex-wrap items-center gap-1 text-[10px] uppercase tracking-[0.14em] font-mono text-slate-400 sm:text-[11px] sm:tracking-[0.18em]">
+          <span className="font-black text-slate-400">{ownerLabel}</span>
+          <span className="text-slate-300">•</span>
+          <span className="text-slate-500">{branchLabel}</span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2.5 text-[11px] sm:gap-3">
           <div
-            className="flex items-center gap-2 ml-4"
-            onClick={(e) => e.stopPropagation()}
+            className={`flex items-center gap-1 rounded-xl border px-2.5 py-1 text-[10px] font-black tracking-wide sm:px-3 sm:text-[11px] ${
+              repo.private
+                ? "bg-slate-100 text-slate-700 border-slate-200"
+                : "bg-blue-50 text-blue-700 border-blue-100"
+            }`}
           >
-            {loading ? (
-              <Loader2 size={20} className="text-slate-400 animate-spin" />
+            {repo.private ? (
+              <>
+                <Lock size={12} />
+                Private
+              </>
             ) : (
-              <button
-                onClick={handleToggle}
-                disabled={loading}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 cursor-pointer ${
-                  isActive ? "bg-emerald-500" : "bg-slate-300"
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    isActive ? "translate-x-6" : "translate-x-1"
-                  }`}
-                />
-              </button>
+              <>
+                <Unlock size={12} />
+                Public
+              </>
             )}
           </div>
-        )}
-      </div>
-
-      <div className="flex items-center gap-3 text-xs text-slate-600">
-        {repo.private ? (
-          <span className="flex items-center gap-1.5 bg-amber-50/80 text-amber-700 px-2.5 py-1 rounded-xl border border-amber-100/50 text-[11px] font-bold tracking-wide">
-            <Lock size={12} />
-            Private
-          </span>
-        ) : (
-          <span className="flex items-center gap-1.5 bg-emerald-50/80 text-emerald-700 px-2.5 py-1 rounded-xl border border-emerald-100/50 text-[11px] font-bold tracking-wide">
-            <Unlock size={12} />
-            Public
-          </span>
-        )}
-        <span className="text-slate-400">•</span>
-        <span className="text-slate-500">{repo.default_branch}</span>
-      </div>
-
-      <div className="mt-3 pt-3 border-t border-slate-100 min-h-[28px] flex items-center">
-        {isActive ? (
-          <div className="flex items-center gap-2 text-xs text-emerald-600 font-medium">
-            <motion.div
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="w-2 h-2 bg-emerald-500 rounded-full"
+          <div
+            className={`flex min-w-0 items-center gap-2 text-[11px] font-semibold sm:text-xs ${
+              isActive ? "text-blue-700" : "text-slate-400"
+            }`}
+          >
+            <span
+              className={`h-2 w-2 rounded-full transition ${
+                isActive ? "bg-blue-600" : "bg-slate-300"
+              }`}
             />
-            AI README updates enabled
+            <span className="truncate">
+              {isActive ? "AI README updates enabled" : "AI updates disabled"}
+            </span>
           </div>
-        ) : (
-          <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-            <div className="w-2 h-2 bg-slate-300 rounded-full" />
-            AI updates disabled
-          </div>
-        )}
+        </div>
       </div>
+
+      <div className="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-b from-transparent via-transparent to-white pointer-events-none" />
     </motion.div>
   );
 };
