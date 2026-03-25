@@ -302,3 +302,139 @@ export const fetchUserLogs = async (req, res) => {
     res.status(500).json({ message: "Error fetching user logs", error });
   }
 };
+
+export const fetchAdminAnalytics = async (_req, res) => {
+  try {
+    const now = new Date();
+    const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const [
+      totalUsers,
+      activeRepos,
+      totalLogs,
+      liveJobs,
+      recentLogs,
+      statusBreakdown,
+      topReposRaw,
+      latestLog,
+    ] = await Promise.all([
+      User.countDocuments(),
+      ActiveRepo.countDocuments({ active: true }),
+      UserLogModel.countDocuments(),
+      UserLogModel.countDocuments({ status: "ongoing" }),
+      UserLogModel.find({ createdAt: { $gte: last7Days } })
+        .select("status createdAt")
+        .sort({ createdAt: 1 })
+        .lean(),
+      UserLogModel.aggregate([
+        {
+          $group: {
+            _id: "$status",
+            count: { $sum: 1 },
+          },
+        },
+      ]),
+      UserLogModel.aggregate([
+        {
+          $group: {
+            _id: {
+              repoName: "$repoName",
+              repoOwner: "$repoOwner",
+            },
+            count: { $sum: 1 },
+            lastEventAt: { $max: "$createdAt" },
+          },
+        },
+        { $sort: { count: -1, lastEventAt: -1 } },
+        { $limit: 5 },
+      ]),
+      UserLogModel.findOne().sort({ createdAt: -1 }).lean(),
+    ]);
+
+    const successfulTerminalRuns = await UserLogModel.countDocuments({
+      status: "success",
+    });
+    const terminalRuns = await UserLogModel.countDocuments({
+      status: { $in: ["success", "failed"] },
+    });
+    const successRate =
+      terminalRuns > 0
+        ? Math.round((successfulTerminalRuns / terminalRuns) * 100)
+        : 0;
+
+    const logsInLast24Hours = recentLogs.filter(
+      (log) => new Date(log.createdAt) >= last24Hours,
+    ).length;
+
+    const activityLookup = new Map();
+    recentLogs.forEach((log) => {
+      const key = new Date(log.createdAt).toISOString().slice(0, 10);
+      const currentDay = activityLookup.get(key) || {
+        date: key,
+        total: 0,
+        success: 0,
+        failed: 0,
+        ongoing: 0,
+      };
+      currentDay.total += 1;
+      currentDay[log.status] += 1;
+      activityLookup.set(key, currentDay);
+    });
+
+    const activity = Array.from({ length: 7 }, (_, index) => {
+      const date = new Date(last7Days);
+      date.setDate(last7Days.getDate() + index + 1);
+      const key = date.toISOString().slice(0, 10);
+      const dayData = activityLookup.get(key) || {
+        date: key,
+        total: 0,
+        success: 0,
+        failed: 0,
+        ongoing: 0,
+      };
+
+      return {
+        ...dayData,
+        label: date.toLocaleDateString("en-US", { weekday: "short" }),
+      };
+    });
+
+    const breakdown = {
+      success: 0,
+      failed: 0,
+      ongoing: 0,
+    };
+
+    statusBreakdown.forEach((entry) => {
+      if (entry?._id in breakdown) {
+        breakdown[entry._id] = entry.count;
+      }
+    });
+
+    const topRepos = topReposRaw.map((repo) => ({
+      repoName: repo._id.repoName,
+      repoOwner: repo._id.repoOwner,
+      count: repo.count,
+      lastEventAt: repo.lastEventAt,
+    }));
+
+    return res.status(200).json({
+      overview: {
+        totalUsers,
+        activeRepos,
+        totalRuns: totalLogs,
+        liveJobs,
+        successRate,
+        logsInLast24Hours,
+        latestActivityAt: latestLog?.createdAt || null,
+      },
+      breakdown,
+      activity,
+      topRepos,
+    });
+  } catch (error) {
+    console.error("Error fetching admin analytics:", error);
+    return res.status(500).json({ message: "Error fetching admin analytics" });
+  }
+};

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import AuthNavigation from "../components/AuthNavigation";
-import { api } from "../lib/api";
+import { api, ENDPOINTS } from "../lib/api";
 import { toast } from "sonner";
 import {
   Send,
@@ -11,10 +11,12 @@ import {
   ChevronLeft,
   AlertCircle,
   Check,
-  Shield,
   X,
+  RefreshCw,
+  Loader2,
+  Activity,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 const Admin = () => {
   const { user } = useAuth();
@@ -26,6 +28,11 @@ const Admin = () => {
   const [recipientOptions, setRecipientOptions] = useState([]);
   const [selectedRecipientIds, setSelectedRecipientIds] = useState([]);
   const [isRecipientsLoading, setIsRecipientsLoading] = useState(false);
+  const [analytics, setAnalytics] = useState(null);
+  const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(true);
+  const [isAnalyticsRefreshing, setIsAnalyticsRefreshing] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState("");
+  const shouldReduceMotion = useReducedMotion();
 
   // Form state
   const [subject, setSubject] = useState("");
@@ -76,6 +83,36 @@ const Admin = () => {
 
     loadRecipients();
   }, [showEmailModal, user]);
+
+  React.useEffect(() => {
+    if (!user?.admin) {
+      return;
+    }
+
+    fetchAnalytics();
+  }, [user]);
+
+  const fetchAnalytics = async (isRefresh = false) => {
+    if (isRefresh) {
+      setIsAnalyticsRefreshing(true);
+    } else {
+      setIsAnalyticsLoading(true);
+    }
+
+    try {
+      const { data } = await api.get(ENDPOINTS.ADMIN_ANALYTICS);
+      setAnalytics(data);
+      setAnalyticsError("");
+    } catch (error) {
+      console.error("Error loading analytics:", error);
+      setAnalyticsError(
+        error.response?.data?.message || "Failed to load analytics",
+      );
+    } finally {
+      setIsAnalyticsLoading(false);
+      setIsAnalyticsRefreshing(false);
+    }
+  };
 
   const handleChangeUpdate = (index, field, value) => {
     const newChanges = [...changes];
@@ -221,6 +258,10 @@ const Admin = () => {
     .map((recipient) => recipient.githubUsername || recipient.email);
 
   const completedSteps = Math.max(currentStep - 1, 0);
+  const analyticsOverview = analytics?.overview;
+  const analyticsBreakdown = analytics?.breakdown;
+  const analyticsActivity = analytics?.activity || [];
+  const analyticsTopRepos = analytics?.topRepos || [];
 
   const steps = [
     {
@@ -257,6 +298,30 @@ const Admin = () => {
     },
   ];
 
+  const analyticsStats = [
+    {
+      label: "Users",
+      value: analyticsOverview?.totalUsers || 0,
+      tone: "text-slate-900",
+    },
+    {
+      label: "Active Repos",
+      value: analyticsOverview?.activeRepos || 0,
+      tone: "text-blue-700",
+    },
+    {
+      label: "Runs",
+      value: analyticsOverview?.totalRuns || 0,
+      tone: "text-sky-700",
+    },
+    {
+      label: "Success Rate",
+      value: analyticsOverview?.successRate || 0,
+      suffix: "%",
+      tone: "text-emerald-700",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-linear-to-b from-white via-slate-50/70 to-white relative overflow-x-hidden">
       <AuthNavigation />
@@ -269,95 +334,453 @@ const Admin = () => {
 
       <div className="relative z-10 px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-32">
         <div className="max-w-6xl mx-auto">
-          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mb-10"
           >
-            <div className="mb-4 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <div className="mb-3 flex items-center gap-2">
-                  <div className="h-1 w-8 rounded-full bg-blue-600" />
-                  <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
-                    Admin System
-                  </span>
+            <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/85 p-6 shadow-[0_20px_60px_-34px_rgba(15,23,42,0.32)] backdrop-blur-sm sm:rounded-[2.5rem] sm:p-8">
+              <div className="flex flex-col gap-4">
+                <div>
+                  <div className="mb-3 flex items-center gap-2">
+                    <div className="h-1 w-8 rounded-full bg-blue-600" />
+                    <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                      Admin System
+                    </span>
+                  </div>
+                  <h1 className="mb-3 text-3xl font-black uppercase leading-none tracking-tighter text-slate-900 sm:text-5xl">
+                    Control Center
+                  </h1>
+                  <p className="max-w-2xl text-sm font-medium tracking-tight text-slate-500 sm:text-base">
+                    Review platform health first, then launch audience updates from a dedicated broadcast workspace.
+                  </p>
                 </div>
-                <h1 className="mb-3 text-3xl font-black uppercase leading-none tracking-tighter text-slate-900 sm:text-5xl">
-                  Control Center
-                </h1>
-                <p className="max-w-2xl text-sm font-medium tracking-tight text-slate-500 sm:text-base">
-                  Run admin communications from the same clean operating surface as the rest of the app.
-                </p>
               </div>
             </div>
           </motion.div>
 
-          {/* Cards Grid */}
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-8">
-            {/* Send Email Card */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="group relative"
-            >
+          <section className="mb-8">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+                  Section 01
+                </p>
+                <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-slate-900 sm:text-3xl">
+                  Analytics
+                </h2>
+              </div>
               <button
-                onClick={() => setShowEmailModal(true)}
-                className="relative flex h-full w-full flex-col overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white/90 p-6 text-left shadow-[0_20px_50px_-32px_rgba(15,23,42,0.35)] transition-all duration-200 hover:border-blue-200 sm:rounded-[2rem] sm:p-8"
+                type="button"
+                onClick={() => fetchAnalytics(true)}
+                className="inline-flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 transition-all hover:border-blue-200 hover:text-blue-600"
               >
-                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600 transition-all duration-300 group-hover:bg-blue-600 group-hover:text-white sm:mb-8 sm:h-16 sm:w-16">
-                  <Send size={32} strokeWidth={1.5} />
-                </div>
-                
-                <div className="mb-6 flex items-center gap-2">
-                  <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
-                    Broadcast Flow
-                  </span>
-                  <div className="h-px flex-1 bg-slate-200" />
-                </div>
-                <h2 className="mb-3 text-2xl font-black uppercase tracking-tight text-slate-900 sm:text-3xl">Broadcast</h2>
-                <p className="mb-8 text-base leading-relaxed text-slate-500 sm:text-lg">
-                  Compose and dispatch feature updates to a selected email audience with full visibility.
-                </p>
-
-                <div className="mt-auto flex items-center gap-2 font-bold text-blue-600">
-                  <span className="text-sm uppercase tracking-widest">Open Composer</span>
-                  <div className="h-0.5 w-12 bg-blue-600/20 transition-all duration-300 group-hover:w-20" />
-                  <ChevronRight size={20} />
-                </div>
+                <RefreshCw
+                  size={14}
+                  className={isAnalyticsRefreshing ? "animate-spin" : ""}
+                />
+                Refresh
               </button>
-            </motion.div>
+            </div>
 
-            {/* Analytics Card (Coming Soon) */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.1 }}
-              className="group relative"
+              transition={{ delay: 0.05 }}
+              className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/90 p-6 shadow-[0_20px_60px_-34px_rgba(15,23,42,0.32)] sm:p-8"
             >
-              <div className="relative flex h-full w-full cursor-not-allowed flex-col overflow-hidden rounded-[1.75rem] border border-dashed border-slate-200 bg-white/55 p-6 text-left shadow-[0_16px_40px_-32px_rgba(15,23,42,0.28)] backdrop-blur-sm sm:rounded-[2rem] sm:p-8">
-                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-slate-100 text-slate-400 sm:mb-8 sm:h-16 sm:w-16">
-                  <BarChart3 size={32} strokeWidth={1.5} />
+              <div className="mb-8 flex flex-col gap-5 border-b border-dashed border-slate-200 pb-6 lg:flex-row lg:items-end lg:justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-sky-100 bg-sky-50 text-sky-600 sm:h-16 sm:w-16">
+                    <BarChart3 size={32} strokeWidth={1.5} />
+                  </div>
+                  <div>
+                    <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+                      System Analytics
+                    </p>
+                    <h3 className="mt-2 text-2xl font-black uppercase tracking-tight text-slate-900">
+                      Platform Health
+                    </h3>
+                    <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
+                      Live operational insight across repository automation, run reliability, and current activity trends.
+                    </p>
+                  </div>
                 </div>
-                <div className="mb-6 flex items-center gap-2">
-                  <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
-                    Next Module
-                  </span>
-                  <div className="h-px flex-1 bg-slate-200" />
-                </div>
-                <h2 className="mb-3 text-2xl font-black uppercase tracking-tight text-slate-400 sm:text-3xl">Analytics</h2>
-                <p className="mb-8 text-base leading-relaxed text-slate-400 sm:text-lg">
-                  Advanced insights and engagement metrics to track the heartbeat of your app.
-                </p>
-
-                <div className="mt-auto">
-                  <span className="inline-flex rounded-xl bg-slate-100 px-4 py-2 text-xs font-bold uppercase tracking-widest text-slate-500">
-                    Coming Soon
+                <div className="inline-flex w-fit items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">
+                  Latest Activity
+                  <span className="text-slate-700">
+                    {formatAnalyticsTimestamp(analyticsOverview?.latestActivityAt)}
                   </span>
                 </div>
               </div>
+
+              {isAnalyticsLoading ? (
+                <div className="flex min-h-[320px] flex-1 flex-col items-center justify-center gap-4 rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50/70 px-6 py-10 text-center">
+                  <Loader2 size={28} className="animate-spin text-blue-600" />
+                  <div>
+                    <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                      Loading Analytics
+                    </p>
+                    <p className="mt-2 text-sm text-slate-500">
+                      Aggregating repository activity and admin metrics.
+                    </p>
+                  </div>
+                </div>
+              ) : analyticsError ? (
+                <div className="flex min-h-[320px] flex-1 flex-col justify-between rounded-[1.5rem] border border-rose-100 bg-rose-50/60 p-5">
+                  <div>
+                    <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-rose-500">
+                      <AlertCircle size={22} />
+                    </div>
+                    <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-rose-500">
+                      Analytics Error
+                    </p>
+                    <p className="mt-3 text-sm leading-relaxed text-rose-700">
+                      {analyticsError}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => fetchAnalytics(true)}
+                    className="mt-6 inline-flex w-fit items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white transition-all hover:bg-rose-700"
+                  >
+                    <RefreshCw size={14} />
+                    Retry
+                  </button>
+                </div>
+              ) : (
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: {},
+                    visible: {
+                      transition: {
+                        staggerChildren: shouldReduceMotion ? 0 : 0.04,
+                      },
+                    },
+                  }}
+                  className="grid gap-5 xl:grid-cols-[1.35fr_0.85fr]"
+                >
+                  <div className="space-y-5">
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                      {analyticsStats.map((stat) => (
+                        <motion.div
+                          key={stat.label}
+                          variants={fadeUpVariant}
+                          className="rounded-[1.35rem] border border-slate-200 bg-linear-to-b from-white to-slate-50/70 p-4"
+                        >
+                          <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                            {stat.label}
+                          </p>
+                          <p className={`mt-2 text-2xl font-black ${stat.tone}`}>
+                            <CountUpNumber
+                              value={stat.value}
+                              suffix={stat.suffix}
+                            />
+                          </p>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    <motion.div
+                      variants={fadeUpVariant}
+                      className="rounded-[1.5rem] border border-slate-200 bg-linear-to-r from-blue-50/80 via-white to-white p-4 sm:p-5"
+                    >
+                      <div className="flex items-center gap-3">
+                        <motion.div
+                          animate={
+                            shouldReduceMotion
+                              ? undefined
+                              : {
+                                  boxShadow: [
+                                    "0 8px 20px -12px rgba(59,130,246,0.20)",
+                                    "0 10px 24px -12px rgba(59,130,246,0.28)",
+                                    "0 8px 20px -12px rgba(59,130,246,0.20)",
+                                  ],
+                                }
+                          }
+                          transition={
+                            shouldReduceMotion
+                              ? undefined
+                              : { repeat: Infinity, duration: 4.2, ease: "easeInOut" }
+                          }
+                          className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-200"
+                        >
+                          <Activity size={18} />
+                        </motion.div>
+                        <div>
+                          <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                            Live Pulse
+                          </p>
+                          <p className="text-lg font-black text-slate-900">
+                            <CountUpNumber
+                              value={analyticsOverview?.logsInLast24Hours || 0}
+                            />{" "}
+                            events in the last 24h
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-3 gap-2">
+                        {[
+                          {
+                            label: "Success",
+                            value: analyticsBreakdown?.success || 0,
+                            className: "bg-blue-50 text-blue-700",
+                          },
+                          {
+                            label: "Failed",
+                            value: analyticsBreakdown?.failed || 0,
+                            className: "bg-rose-50 text-rose-600",
+                          },
+                          {
+                            label: "Live",
+                            value: analyticsOverview?.liveJobs || 0,
+                            className: "bg-sky-50 text-sky-700",
+                          },
+                        ].map((item, index) => (
+                          <motion.div
+                            key={item.label}
+                            initial={{ opacity: 0, y: 16 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{
+                              delay: shouldReduceMotion ? 0 : 0.12 + index * 0.04,
+                              duration: shouldReduceMotion ? 0 : 0.24,
+                            }}
+                            className={`rounded-2xl px-3 py-3 ${item.className}`}
+                          >
+                            <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] opacity-70">
+                              {item.label}
+                            </p>
+                            <p className="mt-1 text-lg font-black">
+                              <CountUpNumber value={item.value} />
+                            </p>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+
+                    <motion.div
+                      variants={fadeUpVariant}
+                      className="rounded-[1.5rem] border border-slate-200 bg-white p-4 sm:p-5"
+                    >
+                      <div className="mb-4 flex items-center justify-between gap-3">
+                        <div>
+                          <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                            Weekly Activity
+                          </p>
+                          <p className="text-sm font-semibold text-slate-600">
+                            Total log volume over the last 7 days
+                          </p>
+                        </div>
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                          7 days
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-7 gap-2">
+                        {analyticsActivity.map((day, index) => {
+                          const height = Math.max(day.total * 16, 14);
+                          return (
+                            <motion.div
+                              key={day.date}
+                              initial={{ opacity: 0, y: 18 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{
+                                delay: shouldReduceMotion ? 0 : 0.04 + index * 0.03,
+                                duration: shouldReduceMotion ? 0 : 0.24,
+                              }}
+                              className="flex flex-col items-center gap-2"
+                            >
+                              <div className="flex h-28 w-full items-end rounded-2xl bg-slate-50 px-2 py-2">
+                                <motion.div
+                                  className="w-full rounded-xl bg-linear-to-t from-blue-600 to-sky-400"
+                                  initial={{ height: "0%" }}
+                                  animate={{ height: `${Math.min(height, 100)}%` }}
+                                  transition={{
+                                    delay: shouldReduceMotion ? 0 : 0.08 + index * 0.04,
+                                    duration: shouldReduceMotion ? 0 : 0.4,
+                                    ease: [0.2, 0.8, 0.2, 1],
+                                  }}
+                                />
+                              </div>
+                              <div className="text-center">
+                                <p className="text-xs font-black uppercase text-slate-700">
+                                  <CountUpNumber value={day.total} duration={800} />
+                                </p>
+                                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                                  {day.label}
+                                </p>
+                              </div>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+                    </motion.div>
+                  </div>
+
+                  <div className="space-y-5">
+                    <motion.div
+                      variants={fadeUpVariant}
+                      className="rounded-[1.5rem] border border-slate-200 bg-slate-50/80 p-4 sm:p-5"
+                    >
+                      <div className="mb-4">
+                        <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                          Top Repositories
+                        </p>
+                        <p className="mt-2 text-sm font-semibold text-slate-600">
+                          Most active repos by automation events
+                        </p>
+                      </div>
+
+                      <div className="space-y-3">
+                        {analyticsTopRepos.length === 0 ? (
+                          <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-6 text-sm text-slate-500">
+                            No repository activity has been recorded yet.
+                          </div>
+                        ) : (
+                          analyticsTopRepos.map((repo, index) => (
+                            <motion.div
+                              key={`${repo.repoOwner}-${repo.repoName}`}
+                              initial={{ opacity: 0, x: 18 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{
+                                delay: shouldReduceMotion ? 0 : 0.08 + index * 0.04,
+                                duration: shouldReduceMotion ? 0 : 0.22,
+                              }}
+                              className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-3"
+                            >
+                              <div className="min-w-0">
+                                <p className="truncate text-sm font-black uppercase tracking-tight text-slate-900">
+                                  {repo.repoName}
+                                </p>
+                                <p className="truncate font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                                  {repo.repoOwner || "unknown owner"}
+                                </p>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-lg font-black text-blue-700">
+                                  <CountUpNumber value={repo.count} duration={850} />
+                                </p>
+                                <p className="text-xs text-slate-400">
+                                  {formatAnalyticsTimestamp(repo.lastEventAt)}
+                                </p>
+                              </div>
+                            </motion.div>
+                          ))
+                        )}
+                      </div>
+                    </motion.div>
+
+                    <motion.div
+                      variants={fadeUpVariant}
+                      className="rounded-[1.5rem] border border-slate-200 bg-linear-to-b from-slate-50 to-white p-4 sm:p-5"
+                    >
+                      <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                        Reliability Notes
+                      </p>
+                      <div className="mt-4 space-y-3">
+                        {[
+                          {
+                            label: "Current queue",
+                            value: `${analyticsOverview?.liveJobs || 0} live jobs`,
+                          },
+                          {
+                            label: "Run health",
+                            value: `${analyticsOverview?.successRate || 0}% success rate`,
+                          },
+                          {
+                            label: "Recent pace",
+                            value: `${analyticsOverview?.logsInLast24Hours || 0} events in 24h`,
+                          },
+                        ].map((item, index) => (
+                          <motion.div
+                            key={item.label}
+                            initial={{ opacity: 0, y: 14 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{
+                              delay: shouldReduceMotion ? 0 : 0.08 + index * 0.04,
+                              duration: shouldReduceMotion ? 0 : 0.22,
+                            }}
+                            className="rounded-2xl border border-slate-200 bg-white px-4 py-3"
+                          >
+                            <p className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                              {item.label}
+                            </p>
+                            <p className="mt-1 text-sm font-semibold text-slate-700">
+                              {item.value}
+                            </p>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              )}
             </motion.div>
-          </div>
+          </section>
+
+          <section>
+            <div className="mb-4">
+              <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+                Section 02
+              </p>
+              <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-slate-900 sm:text-3xl">
+                Broadcast
+              </h2>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/90 p-6 shadow-[0_20px_60px_-34px_rgba(15,23,42,0.32)] sm:p-8"
+            >
+              <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+                <div>
+                  <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600 sm:h-16 sm:w-16">
+                    <Send size={32} strokeWidth={1.5} />
+                  </div>
+                  <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+                    Broadcast Flow
+                  </p>
+                  <h3 className="mt-3 text-2xl font-black uppercase tracking-tight text-slate-900 sm:text-3xl">
+                    Send Product Updates
+                  </h3>
+                  <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
+                    Launch a polished feature announcement from a dedicated composer with audience selection, structured change blocks, and a final review pass before dispatch.
+                  </p>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+                  {[
+                    "Select the exact audience before sending.",
+                    "Structure the update with intro, detail, and change blocks.",
+                    "Review delivery details before the queue is triggered.",
+                  ].map((line) => (
+                    <div
+                      key={line}
+                      className="rounded-[1.35rem] border border-slate-200 bg-slate-50/70 px-4 py-4 text-sm font-semibold text-slate-700"
+                    >
+                      {line}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-8 flex flex-col gap-3 border-t border-dashed border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm font-medium text-slate-500">
+                  Open the composer when you’re ready to prepare the next announcement.
+                </p>
+                <button
+                  onClick={() => setShowEmailModal(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-[1.1rem] bg-[#1d4ed8] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-[#1e40af]"
+                >
+                  Open Composer
+                  <ChevronRight size={18} />
+                </button>
+              </div>
+            </motion.div>
+          </section>
 
         </div>
       </div>
@@ -758,6 +1181,69 @@ const Admin = () => {
         )}
       </AnimatePresence>
     </div>
+  );
+};
+
+const formatAnalyticsTimestamp = (timestamp) => {
+  if (!timestamp) {
+    return "No recent activity";
+  }
+
+  return new Date(timestamp).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+};
+
+const fadeUpVariant = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.24,
+      ease: [0.2, 0.8, 0.2, 1],
+    },
+  },
+};
+
+const CountUpNumber = ({ value, suffix = "", duration = 1100 }) => {
+  const [displayValue, setDisplayValue] = React.useState(0);
+  const target = Number(value) || 0;
+  const widthCh = Math.max(String(target).length + String(suffix).length, 2);
+
+  React.useEffect(() => {
+    let frameId;
+    const startTime = performance.now();
+
+    const tick = (currentTime) => {
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+      setDisplayValue(Math.round(target * easedProgress));
+
+      if (progress < 1) {
+        frameId = window.requestAnimationFrame(tick);
+      }
+    };
+
+    setDisplayValue(0);
+    frameId = window.requestAnimationFrame(tick);
+
+    return () => {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+    };
+  }, [target, duration]);
+
+  return (
+    <span
+      className="inline-block tabular-nums"
+      style={{ minWidth: `${widthCh}ch` }}
+    >
+      {displayValue}
+      {suffix}
+    </span>
   );
 };
 
