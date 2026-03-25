@@ -16,7 +16,7 @@ import {
   Loader2,
   Activity,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 const Admin = () => {
   const { user } = useAuth();
@@ -32,6 +32,7 @@ const Admin = () => {
   const [isAnalyticsLoading, setIsAnalyticsLoading] = useState(true);
   const [isAnalyticsRefreshing, setIsAnalyticsRefreshing] = useState(false);
   const [analyticsError, setAnalyticsError] = useState("");
+  const shouldReduceMotion = useReducedMotion();
 
   // Form state
   const [subject, setSubject] = useState("");
@@ -297,6 +298,30 @@ const Admin = () => {
     },
   ];
 
+  const analyticsStats = [
+    {
+      label: "Users",
+      value: analyticsOverview?.totalUsers || 0,
+      tone: "text-slate-900",
+    },
+    {
+      label: "Active Repos",
+      value: analyticsOverview?.activeRepos || 0,
+      tone: "text-blue-700",
+    },
+    {
+      label: "Runs",
+      value: analyticsOverview?.totalRuns || 0,
+      tone: "text-sky-700",
+    },
+    {
+      label: "Success Rate",
+      value: analyticsOverview?.successRate || 0,
+      suffix: "%",
+      tone: "text-emerald-700",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-linear-to-b from-white via-slate-50/70 to-white relative overflow-x-hidden">
       <AuthNavigation />
@@ -315,7 +340,7 @@ const Admin = () => {
             className="mb-10"
           >
             <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/85 p-6 shadow-[0_20px_60px_-34px_rgba(15,23,42,0.32)] backdrop-blur-sm sm:rounded-[2.5rem] sm:p-8">
-              <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <div className="flex flex-col gap-4">
                 <div>
                   <div className="mb-3 flex items-center gap-2">
                     <div className="h-1 w-8 rounded-full bg-blue-600" />
@@ -329,39 +354,6 @@ const Admin = () => {
                   <p className="max-w-2xl text-sm font-medium tracking-tight text-slate-500 sm:text-base">
                     Review platform health first, then launch audience updates from a dedicated broadcast workspace.
                   </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  {[
-                    {
-                      label: "Users",
-                      value: analyticsOverview?.totalUsers || 0,
-                    },
-                    {
-                      label: "Repos",
-                      value: analyticsOverview?.activeRepos || 0,
-                    },
-                    {
-                      label: "Runs",
-                      value: analyticsOverview?.totalRuns || 0,
-                    },
-                    {
-                      label: "24H",
-                      value: analyticsOverview?.logsInLast24Hours || 0,
-                    },
-                  ].map((item) => (
-                    <div
-                      key={item.label}
-                      className="rounded-[1.25rem] border border-slate-200 bg-linear-to-b from-white to-slate-50/70 px-4 py-3"
-                    >
-                      <p className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
-                        {item.label}
-                      </p>
-                      <p className="mt-2 text-xl font-black text-slate-900 sm:text-2xl">
-                        {item.value}
-                      </p>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
@@ -456,56 +448,75 @@ const Admin = () => {
                   </button>
                 </div>
               ) : (
-                <div className="grid gap-5 xl:grid-cols-[1.35fr_0.85fr]">
+                <motion.div
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: {},
+                    visible: {
+                      transition: {
+                        staggerChildren: shouldReduceMotion ? 0 : 0.04,
+                      },
+                    },
+                  }}
+                  className="grid gap-5 xl:grid-cols-[1.35fr_0.85fr]"
+                >
                   <div className="space-y-5">
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                      {[
-                        {
-                          label: "Users",
-                          value: analyticsOverview?.totalUsers || 0,
-                          tone: "text-slate-900",
-                        },
-                        {
-                          label: "Active Repos",
-                          value: analyticsOverview?.activeRepos || 0,
-                          tone: "text-blue-700",
-                        },
-                        {
-                          label: "Runs",
-                          value: analyticsOverview?.totalRuns || 0,
-                          tone: "text-sky-700",
-                        },
-                        {
-                          label: "Success Rate",
-                          value: `${analyticsOverview?.successRate || 0}%`,
-                          tone: "text-emerald-700",
-                        },
-                      ].map((stat) => (
-                        <div
+                      {analyticsStats.map((stat) => (
+                        <motion.div
                           key={stat.label}
+                          variants={fadeUpVariant}
                           className="rounded-[1.35rem] border border-slate-200 bg-linear-to-b from-white to-slate-50/70 p-4"
                         >
                           <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
                             {stat.label}
                           </p>
                           <p className={`mt-2 text-2xl font-black ${stat.tone}`}>
-                            {stat.value}
+                            <CountUpNumber
+                              value={stat.value}
+                              suffix={stat.suffix}
+                            />
                           </p>
-                        </div>
+                        </motion.div>
                       ))}
                     </div>
 
-                    <div className="rounded-[1.5rem] border border-slate-200 bg-linear-to-r from-blue-50/80 via-white to-white p-4 sm:p-5">
+                    <motion.div
+                      variants={fadeUpVariant}
+                      className="rounded-[1.5rem] border border-slate-200 bg-linear-to-r from-blue-50/80 via-white to-white p-4 sm:p-5"
+                    >
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-200">
+                        <motion.div
+                          animate={
+                            shouldReduceMotion
+                              ? undefined
+                              : {
+                                  boxShadow: [
+                                    "0 8px 20px -12px rgba(59,130,246,0.20)",
+                                    "0 10px 24px -12px rgba(59,130,246,0.28)",
+                                    "0 8px 20px -12px rgba(59,130,246,0.20)",
+                                  ],
+                                }
+                          }
+                          transition={
+                            shouldReduceMotion
+                              ? undefined
+                              : { repeat: Infinity, duration: 4.2, ease: "easeInOut" }
+                          }
+                          className="flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-200"
+                        >
                           <Activity size={18} />
-                        </div>
+                        </motion.div>
                         <div>
                           <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
                             Live Pulse
                           </p>
                           <p className="text-lg font-black text-slate-900">
-                            {analyticsOverview?.logsInLast24Hours || 0} events in the last 24h
+                            <CountUpNumber
+                              value={analyticsOverview?.logsInLast24Hours || 0}
+                            />{" "}
+                            events in the last 24h
                           </p>
                         </div>
                       </div>
@@ -527,21 +538,32 @@ const Admin = () => {
                             value: analyticsOverview?.liveJobs || 0,
                             className: "bg-sky-50 text-sky-700",
                           },
-                        ].map((item) => (
-                          <div
+                        ].map((item, index) => (
+                          <motion.div
                             key={item.label}
+                            initial={{ opacity: 0, y: 16 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{
+                              delay: shouldReduceMotion ? 0 : 0.12 + index * 0.04,
+                              duration: shouldReduceMotion ? 0 : 0.24,
+                            }}
                             className={`rounded-2xl px-3 py-3 ${item.className}`}
                           >
                             <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] opacity-70">
                               {item.label}
                             </p>
-                            <p className="mt-1 text-lg font-black">{item.value}</p>
-                          </div>
+                            <p className="mt-1 text-lg font-black">
+                              <CountUpNumber value={item.value} />
+                            </p>
+                          </motion.div>
                         ))}
                       </div>
-                    </div>
+                    </motion.div>
 
-                    <div className="rounded-[1.5rem] border border-slate-200 bg-white p-4 sm:p-5">
+                    <motion.div
+                      variants={fadeUpVariant}
+                      className="rounded-[1.5rem] border border-slate-200 bg-white p-4 sm:p-5"
+                    >
                       <div className="mb-4 flex items-center justify-between gap-3">
                         <div>
                           <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
@@ -556,33 +578,51 @@ const Admin = () => {
                         </span>
                       </div>
                       <div className="grid grid-cols-7 gap-2">
-                        {analyticsActivity.map((day) => {
+                        {analyticsActivity.map((day, index) => {
                           const height = Math.max(day.total * 16, 14);
                           return (
-                            <div key={day.date} className="flex flex-col items-center gap-2">
+                            <motion.div
+                              key={day.date}
+                              initial={{ opacity: 0, y: 18 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{
+                                delay: shouldReduceMotion ? 0 : 0.04 + index * 0.03,
+                                duration: shouldReduceMotion ? 0 : 0.24,
+                              }}
+                              className="flex flex-col items-center gap-2"
+                            >
                               <div className="flex h-28 w-full items-end rounded-2xl bg-slate-50 px-2 py-2">
-                                <div
+                                <motion.div
                                   className="w-full rounded-xl bg-linear-to-t from-blue-600 to-sky-400"
-                                  style={{ height: `${Math.min(height, 100)}%` }}
+                                  initial={{ height: "0%" }}
+                                  animate={{ height: `${Math.min(height, 100)}%` }}
+                                  transition={{
+                                    delay: shouldReduceMotion ? 0 : 0.08 + index * 0.04,
+                                    duration: shouldReduceMotion ? 0 : 0.4,
+                                    ease: [0.2, 0.8, 0.2, 1],
+                                  }}
                                 />
                               </div>
                               <div className="text-center">
                                 <p className="text-xs font-black uppercase text-slate-700">
-                                  {day.total}
+                                  <CountUpNumber value={day.total} duration={800} />
                                 </p>
                                 <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
                                   {day.label}
                                 </p>
                               </div>
-                            </div>
+                            </motion.div>
                           );
                         })}
                       </div>
-                    </div>
+                    </motion.div>
                   </div>
 
                   <div className="space-y-5">
-                    <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50/80 p-4 sm:p-5">
+                    <motion.div
+                      variants={fadeUpVariant}
+                      className="rounded-[1.5rem] border border-slate-200 bg-slate-50/80 p-4 sm:p-5"
+                    >
                       <div className="mb-4">
                         <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
                           Top Repositories
@@ -598,9 +638,15 @@ const Admin = () => {
                             No repository activity has been recorded yet.
                           </div>
                         ) : (
-                          analyticsTopRepos.map((repo) => (
-                            <div
+                          analyticsTopRepos.map((repo, index) => (
+                            <motion.div
                               key={`${repo.repoOwner}-${repo.repoName}`}
+                              initial={{ opacity: 0, x: 18 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{
+                                delay: shouldReduceMotion ? 0 : 0.08 + index * 0.04,
+                                duration: shouldReduceMotion ? 0 : 0.22,
+                              }}
                               className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-3"
                             >
                               <div className="min-w-0">
@@ -613,19 +659,22 @@ const Admin = () => {
                               </div>
                               <div className="text-right">
                                 <p className="text-lg font-black text-blue-700">
-                                  {repo.count}
+                                  <CountUpNumber value={repo.count} duration={850} />
                                 </p>
                                 <p className="text-xs text-slate-400">
                                   {formatAnalyticsTimestamp(repo.lastEventAt)}
                                 </p>
                               </div>
-                            </div>
+                            </motion.div>
                           ))
                         )}
                       </div>
-                    </div>
+                    </motion.div>
 
-                    <div className="rounded-[1.5rem] border border-slate-200 bg-linear-to-b from-slate-50 to-white p-4 sm:p-5">
+                    <motion.div
+                      variants={fadeUpVariant}
+                      className="rounded-[1.5rem] border border-slate-200 bg-linear-to-b from-slate-50 to-white p-4 sm:p-5"
+                    >
                       <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
                         Reliability Notes
                       </p>
@@ -643,9 +692,15 @@ const Admin = () => {
                             label: "Recent pace",
                             value: `${analyticsOverview?.logsInLast24Hours || 0} events in 24h`,
                           },
-                        ].map((item) => (
-                          <div
+                        ].map((item, index) => (
+                          <motion.div
                             key={item.label}
+                            initial={{ opacity: 0, y: 14 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{
+                              delay: shouldReduceMotion ? 0 : 0.08 + index * 0.04,
+                              duration: shouldReduceMotion ? 0 : 0.22,
+                            }}
                             className="rounded-2xl border border-slate-200 bg-white px-4 py-3"
                           >
                             <p className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
@@ -654,12 +709,12 @@ const Admin = () => {
                             <p className="mt-1 text-sm font-semibold text-slate-700">
                               {item.value}
                             </p>
-                          </div>
+                          </motion.div>
                         ))}
                       </div>
-                    </div>
+                    </motion.div>
                   </div>
-                </div>
+                </motion.div>
               )}
             </motion.div>
           </section>
@@ -1138,6 +1193,58 @@ const formatAnalyticsTimestamp = (timestamp) => {
     month: "short",
     day: "numeric",
   });
+};
+
+const fadeUpVariant = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.24,
+      ease: [0.2, 0.8, 0.2, 1],
+    },
+  },
+};
+
+const CountUpNumber = ({ value, suffix = "", duration = 1100 }) => {
+  const [displayValue, setDisplayValue] = React.useState(0);
+  const target = Number(value) || 0;
+  const widthCh = Math.max(String(target).length + String(suffix).length, 2);
+
+  React.useEffect(() => {
+    let frameId;
+    const startTime = performance.now();
+
+    const tick = (currentTime) => {
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+      const easedProgress = 1 - Math.pow(1 - progress, 3);
+      setDisplayValue(Math.round(target * easedProgress));
+
+      if (progress < 1) {
+        frameId = window.requestAnimationFrame(tick);
+      }
+    };
+
+    setDisplayValue(0);
+    frameId = window.requestAnimationFrame(tick);
+
+    return () => {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+    };
+  }, [target, duration]);
+
+  return (
+    <span
+      className="inline-block tabular-nums"
+      style={{ minWidth: `${widthCh}ch` }}
+    >
+      {displayValue}
+      {suffix}
+    </span>
+  );
 };
 
 export default Admin;
