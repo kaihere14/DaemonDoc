@@ -19,7 +19,7 @@ DaemonDoc hooks into your GitHub repositories via webhooks. Every time you push,
 
 Beyond documentation, the platform features a **revamped Admin Dashboard** with a modern, interactive UI for the **Feature Announcement System**. This system utilizes a multi-step wizard to craft professional, categorized email updates (New, Improved, Fixed, Security) with **targeted recipient selection**, allowing admins to reach specific users or broadcast to the entire eligible audience.
 
-The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with automatic fallback to **Groq** if all Gemini keys are exhausted. You can configure up to 3 API keys per provider for rate limit resilience.
+The AI pipeline uses **Gemini 3 Flash** (primary, 1M token context) with automatic fallback to **Groq** if all Gemini keys are exhausted. You can configure up to 3 API keys per provider for rate limit resilience.
 
 ---
 ## ✨ Features
@@ -27,9 +27,10 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 - **Modern Admin Dashboard** — Revamped UI with interactive cards, background decorations, and a sleek, professional aesthetic powered by Framer Motion.
 - **Multi-Step Announcement Wizard** — A guided 4-step process for creating feature announcements, including **targeted recipient selection**, email basics, descriptions, change lists, and final review.
 - **Granular Audience Targeting** — Select specific recipients for feature updates with real-time stats on eligible users and automatic notification preference filtering.
-- **Intelligent Code Analysis** — Powered by `Gemini 3.1 Flash Lite` for deep understanding of codebase structure, logic, and intent. Includes:
+- **Intelligent Code Analysis** — Powered by `gemini-3.1-flash-lite-preview` for deep understanding of codebase structure, logic, and intent. Includes:
     - **Advanced Context Synthesis**: RAG-based engine aggregates cross-file dependencies for holistic documentation.
     - **Efficient Differential Scan**: Compute-efficient audits processing only modified AST nodes.
+    - **Thought-Aware Generation**: Captures and logs AI reasoning signatures (Chain-of-Thought) for enhanced generation transparency.
     - **Granular Commit Isolation**: Tracks change-sets to provide accurate version histories within your README.
     - **Monorepo Native Support**: Seamlessly handles complex workspaces including Turborepo, Lerna, and Nx structures.
     - **Smart Logic Exclusions**: Filters out boilerplate, tests, and sensitive configuration from public documentation.
@@ -106,8 +107,8 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 
 | Service | Role |
 |---|---|
-| **Gemini 2.5 Flash** | Primary README generation (1M context) |
-| **Gemini 2.5 Flash Lite** | Primary file selection (mini model) |
+| **Gemini 3 Flash** | Primary README generation (1M context) |
+| **Gemini 3.1 Flash Lite** | Primary file selection (mini model) |
 | **Groq** | Fallback provider for both generation and selection |
 | **GitHub API** | Repo tree, file content, webhooks, commits |
 | **MongoDB Atlas** | User and repo data |
@@ -144,7 +145,7 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
                                         │
                                         ▼
                             ┌───────────────────────┐
-                            │  Gemini 2.5 Flash      │
+                            │  Gemini 3 Flash        │
                             │  (→ Groq fallback)     │
                             └───────────────────────┘
 
