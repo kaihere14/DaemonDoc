@@ -23,6 +23,9 @@ const Admin = () => {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [recipientOptions, setRecipientOptions] = useState([]);
+  const [selectedRecipientIds, setSelectedRecipientIds] = useState([]);
+  const [isRecipientsLoading, setIsRecipientsLoading] = useState(false);
 
   // Form state
   const [subject, setSubject] = useState("");
@@ -45,6 +48,35 @@ const Admin = () => {
     }
   }, [user, navigate]);
 
+  React.useEffect(() => {
+    if (!showEmailModal || !user?.admin) {
+      return;
+    }
+
+    const loadRecipients = async () => {
+      setIsRecipientsLoading(true);
+
+      try {
+        const response = await api.get("/api/email/recipients");
+        const recipients = Array.isArray(response.data?.recipients)
+          ? response.data.recipients
+          : [];
+
+        setRecipientOptions(recipients);
+        setSelectedRecipientIds(recipients.map((recipient) => recipient.id));
+      } catch (error) {
+        console.error("Error loading recipients:", error);
+        toast.error(
+          error.response?.data?.message || "Failed to load email recipients",
+        );
+      } finally {
+        setIsRecipientsLoading(false);
+      }
+    };
+
+    loadRecipients();
+  }, [showEmailModal, user]);
+
   const handleChangeUpdate = (index, field, value) => {
     const newChanges = [...changes];
     newChanges[index][field] = value;
@@ -62,6 +94,40 @@ const Admin = () => {
     setChanges(changes.filter((_, i) => i !== index));
   };
 
+  const resetEmailForm = () => {
+    setSubject("");
+    setFeatureName("");
+    setIntro("");
+    setHeroDescription("");
+    setPrimaryCTA("Try Now");
+    setDate(new Date().toDateString());
+    setYear(new Date().getFullYear().toString());
+    setChanges([
+      { tag: "", tagClass: "tag-improved", title: "", description: "" },
+    ]);
+    setRecipientOptions([]);
+    setSelectedRecipientIds([]);
+    setShowConfirmModal(false);
+    setShowEmailModal(false);
+    setCurrentStep(1);
+  };
+
+  const toggleRecipient = (recipientId) => {
+    setSelectedRecipientIds((currentRecipients) =>
+      currentRecipients.includes(recipientId)
+        ? currentRecipients.filter((id) => id !== recipientId)
+        : [...currentRecipients, recipientId],
+    );
+  };
+
+  const selectAllRecipients = () => {
+    setSelectedRecipientIds(recipientOptions.map((recipient) => recipient.id));
+  };
+
+  const clearAllRecipients = () => {
+    setSelectedRecipientIds([]);
+  };
+
   const validateCurrentStep = () => {
     if (currentStep === 1) {
       if (!subject.trim()) {
@@ -70,6 +136,10 @@ const Admin = () => {
       }
       if (!featureName.trim()) {
         toast.error("Feature name is required");
+        return false;
+      }
+      if (selectedRecipientIds.length === 0) {
+        toast.error("Select at least one recipient");
         return false;
       }
     } else if (currentStep === 2) {
@@ -109,6 +179,7 @@ const Admin = () => {
 
     const payload = {
       subject: subject.trim(),
+      recipientUserIds: selectedRecipientIds,
       content: {
         featureName: featureName.trim(),
         intro: intro.trim(),
@@ -124,22 +195,8 @@ const Admin = () => {
 
     try {
       await api.post("/api/email/send", payload);
-      toast.success("Email broadcast queued successfully!");
-
-      // Reset form
-      setSubject("");
-      setFeatureName("");
-      setIntro("");
-      setHeroDescription("");
-      setPrimaryCTA("Try Now");
-      setDate(new Date().toDateString());
-      setYear(new Date().getFullYear().toString());
-      setChanges([
-        { tag: "", tagClass: "tag-improved", title: "", description: "" },
-      ]);
-      setShowConfirmModal(false);
-      setShowEmailModal(false);
-      setCurrentStep(1);
+      toast.success(`Queued email for ${selectedRecipientIds.length} recipients`);
+      resetEmailForm();
     } catch (error) {
       console.error("Error sending email:", error);
       toast.error(error.response?.data?.message || "Failed to send email");
@@ -149,9 +206,16 @@ const Admin = () => {
   };
 
   const closeEmailModal = () => {
-    setShowEmailModal(false);
-    setCurrentStep(1);
+    resetEmailForm();
   };
+
+  const selectedRecipients = recipientOptions.filter((recipient) =>
+    selectedRecipientIds.includes(recipient.id),
+  );
+
+  const selectedRecipientPreview = selectedRecipients
+    .slice(0, 3)
+    .map((recipient) => recipient.githubUsername || recipient.email);
 
   const steps = [
     {
@@ -238,7 +302,7 @@ const Admin = () => {
                 
                 <h2 className="text-3xl font-bold text-slate-900 mb-3">Broadcast</h2>
                 <p className="text-slate-500 text-lg mb-8 leading-relaxed">
-                  Compose and dispatch feature updates to your entire user base with one click.
+                  Compose and dispatch feature updates to a selected email audience with full visibility.
                 </p>
 
                 <div className="mt-auto flex items-center gap-2 text-blue-600 font-bold">
@@ -359,6 +423,83 @@ const Admin = () => {
                           placeholder="The name of the highlight"
                           className="w-full px-5 py-4 rounded-2xl bg-slate-50 border-2 border-transparent focus:border-blue-600 focus:bg-white text-slate-900 transition-all outline-none"
                         />
+                      </div>
+
+                      <div className="rounded-3xl border border-slate-200 bg-slate-50/70 p-5">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
+                              Audience
+                            </p>
+                            <p className="text-lg font-bold text-slate-900">
+                              {isRecipientsLoading
+                                ? "Loading recipients..."
+                                : `${selectedRecipientIds.length} of ${recipientOptions.length} recipients selected`}
+                            </p>
+                            <p className="text-sm text-slate-500">
+                              Pick exactly who should receive this update before you send it.
+                            </p>
+                          </div>
+
+                          <div className="flex gap-2">
+                            <button
+                              type="button"
+                              onClick={selectAllRecipients}
+                              disabled={isRecipientsLoading || recipientOptions.length === 0}
+                              className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-sm font-semibold text-slate-700 disabled:opacity-40"
+                            >
+                              Select all
+                            </button>
+                            <button
+                              type="button"
+                              onClick={clearAllRecipients}
+                              disabled={isRecipientsLoading || selectedRecipientIds.length === 0}
+                              className="px-4 py-2 rounded-xl bg-white border border-slate-200 text-sm font-semibold text-slate-700 disabled:opacity-40"
+                            >
+                              Clear
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 max-h-72 overflow-y-auto space-y-3 pr-1">
+                          {!isRecipientsLoading && recipientOptions.length === 0 && (
+                            <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-6 text-sm text-slate-500">
+                              No eligible email recipients were found.
+                            </div>
+                          )}
+
+                          {recipientOptions.map((recipient) => {
+                            const isSelected = selectedRecipientIds.includes(recipient.id);
+
+                            return (
+                              <label
+                                key={recipient.id}
+                                className={`flex items-center gap-4 rounded-2xl border px-4 py-3 transition-all cursor-pointer ${
+                                  isSelected
+                                    ? "border-blue-200 bg-blue-50/80"
+                                    : "border-slate-200 bg-white"
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={() => toggleRecipient(recipient.id)}
+                                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                                />
+                                <div className="min-w-0">
+                                  <p className="font-semibold text-slate-900 truncate">
+                                    {recipient.githubUsername
+                                      ? `@${recipient.githubUsername}`
+                                      : recipient.email}
+                                  </p>
+                                  <p className="text-sm text-slate-500 truncate">
+                                    {recipient.email}
+                                  </p>
+                                </div>
+                              </label>
+                            );
+                          })}
+                        </div>
                       </div>
                     </motion.div>
                   )}
@@ -484,7 +625,9 @@ const Admin = () => {
                         </div>
                         <div>
                           <p className="font-bold text-blue-900 text-lg">Almost there!</p>
-                          <p className="text-blue-700/70 text-sm">You are about to broadcast this update to all subscribed users. Double check for any typos!</p>
+                          <p className="text-blue-700/70 text-sm">
+                            You are about to send this update to {selectedRecipientIds.length} selected recipients. Double check the copy and the audience before you continue.
+                          </p>
                         </div>
                       </div>
                     </motion.div>
@@ -535,7 +678,7 @@ const Admin = () => {
 
               <h2 className="text-3xl font-black text-slate-900 mb-4">Ready for Launch?</h2>
               <p className="text-slate-500 mb-10 leading-relaxed">
-                You're about to dispatch <span className="text-slate-900 font-bold">"{subject}"</span> to all users. This action is irreversible.
+                You're about to dispatch <span className="text-slate-900 font-bold">"{subject}"</span> to {selectedRecipientIds.length} selected recipients{selectedRecipientPreview.length > 0 ? `, including ${selectedRecipientPreview.join(", ")}` : ""}. This action is irreversible.
               </p>
 
               <div className="space-y-3">

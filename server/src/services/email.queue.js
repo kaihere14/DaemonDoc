@@ -40,21 +40,68 @@ new Worker(
 
 const makeBroadcastId = () => `broadcast_${Date.now()}`;
 
-export const enqueueFeatureUpdateBroadcast = async ({ subject, content }) => {
+const ELIGIBLE_RECIPIENT_FILTER = {
+  emailNotificationsEnabled: { $ne: false },
+  email: { $exists: true, $nin: [null, ""] },
+};
+
+const RECIPIENT_LIST_PROJECTION = {
+  _id: 1,
+  githubUsername: 1,
+  email: 1,
+  avatarUrl: 1,
+};
+
+const normalizeRecipientIds = (recipientUserIds = []) =>
+  [...new Set(recipientUserIds.map((recipientId) => recipientId.trim()))];
+
+export const getFeatureUpdateRecipientsList = async () => {
+  const [recipients, skippedNoEmail, skippedNotificationsDisabled] =
+    await Promise.all([
+      User.find(ELIGIBLE_RECIPIENT_FILTER, RECIPIENT_LIST_PROJECTION)
+        .sort({ githubUsername: 1, email: 1 })
+        .lean(),
+      User.countDocuments({
+        emailNotificationsEnabled: { $ne: false },
+        $or: [{ email: { $exists: false } }, { email: null }, { email: "" }],
+      }),
+      User.countDocuments({ emailNotificationsEnabled: false }),
+    ]);
+
+  return {
+    recipients: recipients.map((recipient) => ({
+      id: String(recipient._id),
+      githubUsername: recipient.githubUsername || "",
+      email: recipient.email,
+      avatarUrl: recipient.avatarUrl || "",
+    })),
+    stats: {
+      selectableRecipients: recipients.length,
+      skippedNoEmail,
+      skippedNotificationsDisabled,
+    },
+  };
+};
+
+export const enqueueFeatureUpdateBroadcast = async ({
+  subject,
+  content,
+  recipientUserIds,
+}) => {
   const broadcastId = makeBroadcastId();
+  const recipientSelectionProvided = Array.isArray(recipientUserIds);
+  const normalizedRecipientIds = recipientSelectionProvided
+    ? normalizeRecipientIds(recipientUserIds)
+    : null;
+  const recipientFilter =
+    normalizedRecipientIds
+      ? { _id: { $in: normalizedRecipientIds } }
+      : {};
 
   const recipients = await User.find(
-    {
-      emailNotificationsEnabled: { $ne: false },
-      email: { $exists: true, $nin: [null, ""] },
-    },
+    { ...ELIGIBLE_RECIPIENT_FILTER, ...recipientFilter },
     { _id: 1, email: 1 },
   ).lean();
-
-  const skippedNoEmail = await User.countDocuments({
-    emailNotificationsEnabled: { $ne: false },
-    $or: [{ email: { $exists: false } }, { email: null }, { email: "" }],
-  });
 
   if (recipients.length > 0) {
     await emailQueue.addBulk(
@@ -89,8 +136,12 @@ export const enqueueFeatureUpdateBroadcast = async ({ subject, content }) => {
 
   return {
     broadcastId,
+    audience: recipientSelectionProvided ? "selected" : "all",
+    requestedRecipients: normalizedRecipientIds?.length ?? null,
     enqueued: recipients.length,
-    skippedNoEmail,
+    skippedSelectedRecipients: normalizedRecipientIds
+      ? normalizedRecipientIds.length - recipients.length
+      : 0,
     workerConcurrency: MAX_CONCURRENCY,
     queueDepth: (counts.waiting || 0) + (counts.delayed || 0),
   };
