@@ -17,7 +17,7 @@
 
 DaemonDoc hooks into your GitHub repositories via webhooks. Every time you push, it scans your codebase, runs it through AI, and commits an up-to-date README back to your repo — no manual writing required.
 
-Beyond documentation, the platform features a **revamped Admin Dashboard** with a modern, interactive UI for the **Feature Announcement System**. This system utilizes a multi-step wizard to craft professional, categorized email updates (New, Improved, Fixed, Security) to be sent to users, ensuring they stay informed about the latest repository changes.
+Beyond documentation, the platform features a **revamped Admin Dashboard** with a modern, interactive UI for the **Feature Announcement System**. This system utilizes a multi-step wizard to craft professional, categorized email updates (New, Improved, Fixed, Security) with **targeted recipient selection**, allowing admins to reach specific users or broadcast to the entire eligible audience.
 
 The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with automatic fallback to **Groq** if all Gemini keys are exhausted. You can configure up to 3 API keys per provider for rate limit resilience.
 
@@ -25,7 +25,8 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 ## ✨ Features
 
 - **Modern Admin Dashboard** — Revamped UI with interactive cards, background decorations, and a sleek, professional aesthetic powered by Framer Motion.
-- **Multi-Step Announcement Wizard** — A guided 4-step process for creating feature announcements, including email basics, descriptions, change lists, and final review.
+- **Multi-Step Announcement Wizard** — A guided 4-step process for creating feature announcements, including **targeted recipient selection**, email basics, descriptions, change lists, and final review.
+- **Granular Audience Targeting** — Select specific recipients for feature updates with real-time stats on eligible users and automatic notification preference filtering.
 - **Intelligent Code Analysis** — Powered by `Gemini 3.1 Flash Lite` for deep understanding of codebase structure, logic, and intent. Includes:
     - **Advanced Context Synthesis**: RAG-based engine aggregates cross-file dependencies for holistic documentation.
     - **Efficient Differential Scan**: Compute-efficient audits processing only modified AST nodes.
@@ -57,7 +58,7 @@ The AI pipeline uses **Gemini 2.5 Flash** (primary, 1M token context) with autom
 4. AI Scans Codebase       →  Step 1: file selection (mini model)
                                Step 2: README generation (main model)
 5. README Committed        →  Pushed back to your repo automatically
-6. Feature Announcement    →  (Optional) Craft updates via a **4-step guided wizard** in the Admin dashboard, featuring categorized tags, unlimited change entries, and real-time validation.
+6. Feature Announcement    →  (Optional) Craft updates via a **4-step guided wizard** in the Admin dashboard, featuring categorized tags, **targeted recipient selection**, unlimited change entries, and real-time validation.
 
 ### Full vs Patch Mode
 
