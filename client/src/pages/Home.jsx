@@ -62,71 +62,83 @@ const Home = () => {
         ogUrl="https://daemondoc.online/home"
         canonical="https://daemondoc.online/home"
       />
-      <div className="min-h-screen bg-linear-to-br from-slate-50 to-white text-slate-900 font-sans selection:bg-indigo-100 overflow-x-hidden">
+      <div className="min-h-screen bg-linear-to-b from-white via-slate-50/70 to-white text-slate-900 font-sans selection:bg-indigo-100 overflow-x-hidden">
         <AuthNavigation />
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute top-24 left-[-8rem] h-72 w-72 rounded-full bg-blue-100/60 blur-3xl" />
+          <div className="absolute top-52 right-[-6rem] h-80 w-80 rounded-full bg-sky-100/40 blur-3xl" />
+        </div>
 
-        <div className="pt-24 pb-16 px-6">
+        <div className="relative pt-24 pb-16 px-6">
           <div className="max-w-7xl mx-auto">
             {/* Header Section */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              className="mb-8"
+              className="mb-10"
             >
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between mb-4">
                 <div>
-                  <h1 className="text-4xl font-bold text-slate-900 mb-2 font-display uppercase tracking-tighter">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="h-1 w-8 rounded-full bg-blue-600" />
+                    <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                      Repository System
+                    </span>
+                  </div>
+                  <h1 className="text-4xl sm:text-5xl font-black text-slate-900 mb-3 uppercase tracking-tighter leading-none">
                     Repositories
                   </h1>
-                  <p className="text-slate-500 font-medium tracking-tight">
+                  <p className="max-w-2xl text-slate-500 font-medium tracking-tight">
                     Manage AI-powered README updates for your GitHub
                     repositories
                   </p>
                 </div>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={fetchRepos}
-                  disabled={loading}
-                  className="bg-white border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
-                >
-                  <RefreshCw
-                    size={16}
-                    className={loading ? "animate-spin" : ""}
-                  />
-                  Refresh list
-                </motion.button>
+                <div className="rounded-[1.75rem] border border-slate-200 bg-white/80 backdrop-blur-sm p-2 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.35)]">
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={fetchRepos}
+                    disabled={loading}
+                    className="bg-[#1d4ed8] text-white px-5 py-3 rounded-[1.1rem] text-sm font-bold flex items-center gap-2 hover:bg-[#1e40af] transition-all shadow-lg shadow-blue-500/20 disabled:opacity-50"
+                  >
+                    <RefreshCw
+                      size={16}
+                      className={loading ? "animate-spin" : ""}
+                    />
+                    Refresh list
+                  </motion.button>
+                </div>
               </div>
 
               {/* Stats Bar */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                <div className="border border-slate-200/60 p-5 rounded-3xl shadow-sm bg-white">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+                <div className="border border-slate-200/60 p-5 rounded-[2rem] shadow-[0_16px_40px_-28px_rgba(15,23,42,0.28)] bg-white/90">
+                  <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400 mb-1">
                     Total
                   </p>
                   <p className="text-2xl font-black text-slate-900">
                     {repos.length}
                   </p>
                 </div>
-                <div className="border border-slate-200/60 p-5 rounded-3xl shadow-sm bg-emerald-50/50">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+                <div className="border border-blue-100 p-5 rounded-[2rem] shadow-[0_16px_40px_-28px_rgba(29,78,216,0.22)] bg-blue-50/80">
+                  <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400 mb-1">
                     Active
                   </p>
-                  <p className="text-2xl font-black text-emerald-600">
+                  <p className="text-2xl font-black text-blue-700">
                     {activeCount}
                   </p>
                 </div>
-                <div className="border border-slate-200/60 p-5 rounded-3xl shadow-sm bg-slate-50/50">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+                <div className="border border-slate-200/60 p-5 rounded-[2rem] shadow-[0_16px_40px_-28px_rgba(15,23,42,0.22)] bg-slate-50/80">
+                  <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400 mb-1">
                     Inactive
                   </p>
                   <p className="text-2xl font-black text-slate-600">
                     {repos.length - activeCount}
                   </p>
                 </div>
-                <div className="border border-slate-200/60 p-5 rounded-3xl shadow-sm bg-sky-50/50">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+                <div className="border border-sky-100 p-5 rounded-[2rem] shadow-[0_16px_40px_-28px_rgba(14,165,233,0.2)] bg-sky-50/80">
+                  <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400 mb-1">
                     Private
                   </p>
                   <p className="text-2xl font-black text-sky-600">
@@ -141,17 +153,17 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
-              className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6"
+              className="flex flex-col gap-4 mb-8 rounded-[2rem] border border-slate-200 bg-white/75 backdrop-blur-sm p-4 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.3)] sm:flex-row sm:items-center"
             >
               {/* Filter Tabs */}
-              <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
+              <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50/80 p-1.5">
                 {FILTER_TABS.map((tab) => (
                   <button
                     key={tab.key}
                     onClick={() => setFilter(tab.key)}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                    className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
                       filter === tab.key
-                        ? "bg-slate-900 text-white shadow-sm"
+                        ? "bg-[#1d4ed8] text-white shadow-lg shadow-blue-500/20"
                         : "text-slate-600 hover:text-slate-900"
                     }`}
                   >
@@ -170,7 +182,7 @@ const Home = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search repositories..."
-                  className="w-full pl-10 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent shadow-sm transition-all"
+                  className="w-full pl-10 pr-10 py-3 bg-white border border-slate-200 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm transition-all"
                 />
                 {searchQuery && (
                   <button
@@ -191,7 +203,7 @@ const Home = () => {
               <div className="flex flex-col items-center justify-center py-20">
                 <Loader2
                   size={48}
-                  className="text-slate-400 animate-spin mb-4"
+                  className="text-blue-500 animate-spin mb-4"
                 />
                 <p className="text-slate-600 font-medium">
                   Loading your repositories...
@@ -201,16 +213,16 @@ const Home = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-red-50 border border-red-200 rounded-xl p-8 text-center"
+                className="bg-white border border-rose-200 rounded-[2rem] p-8 text-center shadow-[0_16px_40px_-30px_rgba(244,63,94,0.35)]"
               >
-                <AlertCircle size={48} className="text-red-500 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-red-900 mb-2">
+                <AlertCircle size={48} className="text-rose-500 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-rose-900 mb-2">
                   Failed to load repositories
                 </h3>
-                <p className="text-red-700 mb-4">{error}</p>
+                <p className="text-rose-700 mb-4">{error}</p>
                 <button
                   onClick={fetchRepos}
-                  className="bg-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition-all"
+                  className="bg-[#1d4ed8] text-white px-6 py-3 rounded-full font-semibold hover:bg-[#1e40af] transition-all"
                 >
                   Try Again
                 </button>
@@ -246,10 +258,10 @@ const Home = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white border border-slate-200 rounded-xl p-12 text-center"
+                className="bg-white/90 border border-dashed border-slate-300 rounded-[2rem] p-12 text-center shadow-[0_16px_40px_-28px_rgba(15,23,42,0.25)]"
               >
-                <Github size={64} className="text-slate-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                <Github size={64} className="text-blue-300 mx-auto mb-4" />
+                <h3 className="text-xl font-black text-slate-900 mb-2 uppercase tracking-tight">
                   No repositories found
                 </h3>
                 <p className="text-slate-600">

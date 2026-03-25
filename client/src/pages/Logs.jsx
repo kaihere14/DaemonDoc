@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Activity,
   CheckCircle2,
   XCircle,
-  Clock,
   GitBranch,
   RefreshCw,
   Loader2,
-  ChevronRight,
   History,
 } from "lucide-react";
 import AuthNavigation from "../components/AuthNavigation";
@@ -47,10 +44,10 @@ const Logs = () => {
     const config = {
       success: {
         label: "Success",
-        color: "text-emerald-600",
-        bg: "bg-emerald-500/10",
-        border: "border-emerald-500/20",
-        glow: "shadow-[0_0_12px_-2px_rgba(16,185,129,0.3)]",
+        color: "text-blue-700",
+        bg: "bg-blue-50",
+        border: "border-blue-100",
+        glow: "shadow-[0_0_12px_-2px_rgba(29,78,216,0.16)]",
         icon: <CheckCircle2 size={14} />,
       },
       failed: {
@@ -63,10 +60,10 @@ const Logs = () => {
       },
       ongoing: {
         label: "In progress",
-        color: "text-sky-600",
-        bg: "bg-sky-500/10",
-        border: "border-sky-500/20",
-        glow: "shadow-[0_0_12px_-2px_rgba(14,165,233,0.3)]",
+        color: "text-sky-700",
+        bg: "bg-sky-50",
+        border: "border-sky-100",
+        glow: "shadow-[0_0_12px_-2px_rgba(14,165,233,0.2)]",
         icon: <Loader2 size={14} className="animate-spin" />,
       },
     };
@@ -88,35 +85,44 @@ const Logs = () => {
   return (
     <>
       <SEO title="Activity Logs - DaemonDoc" />
-      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-sky-100">
+      <div className="min-h-screen bg-linear-to-b from-white via-slate-50/70 to-white text-slate-900 font-sans selection:bg-sky-100">
         <AuthNavigation />
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute top-24 left-[-7rem] h-72 w-72 rounded-full bg-blue-100/55 blur-3xl" />
+          <div className="absolute top-72 right-[-8rem] h-96 w-96 rounded-full bg-sky-100/45 blur-3xl" />
+        </div>
 
-        <div className="pt-32 pb-20 px-6 max-w-5xl mx-auto">
+        <div className="relative pt-32 pb-20 px-6 max-w-5xl mx-auto">
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <div className="h-1 w-6 bg-slate-900 rounded-full" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                <div className="h-1 w-8 bg-blue-600 rounded-full" />
+                <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
                   Activity System
                 </span>
               </div>
-              <h1 className="text-4xl font-[900] text-slate-900 tracking-tighter">
+              <h1 className="text-4xl sm:text-5xl font-[1000] uppercase text-slate-900 tracking-tighter">
                 Event Logs
               </h1>
+              <p className="mt-3 max-w-2xl text-slate-500 font-medium tracking-tight">
+                Track every automated documentation run with the same clean system language as the landing experience.
+              </p>
             </div>
 
-            <button
-              onClick={() => fetchLogs(true)}
-              className="flex items-center gap-2.5 bg-white border border-slate-200 px-6 py-3 rounded-2xl text-sm font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition-all active:scale-95"
-            >
-              <RefreshCw
-                size={16}
-                strokeWidth={2.5}
-                className={refreshing ? "animate-spin" : ""}
-              />
-              Refresh Feed
-            </button>
+            <div className="rounded-[1.75rem] border border-slate-200 bg-white/80 backdrop-blur-sm p-2 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.35)]">
+              <button
+                onClick={() => fetchLogs(true)}
+                className="flex items-center gap-2.5 bg-[#1d4ed8] px-6 py-3 rounded-[1.1rem] text-sm font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-[#1e40af] transition-all active:scale-95"
+              >
+                <RefreshCw
+                  size={16}
+                  strokeWidth={2.5}
+                  className={refreshing ? "animate-spin" : ""}
+                />
+                Refresh Feed
+              </button>
+            </div>
           </div>
 
           {/* Stats Bar */}
@@ -131,8 +137,8 @@ const Logs = () => {
               {
                 label: "Success",
                 val: logs.filter((l) => l.status === "success").length,
-                color: "text-emerald-600",
-                bg: "bg-emerald-50/50",
+                color: "text-blue-700",
+                bg: "bg-blue-50/80",
               },
               {
                 label: "Failed",
@@ -143,15 +149,15 @@ const Logs = () => {
               {
                 label: "Active",
                 val: logs.filter((l) => l.status === "ongoing").length,
-                color: "text-sky-600",
-                bg: "bg-sky-50/50",
+                color: "text-sky-700",
+                bg: "bg-sky-50/80",
               },
             ].map((stat, i) => (
               <div
                 key={i}
-                className={`border border-slate-200/60 p-5 rounded-3xl shadow-sm ${stat.bg}`}
+                className={`border border-slate-200/60 p-5 rounded-[2rem] shadow-[0_16px_40px_-28px_rgba(15,23,42,0.28)] ${stat.bg}`}
               >
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+                <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400 mb-1">
                   {stat.label}
                 </p>
                 <p className={`text-2xl font-black ${stat.color}`}>
@@ -162,13 +168,50 @@ const Logs = () => {
           </div>
 
           {/* Glass Log Container */}
-          <div className="bg-white/70 backdrop-blur-xl border border-slate-200 rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden">
+          <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/85 backdrop-blur-xl shadow-[0_20px_50px_-32px_rgba(15,23,42,0.35)]">
+            <div className="flex items-center gap-3 border-b border-dashed border-slate-200 px-6 py-4 bg-linear-to-r from-blue-50/70 via-white to-transparent">
+              <div className="flex size-10 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-500/20">
+                <History size={18} />
+              </div>
+              <div>
+                <p className="font-mono text-xs font-black uppercase tracking-[0.24em] text-slate-400">
+                  Live Timeline
+                </p>
+                <p className="text-sm font-semibold text-slate-700">
+                  Recent automation activity across your repositories
+                </p>
+              </div>
+            </div>
             <div className="divide-y divide-slate-100">
               {loading && logs.length === 0 ? (
                 <div className="py-24 flex flex-col items-center gap-4">
-                  <Loader2 className="animate-spin text-slate-300" size={40} />
-                  <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                  <Loader2 className="animate-spin text-blue-500" size={40} />
+                  <p className="font-mono text-xs font-black uppercase tracking-[0.24em] text-slate-400">
                     Loading Logs
+                  </p>
+                </div>
+              ) : error ? (
+                <div className="px-6 py-16 text-center">
+                  <XCircle size={42} className="mx-auto mb-4 text-rose-500" />
+                  <h3 className="mb-2 text-lg font-black uppercase tracking-tight text-slate-900">
+                    Failed to load logs
+                  </h3>
+                  <p className="mb-6 text-sm text-slate-500">{error}</p>
+                  <button
+                    onClick={() => fetchLogs(true)}
+                    className="rounded-full bg-[#1d4ed8] px-6 py-3 text-sm font-bold text-white transition-all hover:bg-[#1e40af]"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : logs.length === 0 ? (
+                <div className="px-6 py-20 text-center">
+                  <History size={46} className="mx-auto mb-4 text-blue-300" />
+                  <h3 className="mb-2 text-lg font-black uppercase tracking-tight text-slate-900">
+                    No activity yet
+                  </h3>
+                  <p className="text-sm text-slate-500">
+                    Once README jobs start running, this feed will show the latest activity here.
                   </p>
                 </div>
               ) : (
@@ -205,7 +248,7 @@ const LogItem = ({ log, index, StatusBadge }) => {
       className="group"
     >
       <div
-        className={`flex flex-col sm:flex-row sm:items-center justify-between p-6 gap-4 transition-colors ${commitUrl ? "cursor-pointer hover:bg-slate-50/80" : ""}`}
+        className={`flex flex-col sm:flex-row sm:items-center justify-between p-6 gap-4 transition-colors ${commitUrl ? "cursor-pointer hover:bg-blue-50/40" : ""}`}
         onClick={() => commitUrl && window.open(commitUrl, "_blank")}
       >
         <div className="flex items-start gap-5">
@@ -213,18 +256,18 @@ const LogItem = ({ log, index, StatusBadge }) => {
             className={`mt-1 p-3 rounded-2xl border transition-all ${
               log.status === "failed"
                 ? "bg-rose-50 border-rose-100 text-rose-500"
-                : "bg-slate-50 border-slate-100 text-slate-400 group-hover:bg-white"
+                : "bg-blue-50 border-blue-100 text-blue-600 group-hover:bg-white"
             }`}
           >
             <GitBranch size={20} />
           </div>
 
           <div className="min-w-0">
-            <h3 className="text-[15px] font-bold text-slate-800 tracking-tight mb-1">
+            <h3 className="text-[15px] font-black text-slate-800 tracking-tight mb-1 uppercase">
               {log.action.replace(/_/g, " ")}
             </h3>
             <div className="flex items-center gap-3">
-              <span className="text-xs font-bold text-slate-400 tracking-tight">
+              <span className="font-mono text-xs font-bold text-slate-400 tracking-tight">
                 {log.repoOwner
                   ? `${log.repoOwner}/${log.repoName}`
                   : log.repoName}
