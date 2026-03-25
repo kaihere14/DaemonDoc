@@ -61,20 +61,20 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
         y: -4,
         boxShadow: "0 18px 40px rgba(29,78,216,0.08)",
       }}
-      className="relative overflow-hidden bg-white/90 backdrop-blur-xl border border-slate-200/80 rounded-[2rem] p-6 transition-all duration-200 hover:border-blue-200 group flex flex-col h-full shadow-[0_8px_30px_-18px_rgba(15,23,42,0.25)]"
+      className="relative flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-slate-200/80 bg-white/90 p-4 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.25)] transition-all duration-200 hover:border-blue-200 group backdrop-blur-xl sm:rounded-[2rem] sm:p-6"
     >
-      <div className="flex flex-col gap-4">
-        <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="flex items-start justify-between gap-3 sm:gap-4">
           <div
-            className="flex items-start gap-3 min-w-0 cursor-pointer group/title"
+            className="flex min-w-0 items-start gap-2.5 cursor-pointer group/title sm:gap-3"
             onClick={handleCardClick}
           >
-            <div className="rounded-2xl bg-blue-50/80 border border-blue-100 p-2 flex items-center justify-center shadow-inner shadow-blue-200/50">
-              <GitBranch size={18} className="text-blue-600" />
+            <div className="flex items-center justify-center rounded-2xl border border-blue-100 bg-blue-50/80 p-2 shadow-inner shadow-blue-200/50">
+              <GitBranch size={16} className="text-blue-600 sm:size-[18px]" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1">
-                <h3 className="flex-1 min-w-0 text-lg font-black uppercase tracking-tight text-slate-900 truncate group-hover/title:text-blue-600">
+                <h3 className="min-w-0 flex-1 truncate text-base font-black uppercase tracking-tight text-slate-900 group-hover/title:text-blue-600 sm:text-lg">
                   {repo.name}
                 </h3>
                 <ExternalLink
@@ -82,14 +82,14 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
                   className="text-slate-400 shrink-0 opacity-60 group-hover/title:opacity-100 transition-all group-hover/title:text-blue-600"
                 />
               </div>
-              <p className="font-mono text-[11px] text-slate-500 truncate max-w-[240px]">
+              <p className="max-w-[220px] truncate font-mono text-[11px] text-slate-500 sm:max-w-[240px]">
                 {repo.full_name}
               </p>
             </div>
           </div>
           {showToggle && (
             <div
-              className="flex items-center gap-2 self-start"
+              className="flex shrink-0 items-center gap-2 self-start"
               onClick={(e) => e.stopPropagation()}
             >
               {loading ? (
@@ -113,15 +113,15 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-1 text-[11px] uppercase tracking-[0.18em] font-mono text-slate-400">
+        <div className="flex flex-wrap items-center gap-1 text-[10px] uppercase tracking-[0.14em] font-mono text-slate-400 sm:text-[11px] sm:tracking-[0.18em]">
           <span className="font-black text-slate-400">{ownerLabel}</span>
           <span className="text-slate-300">•</span>
           <span className="text-slate-500">{branchLabel}</span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 text-[11px]">
+        <div className="flex flex-wrap items-center gap-2.5 text-[11px] sm:gap-3">
           <div
-            className={`flex items-center gap-1 rounded-xl px-3 py-1 border text-[11px] font-black tracking-wide ${
+            className={`flex items-center gap-1 rounded-xl border px-2.5 py-1 text-[10px] font-black tracking-wide sm:px-3 sm:text-[11px] ${
               repo.private
                 ? "bg-slate-100 text-slate-700 border-slate-200"
                 : "bg-blue-50 text-blue-700 border-blue-100"
@@ -140,7 +140,7 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
             )}
           </div>
           <div
-            className={`flex items-center gap-2 text-xs font-semibold ${
+            className={`flex min-w-0 items-center gap-2 text-[11px] font-semibold sm:text-xs ${
               isActive ? "text-blue-700" : "text-slate-400"
             }`}
           >
@@ -149,7 +149,9 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
                 isActive ? "bg-blue-600" : "bg-slate-300"
               }`}
             />
-            {isActive ? "AI README updates enabled" : "AI updates disabled"}
+            <span className="truncate">
+              {isActive ? "AI README updates enabled" : "AI updates disabled"}
+            </span>
           </div>
         </div>
       </div>

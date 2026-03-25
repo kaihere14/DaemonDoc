@@ -92,9 +92,9 @@ const Logs = () => {
           <div className="absolute top-72 right-[-8rem] h-96 w-96 rounded-full bg-sky-100/45 blur-3xl" />
         </div>
 
-        <div className="relative pt-32 pb-20 px-6 max-w-5xl mx-auto">
+        <div className="relative mx-auto max-w-5xl px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-32">
           {/* Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
+          <div className="mb-10 flex flex-col gap-5 md:mb-12 md:flex-row md:items-center md:justify-between md:gap-8">
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <div className="h-1 w-8 bg-blue-600 rounded-full" />
@@ -102,18 +102,18 @@ const Logs = () => {
                   Activity System
                 </span>
               </div>
-              <h1 className="text-4xl sm:text-5xl font-[1000] uppercase text-slate-900 tracking-tighter">
+              <h1 className="text-3xl font-[1000] uppercase tracking-tighter text-slate-900 sm:text-5xl">
                 Event Logs
               </h1>
-              <p className="mt-3 max-w-2xl text-slate-500 font-medium tracking-tight">
+              <p className="mt-3 max-w-2xl text-sm font-medium tracking-tight text-slate-500 sm:text-base">
                 Track every automated documentation run with the same clean system language as the landing experience.
               </p>
             </div>
 
-            <div className="rounded-[1.75rem] border border-slate-200 bg-white/80 backdrop-blur-sm p-2 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.35)]">
+            <div className="w-full rounded-[1.5rem] border border-slate-200 bg-white/80 p-2 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.35)] backdrop-blur-sm sm:w-auto sm:rounded-[1.75rem]">
               <button
                 onClick={() => fetchLogs(true)}
-                className="flex items-center gap-2.5 bg-[#1d4ed8] px-6 py-3 rounded-[1.1rem] text-sm font-bold text-white shadow-lg shadow-blue-500/20 hover:bg-[#1e40af] transition-all active:scale-95"
+                className="flex w-full items-center justify-center gap-2.5 rounded-[1rem] bg-[#1d4ed8] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-[#1e40af] active:scale-95 sm:w-auto sm:rounded-[1.1rem] sm:px-6"
               >
                 <RefreshCw
                   size={16}
@@ -126,7 +126,7 @@ const Logs = () => {
           </div>
 
           {/* Stats Bar */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          <div className="mb-8 grid grid-cols-2 gap-3 sm:mb-10 sm:gap-4 md:grid-cols-4">
             {[
               {
                 label: "Total",
@@ -155,12 +155,12 @@ const Logs = () => {
             ].map((stat, i) => (
               <div
                 key={i}
-                className={`border border-slate-200/60 p-5 rounded-[2rem] shadow-[0_16px_40px_-28px_rgba(15,23,42,0.28)] ${stat.bg}`}
+                className={`rounded-[1.5rem] border border-slate-200/60 p-4 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.28)] sm:rounded-[2rem] sm:p-5 ${stat.bg}`}
               >
                 <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400 mb-1">
                   {stat.label}
                 </p>
-                <p className={`text-2xl font-black ${stat.color}`}>
+                <p className={`text-xl font-black sm:text-2xl ${stat.color}`}>
                   {stat.val}
                 </p>
               </div>
@@ -168,12 +168,12 @@ const Logs = () => {
           </div>
 
           {/* Glass Log Container */}
-          <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/85 backdrop-blur-xl shadow-[0_20px_50px_-32px_rgba(15,23,42,0.35)]">
-            <div className="flex items-center gap-3 border-b border-dashed border-slate-200 px-6 py-4 bg-linear-to-r from-blue-50/70 via-white to-transparent">
-              <div className="flex size-10 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-500/20">
+          <div className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white/85 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:rounded-[2rem]">
+            <div className="flex items-start gap-3 border-b border-dashed border-slate-200 bg-linear-to-r from-blue-50/70 via-white to-transparent px-4 py-4 sm:items-center sm:px-6">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-500/20 sm:size-10">
                 <History size={18} />
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="font-mono text-xs font-black uppercase tracking-[0.24em] text-slate-400">
                   Live Timeline
                 </p>
@@ -191,7 +191,7 @@ const Logs = () => {
                   </p>
                 </div>
               ) : error ? (
-                <div className="px-6 py-16 text-center">
+                <div className="px-4 py-14 text-center sm:px-6 sm:py-16">
                   <XCircle size={42} className="mx-auto mb-4 text-rose-500" />
                   <h3 className="mb-2 text-lg font-black uppercase tracking-tight text-slate-900">
                     Failed to load logs
@@ -205,7 +205,7 @@ const Logs = () => {
                   </button>
                 </div>
               ) : logs.length === 0 ? (
-                <div className="px-6 py-20 text-center">
+                <div className="px-4 py-16 text-center sm:px-6 sm:py-20">
                   <History size={46} className="mx-auto mb-4 text-blue-300" />
                   <h3 className="mb-2 text-lg font-black uppercase tracking-tight text-slate-900">
                     No activity yet
@@ -248,12 +248,12 @@ const LogItem = ({ log, index, StatusBadge }) => {
       className="group"
     >
       <div
-        className={`flex flex-col sm:flex-row sm:items-center justify-between p-6 gap-4 transition-colors ${commitUrl ? "cursor-pointer hover:bg-blue-50/40" : ""}`}
+        className={`flex flex-col justify-between gap-4 p-4 transition-colors sm:flex-row sm:items-center sm:p-6 ${commitUrl ? "cursor-pointer hover:bg-blue-50/40" : ""}`}
         onClick={() => commitUrl && window.open(commitUrl, "_blank")}
       >
-        <div className="flex items-start gap-5">
+        <div className="flex min-w-0 items-start gap-3 sm:gap-5">
           <div
-            className={`mt-1 p-3 rounded-2xl border transition-all ${
+            className={`mt-1 rounded-2xl border p-2.5 transition-all sm:p-3 ${
               log.status === "failed"
                 ? "bg-rose-50 border-rose-100 text-rose-500"
                 : "bg-blue-50 border-blue-100 text-blue-600 group-hover:bg-white"
@@ -262,17 +262,17 @@ const LogItem = ({ log, index, StatusBadge }) => {
             <GitBranch size={20} />
           </div>
 
-          <div className="min-w-0">
-            <h3 className="text-[15px] font-black text-slate-800 tracking-tight mb-1 uppercase">
+          <div className="min-w-0 flex-1">
+            <h3 className="mb-1 text-[14px] font-black uppercase tracking-tight text-slate-800 sm:text-[15px]">
               {log.action.replace(/_/g, " ")}
             </h3>
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-xs font-bold text-slate-400 tracking-tight">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 sm:gap-3">
+              <span className="truncate font-mono text-xs font-bold tracking-tight text-slate-400">
                 {log.repoOwner
                   ? `${log.repoOwner}/${log.repoName}`
                   : log.repoName}
               </span>
-              <span className="w-1 h-1 rounded-full bg-slate-200" />
+              <span className="hidden h-1 w-1 rounded-full bg-slate-200 sm:block" />
               <span className="text-xs font-medium text-slate-400">
                 {formatTimestamp(log.createdAt)}
               </span>
@@ -280,7 +280,7 @@ const LogItem = ({ log, index, StatusBadge }) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 self-end sm:self-center">
+        <div className="flex items-center gap-4 self-start sm:self-center">
           <StatusBadge status={log.status} />
         </div>
       </div>
