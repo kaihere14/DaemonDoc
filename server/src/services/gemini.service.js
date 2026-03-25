@@ -6,7 +6,7 @@ const GEMINI_API_BASE =
 export const GEMINI_MODEL =
   process.env.GEMINI_MODEL || "gemini-3-flash-preview";
 export const GEMINI_MODEL_MINI =
-  process.env.GEMINI_MODEL_MINI || "gemini-3-flash-preview";
+  process.env.GEMINI_MODEL_MINI || "gemini-3.1-flash-lite-preview";
 
 // Gemini has a 1M token context window, so we can afford much larger scans
 // than Groq's practical ~6K limit. These limits scale every fetch accordingly.
@@ -131,7 +131,9 @@ export async function callGeminiAPI(
   // the message state if it's being updated.
   // For now, let's return the text but log the thought length.
   if (thought) {
-    console.log(`[Gemini] Captured thought signature (${thought.length} chars)`);
+    console.log(
+      `[Gemini] Captured thought signature (${thought.length} chars)`,
+    );
   }
 
   return text;

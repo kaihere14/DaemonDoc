@@ -212,9 +212,9 @@ export const deactivateRepoActivity = async (req, res) => {
 
     //insted of turning the toggle of we are just removing the complete document from the db as there was a issue with the toggle where if the user deactivates and activates again then the document was created twice and it was creating an issue for the users so we are just removing the document from the db and when the user activates again then we will create a new document in the db and a new webhook in the github
 
-    ActiveRepo.deleteOne({ _id: activeRepo._id });
-    await activeRepo.save();
+    const response = await ActiveRepo.deleteOne({ _id: activeRepo._id });
 
+    console.log(response)
     res
       .status(200)
       .json({ message: "Repository activity deactivated successfully" });
