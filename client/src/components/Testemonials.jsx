@@ -20,15 +20,15 @@ const Testemonials = () => {
     {
       quote:
         "Finally, a documentation tool that respects enterprise security. Getting high-quality READMEs automatically while keeping our code protected is exactly what we needed for our internal developer portal.",
-      name: "Arman Thakur",
+      name: "Gurudas Bhardwaj",
       designation: "Backend Developer",
-      src: "/arman.webp",
+      src: "/gurudwas.webp",
     },
   ];
 
   return (
     <div className=" px-4 h-full w-full  bg-linear-to-b from-white via-cyan-50/50 to-white">
-      <AnimatedTestimonials testimonials={content}  autoplay={false}/>
+      <AnimatedTestimonials testimonials={content} autoplay={false} />
     </div>
   );
 };
