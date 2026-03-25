@@ -195,7 +195,10 @@ const Admin = () => {
 
     try {
       await api.post("/api/email/send", payload);
-      toast.success(`Queued email for ${selectedRecipientIds.length} recipients`);
+      toast.success(`Queued email for ${selectedRecipientIds.length} recipients`, {
+        closeButton: false,
+        duration: 3500,
+      });
       resetEmailForm();
     } catch (error) {
       console.error("Error sending email:", error);

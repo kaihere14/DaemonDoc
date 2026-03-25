@@ -12,7 +12,17 @@ import Admin from "./pages/Admin";
 const App = () => {
   return (
     <div>
-      <Toaster position="bottom-right" richColors closeButton />
+      <Toaster
+        position="bottom-right"
+        richColors
+        closeButton={false}
+        duration={3500}
+        toastOptions={{
+          classNames: {
+            toast: "select-none",
+          },
+        }}
+      />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
