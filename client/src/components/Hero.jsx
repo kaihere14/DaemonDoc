@@ -12,7 +12,6 @@ import { Activity } from "@/components/animate-ui/icons/activity";
 import { ClipboardCheck } from "@/components/animate-ui/icons/clipboard-check";
 import { AnimateIcon } from "@/components/animate-ui/icons/icon";
 
-// Positioned relative to the max-w-7xl container (not the viewport)
 const FLOATING_ICONS = [
   {
     id: "java",

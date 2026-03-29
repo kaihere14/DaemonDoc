@@ -16,15 +16,12 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Verify token on mount
   useEffect(() => {
     const verifyExistingToken = async () => {
       const token = localStorage.getItem("accessToken");
 
       if (token) {
         try {
-          // Pass token explicitly — interceptor only attaches stored tokens,
-          // and at this point it may not be stored yet on first run.
           const { data } = await api.post(
             ENDPOINTS.AUTH_VERIFY,
             {},

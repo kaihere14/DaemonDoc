@@ -36,12 +36,10 @@ const Home = () => {
   };
 
   const filteredRepos = repos.filter((repo) => {
-    // Apply status filter
     let matchesFilter = true;
     if (filter === "active") matchesFilter = repo.activated;
     if (filter === "inactive") matchesFilter = !repo.activated;
 
-    // Apply search query
     const matchesSearch =
       searchQuery === "" ||
       repo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

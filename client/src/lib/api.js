@@ -6,7 +6,6 @@ export const api = axios.create({
   baseURL: BACKEND_URL,
 });
 
-// Attach stored token to every request automatically
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("accessToken");
   if (token) {

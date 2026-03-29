@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import SEO from "../components/SEO";
+import Seo from "../components/SEO";
 import { Github, ArrowLeft, Star } from "lucide-react";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -29,19 +29,17 @@ const Login = () => {
   }
 
   return (
-    <div className="h-dvh w-full bg-white flex flex-col md:flex-row overflow-hidden relative selection:bg-primary selection:text-white font-sans">
-      <SEO
+    <div className="h-dvh md:max-w-600 2xl:max-w-300 mx-auto bg-white flex flex-col md:flex-row overflow-hidden relative selection:bg-primary selection:text-white font-sans">
+      <Seo
         title="Login - DaemonDoc | Connect Your GitHub Account"
         description="Sign in to DaemonDoc with your GitHub account to start automating your repository documentation with AI-powered README generation."
         ogUrl="https://daemondoc.online/login"
         canonical="https://daemondoc.online/login"
       />
 
-      {/* Subtle landing-page style blobs, much lower opacity */}
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/5 rounded-full blur-[160px] pointer-events-none" />
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-100/10 rounded-full blur-[160px] pointer-events-none" />
 
-      {/* Top Left Navigation Bar */}
       <div className="absolute top-0 left-0 w-full p-4 lg:p-6 flex justify-between items-center z-50 pointer-events-none">
         <a href="/" className="pointer-events-auto">
           <img 
@@ -59,7 +57,6 @@ const Login = () => {
         </button>
       </div>
 
-      {/* Auth Side (Split 45/55) */}
       <div className="w-full md:w-[45%] lg:w-[40%] h-full flex flex-col justify-center px-10 lg:px-24 bg-white relative">
         <div className="max-w-sm w-full animate-in fade-in slide-in-from-bottom-6 duration-700">
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-bold uppercase tracking-widest mb-6 border border-primary/20">
@@ -88,14 +85,11 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Visual Side (Split 55/45) */}
       <div className="hidden md:flex flex-1 h-full bg-[#fcfcfd] relative items-center justify-center p-12 lg:p-24 overflow-hidden border-l border-slate-100">
         <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
         
         <div className="relative z-10 max-w-xl animate-in fade-in zoom-in-95 duration-1000">
-          {/* Testimonial Card with Landing Page Dashed-Border and Primary Accents */}
           <div className="bg-white/80 backdrop-blur-md p-12 lg:p-16 rounded-[48px] shadow-[0_32px_64px_-16px_rgba(29,78,216,0.08)] border-2 border-dashed border-slate-200 relative group">
-            {/* Primary Accent Stripe - Matching Landing workflow step cards */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-primary rounded-b-full shadow-[0_0_20px_rgba(29,78,216,0.3)]" />
             
             <h2 className="text-3xl lg:text-5xl font-bold text-slate-900 mb-12 leading-[1.1] font-display tracking-tight">

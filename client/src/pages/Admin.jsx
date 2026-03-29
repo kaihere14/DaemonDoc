@@ -34,7 +34,6 @@ const Admin = () => {
   const [analyticsError, setAnalyticsError] = useState("");
   const shouldReduceMotion = useReducedMotion();
 
-  // Form state
   const [subject, setSubject] = useState("");
   const [featureName, setFeatureName] = useState("");
   const [intro, setIntro] = useState("");
@@ -43,12 +42,10 @@ const Admin = () => {
   const [date, setDate] = useState(new Date().toDateString());
   const [year, setYear] = useState(new Date().getFullYear().toString());
 
-  // Changes (unlimited)
   const [changes, setChanges] = useState([
     { tag: "", tagClass: "tag-improved", title: "", description: "" },
   ]);
 
-  // Redirect if not admin
   React.useEffect(() => {
     if (user && !user.admin) {
       navigate("/home");
@@ -209,7 +206,6 @@ const Admin = () => {
   };
 
   const handleSubmit = async () => {
-    // Validate changes
     const validChanges = changes.filter(
       (c) => c.tag && c.title && c.description,
     );

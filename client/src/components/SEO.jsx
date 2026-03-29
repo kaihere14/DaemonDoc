@@ -10,10 +10,8 @@ const SEO = ({
   canonical = "https://daemondoc.online/",
 }) => {
   useEffect(() => {
-    // Update document title
     document.title = title;
 
-    // Update or create meta tags
     const updateMetaTag = (name, content, isProperty = false) => {
       const attribute = isProperty ? "property" : "name";
       let element = document.querySelector(`meta[${attribute}="${name}"]`);
@@ -28,23 +26,19 @@ const SEO = ({
       }
     };
 
-    // Update meta tags
     updateMetaTag("description", description);
     updateMetaTag("keywords", keywords);
 
-    // Open Graph tags
     updateMetaTag("og:title", title, true);
     updateMetaTag("og:description", description, true);
     updateMetaTag("og:image", ogImage, true);
     updateMetaTag("og:url", ogUrl, true);
 
-    // Twitter Card tags
     updateMetaTag("twitter:title", title);
     updateMetaTag("twitter:description", description);
     updateMetaTag("twitter:image", ogImage);
     updateMetaTag("twitter:creator", twitterHandle);
 
-    // Update canonical link
     let canonicalLink = document.querySelector('link[rel="canonical"]');
     if (canonicalLink) {
       canonicalLink.setAttribute("href", canonical);

@@ -9,7 +9,6 @@ const OauthVerify = () => {
 
   useEffect(() => {
     const verifyToken = async () => {
-      // Extract the access token from the URL hash
       const hash = window.location.hash;
       const params = new URLSearchParams(hash.substring(1));
       const accessToken = params.get("accessToken");
@@ -27,7 +26,6 @@ const OauthVerify = () => {
 
         if (result.success) {
           setStatus("success");
-          // Redirect to home page after a brief delay
           setTimeout(() => {
             navigate("/home");
           }, 1500);
