@@ -200,6 +200,8 @@ GITHUB_CLIENT_ID=your_oauth_client_id
 GITHUB_CLIENT_SECRET=your_oauth_client_secret
 GITHUB_CALLBACK_URL=http://localhost:3000/auth/github/callback
 GITHUB_WEBHOOK_SECRET=your_webhook_secret
+
+> **Note:** The webhook handler now ignores pushes to non‑default branches, so README generation only occurs for pushes on the repository's default branch.
 # Redis (omit REDIS_* vars to use localhost:6379 with no auth)
 REDIS_HOST=your-redis-host
 REDIS_PORT=6379
@@ -259,6 +261,7 @@ Open **http://localhost:5173**
 1. Go to [GitHub Developer Settings](https://github.com/settings/developers) → **New OAuth App**
 2. Set **Authorization callback URL** to `http://localhost:3000/auth/github/callback`
 3. Copy **Client ID** and **Client Secret** → add to `server/.env`
+4. Ensure your webhook is configured for push events; the system will only process pushes to the default branch.
 
 ### Gemini API Keys
 
@@ -276,7 +279,6 @@ Open **http://localhost:5173**
 
 **Local:**
 bash
-
 
 ---
 # macOS
