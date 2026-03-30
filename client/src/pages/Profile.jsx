@@ -99,7 +99,9 @@ const Profile = () => {
                   Account Profile
                 </h1>
                 <p className="max-w-2xl text-sm font-medium tracking-tight text-slate-500 sm:text-base">
-                  Manage your GitHub connection, monitor repository coverage, and control account settings from the same operating surface as the rest of the app.
+                  Manage your GitHub connection, monitor repository coverage,
+                  and control account settings from the same operating surface
+                  as the rest of the app.
                 </p>
               </div>
             </div>
@@ -119,9 +121,11 @@ const Profile = () => {
                     alt={user.githubUsername}
                     className="h-16 w-16 rounded-full border-2 border-slate-200 object-cover sm:h-20 sm:w-20"
                   />
-                  <span className="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center rounded-full border-[3px] border-white bg-blue-600">
-                    <Check size={10} className="text-white" />
-                  </span>
+                  {user.admin && (
+                    <span className="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center rounded-full border-[3px] border-white bg-blue-600">
+                      <Check size={10} className="text-white" />
+                    </span>
+                  )}
                 </div>
                 <div className="min-w-0">
                   <p className="mb-1 font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
@@ -134,6 +138,12 @@ const Profile = () => {
                     @{user.githubUsername}
                   </p>
                 </div>
+
+                {user.admin && (
+                  <span className="inline-flex items-center rounded-2xl bg-blue-600 px-3 py-1 text-xs font-medium text-white sm:text-sm">
+                    Admin
+                  </span>
+                )}
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row">
@@ -201,9 +211,11 @@ const Profile = () => {
                   </span>
                 )}
               </div>
-              <p className={`mb-1 text-xl font-black sm:text-2xl ${
-                hasActiveRepos ? "text-blue-700" : "text-slate-500"
-              }`}>
+              <p
+                className={`mb-1 text-xl font-black sm:text-2xl ${
+                  hasActiveRepos ? "text-blue-700" : "text-slate-500"
+                }`}
+              >
                 {statsLoading ? (
                   <span className="inline-block h-6 w-8 animate-pulse rounded bg-slate-100 sm:h-8" />
                 ) : (
@@ -366,7 +378,8 @@ const Profile = () => {
                             Danger Zone
                           </h5>
                           <p className="mb-3 text-xs text-rose-700/80">
-                            Permanently delete your account and all associated data. This action cannot be undone.
+                            Permanently delete your account and all associated
+                            data. This action cannot be undone.
                           </p>
                           <button
                             onClick={() => setShowDeleteModal(true)}
@@ -411,13 +424,15 @@ const Profile = () => {
                     Delete Account
                   </h3>
                   <p className="text-sm text-slate-500">
-                    This action cannot be undone. All your data will be permanently deleted.
+                    This action cannot be undone. All your data will be
+                    permanently deleted.
                   </p>
                 </div>
 
                 <div className="mb-6">
                   <label className="mb-2 block text-left font-mono text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
-                    Type <span className="text-rose-600">delete</span> to confirm
+                    Type <span className="text-rose-600">delete</span> to
+                    confirm
                   </label>
                   <input
                     type="text"
@@ -445,7 +460,8 @@ const Profile = () => {
                       deleteConfirmText.toLowerCase() !== "delete" || isDeleting
                     }
                     className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold transition-all ${
-                      deleteConfirmText.toLowerCase() === "delete" && !isDeleting
+                      deleteConfirmText.toLowerCase() === "delete" &&
+                      !isDeleting
                         ? "bg-rose-600 text-white hover:bg-rose-700"
                         : "cursor-not-allowed bg-rose-200 text-rose-400"
                     }`}

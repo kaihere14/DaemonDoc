@@ -214,7 +214,7 @@ export const deactivateRepoActivity = async (req, res) => {
 
     const response = await ActiveRepo.deleteOne({ _id: activeRepo._id });
 
-    console.log(response)
+    console.log(response);
     res
       .status(200)
       .json({ message: "Repository activity deactivated successfully" });
@@ -419,6 +419,19 @@ export const fetchAdminAnalytics = async (_req, res) => {
       lastEventAt: repo.lastEventAt,
     }));
 
+    const threeLatestLogs = await UserLogModel.find({})
+      .sort({ createdAt: -1 })
+      .limit(3)
+      .lean();
+    if (threeLatestLogs.length === 0) {
+      threeLatestLogs.push({
+        repoName: "No activity yet",
+        repoOwner: null,
+        status: null,
+        createdAt: new Date(),
+      });
+    }
+
     return res.status(200).json({
       overview: {
         totalUsers,
@@ -432,6 +445,7 @@ export const fetchAdminAnalytics = async (_req, res) => {
       breakdown,
       activity,
       topRepos,
+      recentLogs: threeLatestLogs,
     });
   } catch (error) {
     console.error("Error fetching admin analytics:", error);
