@@ -24,6 +24,10 @@ The AI pipeline uses **Gemini 3 Flash** (primary, 1M token context) with automat
 ---
 ## ✨ Features
 
+- **Advanced Admin Analytics** — Real-time insights into system health and user activity with animated data counters and recent log tracking.
+- **Admin Identity Badging** — Visual distinction for administrative accounts within the profile system for enhanced security awareness.
+- **Docker-Ready Infrastructure** — Includes `docker-compose` configuration for seamless Redis service orchestration with built-in health checks.
+- **Refined Account Management** — Improved clarity in profile settings and account deletion workflows with explicit confirmation requirements.
 - **Modern Admin Dashboard** — Revamped UI with interactive cards, background decorations, and a sleek, professional aesthetic powered by Framer Motion.
 - **Multi-Step Announcement Wizard** — A guided 4-step process for creating feature announcements, including **targeted recipient selection**, email basics, descriptions, change lists, and final review.
 - **Granular Audience Targeting** — Select specific recipients for feature updates with real-time stats on eligible users and automatic notification preference filtering.
@@ -157,7 +161,7 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 
 - Node.js 18+
 - MongoDB (local or [Atlas](https://www.mongodb.com/cloud/atlas))
-- Redis (local or [Redis Cloud](https://redis.com/))
+- Redis (local or via **Docker**)
 - [GitHub OAuth App](https://github.com/settings/developers)
 - Gemini API keys from [Google AI Studio](https://aistudio.google.com/app/apikey)
 - Groq API keys from [Groq Console](https://console.groq.com) (fallback)
@@ -165,20 +169,27 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 ### 1. Clone
 
 bash
-git clone https://github.com/yourusername/daemondoc.git
+git clone https://github.com/kaihere14/daemondoc.git
 cd daemondoc
 
 
-### 2. Server setup
+### 2. Infrastructure (Redis via Docker)
+
+If you have Docker installed, you can quickly spin up the required Redis service:
+
+bash
+cd server
+docker-compose up -d
+
+
+### 3. Server setup
 
 bash
 cd server
 npm install
 
 
-Create `server/.env`:
-
-env
+Create `server/.env` with your environment variables (refer to the Configuration section).
 # Database
 MONGO_URI=mongodb+srv://user:password@cluster.mongodb.net/daemondoc
 # Auth
