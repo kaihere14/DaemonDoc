@@ -51,7 +51,7 @@ const ConfirmBroadcastModal = ({
                 className="w-full px-6 py-4 rounded-2xl bg-slate-900 text-white font-bold shadow-xl shadow-slate-200 hover:bg-black transition-all flex items-center justify-center gap-2"
               >
                 {isLoading ? (
-                  <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-4 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <>
                     <Send size={20} />
