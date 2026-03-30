@@ -243,6 +243,8 @@ export const githubWebhookHandler = async (req, res) => {
     const repoId = payload.repository.id;
     const commitSha = payload.after;
     const commitMessage = payload.head_commit?.message || "";
+    const ref = payload.ref; // e.g., "refs/heads/main"
+    const branchName = ref.replace("refs/heads/", "");
 
     const activeRepo = await ActiveRepo.findOne({
       repoId,
@@ -251,6 +253,14 @@ export const githubWebhookHandler = async (req, res) => {
 
     if (!activeRepo) {
       return res.status(200).send("Repo not active");
+    }
+
+    // Only process README generation on default branch
+    if (branchName !== activeRepo.defaultBranch) {
+      console.log(
+        `Ignoring push to non-default branch: ${branchName} (default: ${activeRepo.defaultBranch})`,
+      );
+      return res.status(200).send("Non-default branch ignored");
     }
 
     if (
