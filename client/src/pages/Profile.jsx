@@ -139,13 +139,11 @@ const Profile = () => {
                   </p>
                 </div>
 
-                <div className="admin-badge absolute left-70 self-center">
-                  {user.admin && (
-                    <span className="text-sm font-md text-shadow-2xs drop-shadow-2xl bg-blue-600 text-white rounded-2xl px-3 py-1">
-                      Admin
-                    </span>
-                  )}
-                </div>
+                {user.admin && (
+                  <span className="inline-flex items-center rounded-2xl bg-blue-600 px-3 py-1 text-xs font-medium text-white sm:text-sm">
+                    Admin
+                  </span>
+                )}
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row">
