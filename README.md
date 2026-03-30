@@ -75,7 +75,7 @@ The AI pipeline uses **Gemini 3 Flash** (primary, 1M token context) with automat
 Gemini key 1 → Gemini key 2 → Gemini key 3 → Groq key 1 → Groq key 2 → Groq key 3
 
 Retriable errors (429 rate limit, 503 overload, network errors) move to the next key. Auth failures (401/403) and payload errors (413) also fall through.
-## Tech Stack
+## Tech Stack 🛠️
 
 ### Frontend (`/client`)
 
@@ -85,8 +85,7 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 | Vite | Build tool | 7.x |
 | React Router | Client-side routing | 7.x |
 | Tailwind CSS | Styling | 4.x |
-| Framer Motion | Animations | 12.x |
-| Motion | Declarative animations | 12.x |
+| Framer Motion | Animations & Transitions | 12.x |
 | Zustand | State management | 5.x |
 | Lucide React | Icons | 0.562.0 |
 | Sonner | Toast notifications | 2.x |
@@ -101,8 +100,9 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 | Node.js | Runtime | 18+ |
 | Express | Web framework | 5.x |
 | MongoDB + Mongoose | Database | — |
-| Redis + IORedis | Job queue backing | — |
+| Redis + IORedis | Job queue backing & Cache | — |
 | BullMQ | Job queue | 5.x |
+| Docker Compose | Service orchestration (Redis) | — |
 | JWT | Auth tokens | — |
 | Axios | HTTP client | — |
 | HTML Templates | Email announcement rendering | — |
@@ -116,7 +116,7 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 | **Groq** | Fallback provider for both generation and selection |
 | **GitHub API** | Repo tree, file content, webhooks, commits |
 | **MongoDB Atlas** | User and repo data |
-| **Redis** | BullMQ job queue |
+| **Redis** | BullMQ job queue & Health monitoring |
 
 ---
 ## Architecture
