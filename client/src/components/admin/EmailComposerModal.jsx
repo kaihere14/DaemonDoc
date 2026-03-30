@@ -223,7 +223,7 @@ const EmailComposerModal = ({
                             </div>
                           )}
 
-                        {recipientOptions.map((recipient) => {
+                        {(recipientOptions ?? []).map((recipient) => {
                           const isSelected = selectedRecipientIds.includes(
                             recipient.id,
                           );
