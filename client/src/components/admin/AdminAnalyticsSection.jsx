@@ -371,7 +371,7 @@ const AdminAnalyticsSection = ({
                                 {log.repoName || "Unknown repository"}
                               </p>
                               <p className="text-xs text-slate-500">
-                                {log.repoOwner ? `by ${log.repoOwner} · ` : ""}
+                                {log.repoOwner ? `by ${log.repoOwner}` : ""}
                               </p>
                               <p className="text-xs text-neutral-400">
                                 {formatAnalyticsTimestamp(
