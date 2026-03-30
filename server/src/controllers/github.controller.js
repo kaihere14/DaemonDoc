@@ -427,7 +427,7 @@ export const fetchAdminAnalytics = async (_req, res) => {
       threeLatestLogs.push({
         repoName: "No activity yet",
         repoOwner: null,
-        status: "none",
+        status: null,
         createdAt: new Date(),
       });
     }
