@@ -39,6 +39,43 @@ const applyProPlan = async (userId, planId) => {
   return expiry;
 };
 
+// ── GET /api/payments/my-plan ─────────────────────────────────────────────────
+
+export const getMyPlan = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select(
+      "plan reviewLimit competitorLimit activeRepoLimit planExpiry",
+    );
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const latestPayment = await PaymentLedger.findOne({
+      userId: req.userId,
+      status: "success",
+    }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      plan: user.plan,
+      reviewLimit: user.reviewLimit,
+      competitorLimit: user.competitorLimit,
+      activeRepoLimit: user.activeRepoLimit,
+      planExpiry: user.planExpiry,
+      latestPayment: latestPayment
+        ? {
+            amount: latestPayment.amount,
+            currency: latestPayment.currency,
+            razorpayPaymentId: latestPayment.razorpayPaymentId,
+            razorpayOrderId: latestPayment.razorpayOrderId,
+            type: latestPayment.type,
+            createdAt: latestPayment.createdAt,
+          }
+        : null,
+    });
+  } catch (error) {
+    console.error("getMyPlan error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 // ── POST /api/payments/create-order ──────────────────────────────────────────
 
 export const createOrder = async (req, res) => {

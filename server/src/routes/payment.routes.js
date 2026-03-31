@@ -3,10 +3,12 @@ import { authenticate } from "../middlewares/auth.middleware.js";
 import {
   createOrder,
   verifyPayment,
+  getMyPlan,
 } from "../controllers/payment.controller.js";
 
 const router = Router();
 
+router.get("/my-plan", authenticate, getMyPlan);
 router.post("/create-order", authenticate, createOrder);
 router.post("/verify", authenticate, verifyPayment);
 
