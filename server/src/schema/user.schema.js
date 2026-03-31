@@ -14,6 +14,17 @@ const userSchema = new Schema(
       content: { type: String, required: true },
       tag: { type: String, required: true },
     },
+
+    // Subscription / plan fields
+    plan: { type: String, enum: ["free", "pro"], default: "free" },
+    reviewLimit: { type: Number, default: 1 },
+    competitorLimit: { type: Number, default: 1 },
+    activeRepoLimit: { type: Number, default: 5 },
+    planExpiry: { type: Date, default: null },
+
+    // Set to true once repos were auto-deactivated due to free plan limit
+    // Used to show a one-time dashboard notification
+    reposDeactivatedNotification: { type: Boolean, default: false },
   },
   { timestamps: true },
 );
