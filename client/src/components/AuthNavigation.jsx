@@ -4,11 +4,11 @@ import {
   User,
   LogOut,
   Home,
-  FileText,
   Activity,
   Menu,
   X,
   Shield,
+  Zap,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -76,6 +76,19 @@ const AuthNavigation = () => {
           >
             {showMobileMenu ? <X size={20} /> : <Menu size={20} />}
           </motion.button>
+
+          {/* Upgrade pill — shown only for free plan users */}
+          {user && user.plan !== "pro" && (
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => navigate("/upgrade")}
+              className="hidden md:flex items-center gap-1.5 rounded-full bg-[#1d4ed8] px-3.5 py-1.5 text-xs font-bold text-white shadow-md shadow-blue-500/20 hover:bg-[#1e40af] transition-all"
+            >
+              <Zap size={11} />
+              Upgrade
+            </motion.button>
+          )}
 
           {/* Navigation Links - Desktop */}
           <div className="hidden md:flex items-center gap-2">
@@ -260,6 +273,20 @@ const AuthNavigation = () => {
                 >
                   <Shield size={18} strokeWidth={2} />
                   <span>Admin</span>
+                </motion.button>
+              )}
+
+              {user && user.plan !== "pro" && (
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    navigate("/upgrade");
+                    setShowMobileMenu(false);
+                  }}
+                  className="w-full px-4 py-3 rounded-lg text-sm font-bold transition-all flex items-center gap-3 bg-blue-50 text-blue-700 hover:bg-blue-100"
+                >
+                  <Zap size={18} strokeWidth={2} />
+                  <span>Upgrade to Pro</span>
                 </motion.button>
               )}
             </div>

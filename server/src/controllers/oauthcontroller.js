@@ -152,6 +152,18 @@ export const logout = async (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 };
 
+export const dismissReposDeactivatedNotification = async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.userId, {
+      $set: { reposDeactivatedNotification: false },
+    });
+    return res.status(200).json({ message: "Notification dismissed" });
+  } catch (error) {
+    console.error("Dismiss notification error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const deleteAccount = async (req, res) => {
   const userId = req.userId;
   try {

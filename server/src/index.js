@@ -4,6 +4,8 @@ import "dotenv/config";
 import authRoutes from "./routes/auth.routes.js";
 import githubRoutes from "./routes/github.routes.js";
 import emailRoutes from "./routes/email.routes.js";
+import paymentRoutes from "./routes/payment.routes.js";
+import { razorpayWebhook } from "./controllers/payment.controller.js";
 import { connectDB } from "./db/connectDB.js";
 
 const app = express();
@@ -15,11 +17,22 @@ app.use(
     credentials: true,
   }),
 );
+
+// ── Razorpay webhook — MUST be registered before express.json() ──────────────
+// Razorpay signature verification requires the raw request body (Buffer).
+// express.json() would parse it into an object, breaking the HMAC check.
+app.post(
+  "/api/webhook/razorpay",
+  express.raw({ type: "application/json" }),
+  razorpayWebhook,
+);
+
 app.use(express.json());
 
 app.use("/auth", authRoutes);
 app.use("/api/github", githubRoutes);
 app.use("/api/email", emailRoutes);
+app.use("/api/payments", paymentRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello from the server!");

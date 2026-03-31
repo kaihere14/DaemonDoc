@@ -9,10 +9,13 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { api, ENDPOINTS } from "../lib/api";
+import PlanLimitModal from "./PlanLimitModal";
 
 const RepoCard = ({ repo, showToggle = true, onToggle }) => {
   const [isActive, setIsActive] = useState(repo.activated);
   const [loading, setLoading] = useState(false);
+  const [showLimitModal, setShowLimitModal] = useState(false);
+  const [limitValue, setLimitValue] = useState(5);
   const ownerLabel =
     repo.owner || repo.full_name?.split("/")?.[0] || "Repository";
   const branchLabel = repo.default_branch || "main";
@@ -44,10 +47,15 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
       toast.success(`${action} ${repo.name} Successfully`);
       if (onToggle) onToggle();
     } catch (err) {
-      toast.error(
-        err.response?.data?.message ||
-          `Failed to ${isActive ? "deactivate" : "activate"} repository`,
-      );
+      if (err.response?.data?.code === "ACTIVE_REPO_LIMIT_REACHED") {
+        setLimitValue(err.response.data.limit ?? 5);
+        setShowLimitModal(true);
+      } else {
+        toast.error(
+          err.response?.data?.message ||
+            `Failed to ${isActive ? "deactivate" : "activate"} repository`,
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -94,6 +102,13 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
             >
               {loading ? (
                 <Loader2 size={20} className="text-slate-400 animate-spin" />
+              ) : repo.canActivate === false && !isActive ? (
+                <button
+                  onClick={() => toast.info("Admin access required to enable webhooks on this repo.")}
+                  className="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-200 cursor-not-allowed opacity-50"
+                >
+                  <span className="inline-block h-4 w-4 translate-x-1 transform rounded-full bg-white" />
+                </button>
               ) : (
                 <button
                   onClick={handleToggle}
@@ -157,6 +172,12 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
       </div>
 
       <div className="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-b from-transparent via-transparent to-white pointer-events-none" />
+
+      <PlanLimitModal
+        open={showLimitModal}
+        onClose={() => setShowLimitModal(false)}
+        limit={limitValue}
+      />
     </motion.div>
   );
 };

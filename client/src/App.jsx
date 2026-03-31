@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import Logs from "./pages/Logs";
 import Admin from "./pages/Admin";
+import Upgrade from "./pages/Upgrade";
 
 const App = () => {
   return (
@@ -31,6 +32,7 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/logs" element={<Logs />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/upgrade" element={<Upgrade />} />
       </Routes>
     </div>
   );

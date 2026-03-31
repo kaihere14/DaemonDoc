@@ -10,6 +10,8 @@ import {
   TrendingUp,
   AlertTriangle,
   Check,
+  Crown,
+  Infinity,
 } from "lucide-react";
 import AuthNavigation from "../components/AuthNavigation";
 import SEO from "../components/SEO";
@@ -266,6 +268,61 @@ const Profile = () => {
               </p>
             </motion.div>
           </div>
+
+          {/* Plan card */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.28 }}
+            className="mb-5 rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.3)] backdrop-blur-sm sm:rounded-[2rem] sm:p-6"
+          >
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-4">
+                <div
+                  className={`flex h-12 w-12 items-center justify-center rounded-2xl ${
+                    user.plan === "pro"
+                      ? "bg-blue-600 text-white shadow-lg shadow-blue-500/25"
+                      : "bg-slate-100 text-slate-500"
+                  }`}
+                >
+                  {user.plan === "pro" ? <Crown size={20} /> : <Zap size={20} />}
+                </div>
+                <div>
+                  <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                    Current Plan
+                  </p>
+                  <h3 className="text-lg font-black uppercase tracking-tight text-slate-900">
+                    {user.plan === "pro" ? "Pro" : "Free"}
+                  </h3>
+                  <div className="mt-0.5 flex flex-wrap gap-2 text-[11px] text-slate-500">
+                    <span>
+                      {user.activeRepoLimit === null
+                        ? "Unlimited repos"
+                        : `${user.activeRepoLimit ?? 5} active repos`}
+                    </span>
+                    <span className="text-slate-300">·</span>
+                    <span>{user.reviewLimit ?? 1} review{(user.reviewLimit ?? 1) !== 1 ? "s" : ""}</span>
+                    <span className="text-slate-300">·</span>
+                    <span>{user.competitorLimit ?? 1} competitor analysis</span>
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => navigate("/upgrade")}
+                className={`flex shrink-0 items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-bold transition-all active:scale-95 ${
+                  user.plan === "pro"
+                    ? "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
+                    : "bg-[#1d4ed8] text-white shadow-lg shadow-blue-500/20 hover:bg-[#1e40af]"
+                }`}
+              >
+                {user.plan === "pro" ? (
+                  <>View Details <ChevronRight size={14} /></>
+                ) : (
+                  <><Zap size={14} /> Upgrade to Pro</>
+                )}
+              </button>
+            </div>
+          </motion.div>
 
           <div className="mb-8">
             <motion.div

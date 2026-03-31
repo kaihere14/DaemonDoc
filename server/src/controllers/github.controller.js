@@ -58,6 +58,7 @@ export const getGithubRepos = async (req, res) => {
         owner: repo.owner.login,
         default_branch: repo.default_branch,
         activated: activeRepoIdSet.has(repo.id),
+        canActivate: !!repo.permissions?.admin,
       }));
 
     res.status(200).json({ reposData });
@@ -93,6 +94,23 @@ export const addRepoActivity = async (req, res) => {
         .json({ message: "Repository activity already exists" });
     }
 
+    // Enforce plan-based active repo limit.
+    // null means unlimited (pro plan) — do NOT fall back with ?? here.
+    const activeRepoLimit = user.activeRepoLimit;
+    if (activeRepoLimit !== null && activeRepoLimit !== undefined) {
+      const currentActiveCount = await ActiveRepo.countDocuments({
+        userId,
+        active: true,
+      });
+      if (currentActiveCount >= activeRepoLimit) {
+        return res.status(403).json({
+          message: `Active repo limit reached. Your plan allows up to ${activeRepoLimit} active ${activeRepoLimit === 1 ? "repo" : "repos"}.`,
+          code: "ACTIVE_REPO_LIMIT_REACHED",
+          limit: activeRepoLimit,
+        });
+      }
+    }
+
     const accessToken = decrypt(user.githubAccessToken);
 
     let webhookId;
@@ -104,7 +122,7 @@ export const addRepoActivity = async (req, res) => {
           active: true,
           events: ["push"],
           config: {
-            url: ` ${process.env.BACKEND_URL}/api/github/webhookhandler`,
+            url: `${process.env.BACKEND_URL}/api/github/webhookhandler`,
             content_type: "json",
             secret: process.env.GITHUB_WEBHOOK_SECRET,
           },
@@ -113,14 +131,29 @@ export const addRepoActivity = async (req, res) => {
       );
       webhookId = webhookRes.data.id;
     } catch (error) {
-      if (error.response && error.response.status === 422) {
+      if (error.response?.status === 422) {
+        // Webhook already exists on GitHub (e.g. repo was deactivated without
+        // removing the webhook). Find and reuse the existing webhook ID.
+        try {
+          const hooksRes = await githubGet(
+            `${GITHUB_API_BASE}/repos/${repoOwner}/${repoName}/hooks`,
+            accessToken,
+          );
+          const webhookUrl = `${process.env.BACKEND_URL}/api/github/webhookhandler`;
+          const existing = hooksRes.data.find((h) => h.config?.url === webhookUrl);
+          if (existing) {
+            webhookId = existing.id;
+          } else {
+            return res.status(422).json({ message: "Webhook already exists for this repository" });
+          }
+        } catch {
+          return res.status(422).json({ message: "Webhook already exists for this repository" });
+        }
+      } else {
         return res
-          .status(422)
-          .json({ message: "Webhook already exists for this repository" });
+          .status(500)
+          .json({ message: "Error creating webhook", error: error.message });
       }
-      return res
-        .status(500)
-        .json({ message: "Error creating webhook", error: error.message });
     }
 
     const activeRepo = new ActiveRepo({
