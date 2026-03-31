@@ -20,22 +20,12 @@ import { useRequireAuth } from "../hooks/useRequireAuth";
 import { useAuth } from "../context/AuthContext";
 import { api, ENDPOINTS } from "../lib/api";
 
-const PLANS = [
-  {
-    id: "pro_monthly",
-    label: "Monthly",
-    price: "₹499",
-    period: "/month",
-    savings: null,
-  },
-  {
-    id: "pro_yearly",
-    label: "Yearly",
-    price: "₹3,999",
-    period: "/year",
-    savings: "Save ~33%",
-  },
-];
+const formatPrice = (paise) =>
+  new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(paise / 100);
 
 const PRO_FEATURES = [
   { label: "Unlimited active repositories", free: "5 repos" },
@@ -67,21 +57,28 @@ const Upgrade = () => {
   const [loading, setLoading] = useState(false);
   const [planData, setPlanData] = useState(null);
   const [planLoading, setPlanLoading] = useState(true);
+  const [availablePlans, setAvailablePlans] = useState([]);
 
   const isPro = user?.plan === "pro";
 
   useEffect(() => {
-    const fetchPlan = async () => {
+    const fetchData = async () => {
       try {
-        const { data } = await api.get(ENDPOINTS.PAYMENT_MY_PLAN);
-        setPlanData(data);
+        const [myPlanRes, plansRes] = await Promise.all([
+          api.get(ENDPOINTS.PAYMENT_MY_PLAN),
+          api.get(ENDPOINTS.PAYMENT_PLANS),
+        ]);
+        setPlanData(myPlanRes.data);
+        const paid = plansRes.data.plans.filter((p) => p.interval !== "free");
+        setAvailablePlans(paid);
+        if (paid.length > 0) setSelectedPlan(paid[0].planId);
       } catch {
         // non-critical
       } finally {
         setPlanLoading(false);
       }
     };
-    if (user) fetchPlan();
+    if (user) fetchData();
   }, [user]);
 
   const handleUpgrade = async () => {
@@ -406,32 +403,38 @@ const Upgrade = () => {
                       </span>
                     </div>
                     <div className="space-y-3">
-                      {PLANS.map((plan) => {
-                        const isSelected = selectedPlan === plan.id;
+                      {planLoading ? (
+                        [1, 2].map((i) => (
+                          <div key={i} className="h-20 animate-pulse rounded-[1.25rem] bg-slate-100" />
+                        ))
+                      ) : availablePlans.map((plan) => {
+                        const isSelected = selectedPlan === plan.planId;
+                        const period = plan.interval === "yearly" ? "/year" : "/month";
+                        const isYearly = plan.interval === "yearly";
                         return (
                           <button
-                            key={plan.id}
-                            onClick={() => setSelectedPlan(plan.id)}
+                            key={plan.planId}
+                            onClick={() => setSelectedPlan(plan.planId)}
                             className={`relative w-full rounded-[1.25rem] border-2 p-5 text-left transition-all ${
                               isSelected
                                 ? "border-blue-500 bg-blue-50/60"
                                 : "border-slate-200 bg-slate-50/60 hover:border-slate-300"
                             }`}
                           >
-                            {plan.savings && (
+                            {isYearly && (
                               <span className="absolute right-4 top-4 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wide text-emerald-700">
-                                {plan.savings}
+                                Save ~33%
                               </span>
                             )}
                             <div className="flex items-center justify-between gap-4">
                               <div>
                                 <p className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-slate-400 mb-1">
-                                  Pro — {plan.label}
+                                  {plan.name}
                                 </p>
                                 <p className="text-2xl font-black text-slate-900">
-                                  {plan.price}
+                                  {formatPrice(plan.amount)}
                                   <span className="text-sm font-semibold text-slate-400">
-                                    {plan.period}
+                                    {period}
                                   </span>
                                 </p>
                               </div>

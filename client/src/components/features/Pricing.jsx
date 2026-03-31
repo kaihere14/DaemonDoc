@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Zap, Check, Crown } from "lucide-react";
+import axios from "axios";
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const FREE_FEATURES = [
   "5 active repositories",
@@ -18,8 +21,24 @@ const PRO_FEATURES = [
   "Email support",
 ];
 
+const formatPrice = (paise) =>
+  new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(paise / 100);
+
 const Pricing = () => {
   const navigate = useNavigate();
+  const [monthlyPlan, setMonthlyPlan] = useState(null);
+  const [yearlyPlan, setYearlyPlan] = useState(null);
+
+  useEffect(() => {
+    axios.get(`${BACKEND_URL}/api/payments/plans`).then(({ data }) => {
+      setMonthlyPlan(data.plans.find((p) => p.planId === "pro_monthly"));
+      setYearlyPlan(data.plans.find((p) => p.planId === "pro_yearly"));
+    }).catch(() => {});
+  }, []);
 
   return (
     <section
@@ -102,10 +121,14 @@ const Pricing = () => {
               For developers and teams who need unlimited power and speed.
             </p>
             <div className="mb-2">
-              <span className="text-4xl font-bold text-white">₹499</span>
+              <span className="text-4xl font-bold text-white">
+                {monthlyPlan ? formatPrice(monthlyPlan.amount) : "₹499"}
+              </span>
               <span className="text-slate-400 text-sm"> / month</span>
             </div>
-            <p className="text-slate-500 text-xs mb-8">or ₹3,999 / year (save ~33%)</p>
+            <p className="text-slate-500 text-xs mb-8">
+              or {yearlyPlan ? formatPrice(yearlyPlan.amount) : "₹3,999"} / year (save ~33%)
+            </p>
             <ul className="space-y-3 mb-8 flex-1">
               {PRO_FEATURES.map((f) => (
                 <li

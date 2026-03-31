@@ -2,11 +2,8 @@ import crypto from "node:crypto";
 import Razorpay from "razorpay";
 import User from "../schema/user.schema.js";
 import PaymentLedger from "../schema/paymentLedger.schema.js";
-import {
-  SUBSCRIPTION_PLANS,
-  PLAN_LIMITS,
-  PLAN_EXPIRY_BUFFER_DAYS,
-} from "../config/pricingPlans.js";
+import Plan from "../schema/plan.schema.js";
+import { PLAN_EXPIRY_BUFFER_DAYS } from "../config/pricingPlans.js";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -22,21 +19,36 @@ const getPlanExpiry = (billingDays) => {
 };
 
 const applyProPlan = async (userId, planId) => {
-  const plan = SUBSCRIPTION_PLANS[planId];
-  const limits = PLAN_LIMITS.pro;
+  const plan = await Plan.findOne({ planId, active: true });
+  if (!plan) throw new Error(`Plan not found in DB: ${planId}`);
+
   const expiry = getPlanExpiry(plan.billingDays);
 
   await User.findByIdAndUpdate(userId, {
     $set: {
       plan: "pro",
-      reviewLimit: limits.reviewLimit,
-      competitorLimit: limits.competitorLimit,
-      activeRepoLimit: limits.activeRepoLimit,
+      reviewLimit: plan.reviewLimit,
+      competitorLimit: plan.competitorLimit,
+      activeRepoLimit: plan.activeRepoLimit,
       planExpiry: expiry,
     },
   });
 
   return expiry;
+};
+
+// ── GET /api/payments/plans ───────────────────────────────────────────────────
+
+export const getPlans = async (_req, res) => {
+  try {
+    const plans = await Plan.find({ active: true }).select(
+      "planId name interval amount currency billingDays reviewLimit competitorLimit activeRepoLimit",
+    );
+    return res.status(200).json({ plans });
+  } catch (error) {
+    console.error("getPlans error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 // ── GET /api/payments/my-plan ─────────────────────────────────────────────────
@@ -81,7 +93,7 @@ export const getMyPlan = async (req, res) => {
 export const createOrder = async (req, res) => {
   const { planId } = req.body;
 
-  const plan = SUBSCRIPTION_PLANS[planId];
+  const plan = await Plan.findOne({ planId, active: true });
   if (!plan) {
     return res.status(400).json({ message: "Invalid plan ID" });
   }
@@ -102,7 +114,7 @@ export const createOrder = async (req, res) => {
       amount: order.amount,
       currency: order.currency,
       planId,
-      planLabel: plan.label,
+      planLabel: plan.name,
       keyId: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
@@ -149,7 +161,7 @@ export const verifyPayment = async (req, res) => {
     return res.status(200).json({ message: "Payment already processed", alreadyProcessed: true });
   }
 
-  const plan = SUBSCRIPTION_PLANS[planId];
+  const plan = await Plan.findOne({ planId, active: true });
   if (!plan) {
     return res.status(400).json({ message: "Invalid plan ID" });
   }
@@ -231,7 +243,7 @@ const handlePaymentCaptured = async (payment) => {
     return;
   }
 
-  const plan = SUBSCRIPTION_PLANS[planId];
+  const plan = await Plan.findOne({ planId, active: true });
   if (!plan) {
     console.warn("Webhook payment.captured: unknown planId", { planId });
     return;

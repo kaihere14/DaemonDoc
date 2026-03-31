@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../middlewares/auth.middleware.js";
 import {
+  getPlans,
   createOrder,
   verifyPayment,
   getMyPlan,
@@ -8,6 +9,7 @@ import {
 
 const router = Router();
 
+router.get("/plans", getPlans); // public — no auth needed
 router.get("/my-plan", authenticate, getMyPlan);
 router.post("/create-order", authenticate, createOrder);
 router.post("/verify", authenticate, verifyPayment);
