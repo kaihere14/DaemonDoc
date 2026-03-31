@@ -3,12 +3,15 @@ import React from "react";
 import { Send, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 
-const AdminBroadcastSection = ({ onOpenComposer }) => {
+const AdminBroadcastSection = ({
+  onOpenComposer,
+  sectionNumber = "02",
+}) => {
   return (
     <section>
       <div className="mb-4">
         <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
-          Section 02
+          Section {sectionNumber}
         </p>
         <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-slate-900 sm:text-3xl">
           Broadcast

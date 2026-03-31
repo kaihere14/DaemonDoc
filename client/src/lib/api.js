@@ -30,4 +30,5 @@ export const ENDPOINTS = {
   ADMIN_PAYMENT_USERS: "/api/payments/admin/users",
   ADMIN_REVOKE_PLAN: "/api/payments/admin/revoke-plan",
   ADMIN_UPDATE_PLAN_PRICE: "/api/payments/admin/update-plan-price",
+  ADMIN_PAYMENT_ANALYTICS: "/api/payments/admin/analytics",
 };
