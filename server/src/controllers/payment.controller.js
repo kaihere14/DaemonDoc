@@ -339,7 +339,7 @@ export const verifyPayment = async (req, res) => {
       amount: plan.amount,
       currency: plan.currency,
       status: "success",
-      note: `${plan.label} activated via checkout`,
+      note: `${plan.name} activated via checkout`,
     });
 
     return res.status(200).json({
@@ -431,7 +431,7 @@ const handlePaymentCaptured = async (payment) => {
     amount: payment.amount,
     currency: payment.currency,
     status: "success",
-    note: `${plan.label} activated via webhook`,
+    note: `${plan.name} activated via webhook`,
     razorpayResponse: payment,
   });
 
