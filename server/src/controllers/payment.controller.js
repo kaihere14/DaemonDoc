@@ -1,10 +1,13 @@
 import crypto from "node:crypto";
 import Razorpay from "razorpay";
 import User from "../schema/user.schema.js";
+import ActiveRepo from "../schema/activeRepo.js";
 import PaymentLedger from "../schema/paymentLedger.schema.js";
 import Plan from "../schema/plan.schema.js";
 import { PLAN_EXPIRY_BUFFER_DAYS } from "../config/pricingPlans.js";
 import { getUsageSummary } from "../utils/usageTracker.js";
+import { decrypt } from "./oauthcontroller.js";
+import { GITHUB_API_BASE, githubDelete } from "../utils/githubApiClient.js";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -54,6 +57,39 @@ export const adminRevokePlan = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    const activeRepos = await ActiveRepo.find({ userId, active: true })
+      .sort({ createdAt: 1, _id: 1 })
+      .select("_id repoOwner repoName webhookId");
+
+    const reposToDeactivate = activeRepos.slice(5);
+
+    if (reposToDeactivate.length > 0 && user.githubAccessToken) {
+      const accessToken = decrypt(user.githubAccessToken);
+
+      for (const repo of reposToDeactivate) {
+        try {
+          await githubDelete(
+            `${GITHUB_API_BASE}/repos/${repo.repoOwner}/${repo.repoName}/hooks/${repo.webhookId}`,
+            accessToken,
+          );
+        } catch (error) {
+          if (error.response?.status !== 404) {
+            console.warn(
+              `Failed to delete webhook for ${repo.repoOwner}/${repo.repoName}:`,
+              error.message,
+            );
+          }
+        }
+      }
+    }
+
+    if (reposToDeactivate.length > 0) {
+      await ActiveRepo.updateMany(
+        { _id: { $in: reposToDeactivate.map((repo) => repo._id) } },
+        { $set: { active: false } },
+      );
+    }
+
     await User.findByIdAndUpdate(userId, {
       $set: {
         plan: "free",
@@ -65,10 +101,14 @@ export const adminRevokePlan = async (req, res) => {
         reviewsUsed: 0,
         competitorAnalysesUsed: 0,
         usagePeriodStart: null,
+        reposDeactivatedNotification: reposToDeactivate.length > 0,
       },
     });
 
-    return res.status(200).json({ message: "Plan revoked. User moved to free plan." });
+    return res.status(200).json({
+      message: "Plan revoked. User moved to free plan.",
+      deactivatedRepoCount: reposToDeactivate.length,
+    });
   } catch (error) {
     console.error("adminRevokePlan error:", error);
     return res.status(500).json({ message: "Internal server error" });
