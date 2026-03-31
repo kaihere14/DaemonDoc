@@ -94,8 +94,9 @@ export const addRepoActivity = async (req, res) => {
         .json({ message: "Repository activity already exists" });
     }
 
-    // Enforce plan-based active repo limit
-    const activeRepoLimit = user.activeRepoLimit ?? 5;
+    // Enforce plan-based active repo limit.
+    // null means unlimited (pro plan) — do NOT fall back with ?? here.
+    const activeRepoLimit = user.activeRepoLimit;
     if (activeRepoLimit !== null && activeRepoLimit !== undefined) {
       const currentActiveCount = await ActiveRepo.countDocuments({
         userId,
