@@ -320,7 +320,8 @@ const Upgrade = () => {
                             </p>
                             {item.resetAt && (
                               <p className="mt-1 text-[10px] text-slate-400">
-                                Resets {new Date(item.resetAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                                {planData?.usage?.planInterval === "yearly" ? "Resets" : "Until"}{" "}
+                                {new Date(item.resetAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
                               </p>
                             )}
                           </>

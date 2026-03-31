@@ -29,11 +29,12 @@ const applyProPlan = async (userId, planId) => {
   await User.findByIdAndUpdate(userId, {
     $set: {
       plan: "pro",
+      planInterval: plan.interval, // "monthly" or "yearly"
       reviewLimit: plan.reviewLimit,
       competitorLimit: plan.competitorLimit,
       activeRepoLimit: plan.activeRepoLimit,
       planExpiry: expiry,
-      // Reset usage counters and start a fresh monthly period
+      // Reset usage counters and start a fresh period
       reviewsUsed: 0,
       competitorAnalysesUsed: 0,
       usagePeriodStart: now,
