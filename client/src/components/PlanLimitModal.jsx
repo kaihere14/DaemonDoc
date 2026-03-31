@@ -1,5 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { X, Zap, Lock } from "lucide-react";
 
 /**
@@ -10,6 +11,8 @@ import { X, Zap, Lock } from "lucide-react";
  *   limit      — number  (the cap they hit)
  */
 const PlanLimitModal = ({ open, onClose, limit = 5 }) => {
+  const navigate = useNavigate();
+
   return (
     <AnimatePresence>
       {open && (
@@ -67,8 +70,8 @@ const PlanLimitModal = ({ open, onClose, limit = 5 }) => {
               <div className="flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={() => {
-                    // TODO: navigate to upgrade/pricing page when available
                     onClose();
+                    navigate("/upgrade");
                   }}
                   className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 transition-all hover:bg-indigo-700 active:scale-95"
                 >

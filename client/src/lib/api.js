@@ -23,4 +23,6 @@ export const ENDPOINTS = {
   FETCH_LOGS: "/api/github/fetchUserLogs",
   ADMIN_ANALYTICS: "/api/github/admin/analytics",
   DISMISS_REPOS_NOTIFICATION: "/auth/dismiss-repos-notification",
+  PAYMENT_CREATE_ORDER: "/api/payments/create-order",
+  PAYMENT_VERIFY: "/api/payments/verify",
 };
