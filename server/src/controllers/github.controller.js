@@ -93,6 +93,22 @@ export const addRepoActivity = async (req, res) => {
         .json({ message: "Repository activity already exists" });
     }
 
+    // Enforce plan-based active repo limit
+    const activeRepoLimit = user.activeRepoLimit ?? 5;
+    if (activeRepoLimit !== null && activeRepoLimit !== undefined) {
+      const currentActiveCount = await ActiveRepo.countDocuments({
+        userId,
+        active: true,
+      });
+      if (currentActiveCount >= activeRepoLimit) {
+        return res.status(403).json({
+          message: `Active repo limit reached. Your plan allows up to ${activeRepoLimit} active ${activeRepoLimit === 1 ? "repo" : "repos"}.`,
+          code: "ACTIVE_REPO_LIMIT_REACHED",
+          limit: activeRepoLimit,
+        });
+      }
+    }
+
     const accessToken = decrypt(user.githubAccessToken);
 
     let webhookId;

@@ -22,4 +22,5 @@ export const ENDPOINTS = {
   DEACTIVATE_REPO: "/api/github/deactivateRepoActivity",
   FETCH_LOGS: "/api/github/fetchUserLogs",
   ADMIN_ANALYTICS: "/api/github/admin/analytics",
+  DISMISS_REPOS_NOTIFICATION: "/auth/dismiss-repos-notification",
 };

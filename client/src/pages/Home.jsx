@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import AuthNavigation from "../components/AuthNavigation";
 import RepoCard from "../components/RepoCard";
 import {
@@ -14,6 +14,8 @@ import {
 import SEO from "../components/SEO";
 import { useRequireAuth } from "../hooks/useRequireAuth";
 import { useRepos } from "../hooks/useRepos";
+import { useAuth } from "../context/AuthContext";
+import { api, ENDPOINTS } from "../lib/api";
 
 const FILTER_TABS = [
   { key: "all", label: "All Repositories" },
@@ -23,9 +25,19 @@ const FILTER_TABS = [
 
 const Home = () => {
   const { user } = useRequireAuth();
+  const { setUser } = useAuth();
   const { repos, setRepos, loading, error, fetchRepos } = useRepos(user);
   const [filter, setFilter] = useState("all"); // all, active, inactive
   const [searchQuery, setSearchQuery] = useState("");
+
+  const handleDismissReposNotification = async () => {
+    try {
+      await api.post(ENDPOINTS.DISMISS_REPOS_NOTIFICATION);
+      setUser((prev) => ({ ...prev, reposDeactivatedNotification: false }));
+    } catch {
+      // Non-critical — banner just stays visible if the request fails
+    }
+  };
 
   const handleSilentToggle = (repoId) => {
     setRepos((prevRepos) =>
@@ -62,6 +74,39 @@ const Home = () => {
       />
       <div className="min-h-screen bg-linear-to-b from-white via-slate-50/70 to-white text-slate-900 font-sans selection:bg-indigo-100 overflow-x-hidden">
         <AuthNavigation />
+
+        {/* One-time banner: shown when repos were auto-deactivated due to free plan limit */}
+        <AnimatePresence>
+          {user?.reposDeactivatedNotification && (
+            <motion.div
+              initial={{ opacity: 0, y: -12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="relative z-20 mx-4 mt-20 sm:mx-6 lg:mx-8"
+            >
+              <div className="max-w-7xl mx-auto rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 shadow-sm flex items-start gap-3">
+                <AlertCircle
+                  size={20}
+                  className="mt-0.5 shrink-0 text-amber-500"
+                />
+                <div className="flex-1 text-sm text-amber-800">
+                  <span className="font-bold">Some repositories were deactivated.</span>{" "}
+                  Your free plan supports up to 5 active repos. Repos beyond that limit were automatically deactivated.{" "}
+                  <span className="font-semibold">Upgrade to Pro</span> for unlimited active repositories.
+                </div>
+                <button
+                  onClick={handleDismissReposNotification}
+                  aria-label="Dismiss notification"
+                  className="shrink-0 rounded-lg p-1 text-amber-500 hover:bg-amber-100 transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute top-24 left-[-8rem] h-72 w-72 rounded-full bg-blue-100/60 blur-3xl" />
           <div className="absolute top-52 right-[-6rem] h-80 w-80 rounded-full bg-sky-100/40 blur-3xl" />
