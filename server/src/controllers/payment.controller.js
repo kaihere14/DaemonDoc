@@ -231,14 +231,12 @@ export const createOrder = async (req, res) => {
 // This is the fast path — webhook is the reliable fallback.
 
 export const verifyPayment = async (req, res) => {
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, planId } =
-    req.body;
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
   if (
     !razorpay_order_id ||
     !razorpay_payment_id ||
-    !razorpay_signature ||
-    !planId
+    !razorpay_signature
   ) {
     return res.status(400).json({ message: "Missing payment fields" });
   }
@@ -264,16 +262,32 @@ export const verifyPayment = async (req, res) => {
     return res.status(200).json({ message: "Payment already processed", alreadyProcessed: true });
   }
 
-  const plan = await Plan.findOne({ planId, active: true });
-  if (!plan) {
-    return res.status(400).json({ message: "Invalid plan ID" });
-  }
-
   try {
+    const order = await razorpay.orders.fetch(razorpay_order_id);
+    const orderPlanId = order.notes?.planId;
+    const orderUserId = order.notes?.userId;
+
+    if (!orderPlanId || !orderUserId) {
+      return res.status(400).json({ message: "Payment order is missing plan metadata" });
+    }
+
+    if (orderUserId !== req.userId.toString()) {
+      return res.status(403).json({ message: "Payment order does not belong to this user" });
+    }
+
+    const plan = await Plan.findOne({ planId: orderPlanId, active: true });
+    if (!plan) {
+      return res.status(400).json({ message: "Invalid plan ID on payment order" });
+    }
+
+    if (order.amount !== plan.amount || order.currency !== plan.currency) {
+      return res.status(400).json({ message: "Payment order does not match plan pricing" });
+    }
+
     const user = await User.findById(req.userId);
     const planBefore = user?.plan ?? "free";
 
-    const planExpiry = await applyProPlan(req.userId, planId);
+    const planExpiry = await applyProPlan(req.userId, orderPlanId);
 
     await PaymentLedger.create({
       userId: req.userId,
