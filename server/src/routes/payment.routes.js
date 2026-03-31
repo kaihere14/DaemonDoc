@@ -5,6 +5,7 @@ import {
   createOrder,
   verifyPayment,
   getMyPlan,
+  fetchPaymentAdminAnalytics,
   adminRevokePlan,
   adminGetUsersWithPlan,
   adminUpdatePlanPrice,
@@ -18,6 +19,7 @@ router.post("/create-order", authenticate, createOrder);
 router.post("/verify", authenticate, verifyPayment);
 
 // Admin
+router.get("/admin/analytics", authenticate, requireAdmin, fetchPaymentAdminAnalytics);
 router.get("/admin/users", authenticate, requireAdmin, adminGetUsersWithPlan);
 router.post("/admin/revoke-plan", authenticate, requireAdmin, adminRevokePlan);
 router.patch("/admin/update-plan-price", authenticate, requireAdmin, adminUpdatePlanPrice);

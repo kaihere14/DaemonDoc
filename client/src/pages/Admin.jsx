@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useReducedMotion } from "framer-motion";
 import AdminHero from "../components/admin/AdminHero";
 import AdminAnalyticsSection from "../components/admin/AdminAnalyticsSection";
+import AdminPaymentsSection from "../components/admin/AdminPaymentsSection";
 import AdminBroadcastSection from "../components/admin/AdminBroadcastSection";
 import AdminSubscriptionSection from "../components/admin/AdminSubscriptionSection";
 import EmailComposerModal from "../components/admin/EmailComposerModal";
@@ -16,6 +17,7 @@ const ADMIN_TABS = [
   { key: "analytics", label: "Analytics" },
   { key: "broadcast", label: "Broadcast" },
   { key: "subscriptions", label: "Subscriptions" },
+  { key: "paid-users", label: "Paid Users" },
 ];
 
 const Admin = () => {
@@ -378,6 +380,13 @@ const Admin = () => {
 
           {activeTab === "subscriptions" && (
             <AdminSubscriptionSection />
+          )}
+
+          {activeTab === "paid-users" && (
+            <AdminPaymentsSection
+              sectionNumber="04"
+              shouldReduceMotion={shouldReduceMotion}
+            />
           )}
         </div>
       </div>
