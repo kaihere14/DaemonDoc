@@ -24,6 +24,10 @@ The AI pipeline uses **Gemini 3 Flash** (primary, 1M token context) with automat
 ---
 ## ✨ Features
 
+- **Comprehensive Payment Administration** — Dedicated dashboard for monitoring revenue, managing user subscriptions, and adjusting plan pricing in real-time.
+- **Interactive Financial Analytics** — Visualized 7-day revenue and purchase trends using animated line charts and data-driven insights.
+- **Subscription Lifecycle Management** — Administrative controls to revoke premium plans, transition users to free tiers, and manage repository limits automatically.
+- **Advanced User Filtering** — Search and filter the user base by subscription plan, GitHub username, or email with paginated ledger views.
 - **Advanced Admin Analytics** — Real-time insights into system health and user activity with animated data counters and recent log tracking.
 - **Admin Identity Badging** — Visual distinction for administrative accounts within the profile system for enhanced security awareness.
 - **Docker-Ready Infrastructure** — Includes `docker-compose` configuration for seamless Redis service orchestration with built-in health checks.
@@ -318,6 +322,15 @@ All protected routes require `Authorization: Bearer <jwt_token>`.
 | `POST` | `/api/github/webhookhandler` | GitHub push event receiver |
 | `GET` | `/api/github/fetchLogs` | Get activity log for the authenticated user |
 
+### Payments & Admin
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/payments/admin/analytics` | Fetch aggregate payment and revenue statistics |
+| `GET` | `/api/payments/admin/users` | List users with plan details (supports search, plan filter, and pagination) |
+| `POST` | `/api/payments/admin/revoke-plan` | Revoke a user's pro plan and revert to free tier limits |
+| `PATCH` | `/api/payments/admin/update-plan-price` | Update the price of a specific subscription plan |
+
 ### Health
 
 | Method | Endpoint | Description |
@@ -325,7 +338,6 @@ All protected routes require `Authorization: Bearer <jwt_token>`.
 | `GET` | `/health` | Health check — returns status, uptime, redis state |
 
 ---
-
 ## 🚀 Deployment
 
 ### Backend (Render)
