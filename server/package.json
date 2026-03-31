@@ -24,6 +24,7 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.2",
     "openai": "^6.32.0",
+    "razorpay": "^2.9.6",
     "resend": "^6.9.4"
   },
   "devDependencies": {
