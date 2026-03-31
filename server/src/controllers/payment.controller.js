@@ -4,6 +4,7 @@ import User from "../schema/user.schema.js";
 import PaymentLedger from "../schema/paymentLedger.schema.js";
 import Plan from "../schema/plan.schema.js";
 import { PLAN_EXPIRY_BUFFER_DAYS } from "../config/pricingPlans.js";
+import { getUsageSummary } from "../utils/usageTracker.js";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -23,6 +24,7 @@ const applyProPlan = async (userId, planId) => {
   if (!plan) throw new Error(`Plan not found in DB: ${planId}`);
 
   const expiry = getPlanExpiry(plan.billingDays);
+  const now = new Date();
 
   await User.findByIdAndUpdate(userId, {
     $set: {
@@ -31,6 +33,10 @@ const applyProPlan = async (userId, planId) => {
       competitorLimit: plan.competitorLimit,
       activeRepoLimit: plan.activeRepoLimit,
       planExpiry: expiry,
+      // Reset usage counters and start a fresh monthly period
+      reviewsUsed: 0,
+      competitorAnalysesUsed: 0,
+      usagePeriodStart: now,
     },
   });
 
@@ -60,10 +66,10 @@ export const getMyPlan = async (req, res) => {
     );
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const latestPayment = await PaymentLedger.findOne({
-      userId: req.userId,
-      status: "success",
-    }).sort({ createdAt: -1 });
+    const [latestPayment, usage] = await Promise.all([
+      PaymentLedger.findOne({ userId: req.userId, status: "success" }).sort({ createdAt: -1 }),
+      getUsageSummary(req.userId),
+    ]);
 
     return res.status(200).json({
       plan: user.plan,
@@ -71,6 +77,7 @@ export const getMyPlan = async (req, res) => {
       competitorLimit: user.competitorLimit,
       activeRepoLimit: user.activeRepoLimit,
       planExpiry: user.planExpiry,
+      usage,
       latestPayment: latestPayment
         ? {
             amount: latestPayment.amount,

@@ -279,11 +279,25 @@ const Upgrade = () => {
                     {[
                       {
                         label: "Active Repos",
-                        value: planData?.activeRepoLimit ?? null,
                         unlimited: planData?.activeRepoLimit === null,
+                        limit: planData?.activeRepoLimit,
+                        used: null, // no monthly cap — just unlimited
+                        resetAt: null,
                       },
-                      { label: "Reviews / Month", value: planData?.reviewLimit ?? 20 },
-                      { label: "Competitor Analyses", value: planData?.competitorLimit ?? 10 },
+                      {
+                        label: "Reviews",
+                        unlimited: false,
+                        limit: planData?.usage?.reviews?.limit ?? planData?.reviewLimit ?? 20,
+                        used: planData?.usage?.reviews?.used ?? 0,
+                        resetAt: planData?.usage?.reviews?.resetAt,
+                      },
+                      {
+                        label: "Competitor Analyses",
+                        unlimited: false,
+                        limit: planData?.usage?.competitor?.limit ?? planData?.competitorLimit ?? 10,
+                        used: planData?.usage?.competitor?.used ?? 0,
+                        resetAt: planData?.usage?.competitor?.resetAt,
+                      },
                     ].map((item) => (
                       <div
                         key={item.label}
@@ -300,7 +314,16 @@ const Upgrade = () => {
                             <span className="text-sm font-black">Unlimited</span>
                           </div>
                         ) : (
-                          <p className="text-xl font-black text-slate-900">{item.value}</p>
+                          <>
+                            <p className="text-xl font-black text-slate-900">
+                              {item.used} <span className="text-sm font-semibold text-slate-400">/ {item.limit}</span>
+                            </p>
+                            {item.resetAt && (
+                              <p className="mt-1 text-[10px] text-slate-400">
+                                Resets {new Date(item.resetAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                              </p>
+                            )}
+                          </>
                         )}
                       </div>
                     ))}
