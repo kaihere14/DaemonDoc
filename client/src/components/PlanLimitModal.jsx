@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { X, Zap, Lock } from "lucide-react";
@@ -13,7 +14,7 @@ import { X, Zap, Lock } from "lucide-react";
 const PlanLimitModal = ({ open, onClose, limit = 5 }) => {
   const navigate = useNavigate();
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {open && (
         <>
@@ -89,7 +90,8 @@ const PlanLimitModal = ({ open, onClose, limit = 5 }) => {
           </motion.div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };
 

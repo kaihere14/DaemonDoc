@@ -58,6 +58,7 @@ export const getGithubRepos = async (req, res) => {
         owner: repo.owner.login,
         default_branch: repo.default_branch,
         activated: activeRepoIdSet.has(repo.id),
+        canActivate: !!repo.permissions?.admin,
       }));
 
     res.status(200).json({ reposData });
