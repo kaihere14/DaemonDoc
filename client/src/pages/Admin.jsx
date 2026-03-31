@@ -8,12 +8,20 @@ import { useReducedMotion } from "framer-motion";
 import AdminHero from "../components/admin/AdminHero";
 import AdminAnalyticsSection from "../components/admin/AdminAnalyticsSection";
 import AdminBroadcastSection from "../components/admin/AdminBroadcastSection";
+import AdminSubscriptionSection from "../components/admin/AdminSubscriptionSection";
 import EmailComposerModal from "../components/admin/EmailComposerModal";
 import ConfirmBroadcastModal from "../components/admin/ConfirmBroadcastModal";
+
+const ADMIN_TABS = [
+  { key: "analytics", label: "Analytics" },
+  { key: "broadcast", label: "Broadcast" },
+  { key: "subscriptions", label: "Subscriptions" },
+];
 
 const Admin = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("analytics");
   const [isLoading, setIsLoading] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -329,23 +337,48 @@ const Admin = () => {
         <div className="max-w-6xl mx-auto">
           <AdminHero />
 
-          <AdminAnalyticsSection
-            analyticsOverview={analyticsOverview}
-            analyticsBreakdown={analyticsBreakdown}
-            analyticsActivity={analyticsActivity}
-            analyticsTopRepos={analyticsTopRepos}
-            analyticsStats={analyticsStats}
-            isAnalyticsLoading={isAnalyticsLoading}
-            analyticsError={analyticsError}
-            recentLogsData={recentLogsData}
-            isAnalyticsRefreshing={isAnalyticsRefreshing}
-            onRefresh={() => fetchAnalytics(true)}
-            shouldReduceMotion={shouldReduceMotion}
-          />
+          {/* Tab bar */}
+          <div className="-mx-1 mb-10 flex items-center gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50/80 p-1.5 w-fit">
+            {ADMIN_TABS.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`shrink-0 rounded-xl px-4 py-2.5 text-sm font-bold transition-all ${
+                  activeTab === tab.key
+                    ? "bg-[#1d4ed8] text-white shadow-lg shadow-blue-500/20"
+                    : "text-slate-600 hover:text-slate-900"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
 
-          <AdminBroadcastSection
-            onOpenComposer={() => setShowEmailModal(true)}
-          />
+          {activeTab === "analytics" && (
+            <AdminAnalyticsSection
+              analyticsOverview={analyticsOverview}
+              analyticsBreakdown={analyticsBreakdown}
+              analyticsActivity={analyticsActivity}
+              analyticsTopRepos={analyticsTopRepos}
+              analyticsStats={analyticsStats}
+              isAnalyticsLoading={isAnalyticsLoading}
+              analyticsError={analyticsError}
+              recentLogsData={recentLogsData}
+              isAnalyticsRefreshing={isAnalyticsRefreshing}
+              onRefresh={() => fetchAnalytics(true)}
+              shouldReduceMotion={shouldReduceMotion}
+            />
+          )}
+
+          {activeTab === "broadcast" && (
+            <AdminBroadcastSection
+              onOpenComposer={() => setShowEmailModal(true)}
+            />
+          )}
+
+          {activeTab === "subscriptions" && (
+            <AdminSubscriptionSection />
+          )}
         </div>
       </div>
 

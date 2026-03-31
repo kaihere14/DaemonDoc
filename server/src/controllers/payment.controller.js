@@ -44,6 +44,101 @@ const applyProPlan = async (userId, planId) => {
   return expiry;
 };
 
+// ── POST /api/admin/payments/revoke-plan ─────────────────────────────────────
+
+export const adminRevokePlan = async (req, res) => {
+  const { userId } = req.body;
+  if (!userId) return res.status(400).json({ message: "userId is required" });
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    await User.findByIdAndUpdate(userId, {
+      $set: {
+        plan: "free",
+        planInterval: "free",
+        reviewLimit: 1,
+        competitorLimit: 1,
+        activeRepoLimit: 5,
+        planExpiry: null,
+        reviewsUsed: 0,
+        competitorAnalysesUsed: 0,
+        usagePeriodStart: null,
+      },
+    });
+
+    return res.status(200).json({ message: "Plan revoked. User moved to free plan." });
+  } catch (error) {
+    console.error("adminRevokePlan error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// ── GET /api/admin/payments/users-plan ────────────────────────────────────────
+
+const PAGE_SIZE = 10;
+
+export const adminGetUsersWithPlan = async (req, res) => {
+  try {
+    const { search = "", plan = "", page = "1" } = req.query;
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+
+    const filter = {};
+    if (plan) filter.plan = plan;
+    if (search) {
+      filter.$or = [
+        { githubUsername: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    const [users, total] = await Promise.all([
+      User.find(filter)
+        .select("githubUsername email avatarUrl plan planInterval planExpiry reviewLimit competitorLimit activeRepoLimit reviewsUsed competitorAnalysesUsed")
+        .sort({ plan: -1, createdAt: -1 })
+        .skip((pageNum - 1) * PAGE_SIZE)
+        .limit(PAGE_SIZE)
+        .lean(),
+      User.countDocuments(filter),
+    ]);
+
+    return res.status(200).json({
+      users,
+      meta: { total, page: pageNum, limit: PAGE_SIZE, pages: Math.ceil(total / PAGE_SIZE) },
+    });
+  } catch (error) {
+    console.error("adminGetUsersWithPlan error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// ── PATCH /api/admin/payments/update-plan-price ───────────────────────────────
+
+export const adminUpdatePlanPrice = async (req, res) => {
+  const { planId, amount } = req.body;
+  if (!planId || amount == null) {
+    return res.status(400).json({ message: "planId and amount are required" });
+  }
+  if (!Number.isInteger(amount) || amount < 0) {
+    return res.status(400).json({ message: "amount must be a non-negative integer (paise)" });
+  }
+
+  try {
+    const plan = await Plan.findOneAndUpdate(
+      { planId },
+      { $set: { amount } },
+      { new: true },
+    );
+    if (!plan) return res.status(404).json({ message: "Plan not found" });
+
+    return res.status(200).json({ message: "Price updated.", plan });
+  } catch (error) {
+    console.error("adminUpdatePlanPrice error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 // ── GET /api/payments/plans ───────────────────────────────────────────────────
 
 export const getPlans = async (_req, res) => {
