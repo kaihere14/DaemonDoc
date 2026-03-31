@@ -14,7 +14,7 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-const DAY_WINDOW = 14;
+const DAY_WINDOW = 7;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -209,7 +209,7 @@ export const fetchPaymentAdminAnalytics = async (_req, res) => {
       failedPayments,
       latestPayment,
       activePaidUsers,
-      dailyRevenueRaw,
+      plans,
       recentPaymentLogs,
     ] = await Promise.all([
       User.countDocuments({ plan: "pro" }),
@@ -226,31 +226,11 @@ export const fetchPaymentAdminAnalytics = async (_req, res) => {
       PaymentLedger.countDocuments({ status: "failed" }),
       PaymentLedger.findOne(successRevenueMatch).sort({ createdAt: -1 }).lean(),
       User.find({ plan: "pro" })
-        .select("githubUsername email avatarUrl plan planInterval")
+        .select("githubUsername email avatarUrl plan planInterval planExpiry createdAt")
         .lean(),
-      PaymentLedger.aggregate([
-        {
-          $match: {
-            ...successRevenueMatch,
-            createdAt: { $gte: rangeStart },
-          },
-        },
-        {
-          $group: {
-            _id: {
-              day: {
-                $dateToString: {
-                  format: "%Y-%m-%d",
-                  date: "$createdAt",
-                },
-              },
-            },
-            purchases: { $sum: 1 },
-            revenue: { $sum: "$amount" },
-          },
-        },
-        { $sort: { "_id.day": 1 } },
-      ]),
+      Plan.find({ active: true, interval: { $in: ["monthly", "yearly"] } })
+        .select("interval amount billingDays")
+        .lean(),
       PaymentLedger.find({})
         .sort({ createdAt: -1 })
         .limit(20)
@@ -280,26 +260,59 @@ export const fetchPaymentAdminAnalytics = async (_req, res) => {
     const latestPaymentByUser = new Map(
       latestSuccessfulPayments.map((entry) => [String(entry._id), entry]),
     );
+    const planByInterval = new Map(plans.map((plan) => [plan.interval, plan]));
 
     let monthlyPaidUsers = 0;
     let yearlyPaidUsers = 0;
     let mrr = 0;
     let arr = 0;
+    let fallbackRevenue = 0;
 
     activePaidUsers.forEach((user) => {
-      const amount = latestPaymentByUser.get(String(user._id))?.amount || 0;
+      const latestPaymentAmount = latestPaymentByUser.get(String(user._id))?.amount;
+      const fallbackAmount = planByInterval.get(user.planInterval)?.amount || 0;
+      const amount = latestPaymentAmount || fallbackAmount;
 
       if (user.planInterval === "yearly") {
         yearlyPaidUsers += 1;
         arr += amount;
         mrr += Math.round(amount / 12);
+        fallbackRevenue += amount;
         return;
       }
 
       monthlyPaidUsers += 1;
       arr += amount * 12;
       mrr += amount;
+      fallbackRevenue += amount;
     });
+
+    const dailyRevenueRaw = await PaymentLedger.aggregate([
+      {
+        $match: {
+          ...successRevenueMatch,
+          createdAt: {
+            $gte: rangeStart,
+            $lt: new Date(todayStart.getTime() + 24 * 60 * 60 * 1000),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            day: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$createdAt",
+              },
+            },
+          },
+          purchases: { $sum: 1 },
+          revenue: { $sum: "$amount" },
+        },
+      },
+      { $sort: { "_id.day": 1 } },
+    ]);
 
     const dailyLookup = new Map(
       dailyRevenueRaw.map((entry) => [
@@ -307,6 +320,43 @@ export const fetchPaymentAdminAnalytics = async (_req, res) => {
         { purchases: entry.purchases, revenue: entry.revenue },
       ]),
     );
+
+    activePaidUsers.forEach((user) => {
+      if (latestPaymentByUser.has(String(user._id))) {
+        return;
+      }
+
+      const plan = planByInterval.get(user.planInterval);
+      if (!plan) {
+        return;
+      }
+
+      let purchaseDate = null;
+
+      if (user.planExpiry) {
+        purchaseDate = new Date(user.planExpiry);
+        purchaseDate.setDate(
+          purchaseDate.getDate() - plan.billingDays - PLAN_EXPIRY_BUFFER_DAYS,
+        );
+      } else if (user.createdAt) {
+        purchaseDate = new Date(user.createdAt);
+      }
+
+      if (!purchaseDate) {
+        return;
+      }
+
+      const purchaseDay = startOfDay(purchaseDate);
+      if (purchaseDay < rangeStart || purchaseDay > todayStart) {
+        return;
+      }
+
+      const key = toDayKey(purchaseDay);
+      const current = dailyLookup.get(key) || { purchases: 0, revenue: 0 };
+      current.purchases += 1;
+      current.revenue += plan.amount;
+      dailyLookup.set(key, current);
+    });
 
     const activity = Array.from({ length: DAY_WINDOW }, (_, index) => {
       const day = new Date(rangeStart);
@@ -353,14 +403,14 @@ export const fetchPaymentAdminAnalytics = async (_req, res) => {
     return res.status(200).json({
       overview: {
         paidUsers,
-        totalRevenue: totalRevenueResult[0]?.totalRevenue || 0,
+        totalRevenue: totalRevenueResult[0]?.totalRevenue || fallbackRevenue,
         successfulPayments,
         failedPayments,
         monthlyPaidUsers,
         yearlyPaidUsers,
         mrr,
         arr,
-        latestPaymentAt: latestPayment?.createdAt || null,
+        latestPaymentAt: latestPayment?.createdAt || activePaidUsers[0]?.createdAt || null,
       },
       activity,
       recentLogs,

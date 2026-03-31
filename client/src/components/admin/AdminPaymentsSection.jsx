@@ -22,6 +22,62 @@ const formatCurrency = (amount) =>
     maximumFractionDigits: 0,
   }).format((amount || 0) / 100);
 
+const startOfDay = (value) => {
+  const date = new Date(value);
+  date.setHours(0, 0, 0, 0);
+  return date;
+};
+
+const buildSevenDayActivity = (logs, fallbackActivity = []) => {
+  const today = startOfDay(new Date());
+  const rangeStart = new Date(today);
+  rangeStart.setDate(rangeStart.getDate() - 6);
+
+  const activityMap = new Map();
+
+  logs.forEach((log) => {
+    if (log.status !== "success" || !log.amount) {
+      return;
+    }
+
+    const createdAt = new Date(log.createdAt);
+    const day = startOfDay(createdAt);
+    if (day < rangeStart || day > today) {
+      return;
+    }
+
+    const key = day.toISOString().slice(0, 10);
+    const current = activityMap.get(key) || { purchases: 0, revenue: 0 };
+    current.purchases += 1;
+    current.revenue += Number(log.amount) || 0;
+    activityMap.set(key, current);
+  });
+
+  const derived = Array.from({ length: 7 }, (_, index) => {
+    const day = new Date(rangeStart);
+    day.setDate(rangeStart.getDate() + index);
+    const key = day.toISOString().slice(0, 10);
+    const current = activityMap.get(key) || { purchases: 0, revenue: 0 };
+
+    return {
+      date: key,
+      label: day.toLocaleDateString("en-US", { weekday: "short" }),
+      shortDate: day.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      }),
+      purchases: current.purchases,
+      revenue: current.revenue,
+    };
+  });
+
+  const hasDerivedData = derived.some(
+    (day) => day.purchases > 0 || day.revenue > 0,
+  );
+
+  return hasDerivedData ? derived : fallbackActivity;
+};
+
 const toneByStatus = {
   success: {
     bg: "bg-emerald-50",
@@ -40,7 +96,7 @@ const toneByStatus = {
   },
 };
 
-const ChartCard = ({
+const LineChartCard = ({
   title,
   subtitle,
   icon,
@@ -50,7 +106,41 @@ const ChartCard = ({
   fillClass,
   shouldReduceMotion,
 }) => {
+  const gradientId = `${dataKey}-line-gradient`;
+  const areaId = `${dataKey}-area-gradient`;
+  const chartHeight = 220;
+  const chartWidth = 640;
+  const paddingX = 16;
+  const paddingTop = 18;
+  const paddingBottom = 34;
+  const innerHeight = chartHeight - paddingTop - paddingBottom;
+  const innerWidth = chartWidth - paddingX * 2;
   const maxValue = Math.max(...data.map((item) => item[dataKey] || 0), 1);
+
+  const points = data.map((day, index) => {
+    const value = day[dataKey] || 0;
+    const x =
+      data.length === 1
+        ? chartWidth / 2
+        : paddingX + (index / (data.length - 1)) * innerWidth;
+    const y = paddingTop + innerHeight - (value / maxValue) * innerHeight;
+
+    return { x, y, value, day };
+  });
+
+  const linePath = points
+    .map((point, index) =>
+      `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`,
+    )
+    .join(" ");
+
+  const areaPath = points.length
+    ? `${linePath} L ${points[points.length - 1].x.toFixed(2)} ${(
+        chartHeight - paddingBottom
+      ).toFixed(2)} L ${points[0].x.toFixed(2)} ${(
+        chartHeight - paddingBottom
+      ).toFixed(2)} Z`
+    : "";
 
   return (
     <motion.div
@@ -71,37 +161,99 @@ const ChartCard = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-2 sm:grid-cols-14">
-        {data.map((day, index) => {
-          const value = day[dataKey] || 0;
-          const height = Math.max((value / maxValue) * 100, value > 0 ? 12 : 4);
-
-          return (
-            <div key={`${dataKey}-${day.date}`} className="flex flex-col items-center gap-2">
-              <div className="flex h-32 w-full items-end rounded-2xl bg-slate-50 px-1.5 py-2">
-                <motion.div
-                  className={`w-full rounded-xl ${fillClass}`}
-                  initial={{ height: shouldReduceMotion ? `${height}%` : "0%" }}
-                  animate={{ height: `${height}%` }}
-                  transition={{
-                    duration: shouldReduceMotion ? 0 : 0.42,
-                    delay: shouldReduceMotion ? 0 : 0.04 + index * 0.02,
-                    ease: [0.2, 0.8, 0.2, 1],
-                  }}
-                  title={`${day.shortDate}: ${valueFormatter(value)}`}
+      <div className="overflow-hidden rounded-[1.25rem] border border-slate-200 bg-linear-to-b from-slate-50 to-white px-3 py-4">
+        <svg
+          viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+          className="h-56 w-full"
+          preserveAspectRatio="none"
+        >
+          {[0, 0.25, 0.5, 0.75, 1].map((tick) => {
+            const y = paddingTop + innerHeight - tick * innerHeight;
+            return (
+              <g key={tick}>
+                <line
+                  x1={paddingX}
+                  x2={chartWidth - paddingX}
+                  y1={y}
+                  y2={y}
+                  stroke="rgba(148,163,184,0.22)"
+                  strokeDasharray="4 6"
                 />
-              </div>
-              <div className="text-center">
-                <p className="text-xs font-black text-slate-800">
-                  {valueFormatter(value)}
-                </p>
-                <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
-                  {day.label}
-                </p>
-              </div>
+                <text
+                  x={chartWidth - paddingX}
+                  y={y - 6}
+                  textAnchor="end"
+                  className="fill-slate-400 text-[10px] font-bold"
+                >
+                  {valueFormatter(Math.round(maxValue * tick))}
+                </text>
+              </g>
+            );
+          })}
+
+          {areaPath ? (
+            <motion.path
+              d={areaPath}
+              fill={`url(#${areaId})`}
+              initial={{ opacity: shouldReduceMotion ? 1 : 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.35 }}
+            />
+          ) : null}
+
+          {linePath ? (
+            <motion.path
+              d={linePath}
+              fill="none"
+              stroke={`url(#${gradientId})`}
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              initial={{ pathLength: shouldReduceMotion ? 1 : 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.8, ease: "easeOut" }}
+            />
+          ) : null}
+
+          {points.map((point, index) => (
+            <motion.g
+              key={`${dataKey}-${point.day.date}`}
+              initial={{ opacity: shouldReduceMotion ? 1 : 0, scale: shouldReduceMotion ? 1 : 0.7 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                duration: shouldReduceMotion ? 0 : 0.24,
+                delay: shouldReduceMotion ? 0 : 0.1 + index * 0.025,
+              }}
+            >
+              <circle cx={point.x} cy={point.y} r="6" fill="white" />
+              <circle cx={point.x} cy={point.y} r="4" className={fillClass} />
+            </motion.g>
+          ))}
+
+          <defs>
+            <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#2563eb" />
+              <stop offset="100%" stopColor="#06b6d4" />
+            </linearGradient>
+            <linearGradient id={areaId} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="rgba(37,99,235,0.22)" />
+              <stop offset="100%" stopColor="rgba(37,99,235,0.02)" />
+            </linearGradient>
+          </defs>
+        </svg>
+
+        <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-7">
+          {data.map((day) => (
+            <div key={`${dataKey}-label-${day.date}`} className="text-center">
+              <p className="text-xs font-black text-slate-800">
+                {valueFormatter(day[dataKey] || 0)}
+              </p>
+              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                {day.label}
+              </p>
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
     </motion.div>
   );
@@ -111,10 +263,12 @@ const AdminPaymentsSection = ({
   sectionNumber = "02",
   shouldReduceMotion,
 }) => {
+  const LOGS_PER_PAGE = 6;
   const [analytics, setAnalytics] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
   const [error, setError] = React.useState("");
+  const [logsPage, setLogsPage] = React.useState(1);
 
   const fetchPaymentAnalytics = React.useCallback(async (refresh = false) => {
     if (refresh) {
@@ -127,6 +281,7 @@ const AdminPaymentsSection = ({
       const { data } = await api.get(ENDPOINTS.ADMIN_PAYMENT_ANALYTICS);
       setAnalytics(data);
       setError("");
+      setLogsPage(1);
     } catch (fetchError) {
       console.error("Error loading payment analytics:", fetchError);
       setError(
@@ -144,10 +299,33 @@ const AdminPaymentsSection = ({
   }, [fetchPaymentAnalytics]);
 
   const overview = analytics?.overview || {};
-  const activity = Array.isArray(analytics?.activity) ? analytics.activity : [];
   const recentLogs = Array.isArray(analytics?.recentLogs)
     ? analytics.recentLogs
     : [];
+  const activity = buildSevenDayActivity(
+    recentLogs,
+    Array.isArray(analytics?.activity) ? analytics.activity : [],
+  );
+  const totalLogPages = Math.max(1, Math.ceil(recentLogs.length / LOGS_PER_PAGE));
+  const paginatedLogs = recentLogs.slice(
+    (logsPage - 1) * LOGS_PER_PAGE,
+    logsPage * LOGS_PER_PAGE,
+  );
+  const logPaginationItems = Array.from(
+    { length: totalLogPages },
+    (_, index) => index + 1,
+  )
+    .filter(
+      (page) =>
+        page === 1 || page === totalLogPages || Math.abs(page - logsPage) <= 1,
+    )
+    .reduce((acc, page, index, pages) => {
+      if (index > 0 && page - pages[index - 1] > 1) {
+        acc.push("…");
+      }
+      acc.push(page);
+      return acc;
+    }, []);
 
   const cards = [
     {
@@ -358,24 +536,24 @@ const AdminPaymentsSection = ({
             </motion.div>
 
             <div className="grid gap-5 xl:grid-cols-2">
-              <ChartCard
+              <LineChartCard
                 title="Daily Buyers"
-                subtitle="Successful purchases across the last 14 days"
+                subtitle="Successful purchases across the last 7 days"
                 icon={<Users size={18} />}
                 data={activity}
                 dataKey="purchases"
                 valueFormatter={(value) => value}
-                fillClass="bg-linear-to-t from-blue-600 to-sky-400"
+                fillClass="fill-blue-600"
                 shouldReduceMotion={shouldReduceMotion}
               />
-              <ChartCard
+              <LineChartCard
                 title="Daily Revenue"
-                subtitle="Captured money transferred each day"
+                subtitle="Captured money transferred across the last 7 days"
                 icon={<BadgeIndianRupee size={18} />}
                 data={activity}
                 dataKey="revenue"
                 valueFormatter={(value) => `₹${Math.round((value || 0) / 100)}`}
-                fillClass="bg-linear-to-t from-emerald-600 to-sky-400"
+                fillClass="fill-emerald-600"
                 shouldReduceMotion={shouldReduceMotion}
               />
             </div>
@@ -403,8 +581,9 @@ const AdminPaymentsSection = ({
                   No payment events yet.
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-slate-200 text-left">
+                <div className="space-y-4">
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-slate-200 text-left">
                     <thead>
                       <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                         <th className="pb-3 pr-4">User</th>
@@ -416,7 +595,7 @@ const AdminPaymentsSection = ({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {recentLogs.map((log) => {
+                      {paginatedLogs.map((log) => {
                         const tone = toneByStatus[log.status] || toneByStatus.pending;
                         const username =
                           log.user?.githubUsername || log.user?.email || "Unknown user";
@@ -474,7 +653,63 @@ const AdminPaymentsSection = ({
                         );
                       })}
                     </tbody>
-                  </table>
+                    </table>
+                  </div>
+
+                  <div className="min-h-[3.5rem] border-t border-dashed border-slate-200 pt-4">
+                    {totalLogPages > 1 ? (
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-slate-400">
+                          {recentLogs.length} event{recentLogs.length !== 1 ? "s" : ""} · page {logsPage} of {totalLogPages}
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setLogsPage((page) => Math.max(1, page - 1))}
+                            disabled={logsPage <= 1 || isLoading}
+                            className="rounded-[0.9rem] border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40"
+                          >
+                            ← Prev
+                          </button>
+                          {logPaginationItems.map((item, index) =>
+                            item === "…" ? (
+                              <span key={`ledger-ellipsis-${index}`} className="px-1 text-xs text-slate-400">
+                                …
+                              </span>
+                            ) : (
+                              <button
+                                key={item}
+                                type="button"
+                                onClick={() => setLogsPage(item)}
+                                disabled={isLoading}
+                                className={`rounded-[0.9rem] px-3 py-1.5 text-xs font-bold transition-colors ${
+                                  item === logsPage
+                                    ? "bg-[#1d4ed8] text-white shadow-sm shadow-blue-500/20"
+                                    : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
+                                }`}
+                              >
+                                {item}
+                              </button>
+                            ),
+                          )}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setLogsPage((page) => Math.min(totalLogPages, page + 1))
+                            }
+                            disabled={logsPage >= totalLogPages || isLoading}
+                            className="rounded-[0.9rem] border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40"
+                          >
+                            Next →
+                          </button>
+                        </div>
+                      </div>
+                    ) : recentLogs.length > 0 ? (
+                      <p className="text-xs text-slate-400">
+                        {recentLogs.length} event{recentLogs.length !== 1 ? "s" : ""}
+                      </p>
+                    ) : null}
+                  </div>
                 </div>
               )}
             </motion.div>
