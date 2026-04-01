@@ -716,14 +716,19 @@ export const resetSubscription = async (req, res) => {
   try {
     const users = await User.find({ plan: "pro" });
     if (!users.length) {
+    const users = await User.find({ plan: "pro" }).select(
+      "_id planInterval planExpiry usagePeriodStart githubAccessToken"
+    ).lean();
+    if (!users.length) {
       return res.status(404).json({ message: "No users found with an active plan" });
     }
 
     await resetQueue.add("reset-job", { users });
 
-    return res
-      .status(200)
-      .json({ message: "Reset Work added in the queue ", users });
+    return res.status(200).json({
+      message: "Reset work added to the queue",
+      userCount: users.length,
+    });
   } catch (error) {
     console.error("Error in resetSubscription:", error);
     return res.status(500).json({ message: "Internal server error" });
