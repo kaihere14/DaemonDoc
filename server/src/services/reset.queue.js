@@ -27,7 +27,7 @@ new Worker(
     }
 
     for (const [idx, data] of users.entries()) {
-      let dateNow = new Date("2027-05-05T10:15:28.430Z");
+      const dateNow = new Date();
 
       console.log(
         `[Reset Queue] Processing user ${idx + 1}/${users.length} (ID: ${data._id})`,
