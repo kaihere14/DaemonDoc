@@ -101,12 +101,24 @@ new Worker(
 // Errors here are swallowed so a logging failure never kills a generation job
 async function updateLogStatus(logId, action, status, commitId = null) {
   try {
-    const log = await UserLogModel.findById(logId);
+    const update = {
+      action,
+      status,
+    };
+
+    if (commitId) {
+      update.commitId = commitId;
+    }
+
+    const log = await UserLogModel.findByIdAndUpdate(logId, update, {
+      new: true,
+      runValidators: true,
+    });
+
     if (log) {
-      log.action = action;
-      log.status = status;
-      if (commitId) log.commitId = commitId;
-      await log.save();
+      console.log(
+        `[AI Handler] Log ${logId} saved as action=${log.action} status=${log.status}`,
+      );
     }
   } catch (err) {
     console.error("[AI Handler] Failed to update log:", err.message);
