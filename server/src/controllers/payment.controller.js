@@ -714,18 +714,16 @@ const handlePaymentCaptured = async (payment) => {
 
 export const resetSubscription = async (req, res) => {
   try {
-    const users = await User.find({ plan: "pro" }).select(
-      "_id planInterval planExpiry usagePeriodStart githubAccessToken"
-    ).lean();
-    if (!users.length) {
-      return res.status(404).json({ message: "No users found with an active plan" });
+    const users = await User.find({ plan: "pro" })
+      .select("_id planInterval planExpiry usagePeriodStart githubAccessToken")
+      .lean();
+    if (users.length) {
+      await resetQueue.add("reset-job", { users });
     }
-
-    await resetQueue.add("reset-job", { users });
 
     return res.status(200).json({
       message: "Reset work added to the queue",
-      userCount: users.length,
+      userCount: users?.length,
     });
   } catch (error) {
     console.error("Error in resetSubscription:", error);
