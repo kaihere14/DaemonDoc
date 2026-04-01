@@ -714,8 +714,6 @@ const handlePaymentCaptured = async (payment) => {
 
 export const resetSubscription = async (req, res) => {
   try {
-    const users = await User.find({ plan: "pro" });
-    if (!users.length) {
     const users = await User.find({ plan: "pro" }).select(
       "_id planInterval planExpiry usagePeriodStart githubAccessToken"
     ).lean();
