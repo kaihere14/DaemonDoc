@@ -29,6 +29,7 @@ const UserLogSchema = new Schema(
       enum: [
         "README_GENERATION_STARTED",
         "README_GENERATION_SUCCESS",
+        "README_GENERATION_SKIPPED",
         "README_GENERATION_FAILED",
         "GITHUB_REPO_CONNECTED",
         "GITHUB_AUTH_FAILED",
@@ -38,7 +39,7 @@ const UserLogSchema = new Schema(
 
     status: {
       type: String,
-      enum: ["success", "failed", "ongoing"],
+      enum: ["success", "failed", "ongoing", "skipped"],
       default: "ongoing",
     },
   },

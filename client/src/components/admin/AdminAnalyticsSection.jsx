@@ -7,10 +7,46 @@ import {
   Activity,
   CheckCircle2,
   XCircle,
+  SkipForward,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import CountUpNumber from "./CountUpNumber";
 import { fadeUpVariant, formatAnalyticsTimestamp } from "./adminUtils";
+
+const STATUS_CONFIG = {
+  success: {
+    label: "Success",
+    color: "text-blue-700",
+    bg: "bg-blue-50",
+    border: "border-blue-100",
+    glow: "shadow-[0_0_12px_-2px_rgba(29,78,216,0.16)]",
+    icon: <CheckCircle2 size={14} />,
+  },
+  failed: {
+    label: "Failed",
+    color: "text-rose-600",
+    bg: "bg-rose-500/10",
+    border: "border-rose-500/20",
+    glow: "shadow-[0_0_12px_-2px_rgba(244,63,94,0.3)]",
+    icon: <XCircle size={14} />,
+  },
+  ongoing: {
+    label: "In progress",
+    color: "text-sky-700",
+    bg: "bg-sky-50",
+    border: "border-sky-100",
+    glow: "shadow-[0_0_12px_-2px_rgba(14,165,233,0.2)]",
+    icon: <Loader2 size={14} className="animate-spin" />,
+  },
+  skipped: {
+    label: "Skipped",
+    color: "text-amber-700",
+    bg: "bg-amber-50",
+    border: "border-amber-100",
+    glow: "shadow-[0_0_12px_-2px_rgba(217,119,6,0.18)]",
+    icon: <SkipForward size={14} />,
+  },
+};
 
 const AdminAnalyticsSection = ({
   analyticsOverview,
@@ -33,33 +69,6 @@ const AdminAnalyticsSection = ({
     ? analyticsTopRepos
     : [];
   const recentLogs = Array.isArray(recentLogsData) ? recentLogsData : [];
-
-  const config = {
-    success: {
-      label: "Success",
-      color: "text-blue-700",
-      bg: "bg-blue-50",
-      border: "border-blue-100",
-      glow: "shadow-[0_0_12px_-2px_rgba(29,78,216,0.16)]",
-      icon: <CheckCircle2 size={14} />,
-    },
-    failed: {
-      label: "Failed",
-      color: "text-rose-600",
-      bg: "bg-rose-500/10",
-      border: "border-rose-500/20",
-      glow: "shadow-[0_0_12px_-2px_rgba(244,63,94,0.3)]",
-      icon: <XCircle size={14} />,
-    },
-    ongoing: {
-      label: "In progress",
-      color: "text-sky-700",
-      bg: "bg-sky-50",
-      border: "border-sky-100",
-      glow: "shadow-[0_0_12px_-2px_rgba(14,165,233,0.2)]",
-      icon: <Loader2 size={14} className="animate-spin" />,
-    },
-  };
 
   return (
     <section className="mb-8">
@@ -226,7 +235,7 @@ const AdminAnalyticsSection = ({
                   </div>
                 </div>
 
-                <div className="mt-4 grid grid-cols-3 gap-2">
+                <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {[
                     {
                       label: "Success",
@@ -237,6 +246,11 @@ const AdminAnalyticsSection = ({
                       label: "Failed",
                       value: analyticsBreakdown?.failed || 0,
                       className: "bg-rose-50 text-rose-600",
+                    },
+                    {
+                      label: "Skipped",
+                      value: analyticsBreakdown?.skipped || 0,
+                      className: "bg-amber-50 text-amber-700",
                     },
                     {
                       label: "Live",
@@ -353,13 +367,8 @@ const AdminAnalyticsSection = ({
                   ) : (
                     recentLogs.map((log, index) =>
                       (() => {
-                        const statusKey =
-                          log.status === "success"
-                            ? "success"
-                            : log.status === "ongoing"
-                              ? "ongoing"
-                              : "failed";
-                        const statusCfg = config[statusKey];
+                        const statusCfg =
+                          STATUS_CONFIG[log.status] || STATUS_CONFIG.ongoing;
 
                         return (
                           <div

@@ -359,7 +359,11 @@ const aihandler = async (data) => {
         console.log(
           `[AI Handler] Patch generation returned null — skipping commit`,
         );
-        await updateLogStatus(data.logId, "README_GENERATION_FAILED", "failed");
+        await updateLogStatus(
+          data.logId,
+          "README_GENERATION_SKIPPED",
+          "skipped",
+        );
         return { skipped: true };
       }
 

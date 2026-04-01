@@ -419,6 +419,7 @@ export const fetchAdminAnalytics = async (_req, res) => {
         success: 0,
         failed: 0,
         ongoing: 0,
+        skipped: 0,
       };
       currentDay.total += 1;
       currentDay[log.status] += 1;
@@ -435,6 +436,7 @@ export const fetchAdminAnalytics = async (_req, res) => {
         success: 0,
         failed: 0,
         ongoing: 0,
+        skipped: 0,
       };
 
       return {
@@ -447,6 +449,7 @@ export const fetchAdminAnalytics = async (_req, res) => {
       success: 0,
       failed: 0,
       ongoing: 0,
+      skipped: 0,
     };
 
     statusBreakdown.forEach((entry) => {

@@ -7,11 +7,52 @@ import {
   RefreshCw,
   Loader2,
   History,
+  SkipForward,
 } from "lucide-react";
 import AuthNavigation from "../components/AuthNavigation";
 import SEO from "../components/SEO";
 import { useRequireAuth } from "../hooks/useRequireAuth";
 import { api, ENDPOINTS } from "../lib/api";
+
+const STATUS_CONFIG = {
+  success: {
+    label: "Success",
+    color: "text-blue-700",
+    bg: "bg-blue-50",
+    border: "border-blue-100",
+    glow: "shadow-[0_0_12px_-2px_rgba(29,78,216,0.16)]",
+    icon: <CheckCircle2 size={14} />,
+    panelTone: "bg-blue-50 border-blue-100 text-blue-600 group-hover:bg-white",
+  },
+  failed: {
+    label: "Failed",
+    color: "text-rose-600",
+    bg: "bg-rose-500/10",
+    border: "border-rose-500/20",
+    glow: "shadow-[0_0_12px_-2px_rgba(244,63,94,0.3)]",
+    icon: <XCircle size={14} />,
+    panelTone: "bg-rose-50 border-rose-100 text-rose-500",
+  },
+  ongoing: {
+    label: "In progress",
+    color: "text-sky-700",
+    bg: "bg-sky-50",
+    border: "border-sky-100",
+    glow: "shadow-[0_0_12px_-2px_rgba(14,165,233,0.2)]",
+    icon: <Loader2 size={14} className="animate-spin" />,
+    panelTone: "bg-sky-50 border-sky-100 text-sky-600 group-hover:bg-white",
+  },
+  skipped: {
+    label: "Skipped",
+    color: "text-amber-700",
+    bg: "bg-amber-50",
+    border: "border-amber-100",
+    glow: "shadow-[0_0_12px_-2px_rgba(217,119,6,0.18)]",
+    icon: <SkipForward size={14} />,
+    panelTone:
+      "bg-amber-50 border-amber-100 text-amber-600 group-hover:bg-white",
+  },
+};
 
 const Logs = () => {
   useRequireAuth();
@@ -41,34 +82,7 @@ const Logs = () => {
   };
 
   const StatusBadge = ({ status }) => {
-    const config = {
-      success: {
-        label: "Success",
-        color: "text-blue-700",
-        bg: "bg-blue-50",
-        border: "border-blue-100",
-        glow: "shadow-[0_0_12px_-2px_rgba(29,78,216,0.16)]",
-        icon: <CheckCircle2 size={14} />,
-      },
-      failed: {
-        label: "Failed",
-        color: "text-rose-600",
-        bg: "bg-rose-500/10",
-        border: "border-rose-500/20",
-        glow: "shadow-[0_0_12px_-2px_rgba(244,63,94,0.3)]",
-        icon: <XCircle size={14} />,
-      },
-      ongoing: {
-        label: "In progress",
-        color: "text-sky-700",
-        bg: "bg-sky-50",
-        border: "border-sky-100",
-        glow: "shadow-[0_0_12px_-2px_rgba(14,165,233,0.2)]",
-        icon: <Loader2 size={14} className="animate-spin" />,
-      },
-    };
-
-    const s = config[status] || config.ongoing;
+    const s = STATUS_CONFIG[status] || STATUS_CONFIG.ongoing;
 
     return (
       <div
@@ -126,7 +140,7 @@ const Logs = () => {
           </div>
 
           {/* Stats Bar */}
-          <div className="mb-8 grid grid-cols-2 gap-3 sm:mb-10 sm:gap-4 md:grid-cols-4">
+          <div className="mb-8 grid grid-cols-2 gap-3 sm:mb-10 sm:gap-4 md:grid-cols-5">
             {[
               {
                 label: "Total",
@@ -145,6 +159,12 @@ const Logs = () => {
                 val: logs.filter((l) => l.status === "failed").length,
                 color: "text-rose-600",
                 bg: "bg-rose-50/50",
+              },
+              {
+                label: "Skipped",
+                val: logs.filter((l) => l.status === "skipped").length,
+                color: "text-amber-700",
+                bg: "bg-amber-50/70",
               },
               {
                 label: "Active",
@@ -239,6 +259,7 @@ const LogItem = ({ log, index, StatusBadge }) => {
     log.commitId && log.repoOwner
       ? `https://github.com/${log.repoOwner}/${log.repoName}/commit/${log.commitId}`
       : null;
+  const statusConfig = STATUS_CONFIG[log.status] || STATUS_CONFIG.ongoing;
 
   return (
     <motion.div
@@ -253,11 +274,7 @@ const LogItem = ({ log, index, StatusBadge }) => {
       >
         <div className="flex min-w-0 items-start gap-3 sm:gap-5">
           <div
-            className={`mt-1 rounded-2xl border p-2.5 transition-all sm:p-3 ${
-              log.status === "failed"
-                ? "bg-rose-50 border-rose-100 text-rose-500"
-                : "bg-blue-50 border-blue-100 text-blue-600 group-hover:bg-white"
-            }`}
+            className={`mt-1 rounded-2xl border p-2.5 transition-all sm:p-3 ${statusConfig.panelTone}`}
           >
             <GitBranch size={20} />
           </div>
