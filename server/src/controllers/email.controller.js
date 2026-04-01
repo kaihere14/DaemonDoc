@@ -19,7 +19,8 @@ export const sendFeatureUpdateEmail = async (req, res) => {
       recipientUserIds !== undefined &&
       (!Array.isArray(recipientUserIds) ||
         recipientUserIds.some(
-          (recipientId) => typeof recipientId !== "string" || !recipientId.trim(),
+          (recipientId) =>
+            typeof recipientId !== "string" || !recipientId.trim(),
         ))
     ) {
       return res.status(400).json({ message: "Invalid recipient list" });

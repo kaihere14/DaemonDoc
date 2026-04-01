@@ -8,6 +8,7 @@ import { PLAN_EXPIRY_BUFFER_DAYS } from "../config/pricingPlans.js";
 import { getUsageSummary } from "../utils/usageTracker.js";
 import { decrypt } from "./oauthcontroller.js";
 import { GITHUB_API_BASE, githubDelete } from "../utils/githubApiClient.js";
+import { resetQueue } from "../services/reset.queue.js";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -150,7 +151,9 @@ export const adminGetUsersWithPlan = async (req, res) => {
 
     const [users, total] = await Promise.all([
       User.find(filter)
-        .select("githubUsername email avatarUrl plan planInterval planExpiry reviewLimit competitorLimit activeRepoLimit reviewsUsed competitorAnalysesUsed")
+        .select(
+          "githubUsername email avatarUrl plan planInterval planExpiry reviewLimit competitorLimit activeRepoLimit reviewsUsed competitorAnalysesUsed",
+        )
         .sort({ plan: -1, createdAt: -1 })
         .skip((pageNum - 1) * PAGE_SIZE)
         .limit(PAGE_SIZE)
@@ -160,7 +163,12 @@ export const adminGetUsersWithPlan = async (req, res) => {
 
     return res.status(200).json({
       users,
-      meta: { total, page: pageNum, limit: PAGE_SIZE, pages: Math.ceil(total / PAGE_SIZE) },
+      meta: {
+        total,
+        page: pageNum,
+        limit: PAGE_SIZE,
+        pages: Math.ceil(total / PAGE_SIZE),
+      },
     });
   } catch (error) {
     console.error("adminGetUsersWithPlan error:", error);
@@ -176,7 +184,9 @@ export const adminUpdatePlanPrice = async (req, res) => {
     return res.status(400).json({ message: "planId and amount are required" });
   }
   if (!Number.isInteger(amount) || amount < 0) {
-    return res.status(400).json({ message: "amount must be a non-negative integer (paise)" });
+    return res
+      .status(400)
+      .json({ message: "amount must be a non-negative integer (paise)" });
   }
 
   try {
@@ -226,7 +236,9 @@ export const fetchPaymentAdminAnalytics = async (_req, res) => {
       PaymentLedger.countDocuments({ status: "failed" }),
       PaymentLedger.findOne(successRevenueMatch).sort({ createdAt: -1 }).lean(),
       User.find({ plan: "pro" })
-        .select("githubUsername email avatarUrl plan planInterval planExpiry createdAt")
+        .select(
+          "githubUsername email avatarUrl plan planInterval planExpiry createdAt",
+        )
         .lean(),
       Plan.find({ active: true, interval: { $in: ["monthly", "yearly"] } })
         .select("interval amount billingDays")
@@ -269,7 +281,9 @@ export const fetchPaymentAdminAnalytics = async (_req, res) => {
     let fallbackRevenue = 0;
 
     activePaidUsers.forEach((user) => {
-      const latestPaymentAmount = latestPaymentByUser.get(String(user._id))?.amount;
+      const latestPaymentAmount = latestPaymentByUser.get(
+        String(user._id),
+      )?.amount;
       const fallbackAmount = planByInterval.get(user.planInterval)?.amount || 0;
       const amount = latestPaymentAmount || fallbackAmount;
 
@@ -410,7 +424,8 @@ export const fetchPaymentAdminAnalytics = async (_req, res) => {
         yearlyPaidUsers,
         mrr,
         arr,
-        latestPaymentAt: latestPayment?.createdAt || activePaidUsers[0]?.createdAt || null,
+        latestPaymentAt:
+          latestPayment?.createdAt || activePaidUsers[0]?.createdAt || null,
       },
       activity,
       recentLogs,
@@ -447,7 +462,9 @@ export const getMyPlan = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const [latestPayment, usage] = await Promise.all([
-      PaymentLedger.findOne({ userId: req.userId, status: "success" }).sort({ createdAt: -1 }),
+      PaymentLedger.findOne({ userId: req.userId, status: "success" }).sort({
+        createdAt: -1,
+      }),
       getUsageSummary(req.userId),
     ]);
 
@@ -515,13 +532,10 @@ export const createOrder = async (req, res) => {
 // This is the fast path — webhook is the reliable fallback.
 
 export const verifyPayment = async (req, res) => {
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+    req.body;
 
-  if (
-    !razorpay_order_id ||
-    !razorpay_payment_id ||
-    !razorpay_signature
-  ) {
+  if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
     return res.status(400).json({ message: "Missing payment fields" });
   }
 
@@ -541,9 +555,13 @@ export const verifyPayment = async (req, res) => {
   }
 
   // ── Idempotency check — never double-credit ───────────────────────────────
-  const existing = await PaymentLedger.findOne({ razorpayPaymentId: razorpay_payment_id });
+  const existing = await PaymentLedger.findOne({
+    razorpayPaymentId: razorpay_payment_id,
+  });
   if (existing) {
-    return res.status(200).json({ message: "Payment already processed", alreadyProcessed: true });
+    return res
+      .status(200)
+      .json({ message: "Payment already processed", alreadyProcessed: true });
   }
 
   try {
@@ -552,20 +570,28 @@ export const verifyPayment = async (req, res) => {
     const orderUserId = order.notes?.userId;
 
     if (!orderPlanId || !orderUserId) {
-      return res.status(400).json({ message: "Payment order is missing plan metadata" });
+      return res
+        .status(400)
+        .json({ message: "Payment order is missing plan metadata" });
     }
 
     if (orderUserId !== req.userId.toString()) {
-      return res.status(403).json({ message: "Payment order does not belong to this user" });
+      return res
+        .status(403)
+        .json({ message: "Payment order does not belong to this user" });
     }
 
     const plan = await Plan.findOne({ planId: orderPlanId, active: true });
     if (!plan) {
-      return res.status(400).json({ message: "Invalid plan ID on payment order" });
+      return res
+        .status(400)
+        .json({ message: "Invalid plan ID on payment order" });
     }
 
     if (order.amount !== plan.amount || order.currency !== plan.currency) {
-      return res.status(400).json({ message: "Payment order does not match plan pricing" });
+      return res
+        .status(400)
+        .json({ message: "Payment order does not match plan pricing" });
     }
 
     const user = await User.findById(req.userId);
@@ -651,7 +677,9 @@ const handlePaymentCaptured = async (payment) => {
   }
 
   // Idempotency check
-  const existing = await PaymentLedger.findOne({ razorpayPaymentId: paymentId });
+  const existing = await PaymentLedger.findOne({
+    razorpayPaymentId: paymentId,
+  });
   if (existing) {
     return; // already handled by verify endpoint — skip silently
   }
@@ -679,5 +707,30 @@ const handlePaymentCaptured = async (payment) => {
     razorpayResponse: payment,
   });
 
-  console.log(`Webhook: Pro plan activated for user ${userId} via payment ${paymentId}`);
+  console.log(
+    `Webhook: Pro plan activated for user ${userId} via payment ${paymentId}`,
+  );
+};
+
+export const resetSubscription = async (req, res) => {
+  try {
+    const users = await User.find({ plan: "pro" });
+    if (!users.length) {
+    const users = await User.find({ plan: "pro" }).select(
+      "_id planInterval planExpiry usagePeriodStart githubAccessToken"
+    ).lean();
+    if (!users.length) {
+      return res.status(404).json({ message: "No users found with an active plan" });
+    }
+
+    await resetQueue.add("reset-job", { users });
+
+    return res.status(200).json({
+      message: "Reset work added to the queue",
+      userCount: users.length,
+    });
+  } catch (error) {
+    console.error("Error in resetSubscription:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };

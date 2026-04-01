@@ -2,47 +2,7 @@ import User from "../schema/user.schema.js";
 
 const USAGE_PERIOD_DAYS = 30;
 
-/**
- * For yearly plans only: roll the usage period forward if 30 days have passed.
- * Monthly plans do NOT reset — their quota covers the full 30+4 day billing period.
- * Returns the (possibly updated) user document.
- */
-const rollPeriodIfExpired = async (user) => {
-  // Monthly plan or free — never reset mid-period
-  if (user.planInterval !== "yearly") return user;
 
-  if (!user.usagePeriodStart) {
-    return User.findByIdAndUpdate(
-      user._id,
-      { $set: { usagePeriodStart: new Date(), reviewsUsed: 0, competitorAnalysesUsed: 0 } },
-      { new: true },
-    );
-  }
-
-  const periodStartMs = new Date(user.usagePeriodStart).getTime();
-  const periodLengthMs = USAGE_PERIOD_DAYS * 24 * 60 * 60 * 1000;
-  const now = Date.now();
-
-  if (now - periodStartMs >= periodLengthMs) {
-    // Roll the period start forward by however many full 30-day blocks have passed
-    const periodsElapsed = Math.floor((now - periodStartMs) / periodLengthMs);
-    const newPeriodStart = new Date(periodStartMs + periodsElapsed * periodLengthMs);
-
-    return User.findByIdAndUpdate(
-      user._id,
-      {
-        $set: {
-          usagePeriodStart: newPeriodStart,
-          reviewsUsed: 0,
-          competitorAnalysesUsed: 0,
-        },
-      },
-      { new: true },
-    );
-  }
-
-  return user;
-};
 
 /**
  * Check whether the user can perform an action, and if so atomically
@@ -56,8 +16,7 @@ export const checkAndIncrementUsage = async (userId, type) => {
   let user = await User.findById(userId);
   if (!user) throw new Error("User not found");
 
-  // Roll forward if the 30-day period has expired
-  user = await rollPeriodIfExpired(user);
+
 
   const usedField = type === "review" ? "reviewsUsed" : "competitorAnalysesUsed";
   const limitField = type === "review" ? "reviewLimit" : "competitorLimit";
@@ -105,7 +64,7 @@ export const getUsageSummary = async (userId) => {
   let user = await User.findById(userId);
   if (!user) throw new Error("User not found");
 
-  user = await rollPeriodIfExpired(user);
+
 
   // For yearly plans: resetAt is 30 days from period start.
   // For monthly plans: quota covers the full billing period — show plan expiry instead.
