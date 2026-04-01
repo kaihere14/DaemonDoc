@@ -6,7 +6,7 @@ import { sendEmail } from "./email.service.js";
 const MAX_CONCURRENCY = 2;
 const EMAIL_QUEUE_NAME = "email-broadcast";
 
-const redisConnection = new IORedis({
+export const redisConnection = new IORedis({
   host: process.env.REDIS_HOST || "localhost",
   port: Number(process.env.REDIS_PORT || 6379),
   password: process.env.REDIS_PASSWORD,
