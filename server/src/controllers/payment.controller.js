@@ -715,7 +715,9 @@ const handlePaymentCaptured = async (payment) => {
 export const resetSubscription = async (req, res) => {
   try {
     const users = await User.find({ plan: "pro" });
-    if (!users) return res.status(404).json("no user found with a active plan");
+    if (!users.length) {
+      return res.status(404).json({ message: "No users found with an active plan" });
+    }
 
     await resetQueue.add("reset-job", { users });
 
