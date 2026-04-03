@@ -24,6 +24,13 @@ const Testemonials = () => {
       designation: "Backend Developer",
       src: "/gurudwas.webp",
     },
+    {
+      quote:
+        "As someone who juggles both frontend and backend, writing documentation always fell through the cracks. This tool handles it automatically and the output actually reflects how our APIs and components work together.",
+      name: "Aakarsh",
+      designation: "Full Stack Developer",
+      src: "/aakarsh.webp",
+    },
   ];
 
   return (

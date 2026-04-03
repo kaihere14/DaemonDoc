@@ -20,8 +20,8 @@ const Footer = () => {
         {/* Top grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16 pb-16">
           {/* Brand column */}
-          <div className="md:col-span-8 flex flex-col gap-6">
-            <div className="flex items-center gap-2">
+          <div className="md:col-span-8 flex flex-col gap-6 relative">
+            <div className="flex items-center gap-2 absolute  -left-9 sm:-left-14 top-0">
               <img
                 src="/DaemonLogo.png"
                 alt="DaemonDoc"
