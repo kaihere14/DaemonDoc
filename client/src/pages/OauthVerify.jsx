@@ -48,12 +48,12 @@ const OauthVerify = () => {
   }, [navigate, login]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
+      <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-xl">
         {status === "verifying" && (
           <div className="space-y-4">
             <div className="flex justify-center">
-              <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
+              <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-gray-900"></div>
             </div>
             <h2 className="text-2xl font-bold text-gray-900">Verifying...</h2>
             <p className="text-gray-500">
@@ -65,9 +65,9 @@ const OauthVerify = () => {
         {status === "success" && (
           <div className="space-y-4">
             <div className="flex justify-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
                 <svg
-                  className="w-8 h-8 text-green-600"
+                  className="h-8 w-8 text-green-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -91,9 +91,9 @@ const OauthVerify = () => {
         {status === "error" && (
           <div className="space-y-4">
             <div className="flex justify-center">
-              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
                 <svg
-                  className="w-8 h-8 text-red-600"
+                  className="h-8 w-8 text-red-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

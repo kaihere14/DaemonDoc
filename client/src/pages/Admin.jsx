@@ -326,21 +326,21 @@ const Admin = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-white via-slate-50/70 to-white relative overflow-x-hidden">
+    <div className="relative min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white">
       <AuthNavigation />
 
       {/* Background Decorations */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <div className="absolute top-24 left-[-8rem] h-72 w-72 rounded-full bg-blue-100/60 blur-3xl" />
         <div className="absolute top-48 right-[-6rem] h-80 w-80 rounded-full bg-sky-100/45 blur-3xl" />
       </div>
 
-      <div className="relative z-10 px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-32">
-        <div className="max-w-6xl mx-auto">
+      <div className="relative z-10 px-4 pt-24 pb-16 sm:px-6 sm:pt-32 sm:pb-20">
+        <div className="mx-auto max-w-6xl">
           <AdminHero />
 
           {/* Tab bar */}
-          <div className="-mx-1 mb-10 flex items-center gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50/80 p-1.5 w-fit">
+          <div className="-mx-1 mb-10 flex w-fit items-center gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50/80 p-1.5">
             {ADMIN_TABS.map((tab) => (
               <button
                 key={tab.key}
@@ -378,9 +378,7 @@ const Admin = () => {
             />
           )}
 
-          {activeTab === "subscriptions" && (
-            <AdminSubscriptionSection />
-          )}
+          {activeTab === "subscriptions" && <AdminSubscriptionSection />}
 
           {activeTab === "paid-users" && (
             <AdminPaymentsSection

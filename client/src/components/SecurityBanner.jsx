@@ -44,20 +44,20 @@ const SecurityBanner = () => {
   return (
     <section
       id="security"
-      className="py-24 sm:py-32 bg-[#FAFAFA] border-y border-slate-200 overflow-hidden"
+      className="overflow-hidden border-y border-slate-200 bg-[#FAFAFA] py-24 sm:py-32"
     >
-      <div className="max-w-[1440px] mx-auto px-6 sm:px-10">
-        <div className="grid lg:grid-cols-[450px_1fr] gap-16 lg:gap-24">
+      <div className="mx-auto max-w-[1440px] px-6 sm:px-10">
+        <div className="grid gap-16 lg:grid-cols-[450px_1fr] lg:gap-24">
           {/* Left: Aggressive Security Stance */}
           <div className="flex flex-col items-start text-left">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="flex items-center gap-3 mb-8"
+              className="mb-8 flex items-center gap-3"
             >
-              <div className="w-2 h-2 rounded-full bg-slate-900" />
-              <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">
+              <div className="h-2 w-2 rounded-full bg-slate-900" />
+              <span className="font-mono text-[10px] font-black tracking-[0.3em] text-slate-500 uppercase">
                 Security_Protocol // Tier_01
               </span>
             </motion.div>
@@ -66,20 +66,20 @@ const SecurityBanner = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-[1000] tracking-tighter uppercase leading-[0.9] mb-10"
+              className="mb-10 text-5xl leading-[0.9] font-[1000] tracking-tighter uppercase sm:text-6xl lg:text-7xl"
             >
               Hardened <br />
               <span className="text-slate-300">By Design.</span>
             </motion.h2>
 
-            <div className="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-4">
+            <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex items-center gap-3 text-slate-900">
                 <Lock size={18} />
-                <span className="text-xs font-black uppercase tracking-widest font-mono">
+                <span className="font-mono text-xs font-black tracking-widest uppercase">
                   End-to-End Encryption
                 </span>
               </div>
-              <p className="text-sm text-slate-500 leading-relaxed font-medium">
+              <p className="text-sm leading-relaxed font-medium text-slate-500">
                 DaemonDoc treats your source code as a black box. Our AI
                 analyzes structure (AST) without ever persisting your logic to
                 disk.
@@ -88,7 +88,7 @@ const SecurityBanner = () => {
           </div>
 
           {/* Right: Technical Compliance Grid */}
-          <div className="grid sm:grid-cols-2 gap-px bg-slate-200 border border-slate-200 rounded-3xl overflow-hidden shadow-2xl shadow-slate-200/50">
+          <div className="grid gap-px overflow-hidden rounded-3xl border border-slate-200 bg-slate-200 shadow-2xl shadow-slate-200/50 sm:grid-cols-2">
             {securityPoints.map((point, idx) => (
               <motion.div
                 key={idx}
@@ -96,21 +96,21 @@ const SecurityBanner = () => {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.05 }}
-                className="bg-white p-8 sm:p-10 group hover:bg-slate-50 transition-colors"
+                className="group bg-white p-8 transition-colors hover:bg-slate-50 sm:p-10"
               >
-                <div className="flex items-center justify-between mb-8">
-                  <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-slate-900 transition-colors">
+                <div className="mb-8 flex items-center justify-between">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-50 text-slate-400 transition-colors group-hover:text-slate-900">
                     {point.icon}
                   </div>
-                  <span className="font-mono text-[10px] font-black text-slate-300 group-hover:text-slate-900 transition-colors">
+                  <span className="font-mono text-[10px] font-black text-slate-300 transition-colors group-hover:text-slate-900">
                     {point.code}
                   </span>
                 </div>
 
-                <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 mb-3">
+                <h3 className="mb-3 text-lg font-black tracking-tight text-slate-900 uppercase">
                   {point.title}
                 </h3>
-                <p className="text-sm text-slate-500 leading-relaxed font-medium">
+                <p className="text-sm leading-relaxed font-medium text-slate-500">
                   {point.description}
                 </p>
               </motion.div>
@@ -119,7 +119,7 @@ const SecurityBanner = () => {
         </div>
 
         {/* Bottom Metadata Bar */}
-        <div className="mt-16 flex flex-wrap justify-between items-center gap-6 opacity-30 grayscale contrast-125">
+        <div className="mt-16 flex flex-wrap items-center justify-between gap-6 opacity-30 contrast-125 grayscale">
           <div className="flex items-center gap-8">
             <span className="text-sm font-black tracking-widest uppercase">
               AES-256
@@ -131,7 +131,7 @@ const SecurityBanner = () => {
               SOC2 COMPLIANT
             </span>
           </div>
-          <div className="h-px flex-1 bg-slate-200 mx-8 hidden lg:block" />
+          <div className="mx-8 hidden h-px flex-1 bg-slate-200 lg:block" />
           <div className="font-mono text-[10px] font-bold">
             SHA_256: 4f8e...9a21
           </div>

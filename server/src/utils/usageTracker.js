@@ -2,8 +2,6 @@ import User from "../schema/user.schema.js";
 
 const USAGE_PERIOD_DAYS = 30;
 
-
-
 /**
  * Check whether the user can perform an action, and if so atomically
  * increment the usage counter.
@@ -16,9 +14,8 @@ export const checkAndIncrementUsage = async (userId, type) => {
   let user = await User.findById(userId);
   if (!user) throw new Error("User not found");
 
-
-
-  const usedField = type === "review" ? "reviewsUsed" : "competitorAnalysesUsed";
+  const usedField =
+    type === "review" ? "reviewsUsed" : "competitorAnalysesUsed";
   const limitField = type === "review" ? "reviewLimit" : "competitorLimit";
 
   const limit = user[limitField] ?? 1;
@@ -26,7 +23,8 @@ export const checkAndIncrementUsage = async (userId, type) => {
 
   if (used >= limit) {
     const resetAt = new Date(
-      new Date(user.usagePeriodStart).getTime() + USAGE_PERIOD_DAYS * 24 * 60 * 60 * 1000,
+      new Date(user.usagePeriodStart).getTime() +
+        USAGE_PERIOD_DAYS * 24 * 60 * 60 * 1000,
     );
     return { allowed: false, used, limit, resetAt };
   }
@@ -41,7 +39,8 @@ export const checkAndIncrementUsage = async (userId, type) => {
   if (!updated) {
     // Race condition — another request beat us to the last slot
     const resetAt = new Date(
-      new Date(user.usagePeriodStart).getTime() + USAGE_PERIOD_DAYS * 24 * 60 * 60 * 1000,
+      new Date(user.usagePeriodStart).getTime() +
+        USAGE_PERIOD_DAYS * 24 * 60 * 60 * 1000,
     );
     return { allowed: false, used: limit, limit, resetAt };
   }
@@ -51,7 +50,8 @@ export const checkAndIncrementUsage = async (userId, type) => {
     used: updated[usedField],
     limit,
     resetAt: new Date(
-      new Date(updated.usagePeriodStart).getTime() + USAGE_PERIOD_DAYS * 24 * 60 * 60 * 1000,
+      new Date(updated.usagePeriodStart).getTime() +
+        USAGE_PERIOD_DAYS * 24 * 60 * 60 * 1000,
     ),
   };
 };
@@ -64,14 +64,13 @@ export const getUsageSummary = async (userId) => {
   let user = await User.findById(userId);
   if (!user) throw new Error("User not found");
 
-
-
   // For yearly plans: resetAt is 30 days from period start.
   // For monthly plans: quota covers the full billing period — show plan expiry instead.
   let resetAt;
   if (user.planInterval === "yearly" && user.usagePeriodStart) {
     resetAt = new Date(
-      new Date(user.usagePeriodStart).getTime() + USAGE_PERIOD_DAYS * 24 * 60 * 60 * 1000,
+      new Date(user.usagePeriodStart).getTime() +
+        USAGE_PERIOD_DAYS * 24 * 60 * 60 * 1000,
     );
   } else {
     resetAt = user.planExpiry ?? null;

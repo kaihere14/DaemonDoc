@@ -11,7 +11,7 @@ import {
   Calendar,
   Receipt,
   ChevronRight,
-  Infinity,
+  Infinity as InfinityIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import AuthNavigation from "../components/AuthNavigation";
@@ -137,7 +137,8 @@ const Upgrade = () => {
       rzp.open();
     } catch (error) {
       toast.error(
-        error.response?.data?.message || "Something went wrong. Please try again.",
+        error.response?.data?.message ||
+          "Something went wrong. Please try again.",
       );
       setLoading(false);
     }
@@ -170,7 +171,7 @@ const Upgrade = () => {
         ogUrl="https://daemondoc.online/upgrade"
         canonical="https://daemondoc.online/upgrade"
       />
-      <div className="min-h-screen bg-linear-to-b from-white via-slate-50/70 to-white text-slate-900 font-sans selection:bg-indigo-100 overflow-x-hidden">
+      <div className="min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-indigo-100">
         <AuthNavigation />
 
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -178,9 +179,8 @@ const Upgrade = () => {
           <div className="absolute top-52 right-[-6rem] h-80 w-80 rounded-full bg-sky-100/40 blur-3xl" />
         </div>
 
-        <div className="relative px-4 pb-14 pt-22 sm:px-6 sm:pb-16 sm:pt-24">
-          <div className="max-w-4xl mx-auto">
-
+        <div className="relative px-4 pt-22 pb-14 sm:px-6 sm:pt-24 sm:pb-16">
+          <div className="mx-auto max-w-4xl">
             {/* Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -190,20 +190,20 @@ const Upgrade = () => {
             >
               <button
                 onClick={() => navigate(-1)}
-                className="mb-6 flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-slate-700 transition-colors"
+                className="mb-6 flex items-center gap-1.5 text-sm font-semibold text-slate-400 transition-colors hover:text-slate-700"
               >
                 <ArrowLeft size={15} />
                 Back
               </button>
               <div className="mb-4 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                  <div className="flex items-center gap-2 mb-3">
+                  <div className="mb-3 flex items-center gap-2">
                     <div className="h-1 w-8 rounded-full bg-blue-600" />
-                    <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                    <span className="font-mono text-[10px] font-black tracking-[0.3em] text-slate-400 uppercase">
                       {isPro ? "Subscription" : "Upgrade"}
                     </span>
                   </div>
-                  <h1 className="mb-3 text-3xl font-black uppercase leading-none tracking-tighter text-slate-900 sm:text-5xl">
+                  <h1 className="mb-3 text-3xl leading-none font-black tracking-tighter text-slate-900 uppercase sm:text-5xl">
                     {isPro ? "Your Plan" : "Go Pro"}
                   </h1>
                   <p className="max-w-2xl text-sm font-medium tracking-tight text-slate-500 sm:text-base">
@@ -218,7 +218,6 @@ const Upgrade = () => {
             {/* ── PRO STATE ─────────────────────────────────────────────── */}
             {isPro ? (
               <div className="space-y-5">
-
                 {/* Plan status card */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
@@ -232,20 +231,22 @@ const Upgrade = () => {
                         <Crown size={24} />
                       </div>
                       <div>
-                        <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-blue-400">
+                        <p className="font-mono text-[10px] font-black tracking-[0.24em] text-blue-400 uppercase">
                           Active Plan
                         </p>
-                        <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900">
+                        <h2 className="text-2xl font-black tracking-tight text-slate-900 uppercase">
                           Pro
                         </h2>
                         <div className="mt-1 flex items-center gap-1.5">
                           <span className="h-2 w-2 rounded-full bg-blue-500" />
-                          <span className="text-xs font-semibold text-blue-700">Active</span>
+                          <span className="text-xs font-semibold text-blue-700">
+                            Active
+                          </span>
                         </div>
                       </div>
                     </div>
                     <div className="flex flex-col gap-1 sm:text-right">
-                      <p className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                      <p className="font-mono text-[10px] font-black tracking-[0.22em] text-slate-400 uppercase">
                         Access Until
                       </p>
                       <div className="flex items-center gap-2 sm:justify-end">
@@ -271,7 +272,7 @@ const Upgrade = () => {
                 >
                   <div className="mb-5 flex items-center gap-2">
                     <div className="h-1 w-6 rounded-full bg-blue-600" />
-                    <span className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                    <span className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                       Your Limits
                     </span>
                   </div>
@@ -287,14 +288,20 @@ const Upgrade = () => {
                       {
                         label: "Reviews",
                         unlimited: false,
-                        limit: planData?.usage?.reviews?.limit ?? planData?.reviewLimit ?? 20,
+                        limit:
+                          planData?.usage?.reviews?.limit ??
+                          planData?.reviewLimit ??
+                          20,
                         used: planData?.usage?.reviews?.used ?? 0,
                         resetAt: planData?.usage?.reviews?.resetAt,
                       },
                       {
                         label: "Competitor Analyses",
                         unlimited: false,
-                        limit: planData?.usage?.competitor?.limit ?? planData?.competitorLimit ?? 10,
+                        limit:
+                          planData?.usage?.competitor?.limit ??
+                          planData?.competitorLimit ??
+                          10,
                         used: planData?.usage?.competitor?.used ?? 0,
                         resetAt: planData?.usage?.competitor?.resetAt,
                       },
@@ -303,7 +310,7 @@ const Upgrade = () => {
                         key={item.label}
                         className="rounded-[1.25rem] border border-slate-200 bg-slate-50/80 p-4"
                       >
-                        <p className="mb-1 font-mono text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                        <p className="mb-1 font-mono text-[10px] font-black tracking-[0.22em] text-slate-400 uppercase">
                           {item.label}
                         </p>
                         {planLoading ? (
@@ -311,17 +318,27 @@ const Upgrade = () => {
                         ) : item.unlimited ? (
                           <div className="flex items-center gap-1.5 text-blue-700">
                             <Infinity size={18} strokeWidth={2.5} />
-                            <span className="text-sm font-black">Unlimited</span>
+                            <span className="text-sm font-black">
+                              Unlimited
+                            </span>
                           </div>
                         ) : (
                           <>
                             <p className="text-xl font-black text-slate-900">
-                              {item.used} <span className="text-sm font-semibold text-slate-400">/ {item.limit}</span>
+                              {item.used}{" "}
+                              <span className="text-sm font-semibold text-slate-400">
+                                / {item.limit}
+                              </span>
                             </p>
                             {item.resetAt && (
                               <p className="mt-1 text-[10px] text-slate-400">
-                                {planData?.usage?.planInterval === "yearly" ? "Resets" : "Until"}{" "}
-                                {new Date(item.resetAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                                {planData?.usage?.planInterval === "yearly"
+                                  ? "Resets"
+                                  : "Until"}{" "}
+                                {new Date(item.resetAt).toLocaleDateString(
+                                  "en-IN",
+                                  { day: "numeric", month: "short" },
+                                )}
                               </p>
                             )}
                           </>
@@ -340,7 +357,7 @@ const Upgrade = () => {
                 >
                   <div className="mb-5 flex items-center gap-2">
                     <div className="h-1 w-6 rounded-full bg-blue-600" />
-                    <span className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                    <span className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                       Latest Payment
                     </span>
                   </div>
@@ -348,7 +365,10 @@ const Upgrade = () => {
                   {planLoading ? (
                     <div className="space-y-3">
                       {[1, 2].map((i) => (
-                        <div key={i} className="h-5 w-full animate-pulse rounded bg-slate-100" />
+                        <div
+                          key={i}
+                          className="h-5 w-full animate-pulse rounded bg-slate-100"
+                        />
                       ))}
                     </div>
                   ) : planData?.latestPayment ? (
@@ -357,7 +377,10 @@ const Upgrade = () => {
                         {[
                           {
                             label: "Amount Paid",
-                            value: formatAmount(planData.latestPayment.amount, planData.latestPayment.currency),
+                            value: formatAmount(
+                              planData.latestPayment.amount,
+                              planData.latestPayment.currency,
+                            ),
                           },
                           {
                             label: "Date",
@@ -380,7 +403,7 @@ const Upgrade = () => {
                             key={item.label}
                             className="rounded-[1.25rem] border border-slate-200 bg-slate-50/80 p-4"
                           >
-                            <p className="mb-1 font-mono text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                            <p className="mb-1 font-mono text-[10px] font-black tracking-[0.22em] text-slate-400 uppercase">
                               {item.label}
                             </p>
                             <p
@@ -403,80 +426,87 @@ const Upgrade = () => {
                       </button>
                     </div>
                   ) : (
-                    <p className="text-sm text-slate-400">No payment records found.</p>
+                    <p className="text-sm text-slate-400">
+                      No payment records found.
+                    </p>
                   )}
                 </motion.div>
               </div>
-
             ) : (
               /* ── FREE STATE — purchase form ─────────────────────────── */
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-
                 {/* Plan selector */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.05 }}
-                  className="lg:col-span-3 space-y-4"
+                  className="space-y-4 lg:col-span-3"
                 >
                   <div className="rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.3)] backdrop-blur-sm sm:rounded-[2rem] sm:p-6">
                     <div className="mb-5 flex items-center gap-2">
                       <div className="h-1 w-6 rounded-full bg-blue-600" />
-                      <span className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                      <span className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                         Choose Plan
                       </span>
                     </div>
                     <div className="space-y-3">
-                      {planLoading ? (
-                        [1, 2].map((i) => (
-                          <div key={i} className="h-20 animate-pulse rounded-[1.25rem] bg-slate-100" />
-                        ))
-                      ) : availablePlans.map((plan) => {
-                        const isSelected = selectedPlan === plan.planId;
-                        const period = plan.interval === "yearly" ? "/year" : "/month";
-                        const isYearly = plan.interval === "yearly";
-                        return (
-                          <button
-                            key={plan.planId}
-                            onClick={() => setSelectedPlan(plan.planId)}
-                            className={`relative w-full rounded-[1.25rem] border-2 p-5 text-left transition-all ${
-                              isSelected
-                                ? "border-blue-500 bg-blue-50/60"
-                                : "border-slate-200 bg-slate-50/60 hover:border-slate-300"
-                            }`}
-                          >
-                            {isYearly && (
-                              <span className="absolute right-4 top-4 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wide text-emerald-700">
-                                Save ~33%
-                              </span>
-                            )}
-                            <div className="flex items-center justify-between gap-4">
-                              <div>
-                                <p className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-slate-400 mb-1">
-                                  {plan.name}
-                                </p>
-                                <p className="text-2xl font-black text-slate-900">
-                                  {formatPrice(plan.amount)}
-                                  <span className="text-sm font-semibold text-slate-400">
-                                    {period}
-                                  </span>
-                                </p>
-                              </div>
-                              <div
-                                className={`h-5 w-5 shrink-0 rounded-full border-2 transition-all ${
+                      {planLoading
+                        ? [1, 2].map((i) => (
+                            <div
+                              key={i}
+                              className="h-20 animate-pulse rounded-[1.25rem] bg-slate-100"
+                            />
+                          ))
+                        : availablePlans.map((plan) => {
+                            const isSelected = selectedPlan === plan.planId;
+                            const period =
+                              plan.interval === "yearly" ? "/year" : "/month";
+                            const isYearly = plan.interval === "yearly";
+                            return (
+                              <button
+                                key={plan.planId}
+                                onClick={() => setSelectedPlan(plan.planId)}
+                                className={`relative w-full rounded-[1.25rem] border-2 p-5 text-left transition-all ${
                                   isSelected
-                                    ? "border-blue-500 bg-blue-500"
-                                    : "border-slate-300"
+                                    ? "border-blue-500 bg-blue-50/60"
+                                    : "border-slate-200 bg-slate-50/60 hover:border-slate-300"
                                 }`}
                               >
-                                {isSelected && (
-                                  <Check size={12} className="text-white m-auto mt-0.5" />
+                                {isYearly && (
+                                  <span className="absolute top-4 right-4 rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-black tracking-wide text-emerald-700 uppercase">
+                                    Save ~33%
+                                  </span>
                                 )}
-                              </div>
-                            </div>
-                          </button>
-                        );
-                      })}
+                                <div className="flex items-center justify-between gap-4">
+                                  <div>
+                                    <p className="mb-1 font-mono text-[10px] font-black tracking-[0.22em] text-slate-400 uppercase">
+                                      {plan.name}
+                                    </p>
+                                    <p className="text-2xl font-black text-slate-900">
+                                      {formatPrice(plan.amount)}
+                                      <span className="text-sm font-semibold text-slate-400">
+                                        {period}
+                                      </span>
+                                    </p>
+                                  </div>
+                                  <div
+                                    className={`h-5 w-5 shrink-0 rounded-full border-2 transition-all ${
+                                      isSelected
+                                        ? "border-blue-500 bg-blue-500"
+                                        : "border-slate-300"
+                                    }`}
+                                  >
+                                    {isSelected && (
+                                      <Check
+                                        size={12}
+                                        className="m-auto mt-0.5 text-white"
+                                      />
+                                    )}
+                                  </div>
+                                </div>
+                              </button>
+                            );
+                          })}
                     </div>
                   </div>
 
@@ -485,7 +515,7 @@ const Upgrade = () => {
                     <button
                       onClick={handleUpgrade}
                       disabled={loading}
-                      className="flex w-full items-center justify-center gap-2 rounded-[1rem] bg-[#1d4ed8] px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-[#1e40af] disabled:opacity-60 active:scale-98 sm:rounded-[1.1rem]"
+                      className="flex w-full items-center justify-center gap-2 rounded-[1rem] bg-[#1d4ed8] px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-[#1e40af] active:scale-98 disabled:opacity-60 sm:rounded-[1.1rem]"
                     >
                       {loading ? (
                         <Loader2 size={17} className="animate-spin" />
@@ -508,10 +538,10 @@ const Upgrade = () => {
                   transition={{ delay: 0.1 }}
                   className="lg:col-span-2"
                 >
-                  <div className="rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.3)] backdrop-blur-sm sm:rounded-[2rem] sm:p-6 h-full">
+                  <div className="h-full rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.3)] backdrop-blur-sm sm:rounded-[2rem] sm:p-6">
                     <div className="mb-5 flex items-center gap-2">
                       <div className="h-1 w-6 rounded-full bg-blue-600" />
-                      <span className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                      <span className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                         What You Get
                       </span>
                     </div>

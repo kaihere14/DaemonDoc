@@ -10,7 +10,7 @@ const planSchema = new Schema(
     // Unique identifier used in code e.g. "pro_monthly", "pro_yearly"
     planId: { type: String, required: true, unique: true },
 
-    name: { type: String, required: true },       // "Pro Monthly"
+    name: { type: String, required: true }, // "Pro Monthly"
     interval: {
       type: String,
       enum: ["free", "monthly", "yearly"],

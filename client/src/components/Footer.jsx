@@ -15,28 +15,28 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative bg-linear-to-b from-white via-slate-50/50 to-white pt-24 pb-12 border-t border-slate-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer className="relative border-t border-slate-100 bg-linear-to-b from-white via-slate-50/50 to-white pt-24 pb-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Top grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16 pb-16">
+        <div className="grid grid-cols-1 gap-12 pb-16 md:grid-cols-12 lg:gap-16">
           {/* Brand column */}
-          <div className="md:col-span-8 flex flex-col gap-6 relative">
-            <div className="flex items-center gap-2 absolute  -left-9 sm:-left-14 top-0">
+          <div className="relative flex flex-col gap-6 md:col-span-8">
+            <div className="absolute top-0 -left-9 flex items-center gap-2 sm:-left-14">
               <img
                 src="/DaemonLogo.png"
                 alt="DaemonDoc"
                 className="w-48 sm:w-60"
               />
             </div>
-            <p className="text-slate-600 leading-relaxed font-light max-w-xs text-sm">
+            <p className="max-w-xs text-sm leading-relaxed font-light text-slate-600">
               The automation layer for your codebase documentation.
             </p>
           </div>
 
           {/* Link columns */}
-          <div className="md:col-span-4 grid grid-cols-2 gap-8">
+          <div className="grid grid-cols-2 gap-8 md:col-span-4">
             <div>
-              <h4 className="text-slate-900 font-semibold mb-6 text-xs uppercase tracking-wider">
+              <h4 className="mb-6 text-xs font-semibold tracking-wider text-slate-900 uppercase">
                 Product
               </h4>
               <ul className="space-y-4">
@@ -44,7 +44,7 @@ const Footer = () => {
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="text-slate-600 hover:text-primary transition-colors text-sm"
+                      className="hover:text-primary text-sm text-slate-600 transition-colors"
                     >
                       {link.label}
                     </a>
@@ -53,7 +53,7 @@ const Footer = () => {
               </ul>
             </div>
             <div>
-              <h4 className="text-slate-900 font-semibold mb-6 text-xs uppercase tracking-wider">
+              <h4 className="mb-6 text-xs font-semibold tracking-wider text-slate-900 uppercase">
                 Legal
               </h4>
               <ul className="space-y-4">
@@ -61,7 +61,7 @@ const Footer = () => {
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="text-slate-600 hover:text-primary transition-colors text-sm"
+                      className="hover:text-primary text-sm text-slate-600 transition-colors"
                     >
                       {link.label}
                     </a>
@@ -73,9 +73,9 @@ const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-100 pt-8 md:flex-row">
           <div className="flex items-center gap-8">
-            <span className="text-slate-500 text-sm">
+            <span className="text-sm text-slate-500">
               © {currentYear} DaemonDoc Inc.
             </span>
           </div>
@@ -84,7 +84,7 @@ const Footer = () => {
             {/* X (Twitter) */}
             <a
               href="#"
-              className="text-slate-400 hover:text-slate-900 transition-colors"
+              className="text-slate-400 transition-colors hover:text-slate-900"
               aria-label="X (Twitter)"
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -96,7 +96,7 @@ const Footer = () => {
               href="https://github.com/kaihere14/daemondoc"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-400 hover:text-slate-900 transition-colors"
+              className="text-slate-400 transition-colors hover:text-slate-900"
               aria-label="GitHub"
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">

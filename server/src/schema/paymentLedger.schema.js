@@ -18,12 +18,12 @@ const paymentLedgerSchema = new Schema(
       type: String,
       enum: [
         "subscription_activated", // first payment of a subscription
-        "subscription_renewed",   // recurring monthly/yearly charge
+        "subscription_renewed", // recurring monthly/yearly charge
         "subscription_cancelled", // user or system cancelled
-        "subscription_halted",    // payment failed after retries
-        "payment_failed",         // individual payment failure
-        "plan_downgraded",        // admin or system downgrade to free
-        "admin_grant",            // manually upgraded by admin
+        "subscription_halted", // payment failed after retries
+        "payment_failed", // individual payment failure
+        "plan_downgraded", // admin or system downgrade to free
+        "admin_grant", // manually upgraded by admin
       ],
       required: true,
     },

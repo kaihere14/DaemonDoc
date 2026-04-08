@@ -1,11 +1,5 @@
 import React, { useRef } from "react";
-import {
-  Play,
-  ArrowRight,
-  Lock,
-  GitCommit,
-  FileCheck,
-} from "lucide-react";
+import { Play, ArrowRight, Lock, GitCommit, FileCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Unplug } from "@/components/animate-ui/icons/unplug";
 import { Activity } from "@/components/animate-ui/icons/activity";
@@ -115,11 +109,11 @@ const Hero = () => {
 
   return (
     <main
-      className="relative  pt-36 pb-20 lg:pt-50 lg:pb-24 overflow-hidden"
+      className="relative overflow-hidden pt-36 pb-20 lg:pt-50 lg:pb-24"
       id="hero"
     >
       {/* Subtle SVG Grid Background */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.15] mask-[radial-gradient(100%_100%_at_50%_0%,white,transparent)]">
+      <div className="pointer-events-none absolute inset-0 z-0 mask-[radial-gradient(100%_100%_at_50%_0%,white,transparent)] opacity-[0.15]">
         <svg className="h-full w-full" aria-hidden="true">
           <defs>
             <pattern
@@ -140,34 +134,34 @@ const Hero = () => {
         </svg>
       </div>
 
-      <div className="absolute inset-0  bg-linear-to-b from-transparent via-cyan-50/30  to-white  z-0 pointer-events-none" />
+      <div className="pointer-events-none absolute inset-0 z-0 bg-linear-to-b from-transparent via-cyan-50/30 to-white" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8  relative z-10 text-center">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
         {/* Floating tech icon chips — absolute inside the container so they hug content edges */}
         {FLOATING_ICONS.map((icon) => (
           <div
             key={icon.id}
-            className={`hidden lg:block absolute ${icon.pos} ${icon.anim}`}
+            className={`absolute hidden lg:block ${icon.pos} ${icon.anim}`}
           >
             <div
-              className={`w-8 h-8 rounded-md flex items-center justify-center shadow-lg shadow-slate-200/40 ${icon.rotate}`}
+              className={`flex h-8 w-8 items-center justify-center rounded-md shadow-lg shadow-slate-200/40 ${icon.rotate}`}
               style={{ background: icon.bg }}
             >
-              <img src={icon.logo} alt={icon.id} className="w-8 h-8" />
+              <img src={icon.logo} alt={icon.id} className="h-8 w-8" />
             </div>
           </div>
         ))}
         {/* Headline + CTAs */}
-        <div className="max-w-4xl mx-auto space-y-8">
+        <div className="mx-auto max-w-4xl space-y-8">
           <h1
-            className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight text-slate-900 overflow-visible"
+            className="overflow-visible text-3xl leading-tight font-bold tracking-tight text-slate-900 sm:text-5xl md:text-6xl lg:text-7xl"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Where your code turns into{" "}
-            <span className="relative inline-block text-shadow-md drop-shadow-2xl text-primary font-extrabold mx-1 sm:ml-5 sm:mr-0 transform-[perspective(800px)_rotateY(15deg)_rotateX(5deg)] bg-blue-50/50 px-2 rounded-lg border border-blue-100 shadow-sm leading-tight whitespace-nowrap">
+            <span className="text-primary relative mx-1 inline-block transform-[perspective(800px)_rotateY(15deg)_rotateX(5deg)] rounded-lg border border-blue-100 bg-blue-50/50 px-2 leading-tight font-extrabold whitespace-nowrap shadow-sm drop-shadow-2xl text-shadow-md sm:mr-0 sm:ml-5">
               documentation
               <svg
-                className="absolute -bottom-2 left-0 w-full h-3 text-primary/40"
+                className="text-primary/40 absolute -bottom-2 left-0 h-3 w-full"
                 viewBox="0 0 200 10"
                 preserveAspectRatio="none"
               >
@@ -190,27 +184,27 @@ const Hero = () => {
             with a click
           </h1>
 
-          <p className="text-xl md:text-2xl text-slate-600 font-light max-w-2xl mx-auto leading-relaxed">
+          <p className="mx-auto max-w-2xl text-xl leading-relaxed font-light text-slate-600 md:text-2xl">
             Connect once. We handle the rest. Your README updates automatically
             with every git push.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+          <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
             <button
               onClick={() => {
                 location.href = "/login";
               }}
-              className="group bg-primary group text-shadow-md drop-shadow-2xl cursor-pointer text-white px-8 py-3.5 rounded-full font-medium flex items-center gap-3 hover:bg-primary/90 transition-colors ease-in-out duration-200 shadow-xl"
+              className="group bg-primary group hover:bg-primary/90 flex cursor-pointer items-center gap-3 rounded-full px-8 py-3.5 font-medium text-white shadow-xl drop-shadow-2xl transition-colors duration-200 ease-in-out text-shadow-md"
             >
               <span>Try Now</span>
-              <span className="bg-white group-hover:-rotate-23 drop-shadow-2xl transition-all duration-300 ease-out text-slate-900  rounded-full p-1">
+              <span className="rounded-full bg-white p-1 text-slate-900 drop-shadow-2xl transition-all duration-300 ease-out group-hover:-rotate-23">
                 <ArrowRight size={14} />
               </span>
             </button>
 
             <a
               href="#features"
-              className="text-slate-600 hover:bg-neutral-300/30 p-4 rounded-full font-medium transition duration-300 flex items-center justify-center gap-1"
+              className="flex items-center justify-center gap-1 rounded-full p-4 font-medium text-slate-600 transition duration-300 hover:bg-neutral-300/30"
             >
               View Capabilities
               <ArrowRight size={16} />
@@ -219,10 +213,10 @@ const Hero = () => {
         </div>
 
         {/* 3-step flow */}
-        <div className="max-w-4xl mx-auto mt-16 mb-8 px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center relative">
+        <div className="mx-auto mt-16 mb-8 max-w-4xl px-4">
+          <div className="relative grid grid-cols-1 gap-8 text-center md:grid-cols-3">
             {/* Connecting SVG Flow (desktop only) */}
-            <div className="hidden md:block absolute top-[28px] left-0 w-full h-[80px] z-0 overflow-visible pointer-events-none">
+            <div className="pointer-events-none absolute top-[28px] left-0 z-0 hidden h-[80px] w-full overflow-visible md:block">
               <svg
                 width="100%"
                 height="80"
@@ -233,10 +227,10 @@ const Hero = () => {
                 {/* More visible base path with 'live' flow */}
                 <motion.path
                   d="M 120 40 L 880 40"
-                  stroke="#3b82f6" 
+                  stroke="#3b82f6"
                   strokeWidth="1.5"
                   strokeDasharray="10 10"
-                  className="opacity-40" 
+                  className="opacity-40"
                   animate={{ strokeDashoffset: [0, -20] }}
                   transition={{
                     duration: 3,
@@ -267,16 +261,16 @@ const Hero = () => {
 
             {STEPS.map((step, i) => (
               <AnimateIcon key={i} animateOnHover asChild>
-                <div className="relative border-dashed border border-neutral-200 drop-shadow-xl z-10 bg-white/60 backdrop-blur-sm p-4 rounded-xl group hover:bg-white transition-colors duration-300">
+                <div className="group relative z-10 rounded-xl border border-dashed border-neutral-200 bg-white/60 p-4 drop-shadow-xl backdrop-blur-sm transition-colors duration-300 hover:bg-white">
                   <div
-                    className={`w-12 h-12 ${step.iconClass} rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border transition-shadow group-hover:shadow-md`}
+                    className={`h-12 w-12 ${step.iconClass} mx-auto mb-3 flex items-center justify-center rounded-full border shadow-sm transition-shadow group-hover:shadow-md`}
                   >
                     <step.Icon size={24} />
                   </div>
                   <h3 className="font-bold text-slate-900">
                     {i + 1}. {step.title}
                   </h3>
-                  <p className="text-sm text-slate-500 mt-1">{step.desc}</p>
+                  <p className="mt-1 text-sm text-slate-500">{step.desc}</p>
                 </div>
               </AnimateIcon>
             ))}
@@ -284,20 +278,20 @@ const Hero = () => {
         </div>
 
         {/* README Preview Card */}
-        <div className="mt-12 relative mx-auto max-w-5xl">
+        <div className="relative mx-auto mt-12 max-w-5xl">
           {/* Gradient glow */}
-          <div className="absolute top-0 left-0 right-0 -inset-1 bg-linear-to-r from-blue-500 to-sky-500 rounded-2xl blur opacity-20 animate-pulse-slow" />
+          <div className="animate-pulse-slow absolute -inset-1 top-0 right-0 left-0 rounded-2xl bg-linear-to-r from-blue-500 to-sky-500 opacity-20 blur" />
 
           {/* Browser card */}
-          <div className="relative bg-white rounded-xl shadow-2xl overflow-hidden border border-slate-200">
+          <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl">
             {/* Browser chrome */}
-            <div className="bg-slate-100 px-4 py-3 border-b border-slate-200 flex items-center gap-4">
-              <div className="flex gap-2 shrink-0">
-                <div className="w-3 h-3 rounded-full bg-red-400" />
-                <div className="w-3 h-3 rounded-full bg-amber-400" />
-                <div className="w-3 h-3 rounded-full bg-emerald-400" />
+            <div className="flex items-center gap-4 border-b border-slate-200 bg-slate-100 px-4 py-3">
+              <div className="flex shrink-0 gap-2">
+                <div className="h-3 w-3 rounded-full bg-red-400" />
+                <div className="h-3 w-3 rounded-full bg-amber-400" />
+                <div className="h-3 w-3 rounded-full bg-emerald-400" />
               </div>
-              <div className="flex-1 bg-white rounded-md py-1 pr-20 text-xs text-slate-400 flex items-center justify-center gap-1 font-mono">
+              <div className="flex flex-1 items-center justify-center gap-1 rounded-md bg-white py-1 pr-20 font-mono text-xs text-slate-400">
                 <Lock size={10} className="shrink-0" />
                 daemondoc.online
               </div>
@@ -305,7 +299,7 @@ const Hero = () => {
 
             {/* Video content */}
             <div
-              className="relative w-full aspect-video bg-slate-900 overflow-hidden cursor-pointer"
+              className="relative aspect-video w-full cursor-pointer overflow-hidden bg-slate-900"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
               onClick={handleClick}
@@ -317,23 +311,23 @@ const Hero = () => {
                 muted
                 playsInline
                 preload="metadata"
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
               />
               {/* Image thumbnail overlay */}
               <img
                 src="/landing.png"
                 alt="Demo thumbnail"
-                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 z-10 ${isPlaying ? "opacity-0" : "opacity-100"}`}
+                className={`absolute inset-0 z-10 h-full w-full object-cover transition-opacity duration-300 ${isPlaying ? "opacity-0" : "opacity-100"}`}
               />
 
               {/* Play/pause icon overlay */}
               <div
-                className={`absolute inset-0 flex items-center justify-center bg-black/10 transition-opacity duration-300 pointer-events-none z-20 ${isPlaying ? "opacity-0" : "opacity-100"}`}
+                className={`pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/10 transition-opacity duration-300 ${isPlaying ? "opacity-0" : "opacity-100"}`}
               >
-                <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg border border-white/20">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full border border-white/20 bg-white/20 shadow-lg backdrop-blur-md">
                   <Play
                     size={28}
-                    className="text-white ml-1"
+                    className="ml-1 text-white"
                     fill="currentColor"
                   />
                 </div>
@@ -344,7 +338,7 @@ const Hero = () => {
       </div>
 
       {/* Blend gradient at the bottom */}
-      <div className="absolute bottom-0 left-0 right-0 w-full h-40 bg-linear-to-t from-white to-transparent pointer-events-none z-0" />
+      <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-0 h-40 w-full bg-linear-to-t from-white to-transparent" />
     </main>
   );
 };

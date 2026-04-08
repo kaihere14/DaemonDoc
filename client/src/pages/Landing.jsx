@@ -24,7 +24,7 @@ const LandingPage = () => {
         canonical="https://daemondoc.online/"
       />
       <motion.div
-        className="min-h-screen bg-white text-slate-900 selection:bg-indigo-100 overflow-x-hidden antialiased"
+        className="min-h-screen overflow-x-hidden bg-white text-slate-900 antialiased selection:bg-indigo-100"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
@@ -34,8 +34,8 @@ const LandingPage = () => {
         <Features />
         <Footer />
       </motion.div>
-      </>
-    );
-  };
+    </>
+  );
+};
 
 export default LandingPage;

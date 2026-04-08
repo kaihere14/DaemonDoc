@@ -34,7 +34,7 @@ const Testemonials = () => {
   ];
 
   return (
-    <div className=" px-4 h-full w-full  bg-linear-to-b from-white via-cyan-50/50 to-white">
+    <div className="h-full w-full bg-linear-to-b from-white via-cyan-50/50 to-white px-4">
       <AnimatedTestimonials testimonials={content} autoplay={false} />
     </div>
   );
