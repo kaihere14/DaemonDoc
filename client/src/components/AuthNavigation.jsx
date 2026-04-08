@@ -12,11 +12,13 @@ import {
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { usePostHog } from "@posthog/react";
 
 const AuthNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const posthog = usePostHog();
   const [showDropdown, setShowDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const dropdownRef = useRef(null);
@@ -38,6 +40,8 @@ const AuthNavigation = () => {
   }, [showDropdown]);
 
   const handleLogout = () => {
+    posthog?.capture("user_logged_out");
+    posthog?.reset();
     logout();
     setShowDropdown(false);
     navigate("/");

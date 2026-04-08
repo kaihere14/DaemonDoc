@@ -19,6 +19,7 @@ import SEO from "../components/SEO";
 import { useRequireAuth } from "../hooks/useRequireAuth";
 import { useAuth } from "../context/AuthContext";
 import { api, ENDPOINTS } from "../lib/api";
+import { usePostHog } from "@posthog/react";
 
 const formatPrice = (paise) =>
   new Intl.NumberFormat("en-IN", {
@@ -59,6 +60,7 @@ const Upgrade = () => {
   const [planLoading, setPlanLoading] = useState(true);
   const [availablePlans, setAvailablePlans] = useState([]);
 
+  const posthog = usePostHog();
   const isPro = user?.plan === "pro";
 
   useEffect(() => {
@@ -93,6 +95,10 @@ const Upgrade = () => {
         return;
       }
 
+      posthog?.capture("upgrade_initiated", {
+        plan_id: selectedPlan,
+      });
+
       const { data } = await api.post(ENDPOINTS.PAYMENT_CREATE_ORDER, {
         planId: selectedPlan,
       });
@@ -117,6 +123,11 @@ const Upgrade = () => {
               razorpay_signature: response.razorpay_signature,
               planId: selectedPlan,
             });
+            posthog?.capture("payment_completed", {
+              plan_id: selectedPlan,
+              payment_id: response.razorpay_payment_id,
+              order_id: response.razorpay_order_id,
+            });
             setUser((prev) => ({ ...prev, plan: "pro" }));
             toast.success("Pro plan activated! Welcome aboard.");
             navigate("/home");
@@ -131,11 +142,15 @@ const Upgrade = () => {
 
       const rzp = new window.Razorpay(options);
       rzp.on("payment.failed", () => {
+        posthog?.capture("payment_failed", {
+          plan_id: selectedPlan,
+        });
         toast.error("Payment failed. Please try again.");
         setLoading(false);
       });
       rzp.open();
     } catch (error) {
+      posthog?.captureException(error);
       toast.error(
         error.response?.data?.message ||
           "Something went wrong. Please try again.",

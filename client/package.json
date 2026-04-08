@@ -12,6 +12,7 @@
   "dependencies": {
     "@base-ui/react": "^1.3.0",
     "@fontsource-variable/geist": "^5.2.8",
+    "@posthog/react": "^1.9.0",
     "@tabler/icons-react": "^3.40.0",
     "@tailwindcss/vite": "^4.1.18",
     "@vercel/analytics": "^1.6.1",
@@ -21,6 +22,7 @@
     "framer-motion": "^12.25.0",
     "lucide-react": "^0.562.0",
     "motion": "^12.38.0",
+    "posthog-js": "^1.365.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.12.0",

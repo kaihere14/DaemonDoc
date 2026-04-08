@@ -17,9 +17,11 @@ import SEO from "../components/SEO";
 import { useRequireAuth } from "../hooks/useRequireAuth";
 import { useRepos } from "../hooks/useRepos";
 import { api, ENDPOINTS } from "../lib/api";
+import { usePostHog } from "@posthog/react";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const posthog = usePostHog();
   const { user, isLoading } = useRequireAuth();
   const { repos, loading: statsLoading } = useRepos(user);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -32,6 +34,8 @@ const Profile = () => {
     setIsDeleting(true);
     try {
       await api.delete(ENDPOINTS.AUTH_DELETE);
+      posthog?.capture("account_deleted");
+      posthog?.reset();
       localStorage.removeItem("accessToken");
       navigate("/");
     } catch {

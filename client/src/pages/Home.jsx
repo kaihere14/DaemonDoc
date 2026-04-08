@@ -15,6 +15,7 @@ import { useRequireAuth } from "../hooks/useRequireAuth";
 import { useRepos } from "../hooks/useRepos";
 import { useAuth } from "../context/AuthContext";
 import { api, ENDPOINTS } from "../lib/api";
+import { usePostHog } from "@posthog/react";
 
 const FILTER_TABS = [
   { key: "all", label: "All Repositories" },
@@ -28,6 +29,7 @@ const Home = () => {
   const { user } = useRequireAuth();
   const { setUser } = useAuth();
   const { repos, setRepos, loading, error, fetchRepos } = useRepos(user);
+  const posthog = usePostHog();
   const [filter, setFilter] = useState("all"); // all, active, inactive
   const [searchQuery, setSearchQuery] = useState("");
   const [reposPage, setReposPage] = useState(1);
@@ -173,7 +175,10 @@ const Home = () => {
                   <motion.button
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
-                    onClick={fetchRepos}
+                    onClick={() => {
+                      posthog?.capture("repos_refreshed");
+                      fetchRepos();
+                    }}
                     disabled={loading}
                     className="flex w-full items-center justify-center gap-2 rounded-[1rem] bg-[#1d4ed8] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-[#1e40af] disabled:opacity-50 sm:w-auto sm:rounded-[1.1rem] sm:px-5"
                   >

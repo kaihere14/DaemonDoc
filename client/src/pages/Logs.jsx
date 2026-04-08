@@ -13,6 +13,7 @@ import AuthNavigation from "../components/AuthNavigation";
 import SEO from "../components/SEO";
 import { useRequireAuth } from "../hooks/useRequireAuth";
 import { api, ENDPOINTS } from "../lib/api";
+import { usePostHog } from "@posthog/react";
 
 const STATUS_CONFIG = {
   success: {
@@ -71,6 +72,7 @@ const StatusBadge = ({ status }) => {
 
 const Logs = () => {
   useRequireAuth();
+  const posthog = usePostHog();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -127,7 +129,10 @@ const Logs = () => {
 
             <div className="w-full rounded-[1.5rem] border border-slate-200 bg-white/80 p-2 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.35)] backdrop-blur-sm sm:w-auto sm:rounded-[1.75rem]">
               <button
-                onClick={() => fetchLogs(true)}
+                onClick={() => {
+                  posthog?.capture("logs_refreshed");
+                  fetchLogs(true);
+                }}
                 className="flex w-full items-center justify-center gap-2.5 rounded-[1rem] bg-[#1d4ed8] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-[#1e40af] active:scale-95 sm:w-auto sm:rounded-[1.1rem] sm:px-6"
               >
                 <RefreshCw

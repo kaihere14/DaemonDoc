@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { usePostHog } from "@posthog/react";
 
 const OauthVerify = () => {
   const navigate = useNavigate();
   const [status, setStatus] = useState("verifying");
   const { login } = useAuth();
+  const posthog = usePostHog();
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -25,6 +27,14 @@ const OauthVerify = () => {
         const result = await login(accessToken);
 
         if (result.success) {
+          posthog?.identify(result.user.githubUsername, {
+            email: result.user.email,
+            name: result.user.name,
+            plan: result.user.plan,
+          });
+          posthog?.capture("user_logged_in", {
+            plan: result.user.plan,
+          });
           setStatus("success");
           setTimeout(() => {
             navigate("/home");
@@ -37,6 +47,7 @@ const OauthVerify = () => {
         }
       } catch (error) {
         console.error("Verification error:", error);
+        posthog?.captureException(error);
         setStatus("error");
         setTimeout(() => {
           navigate("/login");
@@ -45,7 +56,7 @@ const OauthVerify = () => {
     };
 
     verifyToken();
-  }, [navigate, login]);
+  }, [navigate, login, posthog]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">

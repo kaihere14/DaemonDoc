@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
 import axios from "axios";
+import { usePostHog } from "@posthog/react";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -30,6 +31,7 @@ const formatPrice = (paise) =>
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const posthog = usePostHog();
   const [monthlyPlan, setMonthlyPlan] = useState(null);
   const [yearlyPlan, setYearlyPlan] = useState(null);
 
@@ -146,7 +148,10 @@ const Pricing = () => {
               </p>
 
               <button
-                onClick={() => navigate("/upgrade")}
+                onClick={() => {
+                  posthog?.capture("pricing_cta_clicked", { plan: "pro" });
+                  navigate("/upgrade");
+                }}
                 className="relative isolate w-full cursor-pointer overflow-hidden rounded-full bg-blue-600 py-3 text-lg font-semibold text-white transition-all after:absolute after:inset-y-0 after:-left-1/2 after:w-1/2 after:translate-x-[-180%] after:skew-x-[-20deg] after:bg-white/40 after:blur-sm after:transition-transform after:duration-700 after:content-[''] hover:brightness-110 hover:after:translate-x-[320%]"
               >
                 <span className="relative z-10">Upgrade to Pro</span>
