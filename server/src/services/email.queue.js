@@ -52,8 +52,9 @@ const RECIPIENT_LIST_PROJECTION = {
   avatarUrl: 1,
 };
 
-const normalizeRecipientIds = (recipientUserIds = []) =>
-  [...new Set(recipientUserIds.map((recipientId) => recipientId.trim()))];
+const normalizeRecipientIds = (recipientUserIds = []) => [
+  ...new Set(recipientUserIds.map((recipientId) => recipientId.trim())),
+];
 
 export const getFeatureUpdateRecipientsList = async () => {
   const [recipients, skippedNoEmail, skippedNotificationsDisabled] =
@@ -93,10 +94,9 @@ export const enqueueFeatureUpdateBroadcast = async ({
   const normalizedRecipientIds = recipientSelectionProvided
     ? normalizeRecipientIds(recipientUserIds)
     : null;
-  const recipientFilter =
-    normalizedRecipientIds
-      ? { _id: { $in: normalizedRecipientIds } }
-      : {};
+  const recipientFilter = normalizedRecipientIds
+    ? { _id: { $in: normalizedRecipientIds } }
+    : {};
 
   const recipients = await User.find(
     { ...ELIGIBLE_RECIPIENT_FILTER, ...recipientFilter },

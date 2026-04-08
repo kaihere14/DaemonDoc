@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Crown,
@@ -39,34 +38,39 @@ const RevokeModal = ({ user, onConfirm, onClose, isLoading }) => {
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+          className="absolute top-4 right-4 rounded-xl p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
         >
           <X size={18} />
         </button>
         <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-rose-100 bg-rose-50">
           <UserX size={26} className="text-rose-500" />
         </div>
-        <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400 mb-1">
+        <p className="mb-1 font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
           Confirm Action
         </p>
-        <h3 className="text-xl font-black uppercase tracking-tight text-slate-900 mb-2">
+        <h3 className="mb-2 text-xl font-black tracking-tight text-slate-900 uppercase">
           Revoke Pro Plan
         </h3>
-        <p className="text-sm leading-relaxed text-slate-500 mb-6">
+        <p className="mb-6 text-sm leading-relaxed text-slate-500">
           This will move{" "}
           <span className="font-semibold text-slate-700">
             @{user.githubUsername || user.email}
           </span>{" "}
-          back to the <span className="font-semibold text-slate-700">free plan</span> immediately,
-          resetting all limits and clearing expiry.
+          back to the{" "}
+          <span className="font-semibold text-slate-700">free plan</span>{" "}
+          immediately, resetting all limits and clearing expiry.
         </p>
         <div className="flex gap-3">
           <button
             onClick={onConfirm}
             disabled={isLoading}
-            className="flex flex-1 items-center justify-center gap-2 rounded-[1.1rem] bg-rose-600 px-5 py-3 text-sm font-bold uppercase tracking-[0.14em] text-white shadow-lg shadow-rose-500/20 transition-all hover:bg-rose-700 disabled:opacity-60"
+            className="flex flex-1 items-center justify-center gap-2 rounded-[1.1rem] bg-rose-600 px-5 py-3 text-sm font-bold tracking-[0.14em] text-white uppercase shadow-lg shadow-rose-500/20 transition-all hover:bg-rose-700 disabled:opacity-60"
           >
-            {isLoading ? <Loader2 size={16} className="animate-spin" /> : <UserX size={16} />}
+            {isLoading ? (
+              <Loader2 size={16} className="animate-spin" />
+            ) : (
+              <UserX size={16} />
+            )}
             Revoke
           </button>
           <button
@@ -111,10 +115,10 @@ const PriceRow = ({ plan, onSave }) => {
   return (
     <div className="flex items-center justify-between rounded-[1.35rem] border border-slate-200 bg-slate-50/70 px-5 py-4">
       <div>
-        <p className="text-sm font-black uppercase tracking-tight text-slate-900">
+        <p className="text-sm font-black tracking-tight text-slate-900 uppercase">
           {plan.name}
         </p>
-        <p className="text-xs text-slate-400 mt-0.5">
+        <p className="mt-0.5 text-xs text-slate-400">
           {plan.interval} · {plan.billingDays} days
         </p>
       </div>
@@ -129,7 +133,7 @@ const PriceRow = ({ plan, onSave }) => {
                 step="1"
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
-                className="w-20 text-sm font-semibold text-slate-900 outline-none bg-transparent"
+                className="w-20 bg-transparent text-sm font-semibold text-slate-900 outline-none"
                 autoFocus
               />
             </div>
@@ -138,7 +142,11 @@ const PriceRow = ({ plan, onSave }) => {
               disabled={saving}
               className="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
             >
-              {saving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+              {saving ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Check size={14} />
+              )}
             </button>
             <button
               onClick={handleCancel}
@@ -154,7 +162,7 @@ const PriceRow = ({ plan, onSave }) => {
             </span>
             <button
               onClick={() => setEditing(true)}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+              className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-50"
             >
               Edit
             </button>
@@ -178,22 +186,27 @@ const AdminSubscriptionSection = ({ sectionNumber = "03" }) => {
   const [revokeTarget, setRevokeTarget] = useState(null);
   const [revokeLoading, setRevokeLoading] = useState(false);
 
-  const fetchUsers = useCallback(async (targetPage = page) => {
-    setUsersLoading(true);
-    try {
-      const params = new URLSearchParams();
-      if (search) params.set("search", search);
-      if (planFilter) params.set("plan", planFilter);
-      params.set("page", String(targetPage));
-      const { data } = await api.get(`${ENDPOINTS.ADMIN_PAYMENT_USERS}?${params}`);
-      setUsers(data.users || []);
-      setMeta(data.meta || { total: 0, page: targetPage, pages: 1 });
-    } catch {
-      toast.error("Failed to load users");
-    } finally {
-      setUsersLoading(false);
-    }
-  }, [search, planFilter, page]);
+  const fetchUsers = useCallback(
+    async (targetPage = page) => {
+      setUsersLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (search) params.set("search", search);
+        if (planFilter) params.set("plan", planFilter);
+        params.set("page", String(targetPage));
+        const { data } = await api.get(
+          `${ENDPOINTS.ADMIN_PAYMENT_USERS}?${params}`,
+        );
+        setUsers(data.users || []);
+        setMeta(data.meta || { total: 0, page: targetPage, pages: 1 });
+      } catch {
+        toast.error("Failed to load users");
+      } finally {
+        setUsersLoading(false);
+      }
+    },
+    [search, planFilter, page],
+  );
 
   // Reset to page 1 when filters change
   useEffect(() => {
@@ -206,9 +219,13 @@ const AdminSubscriptionSection = ({ sectionNumber = "03" }) => {
   }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    api.get(ENDPOINTS.PAYMENT_PLANS).then(({ data }) => {
-      setPlans(data.plans.filter((p) => p.interval !== "free"));
-    }).catch(() => toast.error("Failed to load plans")).finally(() => setPlansLoading(false));
+    api
+      .get(ENDPOINTS.PAYMENT_PLANS)
+      .then(({ data }) => {
+        setPlans(data.plans.filter((p) => p.interval !== "free"));
+      })
+      .catch(() => toast.error("Failed to load plans"))
+      .finally(() => setPlansLoading(false));
   }, []);
 
   const handleRevoke = async () => {
@@ -216,7 +233,9 @@ const AdminSubscriptionSection = ({ sectionNumber = "03" }) => {
     setRevokeLoading(true);
     try {
       await api.post(ENDPOINTS.ADMIN_REVOKE_PLAN, { userId: revokeTarget._id });
-      toast.success(`@${revokeTarget.githubUsername || revokeTarget.email} moved to free plan`);
+      toast.success(
+        `@${revokeTarget.githubUsername || revokeTarget.email} moved to free plan`,
+      );
       setRevokeTarget(null);
       fetchUsers(page);
     } catch (err) {
@@ -228,10 +247,13 @@ const AdminSubscriptionSection = ({ sectionNumber = "03" }) => {
 
   const handlePriceSave = async (planId, paise) => {
     try {
-      await api.patch(ENDPOINTS.ADMIN_UPDATE_PLAN_PRICE, { planId, amount: paise });
+      await api.patch(ENDPOINTS.ADMIN_UPDATE_PLAN_PRICE, {
+        planId,
+        amount: paise,
+      });
       toast.success("Price updated");
       setPlans((prev) =>
-        prev.map((p) => (p.planId === planId ? { ...p, amount: paise } : p))
+        prev.map((p) => (p.planId === planId ? { ...p, amount: paise } : p)),
       );
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to update price");
@@ -242,10 +264,10 @@ const AdminSubscriptionSection = ({ sectionNumber = "03" }) => {
   return (
     <section className="mt-16">
       <div className="mb-4">
-        <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+        <p className="font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
           Section {sectionNumber}
         </p>
-        <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-slate-900 sm:text-3xl">
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900 uppercase sm:text-3xl">
           Subscriptions
         </h2>
       </div>
@@ -254,21 +276,22 @@ const AdminSubscriptionSection = ({ sectionNumber = "03" }) => {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/90 p-6 shadow-[0_20px_60px_-34px_rgba(15,23,42,0.32)] sm:p-8 space-y-10"
+        className="space-y-10 overflow-hidden rounded-[2rem] border border-slate-200 bg-white/90 p-6 shadow-[0_20px_60px_-34px_rgba(15,23,42,0.32)] sm:p-8"
       >
         {/* Pricing editor */}
         <div>
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600">
             <IndianRupee size={28} strokeWidth={1.5} />
           </div>
-          <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+          <p className="font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
             Plan Pricing
           </p>
-          <h3 className="mt-3 text-2xl font-black uppercase tracking-tight text-slate-900 sm:text-3xl">
+          <h3 className="mt-3 text-2xl font-black tracking-tight text-slate-900 uppercase sm:text-3xl">
             Edit Plan Prices
           </h3>
           <p className="mt-3 text-sm leading-relaxed text-slate-500">
-            Update the amount charged for each paid plan. Changes take effect for new purchases immediately.
+            Update the amount charged for each paid plan. Changes take effect
+            for new purchases immediately.
           </p>
           <div className="mt-6 space-y-3">
             {plansLoading ? (
@@ -277,7 +300,11 @@ const AdminSubscriptionSection = ({ sectionNumber = "03" }) => {
               </div>
             ) : (
               plans.map((plan) => (
-                <PriceRow key={plan.planId} plan={plan} onSave={handlePriceSave} />
+                <PriceRow
+                  key={plan.planId}
+                  plan={plan}
+                  onSave={handlePriceSave}
+                />
               ))
             )}
           </div>
@@ -290,32 +317,36 @@ const AdminSubscriptionSection = ({ sectionNumber = "03" }) => {
           <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-rose-100 bg-rose-50 text-rose-500">
             <Crown size={28} strokeWidth={1.5} />
           </div>
-          <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+          <p className="font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
             User Plans
           </p>
-          <h3 className="mt-3 text-2xl font-black uppercase tracking-tight text-slate-900 sm:text-3xl">
+          <h3 className="mt-3 text-2xl font-black tracking-tight text-slate-900 uppercase sm:text-3xl">
             Manage User Access
           </h3>
           <p className="mt-3 text-sm leading-relaxed text-slate-500">
-            Search users and revoke pro access to move them back to the free plan.
+            Search users and revoke pro access to move them back to the free
+            plan.
           </p>
 
           {/* Filters */}
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
-              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search
+                size={15}
+                className="absolute top-1/2 left-3.5 -translate-y-1/2 text-slate-400"
+              />
               <input
                 type="text"
                 placeholder="Search by username or email…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-[1.1rem] border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-4 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition"
+                className="w-full rounded-[1.1rem] border border-slate-200 bg-slate-50 py-2.5 pr-4 pl-9 text-sm text-slate-800 placeholder-slate-400 transition outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
               />
             </div>
             <select
               value={planFilter}
               onChange={(e) => setPlanFilter(e.target.value)}
-              className="rounded-[1.1rem] border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100 transition"
+              className="rounded-[1.1rem] border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 transition outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
             >
               <option value="">All plans</option>
               <option value="free">Free</option>
@@ -324,56 +355,68 @@ const AdminSubscriptionSection = ({ sectionNumber = "03" }) => {
           </div>
 
           {/* User list */}
-          <div className={`mt-4 space-y-2 transition-opacity duration-200 ${usersLoading ? "opacity-50 pointer-events-none" : "opacity-100"}`}>
+          <div
+            className={`mt-4 space-y-2 transition-opacity duration-200 ${usersLoading ? "pointer-events-none opacity-50" : "opacity-100"}`}
+          >
             {/* Skeleton — shown only when there are no rows yet (initial load) */}
             {usersLoading && users.length === 0 ? (
               Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between rounded-[1.35rem] border border-slate-200 bg-slate-50/70 px-5 py-3.5 gap-3"
+                  className="flex items-center justify-between gap-3 rounded-[1.35rem] border border-slate-200 bg-slate-50/70 px-5 py-3.5"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="h-9 w-9 rounded-xl bg-slate-200 shrink-0 animate-pulse" />
-                    <div className="space-y-1.5 min-w-0">
-                      <div className="h-3 w-32 rounded-full bg-slate-200 animate-pulse" />
-                      <div className="h-2.5 w-20 rounded-full bg-slate-100 animate-pulse" />
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="h-9 w-9 shrink-0 animate-pulse rounded-xl bg-slate-200" />
+                    <div className="min-w-0 space-y-1.5">
+                      <div className="h-3 w-32 animate-pulse rounded-full bg-slate-200" />
+                      <div className="h-2.5 w-20 animate-pulse rounded-full bg-slate-100" />
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <div className="h-5 w-10 rounded-full bg-slate-200 animate-pulse" />
-                    <div className="h-7 w-16 rounded-[0.9rem] bg-slate-100 animate-pulse" />
+                  <div className="flex shrink-0 items-center gap-2">
+                    <div className="h-5 w-10 animate-pulse rounded-full bg-slate-200" />
+                    <div className="h-7 w-16 animate-pulse rounded-[0.9rem] bg-slate-100" />
                   </div>
                 </div>
               ))
             ) : !usersLoading && users.length === 0 ? (
-              <p className="py-6 text-center text-sm text-slate-400">No users found.</p>
+              <p className="py-6 text-center text-sm text-slate-400">
+                No users found.
+              </p>
             ) : (
               users.map((u) => (
                 <div
                   key={u._id}
-                  className="flex items-center justify-between rounded-[1.35rem] border border-slate-200 bg-slate-50/70 px-5 py-3.5 gap-3"
+                  className="flex items-center justify-between gap-3 rounded-[1.35rem] border border-slate-200 bg-slate-50/70 px-5 py-3.5"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex min-w-0 items-center gap-3">
                     {u.avatarUrl ? (
-                      <img src={u.avatarUrl} alt="" className="h-9 w-9 rounded-xl object-cover shrink-0" />
+                      <img
+                        src={u.avatarUrl}
+                        alt=""
+                        className="h-9 w-9 shrink-0 rounded-xl object-cover"
+                      />
                     ) : (
-                      <div className="h-9 w-9 rounded-xl bg-slate-200 shrink-0" />
+                      <div className="h-9 w-9 shrink-0 rounded-xl bg-slate-200" />
                     )}
                     <div className="min-w-0">
                       <p className="truncate text-sm font-bold text-slate-900">
-                        {u.githubUsername ? `@${u.githubUsername}` : u.email || "—"}
+                        {u.githubUsername
+                          ? `@${u.githubUsername}`
+                          : u.email || "—"}
                       </p>
                       {u.email && u.githubUsername && (
-                        <p className="truncate text-xs text-slate-400">{u.email}</p>
+                        <p className="truncate text-xs text-slate-400">
+                          {u.email}
+                        </p>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex shrink-0 items-center gap-2">
                     <span
-                      className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-wider ${
+                      className={`rounded-full px-3 py-1 text-xs font-black tracking-wider uppercase ${
                         u.plan === "pro"
-                          ? "bg-blue-50 text-blue-700 border border-blue-100"
-                          : "bg-slate-100 text-slate-500 border border-slate-200"
+                          ? "border border-blue-100 bg-blue-50 text-blue-700"
+                          : "border border-slate-200 bg-slate-100 text-slate-500"
                       }`}
                     >
                       {u.plan}
@@ -381,7 +424,7 @@ const AdminSubscriptionSection = ({ sectionNumber = "03" }) => {
                     {u.plan === "pro" && (
                       <button
                         onClick={() => setRevokeTarget(u)}
-                        className="inline-flex items-center gap-1.5 rounded-[0.9rem] border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-100 transition-colors"
+                        className="inline-flex items-center gap-1.5 rounded-[0.9rem] border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-600 transition-colors hover:bg-rose-100"
                       >
                         <UserX size={13} />
                         Revoke
@@ -397,18 +440,22 @@ const AdminSubscriptionSection = ({ sectionNumber = "03" }) => {
           {meta.pages > 1 && (
             <div className="mt-5 flex items-center justify-between border-t border-dashed border-slate-200 pt-4">
               <p className="text-xs text-slate-400">
-                {meta.total} user{meta.total !== 1 ? "s" : ""} · page {meta.page} of {meta.pages}
+                {meta.total} user{meta.total !== 1 ? "s" : ""} · page{" "}
+                {meta.page} of {meta.pages}
               </p>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page <= 1 || usersLoading}
-                  className="rounded-[0.9rem] border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-40 transition-colors"
+                  className="rounded-[0.9rem] border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40"
                 >
                   ← Prev
                 </button>
                 {Array.from({ length: meta.pages }, (_, i) => i + 1)
-                  .filter((p) => p === 1 || p === meta.pages || Math.abs(p - page) <= 1)
+                  .filter(
+                    (p) =>
+                      p === 1 || p === meta.pages || Math.abs(p - page) <= 1,
+                  )
                   .reduce((acc, p, idx, arr) => {
                     if (idx > 0 && p - arr[idx - 1] > 1) acc.push("…");
                     acc.push(p);
@@ -416,7 +463,12 @@ const AdminSubscriptionSection = ({ sectionNumber = "03" }) => {
                   }, [])
                   .map((item, idx) =>
                     item === "…" ? (
-                      <span key={`ellipsis-${idx}`} className="text-xs text-slate-400 px-1">…</span>
+                      <span
+                        key={`ellipsis-${idx}`}
+                        className="px-1 text-xs text-slate-400"
+                      >
+                        …
+                      </span>
                     ) : (
                       <button
                         key={item}
@@ -430,12 +482,12 @@ const AdminSubscriptionSection = ({ sectionNumber = "03" }) => {
                       >
                         {item}
                       </button>
-                    )
+                    ),
                   )}
                 <button
                   onClick={() => setPage((p) => Math.min(meta.pages, p + 1))}
                   disabled={page >= meta.pages || usersLoading}
-                  className="rounded-[0.9rem] border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 disabled:opacity-40 transition-colors"
+                  className="rounded-[0.9rem] border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40"
                 >
                   Next →
                 </button>

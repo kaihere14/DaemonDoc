@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types, jsx-a11y/label-has-associated-control, react/no-array-index-key */
 import React from "react";
 import { Send, ChevronRight, Check, X, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -42,7 +41,7 @@ const EmailComposerModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4 sm:p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md sm:p-6"
           onClick={onClose}
         >
           <motion.div
@@ -52,19 +51,19 @@ const EmailComposerModal = ({
             onClick={(e) => e.stopPropagation()}
             className="flex h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_24px_70px_-36px_rgba(15,23,42,0.55)] sm:h-[90vh] lg:flex-row"
           >
-            <div className="border-b border-slate-100 bg-linear-to-b from-slate-50 to-white p-5 sm:p-6 lg:w-72 lg:border-b-0 lg:border-r">
+            <div className="border-b border-slate-100 bg-linear-to-b from-slate-50 to-white p-5 sm:p-6 lg:w-72 lg:border-r lg:border-b-0">
               <div className="mb-8 hidden lg:block">
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600 text-white">
                   <Send size={24} />
                 </div>
-                <h3 className="font-black uppercase tracking-tight text-slate-900">
+                <h3 className="font-black tracking-tight text-slate-900 uppercase">
                   Broadcast
                 </h3>
                 <p className="text-xs text-slate-500">Configure your update</p>
               </div>
 
               <div className="mb-5 rounded-[1.5rem] border border-blue-100 bg-blue-50/70 p-4">
-                <p className="mb-1 font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                <p className="mb-1 font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                   Progress
                 </p>
                 <p className="text-2xl font-black text-blue-700">
@@ -124,7 +123,7 @@ const EmailComposerModal = ({
             <div className="flex min-h-0 flex-1 flex-col">
               <div className="flex items-center justify-between border-b border-slate-100 p-5 sm:p-6 sm:pb-4">
                 <div>
-                  <p className="mb-1 font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                  <p className="mb-1 font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                     Step {currentStep}
                   </p>
                   <h2 className="text-xl font-black text-slate-900 sm:text-2xl">
@@ -147,7 +146,7 @@ const EmailComposerModal = ({
                     className="space-y-5 sm:space-y-6"
                   >
                     <div className="group">
-                      <label className="mb-2 block font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400 transition-colors group-focus-within:text-blue-600">
+                      <label className="mb-2 block font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase transition-colors group-focus-within:text-blue-600">
                         Email Subject
                       </label>
                       <input
@@ -155,12 +154,12 @@ const EmailComposerModal = ({
                         value={subject}
                         onChange={(e) => setSubject(e.target.value)}
                         placeholder="What's this update about?"
-                        className="w-full rounded-2xl border-2 border-transparent bg-slate-50 px-4 py-3.5 text-slate-900 outline-none transition-all focus:border-blue-600 focus:bg-white sm:px-5 sm:py-4"
+                        className="w-full rounded-2xl border-2 border-transparent bg-slate-50 px-4 py-3.5 text-slate-900 transition-all outline-none focus:border-blue-600 focus:bg-white sm:px-5 sm:py-4"
                       />
                     </div>
 
                     <div className="group">
-                      <label className="mb-2 block font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400 transition-colors group-focus-within:text-blue-600">
+                      <label className="mb-2 block font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase transition-colors group-focus-within:text-blue-600">
                         Feature Name
                       </label>
                       <input
@@ -168,14 +167,14 @@ const EmailComposerModal = ({
                         value={featureName}
                         onChange={(e) => setFeatureName(e.target.value)}
                         placeholder="The name of the highlight"
-                        className="w-full rounded-2xl border-2 border-transparent bg-slate-50 px-4 py-3.5 text-slate-900 outline-none transition-all focus:border-blue-600 focus:bg-white sm:px-5 sm:py-4"
+                        className="w-full rounded-2xl border-2 border-transparent bg-slate-50 px-4 py-3.5 text-slate-900 transition-all outline-none focus:border-blue-600 focus:bg-white sm:px-5 sm:py-4"
                       />
                     </div>
 
                     <div className="rounded-[1.5rem] border border-slate-200 bg-white/85 p-4 shadow-[0_16px_40px_-32px_rgba(15,23,42,0.28)] sm:rounded-[2rem] sm:p-5">
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                          <p className="mb-2 font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                          <p className="mb-2 font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                             Audience
                           </p>
                           <p className="text-lg font-black text-slate-900">
@@ -231,7 +230,7 @@ const EmailComposerModal = ({
                           return (
                             <label
                               key={recipient.id}
-                              className={`flex items-center gap-4 rounded-2xl border px-4 py-3 transition-all cursor-pointer ${
+                              className={`flex cursor-pointer items-center gap-4 rounded-2xl border px-4 py-3 transition-all ${
                                 isSelected
                                   ? "border-blue-200 bg-blue-50/80"
                                   : "border-slate-200 bg-white"
@@ -268,26 +267,26 @@ const EmailComposerModal = ({
                     className="space-y-5 sm:space-y-6"
                   >
                     <div className="group">
-                      <label className="mb-2 block font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400 transition-colors group-focus-within:text-blue-600">
+                      <label className="mb-2 block font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase transition-colors group-focus-within:text-blue-600">
                         Hook / Intro
                       </label>
                       <textarea
                         value={intro}
                         onChange={(e) => setIntro(e.target.value)}
                         placeholder="Capture their attention..."
-                        className="h-24 w-full resize-none rounded-2xl border-2 border-transparent bg-slate-50 px-4 py-3.5 text-slate-900 outline-none transition-all focus:border-blue-600 focus:bg-white sm:px-5 sm:py-4"
+                        className="h-24 w-full resize-none rounded-2xl border-2 border-transparent bg-slate-50 px-4 py-3.5 text-slate-900 transition-all outline-none focus:border-blue-600 focus:bg-white sm:px-5 sm:py-4"
                       />
                     </div>
 
                     <div className="group">
-                      <label className="mb-2 block font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400 transition-colors group-focus-within:text-blue-600">
+                      <label className="mb-2 block font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase transition-colors group-focus-within:text-blue-600">
                         Detailed Description
                       </label>
                       <textarea
                         value={heroDescription}
                         onChange={(e) => setHeroDescription(e.target.value)}
                         placeholder="Go into the details..."
-                        className="h-32 w-full resize-none rounded-2xl border-2 border-transparent bg-slate-50 px-4 py-3.5 text-slate-900 outline-none transition-all focus:border-blue-600 focus:bg-white sm:px-5 sm:py-4"
+                        className="h-32 w-full resize-none rounded-2xl border-2 border-transparent bg-slate-50 px-4 py-3.5 text-slate-900 transition-all outline-none focus:border-blue-600 focus:bg-white sm:px-5 sm:py-4"
                       />
                     </div>
                   </motion.div>
@@ -305,7 +304,7 @@ const EmailComposerModal = ({
                       </p>
                       <button
                         onClick={addChangeBlock}
-                        className="rounded-xl bg-blue-50 px-4 py-2 text-xs font-bold uppercase tracking-widest text-blue-600 transition-all hover:bg-blue-600 hover:text-white"
+                        className="rounded-xl bg-blue-50 px-4 py-2 text-xs font-bold tracking-widest text-blue-600 uppercase transition-all hover:bg-blue-600 hover:text-white"
                       >
                         Add Change
                       </button>
@@ -320,7 +319,7 @@ const EmailComposerModal = ({
                           {changes.length > 1 && (
                             <button
                               onClick={() => removeChangeBlock(index)}
-                              className="absolute right-4 top-4 text-slate-300 transition-colors hover:text-red-500"
+                              className="absolute top-4 right-4 text-slate-300 transition-colors hover:text-red-500"
                             >
                               <X size={16} />
                             </button>
@@ -328,7 +327,7 @@ const EmailComposerModal = ({
 
                           <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
-                              <label className="mb-1 block font-mono text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                              <label className="mb-1 block font-mono text-[10px] font-black tracking-[0.2em] text-slate-400 uppercase">
                                 Type
                               </label>
                               <select
@@ -340,7 +339,7 @@ const EmailComposerModal = ({
                                     e.target.value,
                                   )
                                 }
-                                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:border-blue-600"
+                                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm transition-all outline-none focus:border-blue-600"
                               >
                                 <option value="tag-new">New</option>
                                 <option value="tag-improved">Improved</option>
@@ -349,7 +348,7 @@ const EmailComposerModal = ({
                               </select>
                             </div>
                             <div>
-                              <label className="mb-1 block font-mono text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                              <label className="mb-1 block font-mono text-[10px] font-black tracking-[0.2em] text-slate-400 uppercase">
                                 Label
                               </label>
                               <input
@@ -363,7 +362,7 @@ const EmailComposerModal = ({
                                   )
                                 }
                                 placeholder="e.g. HOT"
-                                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:border-blue-600"
+                                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm transition-all outline-none focus:border-blue-600"
                               />
                             </div>
                           </div>
@@ -380,7 +379,7 @@ const EmailComposerModal = ({
                                 )
                               }
                               placeholder="Change title"
-                              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold outline-none transition-all focus:border-blue-600"
+                              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-bold transition-all outline-none focus:border-blue-600"
                             />
                             <textarea
                               value={change.description}
@@ -392,7 +391,7 @@ const EmailComposerModal = ({
                                 )
                               }
                               placeholder="Short explanation"
-                              className="h-16 w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none transition-all focus:border-blue-600"
+                              className="h-16 w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm transition-all outline-none focus:border-blue-600"
                             />
                           </div>
                         </div>
@@ -409,25 +408,25 @@ const EmailComposerModal = ({
                   >
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
                       <div className="group">
-                        <label className="mb-2 block font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                        <label className="mb-2 block font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                           CTA Label
                         </label>
                         <input
                           type="text"
                           value={primaryCTA}
                           onChange={(e) => setPrimaryCTA(e.target.value)}
-                          className="w-full rounded-2xl border-2 border-transparent bg-slate-50 px-4 py-3.5 text-slate-900 outline-none transition-all focus:border-blue-600 focus:bg-white sm:px-5 sm:py-4"
+                          className="w-full rounded-2xl border-2 border-transparent bg-slate-50 px-4 py-3.5 text-slate-900 transition-all outline-none focus:border-blue-600 focus:bg-white sm:px-5 sm:py-4"
                         />
                       </div>
                       <div className="group">
-                        <label className="mb-2 block font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                        <label className="mb-2 block font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                           Display Date
                         </label>
                         <input
                           type="text"
                           value={date}
                           onChange={(e) => setDate(e.target.value)}
-                          className="w-full rounded-2xl border-2 border-transparent bg-slate-50 px-4 py-3.5 text-slate-900 outline-none transition-all focus:border-blue-600 focus:bg-white sm:px-5 sm:py-4"
+                          className="w-full rounded-2xl border-2 border-transparent bg-slate-50 px-4 py-3.5 text-slate-900 transition-all outline-none focus:border-blue-600 focus:bg-white sm:px-5 sm:py-4"
                         />
                       </div>
                     </div>
@@ -462,7 +461,7 @@ const EmailComposerModal = ({
                 </button>
                 <button
                   onClick={goToNextStep}
-                  className="flex-1 rounded-2xl bg-[#1d4ed8] px-4 py-3 text-sm font-bold text-white shadow-xl shadow-blue-200 transition-all hover:bg-[#1e40af] hover:shadow-blue-300 sm:flex-[1.2] sm:px-6 sm:py-4 flex items-center justify-center gap-2"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#1d4ed8] px-4 py-3 text-sm font-bold text-white shadow-xl shadow-blue-200 transition-all hover:bg-[#1e40af] hover:shadow-blue-300 sm:flex-[1.2] sm:px-6 sm:py-4"
                 >
                   {currentStep === 4 ? "Review Broadcast" : "Continue"}
                   {currentStep < 4 && <ChevronRight size={20} />}

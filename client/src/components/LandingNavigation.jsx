@@ -23,36 +23,38 @@ const LandingNavigation = () => {
 
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-500 ease-in-out ${
+      className={`fixed z-50 w-full transition-all duration-500 ease-in-out ${
         scrolled
-          ? "py-2 bg-white/70 backdrop-blur-md border-b border-slate-200/50 shadow-sm"
-          : " bg-transparent border-b border-transparent"
+          ? "border-b border-slate-200/50 bg-white/70 py-2 shadow-sm backdrop-blur-md"
+          : " border-b border-transparent bg-transparent"
       }`}
     >
-      <div className="max-w-[1400px] sm:mx-auto px-4 sm:px-6 lg:pr-22 lg:pl-6 w-full">
+      <div className="w-full max-w-[1400px] px-4 sm:mx-auto sm:px-6 lg:pr-22 lg:pl-6">
         <div
-          className={`flex justify-between items-center transition-all duration-500 ${
+          className={`flex items-center justify-between transition-all duration-500 ${
             scrolled ? "h-14" : "h-20"
           } w-full`}
         >
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2 justify-center">
+          <a href="#" className="flex items-center justify-center gap-2">
             <img
               src="/DaemonLogo.png"
               alt="DaemonDoc"
-              className={`transition-all duration-500 absolute left-0 sm:relative  ${
-                scrolled ? "w-32 sm:w-36 md:w-48 scale-148 sm:scale-100" : "w-40 sm:w-45 md:w-60 scale-150 sm:scale-100"
+              className={`absolute left-0 transition-all duration-500 sm:relative ${
+                scrolled
+                  ? "w-32 scale-148 sm:w-36 sm:scale-100 md:w-48"
+                  : "w-40 scale-150 sm:w-45 sm:scale-100 md:w-60"
               } self-center pt-2`}
             />
           </a>
 
           {/* Desktop nav links */}
-          <div className="hidden md:flex items-center gap-8 lg:pr-25">
+          <div className="hidden items-center gap-8 md:flex lg:pr-25">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="text-slate-600 hover:text-[#1d4ed8] font-medium text-sm transition-colors"
+                className="text-sm font-medium text-slate-600 transition-colors hover:text-[#1d4ed8]"
               >
                 {link.label}
               </a>
@@ -63,7 +65,7 @@ const LandingNavigation = () => {
           <div className="hidden md:flex">
             <button
               onClick={() => navigate("/login")}
-              className="bg-[#1d4ed8] text-shadow-sm cursor-pointer hover:bg-[#1e40af] text-white px-6 py-2.5 rounded-full font-medium text-sm transition-all shadow-lg shadow-blue-500/30"
+              className="cursor-pointer rounded-full bg-[#1d4ed8] px-6 py-2.5 text-sm font-medium text-white shadow-lg shadow-blue-500/30 transition-all text-shadow-sm hover:bg-[#1e40af]"
             >
               Get Started
             </button>
@@ -71,7 +73,7 @@ const LandingNavigation = () => {
 
           {/* Mobile toggle */}
           <button
-            className="md:hidden p-2 text-slate-600 hover:text-slate-900 cursor-pointer"
+            className="cursor-pointer p-2 text-slate-600 hover:text-slate-900 md:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
@@ -82,13 +84,13 @@ const LandingNavigation = () => {
 
       {/* Mobile dropdown */}
       {mobileOpen && (
-        <div className="md:hidden bg-white border-t border-slate-100 px-4 py-4 space-y-1">
+        <div className="space-y-1 border-t border-slate-100 bg-white px-4 py-4 md:hidden">
           {NAV_LINKS.map((link) => (
             <a
               key={link.label}
               href={link.href}
               onClick={() => setMobileOpen(false)}
-              className="block text-slate-600 hover:text-[#1d4ed8] font-medium py-2.5 px-2 rounded-lg hover:bg-slate-50 transition-colors"
+              className="block rounded-lg px-2 py-2.5 font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-[#1d4ed8]"
             >
               {link.label}
             </a>
@@ -96,7 +98,7 @@ const LandingNavigation = () => {
           <div className="pt-2">
             <button
               onClick={() => navigate("/login")}
-              className="w-full bg-[#1d4ed8]  text-white px-6 py-3 rounded-full font-medium"
+              className="w-full rounded-full bg-[#1d4ed8] px-6 py-3 font-medium text-white"
             >
               Get Started
             </button>

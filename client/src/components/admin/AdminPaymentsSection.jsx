@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import React from "react";
 import {
   CreditCard,
@@ -129,8 +128,9 @@ const LineChartCard = ({
   });
 
   const linePath = points
-    .map((point, index) =>
-      `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`,
+    .map(
+      (point, index) =>
+        `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`,
     )
     .join(" ");
 
@@ -149,7 +149,7 @@ const LineChartCard = ({
     >
       <div className="mb-5 flex items-center justify-between gap-3">
         <div>
-          <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+          <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
             {title}
           </p>
           <p className="mt-1 text-sm font-semibold text-slate-600">
@@ -211,14 +211,20 @@ const LineChartCard = ({
               strokeLinejoin="round"
               initial={{ pathLength: shouldReduceMotion ? 1 : 0 }}
               animate={{ pathLength: 1 }}
-              transition={{ duration: shouldReduceMotion ? 0 : 0.8, ease: "easeOut" }}
+              transition={{
+                duration: shouldReduceMotion ? 0 : 0.8,
+                ease: "easeOut",
+              }}
             />
           ) : null}
 
           {points.map((point, index) => (
             <motion.g
               key={`${dataKey}-${point.day.date}`}
-              initial={{ opacity: shouldReduceMotion ? 1 : 0, scale: shouldReduceMotion ? 1 : 0.7 }}
+              initial={{
+                opacity: shouldReduceMotion ? 1 : 0,
+                scale: shouldReduceMotion ? 1 : 0.7,
+              }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{
                 duration: shouldReduceMotion ? 0 : 0.24,
@@ -248,7 +254,7 @@ const LineChartCard = ({
               <p className="text-xs font-black text-slate-800">
                 {valueFormatter(day[dataKey] || 0)}
               </p>
-              <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+              <p className="font-mono text-[10px] font-bold tracking-[0.16em] text-slate-400 uppercase">
                 {day.label}
               </p>
             </div>
@@ -259,10 +265,7 @@ const LineChartCard = ({
   );
 };
 
-const AdminPaymentsSection = ({
-  sectionNumber = "02",
-  shouldReduceMotion,
-}) => {
+const AdminPaymentsSection = ({ sectionNumber = "02", shouldReduceMotion }) => {
   const LOGS_PER_PAGE = 6;
   const [analytics, setAnalytics] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -306,7 +309,10 @@ const AdminPaymentsSection = ({
     recentLogs,
     Array.isArray(analytics?.activity) ? analytics.activity : [],
   );
-  const totalLogPages = Math.max(1, Math.ceil(recentLogs.length / LOGS_PER_PAGE));
+  const totalLogPages = Math.max(
+    1,
+    Math.ceil(recentLogs.length / LOGS_PER_PAGE),
+  );
   const paginatedLogs = recentLogs.slice(
     (logsPage - 1) * LOGS_PER_PAGE,
     logsPage * LOGS_PER_PAGE,
@@ -366,22 +372,19 @@ const AdminPaymentsSection = ({
     <section className="mt-16">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+          <p className="font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
             Section {sectionNumber}
           </p>
-          <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-slate-900 sm:text-3xl">
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900 uppercase sm:text-3xl">
             Paid Users
           </h2>
         </div>
         <button
           type="button"
           onClick={() => fetchPaymentAnalytics(true)}
-          className="inline-flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 transition-all hover:border-blue-200 hover:text-blue-600"
+          className="inline-flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold tracking-[0.2em] text-slate-500 uppercase transition-all hover:border-blue-200 hover:text-blue-600"
         >
-          <RefreshCw
-            size={14}
-            className={isRefreshing ? "animate-spin" : ""}
-          />
+          <RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />
           Refresh
         </button>
       </div>
@@ -398,19 +401,19 @@ const AdminPaymentsSection = ({
               <CreditCard size={30} strokeWidth={1.5} />
             </div>
             <div>
-              <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+              <p className="font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
                 Revenue Surface
               </p>
-              <h3 className="mt-2 text-2xl font-black uppercase tracking-tight text-slate-900">
+              <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-900 uppercase">
                 Cashflow + Buyer Trendline
               </h3>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
-                Track paid user count, incoming revenue, recurring run-rate,
-                and the raw ledger that backs every payment event.
+                Track paid user count, incoming revenue, recurring run-rate, and
+                the raw ledger that backs every payment event.
               </p>
             </div>
           </div>
-          <div className="inline-flex w-fit items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">
+          <div className="inline-flex w-fit items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-[10px] font-black tracking-[0.22em] text-slate-500 uppercase">
             Latest Transfer
             <span className="text-slate-700">
               {formatAnalyticsTimestamp(overview.latestPaymentAt)}
@@ -422,7 +425,7 @@ const AdminPaymentsSection = ({
           <div className="flex min-h-[320px] flex-col items-center justify-center gap-4 rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50/70 px-6 py-10 text-center">
             <Loader2 size={28} className="animate-spin text-blue-600" />
             <div>
-              <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+              <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                 Loading Revenue Analytics
               </p>
               <p className="mt-2 text-sm text-slate-500">
@@ -436,7 +439,7 @@ const AdminPaymentsSection = ({
               <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-rose-500">
                 <AlertCircle size={22} />
               </div>
-              <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-rose-500">
+              <p className="font-mono text-[10px] font-black tracking-[0.24em] text-rose-500 uppercase">
                 Payment Analytics Error
               </p>
               <p className="mt-3 text-sm leading-relaxed text-rose-700">
@@ -446,7 +449,7 @@ const AdminPaymentsSection = ({
             <button
               type="button"
               onClick={() => fetchPaymentAnalytics(true)}
-              className="mt-6 inline-flex w-fit items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white transition-all hover:bg-rose-700"
+              className="mt-6 inline-flex w-fit items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold tracking-[0.2em] text-white uppercase transition-all hover:bg-rose-700"
             >
               <RefreshCw size={14} />
               Retry
@@ -474,7 +477,7 @@ const AdminPaymentsSection = ({
                   className="rounded-[1.35rem] border border-slate-200 bg-linear-to-b from-white to-slate-50/70 p-4"
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                    <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                       {card.label}
                     </p>
                     <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-100 text-slate-600">
@@ -525,7 +528,7 @@ const AdminPaymentsSection = ({
                   key={item.label}
                   className="rounded-2xl border border-white/70 bg-white/70 px-4 py-4"
                 >
-                  <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                  <p className="font-mono text-[10px] font-black tracking-[0.2em] text-slate-400 uppercase">
                     {item.label}
                   </p>
                   <p className={`mt-2 text-xl font-black ${item.tone}`}>
@@ -564,7 +567,7 @@ const AdminPaymentsSection = ({
             >
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
-                  <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                  <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                     Payment Ledger
                   </p>
                   <p className="mt-1 text-sm font-semibold text-slate-600">
@@ -584,75 +587,82 @@ const AdminPaymentsSection = ({
                 <div className="space-y-4">
                   <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-slate-200 text-left">
-                    <thead>
-                      <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                        <th className="pb-3 pr-4">User</th>
-                        <th className="pb-3 pr-4">Type</th>
-                        <th className="pb-3 pr-4">Amount</th>
-                        <th className="pb-3 pr-4">Status</th>
-                        <th className="pb-3 pr-4">When</th>
-                        <th className="pb-3">Note</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {paginatedLogs.map((log) => {
-                        const tone = toneByStatus[log.status] || toneByStatus.pending;
-                        const username =
-                          log.user?.githubUsername || log.user?.email || "Unknown user";
+                      <thead>
+                        <tr className="text-[10px] font-black tracking-[0.2em] text-slate-400 uppercase">
+                          <th className="pr-4 pb-3">User</th>
+                          <th className="pr-4 pb-3">Type</th>
+                          <th className="pr-4 pb-3">Amount</th>
+                          <th className="pr-4 pb-3">Status</th>
+                          <th className="pr-4 pb-3">When</th>
+                          <th className="pb-3">Note</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {paginatedLogs.map((log) => {
+                          const tone =
+                            toneByStatus[log.status] || toneByStatus.pending;
+                          const username =
+                            log.user?.githubUsername ||
+                            log.user?.email ||
+                            "Unknown user";
 
-                        return (
-                          <tr key={log.id} className="align-top">
-                            <td className="py-4 pr-4">
-                              <div className="flex items-center gap-3">
-                                <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl bg-slate-100 text-xs font-black uppercase text-slate-500">
-                                  {log.user?.avatarUrl ? (
-                                    <img
-                                      src={log.user.avatarUrl}
-                                      alt={username}
-                                      className="h-full w-full object-cover"
-                                    />
-                                  ) : (
-                                    username.slice(0, 2)
-                                  )}
+                          return (
+                            <tr key={log.id} className="align-top">
+                              <td className="py-4 pr-4">
+                                <div className="flex items-center gap-3">
+                                  <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl bg-slate-100 text-xs font-black text-slate-500 uppercase">
+                                    {log.user?.avatarUrl ? (
+                                      <img
+                                        src={log.user.avatarUrl}
+                                        alt={username}
+                                        className="h-full w-full object-cover"
+                                      />
+                                    ) : (
+                                      username.slice(0, 2)
+                                    )}
+                                  </div>
+                                  <div>
+                                    <p className="text-sm font-black text-slate-900">
+                                      {username}
+                                    </p>
+                                    <p className="text-xs text-slate-400">
+                                      {log.user?.planInterval ||
+                                        "plan interval unknown"}
+                                    </p>
+                                  </div>
                                 </div>
-                                <div>
-                                  <p className="text-sm font-black text-slate-900">
-                                    {username}
-                                  </p>
-                                  <p className="text-xs text-slate-400">
-                                    {log.user?.planInterval || "plan interval unknown"}
-                                  </p>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="py-4 pr-4">
-                              <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-slate-600">
-                                {log.type.replaceAll("_", " ")}
-                              </span>
-                            </td>
-                            <td className="py-4 pr-4 text-sm font-semibold text-slate-700">
-                              {log.amount ? formatCurrency(log.amount) : "—"}
-                            </td>
-                            <td className="py-4 pr-4">
-                              <span
-                                className={`inline-flex rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] ${tone.bg} ${tone.text} ${tone.border}`}
-                              >
-                                {log.status}
-                              </span>
-                            </td>
-                            <td className="py-4 pr-4 text-sm text-slate-500">
-                              {new Date(log.createdAt).toLocaleString("en-IN", {
-                                dateStyle: "medium",
-                                timeStyle: "short",
-                              })}
-                            </td>
-                            <td className="py-4 text-sm text-slate-500">
-                              {log.note || "No note recorded"}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
+                              </td>
+                              <td className="py-4 pr-4">
+                                <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black tracking-[0.18em] text-slate-600 uppercase">
+                                  {log.type.replaceAll("_", " ")}
+                                </span>
+                              </td>
+                              <td className="py-4 pr-4 text-sm font-semibold text-slate-700">
+                                {log.amount ? formatCurrency(log.amount) : "—"}
+                              </td>
+                              <td className="py-4 pr-4">
+                                <span
+                                  className={`inline-flex rounded-full border px-3 py-1 text-[10px] font-black tracking-[0.18em] uppercase ${tone.bg} ${tone.text} ${tone.border}`}
+                                >
+                                  {log.status}
+                                </span>
+                              </td>
+                              <td className="py-4 pr-4 text-sm text-slate-500">
+                                {new Date(log.createdAt).toLocaleString(
+                                  "en-IN",
+                                  {
+                                    dateStyle: "medium",
+                                    timeStyle: "short",
+                                  },
+                                )}
+                              </td>
+                              <td className="py-4 text-sm text-slate-500">
+                                {log.note || "No note recorded"}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
                     </table>
                   </div>
 
@@ -660,12 +670,16 @@ const AdminPaymentsSection = ({
                     {totalLogPages > 1 ? (
                       <div className="flex items-center justify-between">
                         <p className="text-xs text-slate-400">
-                          {recentLogs.length} event{recentLogs.length !== 1 ? "s" : ""} · page {logsPage} of {totalLogPages}
+                          {recentLogs.length} event
+                          {recentLogs.length !== 1 ? "s" : ""} · page {logsPage}{" "}
+                          of {totalLogPages}
                         </p>
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
-                            onClick={() => setLogsPage((page) => Math.max(1, page - 1))}
+                            onClick={() =>
+                              setLogsPage((page) => Math.max(1, page - 1))
+                            }
                             disabled={logsPage <= 1 || isLoading}
                             className="rounded-[0.9rem] border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40"
                           >
@@ -673,7 +687,10 @@ const AdminPaymentsSection = ({
                           </button>
                           {logPaginationItems.map((item, index) =>
                             item === "…" ? (
-                              <span key={`ledger-ellipsis-${index}`} className="px-1 text-xs text-slate-400">
+                              <span
+                                key={`ledger-ellipsis-${index}`}
+                                className="px-1 text-xs text-slate-400"
+                              >
                                 …
                               </span>
                             ) : (
@@ -695,7 +712,9 @@ const AdminPaymentsSection = ({
                           <button
                             type="button"
                             onClick={() =>
-                              setLogsPage((page) => Math.min(totalLogPages, page + 1))
+                              setLogsPage((page) =>
+                                Math.min(totalLogPages, page + 1),
+                              )
                             }
                             disabled={logsPage >= totalLogPages || isLoading}
                             className="rounded-[0.9rem] border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40"
@@ -706,7 +725,8 @@ const AdminPaymentsSection = ({
                       </div>
                     ) : recentLogs.length > 0 ? (
                       <p className="text-xs text-slate-400">
-                        {recentLogs.length} event{recentLogs.length !== 1 ? "s" : ""}
+                        {recentLogs.length} event
+                        {recentLogs.length !== 1 ? "s" : ""}
                       </p>
                     ) : null}
                   </div>

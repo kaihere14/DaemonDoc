@@ -1,5 +1,12 @@
 import React from "react";
-import { Key, Share2, GitCompare, Layers, GitBranch, Filter } from "lucide-react";
+import {
+  Key,
+  Share2,
+  GitCompare,
+  Layers,
+  GitBranch,
+  Filter,
+} from "lucide-react";
 
 const ENGINE_FEATURES = [
   {
@@ -43,37 +50,37 @@ const ENGINE_FEATURES = [
 const EngineSection = () => (
   <section
     id="engine"
-    className="py-20 lg:py-28 bg-linear-to-b from-white via-slate-50/50 to-white"
+    className="bg-linear-to-b from-white via-slate-50/50 to-white py-20 lg:py-28"
   >
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="text-center max-w-3xl mx-auto mb-16">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto mb-16 max-w-3xl text-center">
         <h2
-          className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 uppercase tracking-tight"
+          className="mb-4 text-3xl font-bold tracking-tight text-slate-900 uppercase md:text-4xl"
           style={{ fontFamily: "'Space Grotesk', sans-serif" }}
         >
           Everything the Engine Does
         </h2>
-        <p className="text-lg text-slate-600 font-light">
+        <p className="text-lg font-light text-slate-600">
           Deep-tech capabilities powering the next generation of automated
           documentation.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
         {ENGINE_FEATURES.map((f) => (
           <div
             key={f.title}
-            className="group p-8 rounded-2xl bg-white border border-slate-100 shadow-xl shadow-slate-200/40 hover:shadow-2xl transition-all duration-300"
+            className="group rounded-2xl border border-slate-100 bg-white p-8 shadow-xl shadow-slate-200/40 transition-all duration-300 hover:shadow-2xl"
           >
             <div
-              className={`w-12 h-12 ${f.iconClass} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}
+              className={`h-12 w-12 ${f.iconClass} mb-6 flex items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110`}
             >
               <f.icon size={22} />
             </div>
-            <h3 className="text-base font-bold text-slate-900 mb-2 uppercase tracking-wide">
+            <h3 className="mb-2 text-base font-bold tracking-wide text-slate-900 uppercase">
               {f.title}
             </h3>
-            <p className="text-slate-600 text-sm leading-relaxed">{f.desc}</p>
+            <p className="text-sm leading-relaxed text-slate-600">{f.desc}</p>
           </div>
         ))}
       </div>

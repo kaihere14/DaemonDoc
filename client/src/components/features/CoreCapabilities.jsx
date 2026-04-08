@@ -40,40 +40,40 @@ const CORE_FEATURES = [
 const CoreCapabilities = () => (
   <section
     id="features"
-    className="pt-22 pb-20 lg:pt-12 lg:pb-28 relative overflow-hidden bg-linear-to-b from-white via-slate-50/50 to-white"
+    className="relative overflow-hidden bg-linear-to-b from-white via-slate-50/50 to-white pt-22 pb-20 lg:pt-12 lg:pb-28"
   >
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="text-center max-w-3xl mx-auto mb-20">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto mb-20 max-w-3xl text-center">
         <h2
-          className="text-3xl md:text-4xl font-bold text-slate-900 mb-4"
+          className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl"
           style={{ fontFamily: "'Space Grotesk', sans-serif" }}
         >
           Core Capabilities
         </h2>
-        <p className="text-lg text-slate-600 font-light">
+        <p className="text-lg font-light text-slate-600">
           Everything you need to maintain perfect documentation without lifting
           a finger.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-3 lg:gap-12">
         {CORE_FEATURES.map((f) => (
           <div
             key={f.title}
-            className={`group relative p-8 rounded-2xl bg-white border border-slate-100 shadow-xl shadow-slate-200/50 hover:shadow-2xl transition-all duration-300 ${f.gradientClass}`}
+            className={`group relative rounded-2xl border border-slate-100 bg-white p-8 shadow-xl shadow-slate-200/50 transition-all duration-300 hover:shadow-2xl ${f.gradientClass}`}
           >
             <div
-              className={`w-14 h-14 ${f.iconClass} rounded-xl flex items-center justify-center mb-6`}
+              className={`h-14 w-14 ${f.iconClass} mb-6 flex items-center justify-center rounded-xl`}
             >
               <f.icon size={28} />
             </div>
             <h3
-              className="text-xl font-bold text-slate-900 mb-3"
+              className="mb-3 text-xl font-bold text-slate-900"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
               {f.title}
             </h3>
-            <p className="text-slate-600 leading-relaxed text-sm">
+            <p className="text-sm leading-relaxed text-slate-600">
               {f.desc[0]}
               <strong>{f.desc[1]}</strong>
               {f.desc[2]}

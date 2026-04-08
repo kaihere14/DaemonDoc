@@ -74,17 +74,17 @@ const AdminAnalyticsSection = ({
     <section className="mb-8">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+          <p className="font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
             Section 01
           </p>
-          <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-slate-900 sm:text-3xl">
+          <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900 uppercase sm:text-3xl">
             Analytics
           </h2>
         </div>
         <button
           type="button"
           onClick={onRefresh}
-          className="inline-flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold uppercase tracking-[0.2em] text-slate-500 transition-all hover:border-blue-200 hover:text-blue-600"
+          className="inline-flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold tracking-[0.2em] text-slate-500 uppercase transition-all hover:border-blue-200 hover:text-blue-600"
         >
           <RefreshCw
             size={14}
@@ -106,10 +106,10 @@ const AdminAnalyticsSection = ({
               <BarChart3 size={32} strokeWidth={1.5} />
             </div>
             <div>
-              <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+              <p className="font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
                 System Analytics
               </p>
-              <h3 className="mt-2 text-2xl font-black uppercase tracking-tight text-slate-900">
+              <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-900 uppercase">
                 Platform Health
               </h3>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
@@ -118,7 +118,7 @@ const AdminAnalyticsSection = ({
               </p>
             </div>
           </div>
-          <div className="inline-flex w-fit items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">
+          <div className="inline-flex w-fit items-center gap-2 rounded-full bg-slate-100 px-4 py-2 text-[10px] font-black tracking-[0.22em] text-slate-500 uppercase">
             Latest Activity
             <span className="text-slate-700">
               {formatAnalyticsTimestamp(analyticsOverview?.latestActivityAt)}
@@ -130,7 +130,7 @@ const AdminAnalyticsSection = ({
           <div className="flex min-h-[320px] flex-1 flex-col items-center justify-center gap-4 rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50/70 px-6 py-10 text-center">
             <Loader2 size={28} className="animate-spin text-blue-600" />
             <div>
-              <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+              <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                 Loading Analytics
               </p>
               <p className="mt-2 text-sm text-slate-500">
@@ -144,7 +144,7 @@ const AdminAnalyticsSection = ({
               <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-rose-500">
                 <AlertCircle size={22} />
               </div>
-              <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-rose-500">
+              <p className="font-mono text-[10px] font-black tracking-[0.24em] text-rose-500 uppercase">
                 Analytics Error
               </p>
               <p className="mt-3 text-sm leading-relaxed text-rose-700">
@@ -154,7 +154,7 @@ const AdminAnalyticsSection = ({
             <button
               type="button"
               onClick={onRefresh}
-              className="mt-6 inline-flex w-fit items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-white transition-all hover:bg-rose-700"
+              className="mt-6 inline-flex w-fit items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold tracking-[0.2em] text-white uppercase transition-all hover:bg-rose-700"
             >
               <RefreshCw size={14} />
               Retry
@@ -182,7 +182,7 @@ const AdminAnalyticsSection = ({
                     variants={fadeUpVariant}
                     className="rounded-[1.35rem] border border-slate-200 bg-linear-to-b from-white to-slate-50/70 p-4"
                   >
-                    <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                    <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                       {stat.label}
                     </p>
                     <p className={`mt-2 text-2xl font-black ${stat.tone}`}>
@@ -223,7 +223,7 @@ const AdminAnalyticsSection = ({
                     <Activity size={18} />
                   </motion.div>
                   <div>
-                    <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                    <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                       Live Pulse
                     </p>
                     <p className="text-lg font-black text-slate-900">
@@ -268,7 +268,7 @@ const AdminAnalyticsSection = ({
                       }}
                       className={`rounded-2xl px-3 py-3 ${item.className}`}
                     >
-                      <p className="font-mono text-[10px] font-black uppercase tracking-[0.2em] opacity-70">
+                      <p className="font-mono text-[10px] font-black tracking-[0.2em] uppercase opacity-70">
                         {item.label}
                       </p>
                       <p className="mt-1 text-lg font-black">
@@ -285,14 +285,14 @@ const AdminAnalyticsSection = ({
               >
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <div>
-                    <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                    <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                       Weekly Activity
                     </p>
                     <p className="text-sm font-semibold text-slate-600">
                       Total log volume over the last 7 days
                     </p>
                   </div>
-                  <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black tracking-[0.2em] text-slate-500 uppercase">
                     7 days
                   </span>
                 </div>
@@ -327,10 +327,10 @@ const AdminAnalyticsSection = ({
                           />
                         </div>
                         <div className="text-center">
-                          <p className="text-xs font-black uppercase text-slate-700">
+                          <p className="text-xs font-black text-slate-700 uppercase">
                             <CountUpNumber value={day.total} duration={800} />
                           </p>
-                          <p className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                          <p className="font-mono text-[10px] font-bold tracking-[0.16em] text-slate-400 uppercase">
                             {day.label}
                           </p>
                         </div>
@@ -345,7 +345,7 @@ const AdminAnalyticsSection = ({
                 className="rounded-[1.5rem] border border-slate-200 bg-white px-4 py-5 sm:p-6"
               >
                 <div className="flex flex-col gap-2">
-                  <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                  <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                     Recent Repository Activity
                   </p>
                   <p className="text-sm font-semibold text-slate-600">
@@ -373,7 +373,7 @@ const AdminAnalyticsSection = ({
                         return (
                           <div
                             key={`${log._id || log.timestamp || log.repoName || "log"}-${index}`}
-                            className="rounded-xl border border-slate-200 bg-white px-3 py-2 flex justify-between items-center"
+                            className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2"
                           >
                             <div className="flex flex-col">
                               <p className="truncate text-sm font-semibold text-slate-900">
@@ -390,7 +390,7 @@ const AdminAnalyticsSection = ({
                             </div>
                             <div className="flex flex-col items-center justify-center gap-1">
                               <span
-                                className={`inline-flex items-center gap-1 text-shadow-2xs drop-shadow-2xl border px-2 py-1 rounded-full text-xs font-bold uppercase ${statusCfg.bg} ${statusCfg.border} ${statusCfg.color} ${statusCfg.glow}`}
+                                className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs font-bold uppercase drop-shadow-2xl text-shadow-2xs ${statusCfg.bg} ${statusCfg.border} ${statusCfg.color} ${statusCfg.glow}`}
                               >
                                 {statusCfg.icon}
                                 {statusCfg.label}
@@ -411,7 +411,7 @@ const AdminAnalyticsSection = ({
                 className="rounded-[1.5rem] border border-slate-200 bg-slate-50/80 p-4 sm:p-5"
               >
                 <div className="mb-4">
-                  <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                  <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                     Top Repositories
                   </p>
                   <p className="mt-2 text-sm font-semibold text-slate-600">
@@ -437,10 +437,10 @@ const AdminAnalyticsSection = ({
                         className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white px-4 py-3"
                       >
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-black uppercase tracking-tight text-slate-900">
+                          <p className="truncate text-sm font-black tracking-tight text-slate-900 uppercase">
                             {repo.repoName}
                           </p>
-                          <p className="truncate font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                          <p className="truncate font-mono text-[10px] font-bold tracking-[0.18em] text-slate-400 uppercase">
                             {repo.repoOwner || "unknown owner"}
                           </p>
                         </div>
@@ -462,7 +462,7 @@ const AdminAnalyticsSection = ({
                 variants={fadeUpVariant}
                 className="rounded-[1.5rem] border border-slate-200 bg-linear-to-b from-slate-50 to-white p-4 sm:p-5"
               >
-                <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                   Reliability Notes
                 </p>
                 <div className="mt-4 space-y-3">
@@ -490,7 +490,7 @@ const AdminAnalyticsSection = ({
                       }}
                       className="rounded-2xl border border-slate-200 bg-white px-4 py-3"
                     >
-                      <p className="font-mono text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                      <p className="font-mono text-[10px] font-black tracking-[0.18em] text-slate-400 uppercase">
                         {item.label}
                       </p>
                       <p className="mt-1 text-sm font-semibold text-slate-700">

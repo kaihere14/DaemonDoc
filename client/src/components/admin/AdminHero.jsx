@@ -13,11 +13,11 @@ const AdminHero = () => {
           <div>
             <div className="mb-3 flex items-center gap-2">
               <div className="h-1 w-8 rounded-full bg-blue-600" />
-              <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+              <span className="font-mono text-[10px] font-black tracking-[0.3em] text-slate-400 uppercase">
                 Admin System
               </span>
             </div>
-            <h1 className="mb-3 text-3xl font-black uppercase leading-none tracking-tighter text-slate-900 sm:text-5xl">
+            <h1 className="mb-3 text-3xl leading-none font-black tracking-tighter text-slate-900 uppercase sm:text-5xl">
               Control Center
             </h1>
             <p className="max-w-2xl text-sm font-medium tracking-tight text-slate-500 sm:text-base">

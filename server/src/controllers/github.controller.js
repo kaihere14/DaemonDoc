@@ -140,14 +140,20 @@ export const addRepoActivity = async (req, res) => {
             accessToken,
           );
           const webhookUrl = `${process.env.BACKEND_URL}/api/github/webhookhandler`;
-          const existing = hooksRes.data.find((h) => h.config?.url === webhookUrl);
+          const existing = hooksRes.data.find(
+            (h) => h.config?.url === webhookUrl,
+          );
           if (existing) {
             webhookId = existing.id;
           } else {
-            return res.status(422).json({ message: "Webhook already exists for this repository" });
+            return res
+              .status(422)
+              .json({ message: "Webhook already exists for this repository" });
           }
         } catch {
-          return res.status(422).json({ message: "Webhook already exists for this repository" });
+          return res
+            .status(422)
+            .json({ message: "Webhook already exists for this repository" });
         }
       } else {
         return res

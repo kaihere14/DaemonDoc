@@ -1,8 +1,12 @@
-'use client';;
-import * as React from 'react';
-import { motion } from 'motion/react';
+"use client";
+import * as React from "react";
+import { motion } from "motion/react";
 
-import { getVariants, useAnimateIconContext, IconWrapper } from '@/components/animate-ui/icons/icon';
+import {
+  getVariants,
+  useAnimateIconContext,
+  IconWrapper,
+} from "@/components/animate-ui/icons/icon";
 
 const animations = {
   default: {
@@ -18,14 +22,14 @@ const animations = {
         pathOffset: [1, 0],
         transition: {
           duration: 0.8,
-          ease: 'easeInOut',
+          ease: "easeInOut",
           opacity: { duration: 0.01 },
         },
       },
-    }
+    },
   },
 
-  'default-return': {
+  "default-return": {
     path: {
       initial: {
         opacity: 1,
@@ -38,14 +42,14 @@ const animations = {
         pathOffset: [1, 0, 0.01, 0],
         transition: {
           duration: 2.5,
-          ease: 'easeInOut',
+          ease: "easeInOut",
           opacity: { duration: 0.01 },
         },
       },
-    }
+    },
   },
 
-  'default-loop': {
+  "default-loop": {
     path: {
       initial: {
         opacity: 1,
@@ -58,20 +62,17 @@ const animations = {
         pathOffset: [1, 0, 0.01, 0, 0.999],
         transition: {
           duration: 3,
-          ease: 'easeInOut',
+          ease: "easeInOut",
           repeat: Infinity,
-          repeatType: 'loop',
+          repeatType: "loop",
           opacity: { duration: 0.01 },
         },
       },
-    }
-  }
+    },
+  },
 };
 
-function IconComponent({
-  size,
-  ...props
-}) {
+function IconComponent({ size, ...props }) {
   const { controls } = useAnimateIconContext();
   const variants = getVariants(animations);
 
@@ -86,12 +87,14 @@ function IconComponent({
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
-      {...props}>
+      {...props}
+    >
       <motion.path
         d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"
         variants={variants.path}
         initial="initial"
-        animate={controls} />
+        animate={controls}
+      />
     </motion.svg>
   );
 }

@@ -54,6 +54,21 @@ const STATUS_CONFIG = {
   },
 };
 
+const StatusBadge = ({ status }) => {
+  const s = STATUS_CONFIG[status] || STATUS_CONFIG.ongoing;
+
+  return (
+    <div
+      className={`flex w-[130px] items-center justify-center gap-2 rounded-full border py-1.5 transition-all ${s.bg} ${s.border} ${s.color} ${s.glow}`}
+    >
+      {s.icon}
+      <span className="text-[11px] font-bold tracking-wider uppercase">
+        {s.label}
+      </span>
+    </div>
+  );
+};
+
 const Logs = () => {
   useRequireAuth();
   const [logs, setLogs] = useState([]);
@@ -81,46 +96,32 @@ const Logs = () => {
     }
   };
 
-  const StatusBadge = ({ status }) => {
-    const s = STATUS_CONFIG[status] || STATUS_CONFIG.ongoing;
-
-    return (
-      <div
-        className={`flex items-center justify-center gap-2 w-[130px] py-1.5 rounded-full border transition-all ${s.bg} ${s.border} ${s.color} ${s.glow}`}
-      >
-        {s.icon}
-        <span className="text-[11px] font-bold tracking-wider uppercase">
-          {s.label}
-        </span>
-      </div>
-    );
-  };
-
   return (
     <>
       <SEO title="Activity Logs - DaemonDoc" />
-      <div className="min-h-screen bg-linear-to-b from-white via-slate-50/70 to-white text-slate-900 font-sans selection:bg-sky-100">
+      <div className="min-h-screen bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-sky-100">
         <AuthNavigation />
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute top-24 left-[-7rem] h-72 w-72 rounded-full bg-blue-100/55 blur-3xl" />
           <div className="absolute top-72 right-[-8rem] h-96 w-96 rounded-full bg-sky-100/45 blur-3xl" />
         </div>
 
-        <div className="relative mx-auto max-w-5xl px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-32">
+        <div className="relative mx-auto max-w-5xl px-4 pt-24 pb-16 sm:px-6 sm:pt-32 sm:pb-20">
           {/* Header */}
           <div className="mb-10 flex flex-col gap-5 md:mb-12 md:flex-row md:items-center md:justify-between md:gap-8">
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-1 w-8 bg-blue-600 rounded-full" />
-                <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+              <div className="mb-2 flex items-center gap-2">
+                <div className="h-1 w-8 rounded-full bg-blue-600" />
+                <span className="font-mono text-[10px] font-black tracking-[0.3em] text-slate-400 uppercase">
                   Activity System
                 </span>
               </div>
-              <h1 className="text-3xl font-[1000] uppercase tracking-tighter text-slate-900 sm:text-5xl">
+              <h1 className="text-3xl font-[1000] tracking-tighter text-slate-900 uppercase sm:text-5xl">
                 Event Logs
               </h1>
               <p className="mt-3 max-w-2xl text-sm font-medium tracking-tight text-slate-500 sm:text-base">
-                Track every automated documentation run with the same clean system language as the landing experience.
+                Track every automated documentation run with the same clean
+                system language as the landing experience.
               </p>
             </div>
 
@@ -177,7 +178,7 @@ const Logs = () => {
                 key={i}
                 className={`rounded-[1.5rem] border border-slate-200/60 p-4 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.28)] sm:rounded-[2rem] sm:p-5 ${stat.bg}`}
               >
-                <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400 mb-1">
+                <p className="mb-1 font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
                   {stat.label}
                 </p>
                 <p className={`text-xl font-black sm:text-2xl ${stat.color}`}>
@@ -194,7 +195,7 @@ const Logs = () => {
                 <History size={18} />
               </div>
               <div className="min-w-0">
-                <p className="font-mono text-xs font-black uppercase tracking-[0.24em] text-slate-400">
+                <p className="font-mono text-xs font-black tracking-[0.24em] text-slate-400 uppercase">
                   Live Timeline
                 </p>
                 <p className="text-sm font-semibold text-slate-700">
@@ -204,16 +205,16 @@ const Logs = () => {
             </div>
             <div className="divide-y divide-slate-100">
               {loading && logs.length === 0 ? (
-                <div className="py-24 flex flex-col items-center gap-4">
+                <div className="flex flex-col items-center gap-4 py-24">
                   <Loader2 className="animate-spin text-blue-500" size={40} />
-                  <p className="font-mono text-xs font-black uppercase tracking-[0.24em] text-slate-400">
+                  <p className="font-mono text-xs font-black tracking-[0.24em] text-slate-400 uppercase">
                     Loading Logs
                   </p>
                 </div>
               ) : error ? (
                 <div className="px-4 py-14 text-center sm:px-6 sm:py-16">
                   <XCircle size={42} className="mx-auto mb-4 text-rose-500" />
-                  <h3 className="mb-2 text-lg font-black uppercase tracking-tight text-slate-900">
+                  <h3 className="mb-2 text-lg font-black tracking-tight text-slate-900 uppercase">
                     Failed to load logs
                   </h3>
                   <p className="mb-6 text-sm text-slate-500">{error}</p>
@@ -227,22 +228,18 @@ const Logs = () => {
               ) : logs.length === 0 ? (
                 <div className="px-4 py-16 text-center sm:px-6 sm:py-20">
                   <History size={46} className="mx-auto mb-4 text-blue-300" />
-                  <h3 className="mb-2 text-lg font-black uppercase tracking-tight text-slate-900">
+                  <h3 className="mb-2 text-lg font-black tracking-tight text-slate-900 uppercase">
                     No activity yet
                   </h3>
                   <p className="text-sm text-slate-500">
-                    Once README jobs start running, this feed will show the latest activity here.
+                    Once README jobs start running, this feed will show the
+                    latest activity here.
                   </p>
                 </div>
               ) : (
                 <AnimatePresence>
                   {logs.map((log, index) => (
-                    <LogItem
-                      key={log._id}
-                      log={log}
-                      index={index}
-                      StatusBadge={StatusBadge}
-                    />
+                    <LogItem key={log._id} log={log} index={index} />
                   ))}
                 </AnimatePresence>
               )}
@@ -254,7 +251,7 @@ const Logs = () => {
   );
 };
 
-const LogItem = ({ log, index, StatusBadge }) => {
+const LogItem = ({ log, index }) => {
   const commitUrl =
     log.commitId && log.repoOwner
       ? `https://github.com/${log.repoOwner}/${log.repoName}/commit/${log.commitId}`
@@ -280,7 +277,7 @@ const LogItem = ({ log, index, StatusBadge }) => {
           </div>
 
           <div className="min-w-0 flex-1">
-            <h3 className="mb-1 text-[14px] font-black uppercase tracking-tight text-slate-800 sm:text-[15px]">
+            <h3 className="mb-1 text-[14px] font-black tracking-tight text-slate-800 uppercase sm:text-[15px]">
               {log.action.replace(/_/g, " ")}
             </h3>
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 sm:gap-3">

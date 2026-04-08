@@ -42,29 +42,29 @@ const HowItWorks = () => {
   return (
     <section
       id="how-it-works"
-      className="py-20 lg:py-32 bg-white overflow-hidden border-t border-slate-100"
+      className="overflow-hidden border-t border-slate-100 bg-white py-20 lg:py-32"
     >
-      <div className="max-w-[1440px] mx-auto px-6 lg:px-8">
+      <div className="mx-auto max-w-[1440px] px-6 lg:px-8">
         {/* Header: Fixed for mobile scaling */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 lg:mb-24 gap-8">
+        <div className="mb-16 flex flex-col items-start justify-between gap-8 md:flex-row md:items-end lg:mb-24">
           <div className="max-w-2xl">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="flex items-center gap-3 mb-4 lg:mb-6"
+              className="mb-4 flex items-center gap-3 lg:mb-6"
             >
-              <div className="w-2 h-2 rounded-full bg-slate-900" />
-              <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+              <div className="h-2 w-2 rounded-full bg-slate-900" />
+              <span className="font-mono text-[10px] font-black tracking-[0.3em] text-slate-400 uppercase">
                 System_Workflow // v0.4
               </span>
             </motion.div>
-            <h2 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tighter uppercase leading-[0.85]">
+            <h2 className="text-4xl leading-[0.85] font-black tracking-tighter uppercase sm:text-5xl lg:text-7xl">
               The Protocol.
             </h2>
           </div>
-          <div className="hidden lg:block text-right pb-2">
-            <p className="font-mono text-[10px] font-bold text-slate-300 uppercase leading-relaxed">
+          <div className="hidden pb-2 text-right lg:block">
+            <p className="font-mono text-[10px] leading-relaxed font-bold text-slate-300 uppercase">
               [ Input: Raw Code ] <br />
               [ Processing: LLM + AST Explorer ] <br />[ Output: Structured
               Documentation ]
@@ -75,12 +75,12 @@ const HowItWorks = () => {
         {/* The Pipeline Interface */}
         <div className="relative">
           {/* Desktop Connecting Line (Horizontal) */}
-          <div className="absolute top-[39px] left-0 w-full h-px bg-slate-100 hidden lg:block" />
+          <div className="absolute top-[39px] left-0 hidden h-px w-full bg-slate-100 lg:block" />
 
           {/* Mobile Connecting Line (Vertical) */}
-          <div className="absolute top-0 left-[39px] w-px h-full bg-slate-100 lg:hidden" />
+          <div className="absolute top-0 left-[39px] h-full w-px bg-slate-100 lg:hidden" />
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 lg:gap-12 relative z-10">
+          <div className="relative z-10 grid grid-cols-1 gap-12 lg:grid-cols-4 lg:gap-12">
             {steps.map((step, idx) => (
               <motion.div
                 key={idx}
@@ -88,15 +88,13 @@ const HowItWorks = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.1 }}
-                className="group flex lg:flex-col gap-6 lg:gap-0"
+                className="group flex gap-6 lg:flex-col lg:gap-0"
               >
                 {/* Visual Node */}
-                <div className="flex flex-col items-center lg:items-start lg:mb-8 shrink-0">
+                <div className="flex shrink-0 flex-col items-center lg:mb-8 lg:items-start">
                   <div className="relative">
                     <div
-                      className={`w-16 h-16 lg:w-20 lg:h-20 rounded-2xl border-2 flex items-center justify-center transition-all duration-500 bg-white
-                        ${idx === 2 ? "border-slate-900 shadow-xl lg:shadow-2xl" : "border-slate-100 group-hover:border-slate-300"}
-                      `}
+                      className={`flex h-16 w-16 items-center justify-center rounded-2xl border-2 bg-white transition-all duration-500 lg:h-20 lg:w-20 ${idx === 2 ? "border-slate-900 shadow-xl lg:shadow-2xl" : "border-slate-100 group-hover:border-slate-300"} `}
                     >
                       {React.cloneElement(step.icon, {
                         className:
@@ -107,9 +105,7 @@ const HowItWorks = () => {
                     </div>
                     {/* Signal Dot */}
                     <div
-                      className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white
-                        ${idx === 2 ? "bg-blue-500 animate-pulse" : "bg-slate-200"}
-                      `}
+                      className={`absolute -top-1 -right-1 h-3 w-3 rounded-full border-2 border-white ${idx === 2 ? "animate-pulse bg-blue-500" : "bg-slate-200"} `}
                     />
                   </div>
 
@@ -122,21 +118,21 @@ const HowItWorks = () => {
                 </div>
 
                 {/* Content */}
-                <div className="space-y-3 lg:space-y-4 pt-2 lg:pt-0">
+                <div className="space-y-3 pt-2 lg:space-y-4 lg:pt-0">
                   <div className="flex items-center gap-3">
                     <span className="font-mono text-[10px] font-black text-slate-300">
                       0{idx + 1}
                     </span>
-                    <span className="px-2 py-0.5 bg-slate-50 text-[9px] font-black font-mono text-slate-400 border border-slate-100 uppercase rounded">
+                    <span className="rounded border border-slate-100 bg-slate-50 px-2 py-0.5 font-mono text-[9px] font-black text-slate-400 uppercase">
                       {step.code}
                     </span>
                   </div>
 
-                  <h3 className="text-lg lg:text-xl font-black uppercase tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+                  <h3 className="text-lg font-black tracking-tight text-slate-900 uppercase transition-colors group-hover:text-blue-600 lg:text-xl">
                     {step.title}
                   </h3>
 
-                  <p className="text-sm text-slate-500 leading-relaxed font-medium lg:max-w-[240px]">
+                  <p className="text-sm leading-relaxed font-medium text-slate-500 lg:max-w-[240px]">
                     {step.desc}
                   </p>
                 </div>
@@ -149,17 +145,17 @@ const HowItWorks = () => {
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          className="mt-16 lg:mt-24 p-6 lg:p-8 border border-slate-100 rounded-3xl lg:rounded-[2rem] bg-slate-50/50 flex flex-col md:flex-row items-center justify-between gap-6"
+          className="mt-16 flex flex-col items-center justify-between gap-6 rounded-3xl border border-slate-100 bg-slate-50/50 p-6 md:flex-row lg:mt-24 lg:rounded-[2rem] lg:p-8"
         >
-          <div className="flex items-center gap-4 lg:gap-6 w-full md:w-auto">
-            <div className="p-3 bg-white rounded-xl border border-slate-200 shadow-sm shrink-0">
+          <div className="flex w-full items-center gap-4 md:w-auto lg:gap-6">
+            <div className="shrink-0 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
               <GitPullRequest size={20} className="text-slate-400" />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">
+              <p className="mb-1 text-[10px] font-black tracking-widest text-slate-400 uppercase">
                 Latest Operation
               </p>
-              <p className="text-[11px] lg:text-xs font-mono font-bold text-slate-900 line-clamp-1">
+              <p className="line-clamp-1 font-mono text-[11px] font-bold text-slate-900 lg:text-xs">
                 PR #842: Documentation Update — /src/core/auth.ts
               </p>
             </div>
@@ -170,7 +166,7 @@ const HowItWorks = () => {
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
-                className={`w-1 h-3 lg:h-4 rounded-full ${i < 4 ? "bg-slate-900" : "bg-slate-200"}`}
+                className={`h-3 w-1 rounded-full lg:h-4 ${i < 4 ? "bg-slate-900" : "bg-slate-200"}`}
               />
             ))}
           </div>

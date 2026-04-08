@@ -60,8 +60,13 @@ async function run() {
   console.log("Connected to MongoDB");
 
   for (const plan of PLANS) {
-    await Plan.findOneAndUpdate({ planId: plan.planId }, plan, { upsert: true, new: true });
-    console.log(`Upserted plan: ${plan.planId} (${plan.name}, ₹${plan.amount / 100})`);
+    await Plan.findOneAndUpdate({ planId: plan.planId }, plan, {
+      upsert: true,
+      new: true,
+    });
+    console.log(
+      `Upserted plan: ${plan.planId} (${plan.name}, ₹${plan.amount / 100})`,
+    );
   }
 
   console.log("Seeding complete.");

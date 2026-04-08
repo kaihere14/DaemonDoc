@@ -11,7 +11,6 @@ import {
   AlertTriangle,
   Check,
   Crown,
-  Infinity,
 } from "lucide-react";
 import AuthNavigation from "../components/AuthNavigation";
 import SEO from "../components/SEO";
@@ -54,13 +53,13 @@ const Profile = () => {
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen bg-linear-to-b from-white via-slate-50/70 to-white flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-linear-to-b from-white via-slate-50/70 to-white">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="flex flex-col items-center gap-4"
         >
-          <div className="h-8 w-8 rounded-full border-2 border-slate-300 border-t-blue-600 animate-spin" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-blue-600" />
           <p className="text-sm font-medium text-slate-500">
             Loading your profile...
           </p>
@@ -75,14 +74,14 @@ const Profile = () => {
         title="Profile - DaemonDoc"
         description="Review your DaemonDoc account, GitHub connection, repository activity, and account settings."
       />
-      <div className="min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white text-slate-900 font-sans selection:bg-blue-50">
+      <div className="min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-blue-50">
         <AuthNavigation />
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute top-24 left-[-8rem] h-72 w-72 rounded-full bg-blue-100/60 blur-3xl" />
           <div className="absolute top-56 right-[-7rem] h-80 w-80 rounded-full bg-sky-100/45 blur-3xl" />
         </div>
 
-        <div className="relative mx-auto max-w-6xl px-4 pb-16 pt-24 sm:px-6 sm:pb-20 sm:pt-32">
+        <div className="relative mx-auto max-w-6xl px-4 pt-24 pb-16 sm:px-6 sm:pt-32 sm:pb-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -93,11 +92,11 @@ const Profile = () => {
               <div>
                 <div className="mb-3 flex items-center gap-2">
                   <div className="h-1 w-8 rounded-full bg-blue-600" />
-                  <span className="font-mono text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                  <span className="font-mono text-[10px] font-black tracking-[0.3em] text-slate-400 uppercase">
                     Profile System
                   </span>
                 </div>
-                <h1 className="mb-3 text-3xl font-black uppercase leading-none tracking-tighter text-slate-900 sm:text-5xl">
+                <h1 className="mb-3 text-3xl leading-none font-black tracking-tighter text-slate-900 uppercase sm:text-5xl">
                   Account Profile
                 </h1>
                 <p className="max-w-2xl text-sm font-medium tracking-tight text-slate-500 sm:text-base">
@@ -124,16 +123,16 @@ const Profile = () => {
                     className="h-16 w-16 rounded-full border-2 border-slate-200 object-cover sm:h-20 sm:w-20"
                   />
                   {user.admin && (
-                    <span className="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center rounded-full border-[3px] border-white bg-blue-600">
+                    <span className="absolute right-0 bottom-0 flex h-5 w-5 items-center justify-center rounded-full border-[3px] border-white bg-blue-600">
                       <Check size={10} className="text-white" />
                     </span>
                   )}
                 </div>
                 <div className="min-w-0">
-                  <p className="mb-1 font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                  <p className="mb-1 font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                     Connected Identity
                   </p>
-                  <h2 className="truncate text-xl font-black uppercase tracking-tight text-slate-900 sm:text-2xl">
+                  <h2 className="truncate text-xl font-black tracking-tight text-slate-900 uppercase sm:text-2xl">
                     {user.name || user.githubUsername}
                   </h2>
                   <p className="truncate text-sm text-slate-500">
@@ -182,7 +181,7 @@ const Profile = () => {
                   repos.length
                 )}
               </p>
-              <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+              <p className="font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
                 Total Repos
               </p>
             </motion.div>
@@ -208,7 +207,7 @@ const Profile = () => {
                   <Zap size={18} />
                 </div>
                 {hasActiveRepos && (
-                  <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.18em] text-blue-700">
+                  <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-black tracking-[0.18em] text-blue-700 uppercase">
                     Live
                   </span>
                 )}
@@ -224,7 +223,7 @@ const Profile = () => {
                   activeReposCount
                 )}
               </p>
-              <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+              <p className="font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
                 Active Updates
               </p>
             </motion.div>
@@ -243,7 +242,7 @@ const Profile = () => {
               <p className="mb-1 text-base font-black text-slate-900 sm:text-lg">
                 {user.autoReadmeEnabled ? "Real-time" : "Paused"}
               </p>
-              <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+              <p className="font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
                 Sync Status
               </p>
             </motion.div>
@@ -263,7 +262,7 @@ const Profile = () => {
               <p className="mb-1 text-xl font-black text-sky-700 sm:text-2xl">
                 {privateReposCount}
               </p>
-              <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+              <p className="font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
                 Private Repos
               </p>
             </motion.div>
@@ -285,13 +284,17 @@ const Profile = () => {
                       : "bg-slate-100 text-slate-500"
                   }`}
                 >
-                  {user.plan === "pro" ? <Crown size={20} /> : <Zap size={20} />}
+                  {user.plan === "pro" ? (
+                    <Crown size={20} />
+                  ) : (
+                    <Zap size={20} />
+                  )}
                 </div>
                 <div>
-                  <p className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                  <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                     Current Plan
                   </p>
-                  <h3 className="text-lg font-black uppercase tracking-tight text-slate-900">
+                  <h3 className="text-lg font-black tracking-tight text-slate-900 uppercase">
                     {user.plan === "pro" ? "Pro" : "Free"}
                   </h3>
                   <div className="mt-0.5 flex flex-wrap gap-2 text-[11px] text-slate-500">
@@ -301,7 +304,10 @@ const Profile = () => {
                         : `${user.activeRepoLimit ?? 5} active repos`}
                     </span>
                     <span className="text-slate-300">·</span>
-                    <span>{user.reviewLimit ?? 1} review{(user.reviewLimit ?? 1) !== 1 ? "s" : ""}</span>
+                    <span>
+                      {user.reviewLimit ?? 1} review
+                      {(user.reviewLimit ?? 1) !== 1 ? "s" : ""}
+                    </span>
                     <span className="text-slate-300">·</span>
                     <span>{user.competitorLimit ?? 1} competitor analysis</span>
                   </div>
@@ -316,9 +322,13 @@ const Profile = () => {
                 }`}
               >
                 {user.plan === "pro" ? (
-                  <>View Details <ChevronRight size={14} /></>
+                  <>
+                    View Details <ChevronRight size={14} />
+                  </>
                 ) : (
-                  <><Zap size={14} /> Upgrade to Pro</>
+                  <>
+                    <Zap size={14} /> Upgrade to Pro
+                  </>
                 )}
               </button>
             </div>
@@ -333,7 +343,7 @@ const Profile = () => {
             >
               <div className="mb-5 flex items-center gap-2">
                 <div className="h-1 w-6 rounded-full bg-blue-600" />
-                <span className="font-mono text-[10px] font-black uppercase tracking-[0.24em] text-slate-400">
+                <span className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                   Integrations
                 </span>
               </div>
@@ -355,7 +365,7 @@ const Profile = () => {
                   </div>
                   <div className="flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-blue-700">
                     <Check size={12} />
-                    <span className="text-[10px] font-black uppercase tracking-[0.18em]">
+                    <span className="text-[10px] font-black tracking-[0.18em] uppercase">
                       Active
                     </span>
                   </div>
@@ -363,7 +373,7 @@ const Profile = () => {
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="rounded-[1.25rem] border border-slate-200 bg-white p-4">
-                    <p className="mb-1 font-mono text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                    <p className="mb-1 font-mono text-[10px] font-black tracking-[0.22em] text-slate-400 uppercase">
                       Username
                     </p>
                     <p className="truncate text-sm font-semibold text-slate-900">
@@ -371,7 +381,7 @@ const Profile = () => {
                     </p>
                   </div>
                   <div className="rounded-[1.25rem] border border-slate-200 bg-white p-4">
-                    <p className="mb-1 font-mono text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                    <p className="mb-1 font-mono text-[10px] font-black tracking-[0.22em] text-slate-400 uppercase">
                       Auto README
                     </p>
                     <p className="text-sm font-semibold text-slate-900">
@@ -398,7 +408,7 @@ const Profile = () => {
                   <Settings size={18} />
                 </div>
                 <div className="text-left">
-                  <p className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                  <p className="font-mono text-[10px] font-black tracking-[0.22em] text-slate-400 uppercase">
                     Settings
                   </p>
                   <span className="text-sm font-semibold text-slate-700">
@@ -423,7 +433,7 @@ const Profile = () => {
                   transition={{ duration: 0.2 }}
                   className="overflow-hidden"
                 >
-                  <div className="border-t border-slate-100 px-5 pb-5 pt-3 sm:px-6 sm:pb-6">
+                  <div className="border-t border-slate-100 px-5 pt-3 pb-5 sm:px-6 sm:pb-6">
                     <div className="rounded-[1.5rem] border border-rose-100 bg-rose-50/60 p-4">
                       <div className="flex items-start gap-3">
                         <AlertTriangle
@@ -431,7 +441,7 @@ const Profile = () => {
                           className="mt-0.5 shrink-0 text-rose-500"
                         />
                         <div className="flex-1">
-                          <h5 className="mb-1 text-sm font-black uppercase tracking-tight text-rose-900">
+                          <h5 className="mb-1 text-sm font-black tracking-tight text-rose-900 uppercase">
                             Danger Zone
                           </h5>
                           <p className="mb-3 text-xs text-rose-700/80">
@@ -477,7 +487,7 @@ const Profile = () => {
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-rose-100 text-rose-600">
                     <AlertTriangle className="h-8 w-8" />
                   </div>
-                  <h3 className="mb-2 text-xl font-black uppercase tracking-tight text-slate-900">
+                  <h3 className="mb-2 text-xl font-black tracking-tight text-slate-900 uppercase">
                     Delete Account
                   </h3>
                   <p className="text-sm text-slate-500">
@@ -487,7 +497,7 @@ const Profile = () => {
                 </div>
 
                 <div className="mb-6">
-                  <label className="mb-2 block text-left font-mono text-[10px] font-black uppercase tracking-[0.22em] text-slate-400">
+                  <label className="mb-2 block text-left font-mono text-[10px] font-black tracking-[0.22em] text-slate-400 uppercase">
                     Type <span className="text-rose-600">delete</span> to
                     confirm
                   </label>
@@ -496,7 +506,7 @@ const Profile = () => {
                     value={deleteConfirmText}
                     onChange={(e) => setDeleteConfirmText(e.target.value)}
                     placeholder="Type 'delete' here"
-                    className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-900 transition-all focus:border-transparent focus:outline-none focus:ring-2 focus:ring-rose-500"
+                    className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-900 transition-all focus:border-transparent focus:ring-2 focus:ring-rose-500 focus:outline-none"
                     autoFocus
                   />
                 </div>

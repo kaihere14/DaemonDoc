@@ -1,8 +1,12 @@
-'use client';;
-import * as React from 'react';
-import { motion } from 'motion/react';
+"use client";
+import * as React from "react";
+import { motion } from "motion/react";
 
-import { getVariants, useAnimateIconContext, IconWrapper } from '@/components/animate-ui/icons/icon';
+import {
+  getVariants,
+  useAnimateIconContext,
+  IconWrapper,
+} from "@/components/animate-ui/icons/icon";
 
 const animations = {
   default: {
@@ -21,10 +25,10 @@ const animations = {
         scale: [1, 1.1, 1],
         transition: {
           duration: 0.6,
-          ease: 'easeInOut',
+          ease: "easeInOut",
         },
       },
-    }
+    },
   },
 
   check: {
@@ -43,17 +47,14 @@ const animations = {
         scale: [1.1, 1],
         transition: {
           duration: 0.6,
-          ease: 'easeInOut',
+          ease: "easeInOut",
         },
       },
-    }
-  }
+    },
+  },
 };
 
-function IconComponent({
-  size,
-  ...props
-}) {
+function IconComponent({ size, ...props }) {
   const { controls } = useAnimateIconContext();
   const variants = getVariants(animations);
 
@@ -68,7 +69,8 @@ function IconComponent({
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
-      {...props}>
+      {...props}
+    >
       <motion.rect
         width="8"
         height="4"
@@ -78,17 +80,20 @@ function IconComponent({
         ry="1"
         variants={variants.rect}
         initial="initial"
-        animate={controls} />
+        animate={controls}
+      />
       <motion.path
         d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
         variants={variants.path1}
         initial="initial"
-        animate={controls} />
+        animate={controls}
+      />
       <motion.path
         d="m9 14 2 2 4-4"
         variants={variants.path2}
         initial="initial"
-        animate={controls} />
+        animate={controls}
+      />
     </motion.svg>
   );
 }

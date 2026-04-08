@@ -1,19 +1,15 @@
-/* eslint-disable react/prop-types */
 import React from "react";
 import { Send, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 
-const AdminBroadcastSection = ({
-  onOpenComposer,
-  sectionNumber = "02",
-}) => {
+const AdminBroadcastSection = ({ onOpenComposer, sectionNumber = "02" }) => {
   return (
     <section>
       <div className="mb-4">
-        <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+        <p className="font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
           Section {sectionNumber}
         </p>
-        <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-slate-900 sm:text-3xl">
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-900 uppercase sm:text-3xl">
           Broadcast
         </h2>
       </div>
@@ -29,10 +25,10 @@ const AdminBroadcastSection = ({
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600 sm:h-16 sm:w-16">
               <Send size={32} strokeWidth={1.5} />
             </div>
-            <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-slate-400">
+            <p className="font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
               Broadcast Flow
             </p>
-            <h3 className="mt-3 text-2xl font-black uppercase tracking-tight text-slate-900 sm:text-3xl">
+            <h3 className="mt-3 text-2xl font-black tracking-tight text-slate-900 uppercase sm:text-3xl">
               Send Product Updates
             </h3>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">
@@ -65,7 +61,7 @@ const AdminBroadcastSection = ({
           </p>
           <button
             onClick={onOpenComposer}
-            className="inline-flex items-center justify-center gap-2 rounded-[1.1rem] bg-[#1d4ed8] px-5 py-3 text-sm font-bold uppercase tracking-[0.16em] text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-[#1e40af]"
+            className="inline-flex items-center justify-center gap-2 rounded-[1.1rem] bg-[#1d4ed8] px-5 py-3 text-sm font-bold tracking-[0.16em] text-white uppercase shadow-lg shadow-blue-500/20 transition-all hover:bg-[#1e40af]"
           >
             Open Composer
             <ChevronRight size={18} />

@@ -94,9 +94,7 @@ new Worker(
             reposDeactivatedNotification: reposToDeactivate.length > 0,
           },
         });
-        console.log(
-          `[Reset Queue] User ${data._id} successfully downgraded.`,
-        );
+        console.log(`[Reset Queue] User ${data._id} successfully downgraded.`);
       } else if (
         data.planInterval === "yearly" &&
         data.usagePeriodStart &&

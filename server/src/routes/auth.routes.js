@@ -15,6 +15,10 @@ router.get("/github", githubAuthRedirect);
 router.get("/github/callback", githubCallBack);
 router.post("/verify", authenticate, verifyUser);
 router.delete("/delete", authenticate, deleteAccount);
-router.post("/dismiss-repos-notification", authenticate, dismissReposDeactivatedNotification);
+router.post(
+  "/dismiss-repos-notification",
+  authenticate,
+  dismissReposDeactivatedNotification,
+);
 
 export default router;

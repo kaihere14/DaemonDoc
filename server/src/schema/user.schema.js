@@ -18,7 +18,11 @@ const userSchema = new Schema(
     // Subscription / plan fields
     plan: { type: String, enum: ["free", "pro"], default: "free" },
     // Tracks which billing interval is active — drives reset logic
-    planInterval: { type: String, enum: ["free", "monthly", "yearly"], default: "free" },
+    planInterval: {
+      type: String,
+      enum: ["free", "monthly", "yearly"],
+      default: "free",
+    },
     reviewLimit: { type: Number, default: 1 },
     competitorLimit: { type: Number, default: 1 },
     activeRepoLimit: { type: Number, default: 5 },

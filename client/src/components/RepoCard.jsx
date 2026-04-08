@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  GitBranch,
-  Lock,
-  Unlock,
-  Loader2,
-  ExternalLink,
-} from "lucide-react";
+import { GitBranch, Lock, Unlock, Loader2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { api, ENDPOINTS } from "../lib/api";
 import PlanLimitModal from "./PlanLimitModal";
@@ -69,25 +63,25 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
         y: -4,
         boxShadow: "0 18px 40px rgba(29,78,216,0.08)",
       }}
-      className="relative flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-slate-200/80 bg-white/90 p-4 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.25)] transition-all duration-200 hover:border-blue-200 group backdrop-blur-xl sm:rounded-[2rem] sm:p-6"
+      className="group relative flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-slate-200/80 bg-white/90 p-4 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.25)] backdrop-blur-xl transition-all duration-200 hover:border-blue-200 sm:rounded-[2rem] sm:p-6"
     >
       <div className="flex flex-col gap-3 sm:gap-4">
         <div className="flex items-start justify-between gap-3 sm:gap-4">
           <div
-            className="flex min-w-0 items-start gap-2.5 cursor-pointer group/title sm:gap-3"
+            className="group/title flex min-w-0 cursor-pointer items-start gap-2.5 sm:gap-3"
             onClick={handleCardClick}
           >
             <div className="flex items-center justify-center rounded-2xl border border-blue-100 bg-blue-50/80 p-2 shadow-inner shadow-blue-200/50">
               <GitBranch size={16} className="text-blue-600 sm:size-[18px]" />
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1">
-                <h3 className="min-w-0 flex-1 truncate text-base font-black uppercase tracking-tight text-slate-900 group-hover/title:text-blue-600 sm:text-lg">
+                <h3 className="min-w-0 flex-1 truncate text-base font-black tracking-tight text-slate-900 uppercase group-hover/title:text-blue-600 sm:text-lg">
                   {repo.name}
                 </h3>
                 <ExternalLink
                   size={14}
-                  className="text-slate-400 shrink-0 opacity-60 group-hover/title:opacity-100 transition-all group-hover/title:text-blue-600"
+                  className="shrink-0 text-slate-400 opacity-60 transition-all group-hover/title:text-blue-600 group-hover/title:opacity-100"
                 />
               </div>
               <p className="max-w-[220px] truncate font-mono text-[11px] text-slate-500 sm:max-w-[240px]">
@@ -101,11 +95,15 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
               onClick={(e) => e.stopPropagation()}
             >
               {loading ? (
-                <Loader2 size={20} className="text-slate-400 animate-spin" />
+                <Loader2 size={20} className="animate-spin text-slate-400" />
               ) : repo.canActivate === false && !isActive ? (
                 <button
-                  onClick={() => toast.info("Admin access required to enable webhooks on this repo.")}
-                  className="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-200 cursor-not-allowed opacity-50"
+                  onClick={() =>
+                    toast.info(
+                      "Admin access required to enable webhooks on this repo.",
+                    )
+                  }
+                  className="relative inline-flex h-6 w-11 cursor-not-allowed items-center rounded-full bg-slate-200 opacity-50"
                 >
                   <span className="inline-block h-4 w-4 translate-x-1 transform rounded-full bg-white" />
                 </button>
@@ -113,7 +111,7 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
                 <button
                   onClick={handleToggle}
                   disabled={loading}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 cursor-pointer ${
+                  className={`relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:outline-none ${
                     isActive ? "bg-blue-600" : "bg-slate-300"
                   }`}
                 >
@@ -128,7 +126,7 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
           )}
         </div>
 
-        <div className="flex flex-wrap items-center gap-1 text-[10px] uppercase tracking-[0.14em] font-mono text-slate-400 sm:text-[11px] sm:tracking-[0.18em]">
+        <div className="flex flex-wrap items-center gap-1 font-mono text-[10px] tracking-[0.14em] text-slate-400 uppercase sm:text-[11px] sm:tracking-[0.18em]">
           <span className="font-black text-slate-400">{ownerLabel}</span>
           <span className="text-slate-300">•</span>
           <span className="text-slate-500">{branchLabel}</span>
@@ -138,8 +136,8 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
           <div
             className={`flex items-center gap-1 rounded-xl border px-2.5 py-1 text-[10px] font-black tracking-wide sm:px-3 sm:text-[11px] ${
               repo.private
-                ? "bg-slate-100 text-slate-700 border-slate-200"
-                : "bg-blue-50 text-blue-700 border-blue-100"
+                ? "border-slate-200 bg-slate-100 text-slate-700"
+                : "border-blue-100 bg-blue-50 text-blue-700"
             }`}
           >
             {repo.private ? (
@@ -171,7 +169,7 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
         </div>
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 h-6 bg-gradient-to-b from-transparent via-transparent to-white pointer-events-none" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-b from-transparent via-transparent to-white" />
 
       <PlanLimitModal
         open={showLimitModal}
