@@ -1,3 +1,4 @@
+
 # DaemonDoc — AI-Powered README Generator
 
 <div align="center">
@@ -25,6 +26,10 @@ The AI pipeline uses **Gemini 3 Flash** (primary, 1M token context) with automat
 
 ## ✨ Features
 
+- **Deep Behavioral Analytics** — Integrated PostHog for tracking the full user lifecycle, from repository activations and deactivations to manual refresh events.
+- **Conversion Funnel Monitoring** — Real-time tracking of the upgrade journey, capturing pricing CTA clicks, checkout initiations, and payment outcomes (success/failure).
+- **Automated Error Capture** — Proactive client-side exception monitoring via PostHog to identify friction points in authentication and payment workflows.
+- **User Identity Resolution** — Synchronizes GitHub usernames and plan status with PostHog profiles for granular usage insights and churn analysis.
 - **Comprehensive Payment Administration** — Dedicated dashboard for monitoring revenue, managing user subscriptions, and adjusting plan pricing in real-time.
 - **Interactive Financial Analytics** — Visualized 7-day revenue and purchase trends using animated line charts and data-driven insights.
 - **Subscription Lifecycle Management** — Administrative controls to revoke premium plans, transition users to free tiers, and manage repository limits automatically.
@@ -60,7 +65,6 @@ The AI pipeline uses **Gemini 3 Flash** (primary, 1M token context) with automat
 - **Toast Notifications** — Provides instant, non-intrusive feedback for user actions.
 - **Animated UI Elements** — Dynamic and engaging animations for key sections like the Hero.
 - **Modernized Login Page** — Redesigned login experience with a sleek split-layout.
-
 ## ⚙️ How It Works
 
 1. Connect GitHub Account → OAuth login, encrypted token stored
@@ -280,6 +284,14 @@ Open **http://localhost:5173**
 3. Copy **Client ID** and **Client Secret** → add to `server/.env`
 4. Ensure your webhook is configured for push events; the system will only process pushes to the default branch.
 
+### PostHog Analytics
+
+1. Sign up at [PostHog](https://posthog.com/)
+2. Create a new project and copy your **Project API Key** and **API Host**
+3. Add to `client/.env`:
+   - `VITE_PUBLIC_POSTHOG_PROJECT_TOKEN=your_project_token`
+   - `VITE_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com` (or your region's host)
+
 ### Gemini API Keys
 
 1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
@@ -296,8 +308,6 @@ Open **http://localhost:5173**
 
 **Local:**
 bash
-
----
 # macOS
 brew install redis && brew services start redis
 
