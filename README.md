@@ -199,10 +199,12 @@ npm install
 
 Create `server/.env` with your environment variables (refer to the Configuration section).
 
-# Database
+## 🗄️ Database
 
 MONGO_URI=mongodb+srv://user:password@cluster.mongodb.net/daemondoc
 
+### Schema Optimizations
+- **Indexing**: The `userId` field in the `activeRepo` and `paymentLedger` schemas is indexed to optimize query performance for user-specific data lookups.
 # Auth
 
 JWT_SECRET=your_jwt_secret_minimum_32_chars
