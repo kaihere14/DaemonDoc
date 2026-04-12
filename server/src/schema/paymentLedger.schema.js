@@ -7,7 +7,12 @@ import { Schema, model } from "mongoose";
  */
 const paymentLedgerSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
 
     // Razorpay IDs — store all three whenever available
     razorpayOrderId: { type: String, default: null },

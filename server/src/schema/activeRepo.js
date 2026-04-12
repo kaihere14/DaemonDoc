@@ -2,7 +2,12 @@ import { Schema, model } from "mongoose";
 
 const activeRepoSchema = new Schema(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
 
     repoId: { type: Number, required: true },
     repoName: { type: String, required: true },
