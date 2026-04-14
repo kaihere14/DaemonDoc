@@ -332,7 +332,7 @@ const Upgrade = () => {
                           <span className="inline-block h-6 w-12 animate-pulse rounded bg-slate-200" />
                         ) : item.unlimited ? (
                           <div className="flex items-center gap-1.5 text-blue-700">
-                            <Infinity size={18} strokeWidth={2.5} />
+                            <InfinityIcon size={18} strokeWidth={2.5} />
                             <span className="text-sm font-black">
                               Unlimited
                             </span>
