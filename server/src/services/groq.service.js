@@ -31,6 +31,44 @@ function estimateTokens(text) {
   return Math.ceil(text.length / 4);
 }
 
+const GROQ_MAX_INPUT_TOKENS = 8000;
+
+// Hard-truncates a prompt string to fit within a token budget.
+// Cuts from the middle (keeps head + tail) to preserve context framing.
+function truncateToTokenLimit(text, maxTokens) {
+  const maxChars = maxTokens * 4;
+  if (text.length <= maxChars) return text;
+  const headChars = Math.floor(maxChars * 0.6);
+  const tailChars = maxChars - headChars;
+  return (
+    text.slice(0, headChars) +
+    "\n\n... [content truncated to fit Groq context limit] ...\n\n" +
+    text.slice(-tailChars)
+  );
+}
+
+// For Groq: reserves outputTokens + systemPrompt budget, then truncates user prompt.
+function truncateMessagesForGroq(messages) {
+  const systemMsg = messages.find((m) => m.role === "system");
+  const systemTokens = systemMsg ? estimateTokens(systemMsg.content) : 0;
+  // Reserve output budget (6000) + system prompt + small overhead
+  const reservedTokens = 6000 + systemTokens + 200;
+  const userBudget = GROQ_MAX_INPUT_TOKENS - reservedTokens;
+
+  if (userBudget <= 0) return messages; // system prompt alone is too big, send as-is
+
+  return messages.map((m) => {
+    if (m.role !== "user") return m;
+    const truncated = truncateToTokenLimit(m.content, userBudget);
+    if (truncated !== m.content) {
+      console.log(
+        `[Groq] User prompt truncated: ${estimateTokens(m.content)} → ${estimateTokens(truncated)} tokens`,
+      );
+    }
+    return { ...m, content: truncated };
+  });
+}
+
 // Routes to the right provider — Gemini and Groq have different request shapes
 async function callLLMAPI({
   messages,
@@ -51,9 +89,10 @@ async function callLLMAPI({
     );
   }
 
+  const trimmedMessages = truncateMessagesForGroq(messages);
   const response = await axios.post(
     GROQ_API_URL,
-    { model, messages, temperature, max_tokens: maxTokens },
+    { model, messages: trimmedMessages, temperature, max_tokens: maxTokens },
     {
       headers: {
         "Content-Type": "application/json",
