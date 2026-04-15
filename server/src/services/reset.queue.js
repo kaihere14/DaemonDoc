@@ -1,10 +1,10 @@
 import IORedis from "ioredis";
 import { Queue, Worker } from "bullmq";
 import User from "../schema/user.schema.js";
-import { redisConnection } from "./email.queue.js";
 import ActiveRepo from "../schema/activeRepo.js";
 import { decrypt } from "../controllers/oauthcontroller.js";
 import { GITHUB_API_BASE, githubDelete } from "../utils/githubApiClient.js";
+import { redisConnection } from "../utils/redis.js";
 
 export const RESET_QUEUE_NAME = "reset-broadcast";
 const MAX_CONCURRENCY = 4;

@@ -5,6 +5,7 @@ import ActiveRepo from "../schema/activeRepo.js";
 import UserLogModel from "../schema/userLog.schema.js";
 import { encrypt, decrypt } from "../utils/crypto.js";
 import { GITHUB_API_BASE, githubDelete } from "../utils/githubApiClient.js";
+import { redis } from "../utils/redis.js";
 
 export { encrypt, decrypt };
 
@@ -122,6 +123,7 @@ export const createOAuthUser = async (
       githubAccessToken: encrypt(access_token),
     });
     await user.save();
+    await redis.del("admin_analytics");
   } else {
     console.log("User already exists. Updating access token.");
     user.githubAccessToken = encrypt(access_token);
@@ -192,6 +194,7 @@ export const deleteAccount = async (req, res) => {
     await User.deleteOne({ _id: userId });
     await UserLogModel.deleteMany({ userId });
     await ActiveRepo.deleteMany({ userId });
+    await redis.del("admin_analytics");
     return res.status(200).json({ message: "Account deleted successfully" });
   } catch (error) {
     console.error("Delete account error:", error);

@@ -18,9 +18,6 @@ app.use(
   }),
 );
 
-// ── Razorpay webhook — MUST be registered before express.json() ──────────────
-// Razorpay signature verification requires the raw request body (Buffer).
-// express.json() would parse it into an object, breaking the HMAC check.
 app.post(
   "/api/webhook/razorpay",
   express.raw({ type: "application/json" }),

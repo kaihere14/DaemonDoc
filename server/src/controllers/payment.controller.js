@@ -9,6 +9,7 @@ import { getUsageSummary } from "../utils/usageTracker.js";
 import { decrypt } from "./oauthcontroller.js";
 import { GITHUB_API_BASE, githubDelete } from "../utils/githubApiClient.js";
 import { resetQueue } from "../services/reset.queue.js";
+import { redis } from "../utils/redis.js";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -120,6 +121,8 @@ export const adminRevokePlan = async (req, res) => {
         reposDeactivatedNotification: reposToDeactivate.length > 0,
       },
     });
+
+    await redis.del("admin_analytics");
 
     return res.status(200).json({
       message: "Plan revoked. User moved to free plan.",
