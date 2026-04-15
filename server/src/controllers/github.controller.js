@@ -10,6 +10,8 @@ import {
   githubPost,
   githubDelete,
 } from "../utils/githubApiClient.js";
+import { RedisConnection } from "bullmq";
+import { redis } from "../utils/redis.js";
 
 export function verifyGithubSignature(req) {
   const signature = req.headers["x-hub-signature-256"];
@@ -174,6 +176,7 @@ export const addRepoActivity = async (req, res) => {
     });
 
     await activeRepo.save();
+    await redis.del("admin_analytics");
 
     // On first-ever activation, immediately trigger README generation
     // so users don't have to make a commit themselves to see it work.
@@ -252,6 +255,7 @@ export const deactivateRepoActivity = async (req, res) => {
     //insted of turning the toggle of we are just removing the complete document from the db as there was a issue with the toggle where if the user deactivates and activates again then the document was created twice and it was creating an issue for the users so we are just removing the document from the db and when the user activates again then we will create a new document in the db and a new webhook in the github
 
     const response = await ActiveRepo.deleteOne({ _id: activeRepo._id });
+    await redis.del("admin_analytics");
 
     console.log(response);
     res
@@ -354,6 +358,12 @@ export const fetchUserLogs = async (req, res) => {
 
 export const fetchAdminAnalytics = async (_req, res) => {
   try {
+    const cachedAnalytics = await redis.get("admin_analytics");
+    if (cachedAnalytics) {
+      console.log("[cache] Serving admin analytics from Redis cache");
+      return res.status(200).json(JSON.parse(cachedAnalytics));
+    }
+
     const now = new Date();
     const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -483,6 +493,29 @@ export const fetchAdminAnalytics = async (_req, res) => {
         createdAt: new Date(),
       });
     }
+
+    const saveCache = await redis.set(
+      "admin_analytics",
+      JSON.stringify({
+        overview: {
+          totalUsers,
+          activeRepos,
+          totalRuns: totalLogs,
+          liveJobs,
+          successRate,
+          logsInLast24Hours,
+          latestActivityAt: latestLog?.createdAt || null,
+        },
+        breakdown,
+        activity,
+        topRepos,
+        recentLogs: threeLatestLogs,
+      }),
+    );
+    console.log(
+      "[cache] Admin analytics saved to Redis cache with ID:",
+      saveCache,
+    );
 
     return res.status(200).json({
       overview: {

@@ -1,6 +1,7 @@
 import IORedis from "ioredis";
 import { Queue } from "bullmq";
 import { Worker } from "bullmq";
+import { redis } from "./redis.js";
 import User from "../schema/user.schema.js";
 import ActiveRepo from "../schema/activeRepo.js";
 import { decrypt } from "./crypto.js";
@@ -87,6 +88,7 @@ new Worker(
       action: "README_GENERATION_STARTED",
       status: "ongoing",
     });
+    await redis.del("admin_analytics");
     job.data.logId = userLog._id.toString();
     console.log("Updated job data with logId:", job.data.logId);
     await aihandler(job.data);
@@ -119,6 +121,7 @@ async function updateLogStatus(logId, action, status, commitId = null) {
       console.log(
         `[AI Handler] Log ${logId} saved as action=${log.action} status=${log.status}`,
       );
+      await redis.del("admin_analytics");
     }
   } catch (err) {
     console.error("[AI Handler] Failed to update log:", err.message);
