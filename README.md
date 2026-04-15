@@ -238,13 +238,14 @@ GEMINI_API_KEY3=your_gemini_key_3
 GEMINI_MODEL=gemini-3-flash-preview
 GEMINI_MODEL_MINI=gemini-3-flash-preview
 
-# Groq (fallback — add up to 3 keys)
+# Groq (fallback — add up to 3 keys) ⚡
 
 GROQ_API_KEY1=your_groq_key_1
 GROQ_API_KEY2=your_groq_key_2
 GROQ_API_KEY3=your_groq_key_3
 GROQ_MODEL=openai/gpt-oss-120b
 
+This provider includes intelligent prompt truncation to respect the 8,000 token context limit. It utilizes a middle-cut strategy to preserve critical context framing (head and tail) when processing large codebases.
 # Output
 
 README_FILE_NAME=README.md
