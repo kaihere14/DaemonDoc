@@ -26,6 +26,8 @@ The AI pipeline uses **Gemini 3 Flash** (primary, 1M token context) with automat
 
 ## ✨ Features
 
+- **Interactive Onboarding Flow** — A guided 5-step visual tour on the login page demonstrating the technical pipeline: commit simulation, webhook triggers, file scanning, and real-time README generation.
+- **Animated Feature Visualizations** — High-fidelity UI animations using Lucide components to illustrate the "Push once, sync forever" workflow.
 - **Deep Behavioral Analytics** — Integrated PostHog for tracking the full user lifecycle, from repository activations and deactivations to manual refresh events.
 - **Conversion Funnel Monitoring** — Real-time tracking of the upgrade journey, capturing pricing CTA clicks, checkout initiations, and payment outcomes (success/failure).
 - **Automated Error Capture** — Proactive client-side exception monitoring via PostHog to identify friction points in authentication and payment workflows.
@@ -64,7 +66,7 @@ The AI pipeline uses **Gemini 3 Flash** (primary, 1M token context) with automat
 - **Activity Logs** — Dashboard shows every job: repo, timestamp, success/failed/in-progress status.
 - **Toast Notifications** — Provides instant, non-intrusive feedback for user actions.
 - **Animated UI Elements** — Dynamic and engaging animations for key sections like the Hero.
-- **Modernized Login Page** — Redesigned login experience with a sleek split-layout.
+- **Modernized Login Page** — Redesigned login experience with a sleek split-layout and interactive onboarding flow.
 ## ⚙️ How It Works
 
 1. Connect GitHub Account → OAuth login, encrypted token stored
