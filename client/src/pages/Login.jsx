@@ -7,10 +7,16 @@ import {
   ArrowRight,
   FolderSearch,
   CheckCheck,
+  CheckCircle,
   Zap,
   RotateCcw,
   Terminal,
   Bot,
+  Upload,
+  Folder,
+  FileCode,
+  FileText,
+  Package,
 } from "lucide-react";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -35,11 +41,11 @@ GET  /api/user
 DELETE /api/user/:id`;
 
 const FETCH_FILES = [
-  { name: "src/", icon: "📁", size: "12 files" },
-  { name: "package.json", icon: "📄", size: "2.1 kb" },
-  { name: "tsconfig.json", icon: "📄", size: "0.8 kb" },
-  { name: "README.md", icon: "📝", size: "3.4 kb", isTarget: true },
-  { name: "docker-compose.yml", icon: "🐋", size: "1.2 kb" },
+  { name: "src/", Icon: Folder, size: "12 files" },
+  { name: "package.json", Icon: FileCode, size: "2.1 kb" },
+  { name: "tsconfig.json", Icon: FileCode, size: "0.8 kb" },
+  { name: "README.md", Icon: FileText, size: "3.4 kb", isTarget: true },
+  { name: "docker-compose.yml", Icon: Package, size: "1.2 kb" },
 ];
 
 const SCAN_FILES = [
@@ -311,25 +317,25 @@ const Login = () => {
       {
         key: "pushing",
         label: "Pushing to GitHub...",
-        icon: "⬆️",
+        Icon: Upload,
         color: "text-blue-600",
       },
       {
         key: "webhook",
         label: "Webhook fired",
-        icon: "⚡",
+        Icon: Zap,
         color: "text-yellow-600",
       },
       {
         key: "processing",
         label: "DaemonDoc processing...",
-        icon: "🤖",
+        Icon: Bot,
         color: "text-primary",
       },
       {
         key: "done",
         label: "README.md committed",
-        icon: "✅",
+        Icon: CheckCircle,
         color: "text-emerald-600",
       },
     ];
@@ -386,7 +392,10 @@ const Login = () => {
                         : "bg-slate-50/40 opacity-20"
                     }`}
                   >
-                    <span>{s.icon}</span>
+                    <s.Icon
+                      size={15}
+                      className={reached ? s.color : "text-slate-300"}
+                    />
                     <span className={reached ? s.color : "text-slate-400"}>
                       {s.label}
                     </span>
@@ -542,7 +551,10 @@ const Login = () => {
                           : "bg-slate-50/30 opacity-20"
                     }`}
                   >
-                    <span className="text-base">{f.icon}</span>
+                    <f.Icon
+                      size={15}
+                      className={`shrink-0 ${fetched && f.isTarget ? "text-primary" : "text-slate-400"}`}
+                    />
                     <span
                       className={`flex-1 font-mono text-xs font-medium ${
                         fetched && f.isTarget
