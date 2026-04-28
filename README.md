@@ -61,8 +61,9 @@ The AI pipeline uses **Gemini 3 Flash** (primary, 1M token context) with automat
 - **Large Context Scanning** — Gemini's 1M token window enables scanning up to 50 files (500 lines each) for comprehensive context.
 - **Async Job Queue** — BullMQ + Redis handles all generation in the background; webhooks return instantly.
 - **GitHub OAuth 2.0** — Secure handshake protocols ensuring precise permission scoping for private repositories.
-- **Animated Testimonials** — Engaging, dynamic testimonials showcasing real user experiences.
-- **Comprehensive Landing Page Sections** — Dedicated sections for Core Capabilities, Engine Features, Social Proof, and Pricing.
+- **Interactive Masonry Testimonials** — A sleek, grid-based testimonial section featuring hover-triggered focus effects and dynamic blur transitions for enhanced readability.
+- **Integrated Social Proof** — Brand trust indicators (ACME Corp, Nebula, FlashDev) seamlessly embedded within the testimonial flow to reinforce credibility.
+- **Comprehensive Landing Page Sections** — Dedicated sections for Core Capabilities, Engine Features, Integrated Social Proof, and Pricing.
 - **Activity Logs** — Dashboard shows every job: repo, timestamp, success/failed/in-progress status.
 - **Toast Notifications** — Provides instant, non-intrusive feedback for user actions.
 - **Animated UI Elements** — Dynamic and engaging animations for key sections like the Hero.
