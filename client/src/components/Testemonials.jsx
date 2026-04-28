@@ -31,6 +31,13 @@ const Testemonials = () => {
       designation: "Full Stack Developer",
       src: "/aakarsh.webp",
     },
+    {
+      quote:
+        "Tried DaemonDoc and it’s honestly amazing. The UI is super clean, and the login page feels unreal and majestic. Everything is well-designed and smooth. Loved it",
+      name: "Raghuraj Singh Rathore",
+      designation: "Front End Developer",
+      src: "/raghuraj.webp",
+    },
   ];
 
   return (
