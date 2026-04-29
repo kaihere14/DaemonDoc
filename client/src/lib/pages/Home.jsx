@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import AuthNavigation from "../components/AuthNavigation";
-import RepoCard from "../components/RepoCard";
+import AuthNavigation from "../../components/AuthNavigation";
+import RepoCard from "../../components/RepoCard";
 import {
   Loader2,
   Github,
@@ -10,11 +10,11 @@ import {
   Search,
   X,
 } from "lucide-react";
-import SEO from "../components/SEO";
-import { useRequireAuth } from "../hooks/useRequireAuth";
-import { useRepos } from "../hooks/useRepos";
-import { useAuth } from "../context/AuthContext";
-import { api, ENDPOINTS } from "../lib/api";
+import SEO from "../../components/SEO";
+import { useRequireAuth } from "../../hooks/useRequireAuth";
+import { useRepos } from "../../hooks/useRepos";
+import { useAuth } from "../../context/AuthContext";
+import { api, ENDPOINTS } from "../api";
 import { usePostHog } from "@posthog/react";
 
 const FILTER_TABS = [

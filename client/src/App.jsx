@@ -1,14 +1,14 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
-import Login from "./pages/Login";
-import OauthVerify from "./pages/OauthVerify";
-import Landing from "./pages/Landing";
-import Home from "./pages/Home";
-import Profile from "./pages/Profile";
-import Logs from "./pages/Logs";
-import Admin from "./pages/Admin";
-import Upgrade from "./pages/Upgrade";
+import Login from "./lib/pages/Login";
+import OauthVerify from "./lib/pages/OauthVerify";
+import Landing from "./lib/pages/Landing";
+import Home from "./lib/pages/Home";
+import Profile from "./lib/pages/Profile";
+import Logs from "./lib/pages/Logs";
+import Admin from "./lib/pages/Admin";
+import Upgrade from "./lib/pages/Upgrade";
 
 const App = () => {
   return (

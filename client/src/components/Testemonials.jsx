@@ -1,4 +1,4 @@
-import React, { act } from "react";
+import React from "react";
 import { AnimatedTestimonials } from "./ui/animated-testimonials";
 import { cn } from "@/lib/utils";
 import SocialProof from "./features/SocialProof";
@@ -51,7 +51,7 @@ const Testemonials = () => {
   const [activeIndex, setActiveIndex] = React.useState(-1);
 
   return (
-    <div className="h-full w-full  px-4">
+    <div className="h-full w-full px-4">
       {/* Section Heading */}
       <div className="mx-auto mb-12 max-w-3xl text-center">
         <h2
@@ -66,34 +66,47 @@ const Testemonials = () => {
       </div>
 
       <div className="py-5">
-        <SocialProof/>
+        <SocialProof />
       </div>
 
       {/* <AnimatedTestimonials testimonials={content} autoplay={false} /> */}
       {/* Masonry Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 mt-12 max-w-300 mx-auto items-end">
+      <div className="mx-auto mt-12 grid max-w-300 grid-cols-1 items-end gap-10 sm:grid-cols-2 md:grid-cols-3">
         {content.map((testimonial, index) => (
           <div
             key={index}
-            onMouseEnter={()=>setActiveIndex(index)}
-            onMouseLeave={()=>setActiveIndex(-1)}
-            className={cn("flex flex-col items-start  rounded-lg  p-10 h-fit relative ",
-                          activeIndex === index ? "blur-none":"blur-sm",
-                          activeIndex === -1 ? "blur-none": "transition-all duration-200 ease-in",
-                        )}
+            onMouseEnter={() => setActiveIndex(index)}
+            onMouseLeave={() => setActiveIndex(-1)}
+            className={cn(
+              "relative flex h-fit flex-col items-start rounded-lg p-10",
+              activeIndex === index ? "blur-none" : "blur-xs",
+              activeIndex === -1
+                ? "blur-none"
+                : "transition-all duration-200 ease-in",
+            )}
           >
-            <div className="border border-dashed border-neutral-200 w-[105%] absolute -left-2 top-2"></div>
-            <div className="border border-dashed border-neutral-200 h-[105%] absolute left-2 -top-2"></div>
-            <div className="border border-dashed border-neutral-200 h-[105%] absolute right-2 -top-2"></div>
-            <div className="border border-dashed border-neutral-200 w-[105%] absolute -left-2 bottom-2"></div>
+            <div className="absolute top-2 -left-2 w-[105%] border border-dashed border-neutral-200"></div>
+            <div className="absolute -top-2 left-2 h-[105%] border border-dashed border-neutral-200"></div>
+            <div className="absolute -top-2 right-2 h-[105%] border border-dashed border-neutral-200"></div>
+            <div className="absolute bottom-2 -left-2 w-[105%] border border-dashed border-neutral-200"></div>
             <div className="absolute top-2 left-3">
-              <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="absolute top-2 left-2 text-neutral-200" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M464 256h-80v-64c0-35.3 28.7-64 64-64h8c13.3 0 24-10.7 24-24V56c0-13.3-10.7-24-24-24h-8c-88.4 0-160 71.6-160 160v240c0 26.5 21.5 48 48 48h128c26.5 0 48-21.5 48-48V304c0-26.5-21.5-48-48-48zm-288 0H96v-64c0-35.3 28.7-64 64-64h8c13.3 0 24-10.7 24-24V56c0-13.3-10.7-24-24-24h-8C71.6 32 0 103.6 0 192v240c0 26.5 21.5 48 48 48h128c26.5 0 48-21.5 48-48V304c0-26.5-21.5-48-48-48z"></path></svg>
+              <svg
+                stroke="currentColor"
+                fill="currentColor"
+                stroke-width="0"
+                viewBox="0 0 512 512"
+                class="absolute top-2 left-2 text-neutral-200"
+                height="1em"
+                width="1em"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M464 256h-80v-64c0-35.3 28.7-64 64-64h8c13.3 0 24-10.7 24-24V56c0-13.3-10.7-24-24-24h-8c-88.4 0-160 71.6-160 160v240c0 26.5 21.5 48 48 48h128c26.5 0 48-21.5 48-48V304c0-26.5-21.5-48-48-48zm-288 0H96v-64c0-35.3 28.7-64 64-64h8c13.3 0 24-10.7 24-24V56c0-13.3-10.7-24-24-24h-8C71.6 32 0 103.6 0 192v240c0 26.5 21.5 48 48 48h128c26.5 0 48-21.5 48-48V304c0-26.5-21.5-48-48-48z"></path>
+              </svg>
             </div>
 
+            <p className="mb-4 text-gray-600">{testimonial.quote}</p>
 
-            <p className="text-gray-600  mb-4">{testimonial.quote}</p>
-            
-            <div className="flex justify-center items-center gap-3">
+            <div className="flex items-center justify-center gap-3">
               <div className="img">
                 <img
                   src={testimonial.src}
@@ -102,8 +115,12 @@ const Testemonials = () => {
                 />
               </div>
               <div className="flex flex-col">
-                <h3 className="text-md font-semibold text-shadow-2xs">{testimonial.name}</h3>
-                <p className="text-sm text-gray-500">{testimonial.designation}</p>
+                <h3 className="text-md font-semibold text-shadow-2xs">
+                  {testimonial.name}
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {testimonial.designation}
+                </p>
               </div>
             </div>
           </div>

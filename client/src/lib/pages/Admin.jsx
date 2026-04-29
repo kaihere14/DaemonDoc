@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import AuthNavigation from "../components/AuthNavigation";
-import { api, ENDPOINTS } from "../lib/api";
+import { useAuth } from "../../context/AuthContext";
+import AuthNavigation from "../../components/AuthNavigation";
+import { api, ENDPOINTS } from "../api";
 import { toast } from "sonner";
 import { useReducedMotion } from "framer-motion";
-import AdminHero from "../components/admin/AdminHero";
-import AdminAnalyticsSection from "../components/admin/AdminAnalyticsSection";
-import AdminPaymentsSection from "../components/admin/AdminPaymentsSection";
-import AdminBroadcastSection from "../components/admin/AdminBroadcastSection";
-import AdminSubscriptionSection from "../components/admin/AdminSubscriptionSection";
-import EmailComposerModal from "../components/admin/EmailComposerModal";
-import ConfirmBroadcastModal from "../components/admin/ConfirmBroadcastModal";
+import AdminHero from "../../components/admin/AdminHero";
+import AdminAnalyticsSection from "../../components/admin/AdminAnalyticsSection";
+import AdminPaymentsSection from "../../components/admin/AdminPaymentsSection";
+import AdminBroadcastSection from "../../components/admin/AdminBroadcastSection";
+import AdminSubscriptionSection from "../../components/admin/AdminSubscriptionSection";
+import EmailComposerModal from "../../components/admin/EmailComposerModal";
+import ConfirmBroadcastModal from "../../components/admin/ConfirmBroadcastModal";
 
 const ADMIN_TABS = [
   { key: "analytics", label: "Analytics" },

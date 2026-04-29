@@ -14,11 +14,11 @@ import {
   Infinity as InfinityIcon,
 } from "lucide-react";
 import { toast } from "sonner";
-import AuthNavigation from "../components/AuthNavigation";
-import SEO from "../components/SEO";
-import { useRequireAuth } from "../hooks/useRequireAuth";
-import { useAuth } from "../context/AuthContext";
-import { api, ENDPOINTS } from "../lib/api";
+import AuthNavigation from "../../components/AuthNavigation";
+import SEO from "../../components/SEO";
+import { useRequireAuth } from "../../hooks/useRequireAuth";
+import { useAuth } from "../../context/AuthContext";
+import { api, ENDPOINTS } from "../api";
 import { usePostHog } from "@posthog/react";
 
 const formatPrice = (paise) =>

@@ -9,10 +9,10 @@ import {
   History,
   SkipForward,
 } from "lucide-react";
-import AuthNavigation from "../components/AuthNavigation";
-import SEO from "../components/SEO";
-import { useRequireAuth } from "../hooks/useRequireAuth";
-import { api, ENDPOINTS } from "../lib/api";
+import AuthNavigation from "../../components/AuthNavigation";
+import SEO from "../../components/SEO";
+import { useRequireAuth } from "../../hooks/useRequireAuth";
+import { api, ENDPOINTS } from "../api";
 import { usePostHog } from "@posthog/react";
 
 const STATUS_CONFIG = {

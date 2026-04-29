@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import LandingNavigation from "../components/LandingNavigation";
-import Hero from "../components/Hero";
-import Features from "../components/Features";
-import Footer from "../components/Footer";
-import SEO from "../components/SEO";
+import LandingNavigation from "../../components/LandingNavigation";
+import Hero from "../../components/Hero";
+import Features from "../../components/Features";
+import Footer from "../../components/Footer";
+import SEO from "../../components/SEO";
 
 const LandingPage = () => {
   useEffect(() => {
