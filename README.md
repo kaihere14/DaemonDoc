@@ -26,10 +26,13 @@ The AI pipeline uses **Gemini 3 Flash** (primary, 1M token context) with automat
 
 ## ✨ Features
 
+- **Pro Subscription Tier** — Unlock unlimited repositories, priority AI generation, and enhanced project/competitor analysis limits.
+- **Seamless Payment Integration** — Integrated upgrade flow with real-time plan synchronization and localized currency formatting (INR).
+- **Animated Technical Iconography** — Custom-engineered SVG animations (Hammer, Disc, PlugZap, Search) that visualize complex engine processes like AST scanning and context synthesis.
+- **Interactive Masonry Testimonials** — A sleek, grid-based testimonial section featuring hover-triggered focus effects and dynamic blur transitions for enhanced readability.
+- **Conversion Analytics** — Integrated PostHog tracking for the entire subscription funnel, from pricing views to successful upgrades.
 - **Interactive Onboarding Flow** — A guided 5-step visual tour on the login page demonstrating the technical pipeline: commit simulation, webhook triggers, file scanning, and real-time README generation.
-- **Animated Feature Visualizations** — High-fidelity UI animations using Lucide components to illustrate the "Push once, sync forever" workflow.
 - **Deep Behavioral Analytics** — Integrated PostHog for tracking the full user lifecycle, from repository activations and deactivations to manual refresh events.
-- **Conversion Funnel Monitoring** — Real-time tracking of the upgrade journey, capturing pricing CTA clicks, checkout initiations, and payment outcomes (success/failure).
 - **Automated Error Capture** — Proactive client-side exception monitoring via PostHog to identify friction points in authentication and payment workflows.
 - **User Identity Resolution** — Synchronizes GitHub usernames and plan status with PostHog profiles for granular usage insights and churn analysis.
 - **Comprehensive Payment Administration** — Dedicated dashboard for monitoring revenue, managing user subscriptions, and adjusting plan pricing in real-time.
@@ -41,33 +44,14 @@ The AI pipeline uses **Gemini 3 Flash** (primary, 1M token context) with automat
 - **Docker-Ready Infrastructure** — Includes `docker-compose` configuration for seamless Redis service orchestration with built-in health checks.
 - **Refined Account Management** — Improved clarity in profile settings and account deletion workflows with explicit confirmation requirements.
 - **Modern Admin Dashboard** — Revamped UI with interactive cards, background decorations, and a sleek, professional aesthetic powered by Framer Motion.
-- **Multi-Step Announcement Wizard** — A guided 4-step process for creating feature announcements, including **targeted recipient selection**, email basics, descriptions, change lists, and final review.
-- **Granular Audience Targeting** — Select specific recipients for feature updates with real-time stats on eligible users and automatic notification preference filtering.
-- **Intelligent Code Analysis** — Powered by `gemini-3.1-flash-lite-preview` for deep understanding of codebase structure, logic, and intent. Includes:
-  - **Advanced Context Synthesis**: RAG-based engine aggregates cross-file dependencies for holistic documentation.
-  - **Efficient Differential Scan**: Compute-efficient audits processing only modified AST nodes.
-  - **Thought-Aware Generation**: Captures and logs AI reasoning signatures (Chain-of-Thought) for enhanced generation transparency.
-  - **Granular Commit Isolation**: Tracks change-sets to provide accurate version histories within your README.
-  - **Monorepo Native Support**: Seamlessly handles complex workspaces including Turborepo, Lerna, and Nx structures.
-  - **Smart Logic Exclusions**: Filters out boilerplate, tests, and sensitive configuration from public documentation.
+- **Multi-Step Announcement Wizard** — A guided 4-step process for creating feature announcements, including targeted recipient selection, email basics, descriptions, change lists, and final review.
+- **Intelligent Code Analysis** — Powered by `gemini-3.1-flash-lite-preview` for deep understanding of codebase structure, logic, and intent. Includes RAG-based context synthesis and efficient differential AST scanning.
 - **Professional Feature Announcements** — Integrated email system with categorized update tags (`New`, `Improved`, `Fixed`, `Security`) and dual-action CTAs for user engagement.
-- **Dynamic Change Lists** — Unlimited change entries in announcement emails with validated tag classes, enabling rich, structured updates.
-- **Robust Email Fallback** — Resilient HTML template rendering ensures users receive updates even if primary templates encounter issues.
 - **Real-time Webhook Integration** — "Push once, sync forever" promise, listening for git events to keep your README always up-to-date.
 - **Enterprise-Grade Security** — Bank-level AES-256 encryption protects GitHub tokens and repository access keys at rest and in transit.
-- **Immediate First-Time Generation** — README is generated instantly upon first repository activation.
-- **Incremental Patch Mode** — On subsequent pushes, only affected sections are updated, minimizing compute and latency.
-- **Multi-Key AI Fallback** — Up to 3 Gemini keys, then up to 3 Groq keys, ensuring continuous generation.
-- **Large Context Scanning** — Gemini's 1M token window enables scanning up to 50 files (500 lines each) for comprehensive context.
+- **Multi-Key AI Fallback** — Up to 3 Gemini keys and 3 Groq keys, ensuring continuous generation resilience.
 - **Async Job Queue** — BullMQ + Redis handles all generation in the background; webhooks return instantly.
 - **GitHub OAuth 2.0** — Secure handshake protocols ensuring precise permission scoping for private repositories.
-- **Interactive Masonry Testimonials** — A sleek, grid-based testimonial section featuring hover-triggered focus effects and dynamic blur transitions for enhanced readability.
-- **Integrated Social Proof** — Brand trust indicators (ACME Corp, Nebula, FlashDev) seamlessly embedded within the testimonial flow to reinforce credibility.
-- **Comprehensive Landing Page Sections** — Dedicated sections for Core Capabilities, Engine Features, Integrated Social Proof, and Pricing.
-- **Activity Logs** — Dashboard shows every job: repo, timestamp, success/failed/in-progress status.
-- **Toast Notifications** — Provides instant, non-intrusive feedback for user actions.
-- **Animated UI Elements** — Dynamic and engaging animations for key sections like the Hero.
-- **Modernized Login Page** — Redesigned login experience with a sleek split-layout and interactive onboarding flow.
 ## ⚙️ How It Works
 
 1. Connect GitHub Account → OAuth login, encrypted token stored
