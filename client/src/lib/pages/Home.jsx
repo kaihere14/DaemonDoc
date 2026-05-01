@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AuthNavigation from "../../components/AuthNavigation";
 import RepoCard from "../../components/RepoCard";
@@ -16,6 +16,10 @@ import { useRepos } from "../../hooks/useRepos";
 import { useAuth } from "../../context/AuthContext";
 import { api, ENDPOINTS } from "../api";
 import { usePostHog } from "@posthog/react";
+import {
+  WalkthroughBanner,
+  WalkthroughModal,
+} from "../../components/WalkthroughOverlay";
 
 const FILTER_TABS = [
   { key: "all", label: "All Repositories" },
@@ -25,6 +29,8 @@ const FILTER_TABS = [
 
 const REPOS_PER_PAGE = 12;
 
+const WT_KEY = (username) => `dd_wt_v1_${username}`;
+
 const Home = () => {
   const { user } = useRequireAuth();
   const { setUser } = useAuth();
@@ -33,6 +39,24 @@ const Home = () => {
   const [filter, setFilter] = useState("all"); // all, active, inactive
   const [searchQuery, setSearchQuery] = useState("");
   const [reposPage, setReposPage] = useState(1);
+
+  const [, forceUpdate] = useState(0);
+  const wtStep = user?.githubUsername
+    ? (localStorage.getItem(WT_KEY(user.githubUsername)) ?? "step0")
+    : null;
+
+  const advanceWalkthrough = useCallback(
+    (to) => {
+      if (!user?.githubUsername) return;
+      localStorage.setItem(WT_KEY(user.githubUsername), to);
+      forceUpdate((n) => n + 1);
+    },
+    [user],
+  );
+
+  const handleRepoActivated = useCallback(() => {
+    if (wtStep === "step0") advanceWalkthrough("step1");
+  }, [wtStep, advanceWalkthrough]);
 
   const handleDismissReposNotification = async () => {
     try {
@@ -101,6 +125,11 @@ const Home = () => {
         description="Manage AI-powered README updates for your GitHub repositories. View, enable, and configure automatic documentation generation."
         ogUrl="https://daemondoc.online/home"
         canonical="https://daemondoc.online/home"
+      />
+      <WalkthroughModal
+        open={wtStep === "step1"}
+        onGoToLogs={() => advanceWalkthrough("step2")}
+        onSkip={() => advanceWalkthrough("done")}
       />
       <div className="min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-indigo-100">
         <AuthNavigation />
@@ -287,6 +316,11 @@ const Home = () => {
               </div>
             </motion.div>
 
+            {/* Walkthrough: step 0 guide banner */}
+            {wtStep === "step0" && !loading && repos.length > 0 && (
+              <WalkthroughBanner onSkip={() => advanceWalkthrough("done")} />
+            )}
+
             {/* Content */}
             {loading ? (
               <div className="flex flex-col items-center justify-center py-20">
@@ -340,6 +374,9 @@ const Home = () => {
                         repo={repo}
                         showToggle={true}
                         onToggle={() => handleSilentToggle(repo.id)}
+                        onActivate={
+                          wtStep === "step0" ? handleRepoActivated : undefined
+                        }
                       />
                     </motion.div>
                   ))}

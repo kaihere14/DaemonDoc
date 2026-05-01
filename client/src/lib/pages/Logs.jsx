@@ -14,6 +14,7 @@ import SEO from "../../components/SEO";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { api, ENDPOINTS } from "../api";
 import { usePostHog } from "@posthog/react";
+import { WalkthroughLogsBanner } from "../../components/WalkthroughOverlay";
 
 const STATUS_CONFIG = {
   success: {
@@ -71,12 +72,30 @@ const StatusBadge = ({ status }) => {
 };
 
 const Logs = () => {
-  useRequireAuth();
+  const { user } = useRequireAuth();
   const posthog = usePostHog();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+
+  const [showWtBanner, setShowWtBanner] = useState(() => {
+    return false; // resolved after user loads
+  });
+
+  useEffect(() => {
+    if (user?.githubUsername) {
+      const key = `dd_wt_v1_${user.githubUsername}`;
+      setShowWtBanner(localStorage.getItem(key) === "step2");
+    }
+  }, [user?.githubUsername]);
+
+  const handleWtDismiss = () => {
+    if (user?.githubUsername) {
+      localStorage.setItem(`dd_wt_v1_${user.githubUsername}`, "done");
+    }
+    setShowWtBanner(false);
+  };
 
   useEffect(() => {
     fetchLogs();
@@ -144,6 +163,11 @@ const Logs = () => {
               </button>
             </div>
           </div>
+
+          {/* Walkthrough: step 2 info banner */}
+          {showWtBanner && (
+            <WalkthroughLogsBanner onDismiss={handleWtDismiss} />
+          )}
 
           {/* Stats Bar */}
           <div className="mb-8 grid grid-cols-2 gap-3 sm:mb-10 sm:gap-4 md:grid-cols-5">

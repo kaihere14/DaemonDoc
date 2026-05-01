@@ -6,7 +6,7 @@ import { api, ENDPOINTS } from "../lib/api";
 import PlanLimitModal from "./PlanLimitModal";
 import { usePostHog } from "@posthog/react";
 
-const RepoCard = ({ repo, showToggle = true, onToggle }) => {
+const RepoCard = ({ repo, showToggle = true, onToggle, onActivate }) => {
   const posthog = usePostHog();
   const [isActive, setIsActive] = useState(repo.activated);
   const [loading, setLoading] = useState(false);
@@ -46,6 +46,7 @@ const RepoCard = ({ repo, showToggle = true, onToggle }) => {
         repo_full_name: repo.full_name,
         repo_private: repo.private,
       });
+      if (!isActive && onActivate) onActivate();
       if (onToggle) onToggle();
     } catch (err) {
       if (err.response?.data?.code === "ACTIVE_REPO_LIMIT_REACHED") {
