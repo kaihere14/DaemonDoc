@@ -26,6 +26,7 @@ The AI pipeline uses **Gemini 3 Flash** (primary, 1M token context) with automat
 
 ## ✨ Features
 
+- **Guided User Onboarding Walkthrough** — A multi-stage interactive experience including non-blocking dashboard banners, a post-activation success modal, and contextual guidance in the activity logs to help users navigate their first README generation.
 - **Pro Subscription Tier** — Unlock unlimited repositories, priority AI generation, and enhanced project/competitor analysis limits.
 - **Seamless Payment Integration** — Integrated upgrade flow with real-time plan synchronization and localized currency formatting (INR).
 - **Animated Technical Iconography** — Custom-engineered SVG animations (Hammer, Disc, PlugZap, Search) that visualize complex engine processes like AST scanning and context synthesis.
