@@ -154,11 +154,11 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 
 ---
 
-## Installation
+## Installation 🛠️
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 18+ or **Bun**
 - MongoDB (local or [Atlas](https://www.mongodb.com/cloud/atlas))
 - Redis (local or via **Docker**)
 - [GitHub OAuth App](https://github.com/settings/developers)
@@ -171,6 +171,7 @@ bash
 git clone https://github.com/kaihere14/daemondoc.git
 cd daemondoc
 
+
 ### 2. Infrastructure (Redis via Docker)
 
 If you have Docker installed, you can quickly spin up the required Redis service:
@@ -179,13 +180,21 @@ bash
 cd server
 docker-compose up -d
 
+
 ### 3. Server setup
 
 bash
 cd server
-npm install
+npm install # or bun install
+
 
 Create `server/.env` with your environment variables (refer to the Configuration section).
+
+### 4. Client setup
+
+bash
+cd ../client
+npm install # or bun install
 
 ## 🗄️ Database
 
