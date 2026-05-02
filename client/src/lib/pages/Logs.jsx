@@ -56,6 +56,20 @@ const STATUS_CONFIG = {
   },
 };
 
+const logRowVariants = {
+  initial: { opacity: 0, y: 10 },
+  animate: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.02 },
+  }),
+  exit: {
+    opacity: 0,
+    y: -10,
+    transition: { duration: 0.18 },
+  },
+};
+
 const StatusBadge = ({ status }) => {
   const s = STATUS_CONFIG[status] || STATUS_CONFIG.ongoing;
 
@@ -268,7 +282,20 @@ const Logs = () => {
               ) : (
                 <AnimatePresence>
                   {logs.map((log, index) => (
-                    <LogItem key={log._id} log={log} index={index} />
+                    <motion.div
+                      key={log._id}
+                      className="relative"
+                      custom={index}
+                      variants={logRowVariants}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                    >
+                      {showWtBanner && index === 0 && (
+                        <div className="pointer-events-none absolute inset-0 z-10 border-2 border-dashed border-sky-400" />
+                      )}
+                      <LogItem log={log} />
+                    </motion.div>
                   ))}
                 </AnimatePresence>
               )}
@@ -280,7 +307,7 @@ const Logs = () => {
   );
 };
 
-const LogItem = ({ log, index }) => {
+const LogItem = ({ log }) => {
   const commitUrl =
     log.commitId && log.repoOwner
       ? `https://github.com/${log.repoOwner}/${log.repoName}/commit/${log.commitId}`
@@ -288,12 +315,7 @@ const LogItem = ({ log, index }) => {
   const statusConfig = STATUS_CONFIG[log.status] || STATUS_CONFIG.ongoing;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.02 }}
-      className="group"
-    >
+    <div className="group">
       <div
         className={`flex flex-col justify-between gap-4 p-4 transition-colors sm:flex-row sm:items-center sm:p-6 ${commitUrl ? "cursor-pointer hover:bg-blue-50/40" : ""}`}
         onClick={() => commitUrl && window.open(commitUrl, "_blank")}
@@ -327,7 +349,7 @@ const LogItem = ({ log, index }) => {
           <StatusBadge status={log.status} />
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { GitBranch, Lock, Unlock, Loader2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { api, ENDPOINTS } from "../lib/api";
 import PlanLimitModal from "./PlanLimitModal";
 import { usePostHog } from "@posthog/react";
 
-const RepoCard = ({ repo, showToggle = true, onToggle, onActivate }) => {
+const RepoCard = ({ repo, showToggle = true, onToggle, onActivate, isWalkthroughTarget = false }) => {
+  const reduceMotion = useReducedMotion();
   const posthog = usePostHog();
   const [isActive, setIsActive] = useState(repo.activated);
   const [loading, setLoading] = useState(false);
@@ -77,7 +78,11 @@ const RepoCard = ({ repo, showToggle = true, onToggle, onActivate }) => {
         y: -4,
         boxShadow: "0 18px 40px rgba(29,78,216,0.08)",
       }}
-      className="group relative flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-slate-200/80 bg-white/90 p-4 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.25)] backdrop-blur-xl transition-all duration-200 hover:border-blue-200 sm:rounded-[2rem] sm:p-6"
+      className={`group relative flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-white/90 p-4 backdrop-blur-xl transition-all duration-200 sm:rounded-[2rem] sm:p-6 ${
+        isWalkthroughTarget && !isActive
+          ? "border-2 border-dashed border-blue-400 shadow-[0_8px_30px_-18px_rgba(29,78,216,0.35)]"
+          : "border border-slate-200/80 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.25)] hover:border-blue-200"
+      }`}
     >
       <div className="flex flex-col gap-3 sm:gap-4">
         <div className="flex items-start justify-between gap-3 sm:gap-4">
@@ -108,6 +113,20 @@ const RepoCard = ({ repo, showToggle = true, onToggle, onActivate }) => {
               className="flex shrink-0 items-center gap-2 self-start"
               onClick={(e) => e.stopPropagation()}
             >
+              {isWalkthroughTarget && !isActive && !loading &&
+                (reduceMotion ? (
+                  <span className="select-none text-xs font-bold text-blue-500">
+                    Enable →
+                  </span>
+                ) : (
+                  <motion.span
+                    animate={{ x: [0, 3, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.0, ease: "easeInOut" }}
+                    className="select-none text-xs font-bold text-blue-500"
+                  >
+                    Enable →
+                  </motion.span>
+                ))}
               {loading ? (
                 <Loader2 size={20} className="animate-spin text-slate-400" />
               ) : repo.canActivate === false && !isActive ? (

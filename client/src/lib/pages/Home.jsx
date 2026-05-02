@@ -377,6 +377,9 @@ const Home = () => {
                         onActivate={
                           wtStep === "step0" ? handleRepoActivated : undefined
                         }
+                        isWalkthroughTarget={
+                          wtStep === "step0" && index === 0 && !repo.activated
+                        }
                       />
                     </motion.div>
                   ))}
