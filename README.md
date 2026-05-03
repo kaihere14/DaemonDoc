@@ -14,16 +14,15 @@
 
 ---
 
-## Overview
+## 📖 Overview
 
-DaemonDoc hooks into your GitHub repositories via webhooks. Every time you push, it scans your codebase, runs it through AI, and commits an up-to-date README back to your repo — no manual writing required.
+DaemonDoc is an AI-powered documentation engine that automates the creation and maintenance of GitHub READMEs. By integrating directly with your repositories via webhooks, it analyzes your codebase and commit diffs to ensure your documentation remains accurate and up-to-date without manual intervention.
 
-Beyond documentation, the platform features a **revamped Admin Dashboard** with a modern, interactive UI for the **Feature Announcement System**. This system utilizes a multi-step wizard to craft professional, categorized email updates (New, Improved, Fixed, Security) with **targeted recipient selection**, allowing admins to reach specific users or broadcast to the entire eligible audience.
+The system features a sophisticated **dual-mode AI pipeline**:
+- **Full Generation**: Scans the repository tree and key files to build a comprehensive initial README.
+- **Patch Mode**: Uses stored section hashes to surgically update only the parts of the README affected by recent commits, preserving the rest of the document and minimizing token usage.
 
-The AI pipeline uses **Gemini 3 Flash** (primary, 1M token context) with automatic fallback to **Groq** if all Gemini keys are exhausted. You can configure up to 3 API keys per provider for rate limit resilience.
-
----
-
+Powered by **Google Gemini** (primary, 1M token context) with a resilient fallback to **Groq**, DaemonDoc handles complex repository structures with ease. It includes a full-featured dashboard for repository management, real-time generation logs, and a Pro subscription tier powered by **Razorpay**.
 ## ✨ Features
 
 - **Guided User Onboarding Walkthrough** — A multi-stage interactive experience including non-blocking dashboard banners, a post-activation success modal, and contextual guidance in the activity logs to help users navigate their first README generation.
@@ -119,41 +118,19 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 
 ---
 
-## Architecture
+## 🏗️ Architecture
 
-┌─────────────────────────┐
-│ React Client │
-│ (Vite + Tailwind) │
-└────────────┬────────────┘
-│ REST API
-▼
-┌────────────────────────────────────────────────┐
-│ Express Backend │
-│ ┌─────────────┐ ┌──────────┐ ┌──────────┐ │
-│ │ Auth │ │ GitHub │ │ Worker │ │
-│ │ Controller │ │Controller│ │Controller│ │
-│ └─────────────┘ └──────────┘ └──────────┘ │
-└────────┬───────────────┬───────────────┬───────┘
-│ │ │
-▼ ▼ ▼
-┌─────────┐ ┌────────────┐ ┌─────────┐
-│ MongoDB │ │ GitHub API │ │ Redis │
-└─────────┘ └────────────┘ └────┬────┘
-│
-▼
-┌─────────────┐
-│ BullMQ │
-│ Worker │
-└──────┬──────┘
-│
-▼
-┌───────────────────────┐
-│ Gemini 3 Flash │
-│ (→ Groq fallback) │
-└───────────────────────┘
+DaemonDoc follows a modern decoupled architecture designed for scalability and reliability:
 
----
-
+- **Frontend**: A high-performance SPA built with **React 19**, **Vite 7**, and **Tailwind CSS v4**. It utilizes **Framer Motion** for fluid transitions and **Lucide React** for iconography.
+- **Backend**: An **Express.js 5** REST API handling authentication, repository orchestration, and payment processing.
+- **Worker Tier**: A robust **BullMQ** system backed by **Redis** that offloads long-running AI generation tasks from the main request cycle to ensure API responsiveness.
+- **Data Layer**: **MongoDB** (via Mongoose) stores user profiles, encrypted GitHub tokens, active repository metadata, and generation logs.
+- **AI Engine**: A multi-provider strategy utilizing **Google Gemini** for deep context analysis, falling back to **Groq** for high-speed resilience.
+- **Integrations**:
+  - **GitHub API**: For OAuth, webhook management, and committing documentation via the Contents API.
+  - **Razorpay**: For secure INR payment processing and subscription lifecycle management.
+  - **Resend**: For transactional and broadcast email delivery.
 ## Installation 🛠️
 
 ### Prerequisites
