@@ -25,6 +25,7 @@ The system features a sophisticated **dual-mode AI pipeline**:
 Powered by **Google Gemini** (primary, 1M token context) with a resilient fallback to **Groq**, DaemonDoc handles complex repository structures with ease. It includes a full-featured dashboard for repository management, real-time generation logs, and a Pro subscription tier powered by **Razorpay**.
 ## ✨ Features
 
+- **Dynamic Hero Experience** — Enhanced landing page featuring interactive video controls, floating tech stack iconography, and animated workflow steps (Connect, Push, Sync) for a high-conversion user introduction.
 - **Guided User Onboarding Walkthrough** — A multi-stage interactive experience including non-blocking dashboard banners, a post-activation success modal, and contextual guidance in the activity logs to help users navigate their first README generation.
 - **Pro Subscription Tier** — Unlock unlimited repositories, priority AI generation, and enhanced project/competitor analysis limits.
 - **Seamless Payment Integration** — Integrated upgrade flow with real-time plan synchronization and localized currency formatting (INR).
