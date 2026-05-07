@@ -190,17 +190,37 @@ const Hero = () => {
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
-            <button
+            <motion.button
               onClick={() => {
                 location.href = "/login";
               }}
-              className="group bg-primary group hover:bg-primary/90 flex cursor-pointer items-center gap-3 rounded-full px-8 py-3.5 font-medium text-white shadow-xl drop-shadow-2xl transition-colors duration-200 ease-in-out text-shadow-md"
+              whileHover="hover"
+              initial="rest"
+              animate="rest"
+              className="group bg-primary relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-full px-8 py-3.5 font-medium text-white shadow-xl drop-shadow-2xl transition-colors duration-200 ease-in-out text-shadow-md"
             >
-              <span>Try Now</span>
-              <span className="rounded-full bg-white p-1 text-slate-900 drop-shadow-2xl transition-all duration-300 ease-out group-hover:-rotate-23">
-                <ArrowRight size={14} />
+              <motion.span
+                variants={{
+                  rest: {
+                    clipPath: "circle(16px at calc(100% - 28px) 50%)",
+                  },
+                  hover: {
+                    clipPath: "circle(240px at calc(100% - 28px) 50%)",
+                  },
+                }}
+                transition={{ duration: 0.35, ease: "easeInOut" }}
+                className="absolute inset-0 z-0 bg-white"
+              />
+              <span className="group-hover:text-primary relative z-10 pr-6 transition-colors duration-200 ease-in-out">
+                Try Now
               </span>
-            </button>
+              <span className="absolute right-4 z-10 rounded-full bg-white p-1 text-slate-900 drop-shadow-2xl transition-all duration-300 ease-out">
+                <ArrowRight
+                  size={18}
+                  className="group-hover:text-primary transition-colors duration-200 ease-in-out"
+                />
+              </span>
+            </motion.button>
 
             <a
               href="#features"
