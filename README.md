@@ -25,6 +25,8 @@ The system features a sophisticated **dual-mode AI pipeline**:
 Powered by **Google Gemini** (primary, 1M token context) with a resilient fallback to **Groq**, DaemonDoc handles complex repository structures with ease. It includes a full-featured dashboard for repository management, real-time generation logs, and a Pro subscription tier powered by **Razorpay**.
 ## ✨ Features
 
+- **Real-time Log Streaming** — Live chronological detail messages for generation jobs powered by Convex reactive subscriptions.
+- **Expandable Activity Logs** — Interactive log rows that expand to reveal a live-updating message trail of the documentation pipeline.
 - **Dynamic Hero Experience** — Enhanced landing page featuring interactive video controls, floating tech stack iconography, and animated workflow steps (Connect, Push, Sync) for a high-conversion user introduction.
 - **Guided User Onboarding Walkthrough** — A multi-stage interactive experience including non-blocking dashboard banners, a post-activation success modal, and contextual guidance in the activity logs to help users navigate their first README generation.
 - **Pro Subscription Tier** — Unlock unlimited repositories, priority AI generation, and enhanced project/competitor analysis limits.
@@ -82,6 +84,7 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 | -------------------------- | ------------------------ | ------- |
 | React                      | UI framework             | 19.x    |
 | Vite                       | Build tool               | 7.x     |
+| Convex React Client        | Real-time subscriptions  | 1.37.x  |
 | React Router               | Client-side routing      | 7.x     |
 | Tailwind CSS               | Styling                  | 4.x     |
 | Framer Motion              | Animations & Transitions | 12.x    |
@@ -98,6 +101,7 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 | ------------------ | ----------------------------- | ------- |
 | Node.js            | Runtime                       | 18+     |
 | Express            | Web framework                 | 5.x     |
+| Convex             | Real-time log store           | —       |
 | MongoDB + Mongoose | Database                      | —       |
 | Redis + IORedis    | Job queue backing & Cache     | —       |
 | BullMQ             | Job queue                     | 5.x     |
@@ -113,20 +117,21 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 | **Gemini 3 Flash**        | Primary README generation (1M context)              |
 | **Gemini 3.1 Flash Lite** | Primary file selection (mini model)                 |
 | **Groq**                  | Fallback provider for both generation and selection |
+| **Convex**                | Live log metadata and message details               |
 | **GitHub API**            | Repo tree, file content, webhooks, commits          |
 | **MongoDB Atlas**         | User and repo data                                  |
 | **Redis**                 | BullMQ job queue & Health monitoring                |
 
 ---
-
 ## 🏗️ Architecture
 
 DaemonDoc follows a modern decoupled architecture designed for scalability and reliability:
 
-- **Frontend**: A high-performance SPA built with **React 19**, **Vite 7**, and **Tailwind CSS v4**. It utilizes **Framer Motion** for fluid transitions and **Lucide React** for iconography.
-- **Backend**: An **Express.js 5** REST API handling authentication, repository orchestration, and payment processing.
-- **Worker Tier**: A robust **BullMQ** system backed by **Redis** that offloads long-running AI generation tasks from the main request cycle to ensure API responsiveness.
-- **Data Layer**: **MongoDB** (via Mongoose) stores user profiles, encrypted GitHub tokens, active repository metadata, and generation logs.
+- **Frontend**: A high-performance SPA built with **React 19**, **Vite 7**, and **Tailwind CSS v4**. It utilizes **Convex React Client** for read-only reactive subscriptions to live log details.
+- **Backend**: An **Express.js 5** REST API handling authentication, repository orchestration, and payment processing. It mirrors log events to Convex via HTTP actions.
+- **Worker Tier**: A robust **BullMQ** system backed by **Redis** that offloads long-running AI generation tasks from the main request cycle.
+- **Real-time Layer**: **Convex** serves as the transient store for live log metadata and message trails, allowing the client to stream updates without polling the primary database.
+- **Data Layer**: **MongoDB** (via Mongoose) remains the authoritative source for user profiles, encrypted GitHub tokens, and persistent generation logs.
 - **AI Engine**: A multi-provider strategy utilizing **Google Gemini** for deep context analysis, falling back to **Groq** for high-speed resilience.
 - **Integrations**:
   - **GitHub API**: For OAuth, webhook management, and committing documentation via the Contents API.
@@ -139,6 +144,7 @@ DaemonDoc follows a modern decoupled architecture designed for scalability and r
 - Node.js 18+ or **Bun**
 - MongoDB (local or [Atlas](https://www.mongodb.com/cloud/atlas))
 - Redis (local or via **Docker**)
+- [Convex Account](https://www.convex.dev/)
 - [GitHub OAuth App](https://github.com/settings/developers)
 - Gemini API keys from [Google AI Studio](https://aistudio.google.com/app/apikey)
 - Groq API keys from [Groq Console](https://console.groq.com) (fallback)
@@ -159,16 +165,24 @@ cd server
 docker-compose up -d
 
 
-### 3. Server setup
+### 3. Convex Setup
 
 bash
-cd server
+cd ../convex-server
+npm install
+npx convex dev # This will set up your Convex project and generate types
+
+
+### 4. Server setup
+
+bash
+cd ../server
 npm install # or bun install
 
 
 Create `server/.env` with your environment variables (refer to the Configuration section).
 
-### 4. Client setup
+### 5. Client setup
 
 bash
 cd ../client
@@ -179,7 +193,11 @@ npm install # or bun install
 MONGO_URI=mongodb+srv://user:password@cluster.mongodb.net/daemondoc
 
 ### Schema Optimizations
-- **Indexing**: The `userId` field in the `activeRepo` and `paymentLedger` schemas is indexed to optimize query performance for user-specific data lookups.
+- **Indexing**: The `userId` and `logId` fields in the `userLog` schema are indexed to optimize query performance for activity tracking and real-time correlation.
+
+### Convex Real-time Store
+- **logs**: Stores transient log metadata (`logId`, `status`, `repoName`) for reactive UI updates.
+- **logMessages**: Stores chronological message trails for active generation jobs, indexed by `logId` for efficient streaming.
 # Auth
 
 JWT_SECRET=your_jwt_secret_minimum_32_chars
@@ -255,6 +273,14 @@ Open **http://localhost:5173**
 ---
 ## Configuration
 
+### Convex Integration
+
+1. Create a project on [Convex](https://www.convex.dev/)
+2. Add to `client/.env`:
+   - `VITE_CONVEX_URL=your_convex_deployment_url`
+3. Add to `server/.env`:
+   - `CONVEX_SITE_URL=your_convex_site_url` (for HTTP actions)
+
 ### GitHub OAuth App
 
 1. Go to [GitHub Developer Settings](https://github.com/settings/developers) → **New OAuth App**
@@ -281,11 +307,6 @@ Open **http://localhost:5173**
 1. Visit [Groq Console](https://console.groq.com) → **API Keys**
 2. Create up to 3 keys
 3. Add as `GROQ_API_KEY1`, `GROQ_API_KEY2`, `GROQ_API_KEY3` in `server/.env`
-
-### Redis
-
-**Local:**
-bash
 # macOS
 brew install redis && brew services start redis
 
