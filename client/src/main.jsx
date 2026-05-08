@@ -7,6 +7,9 @@ import { AuthProvider } from "./context/AuthContext";
 import { Analytics } from "@vercel/analytics/react";
 import posthog from "posthog-js";
 import { PostHogErrorBoundary, PostHogProvider } from "@posthog/react";
+import { ConvexProvider, ConvexReactClient } from "convex/react";
+
+const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
 
 posthog.init(import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN, {
   api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
@@ -19,9 +22,11 @@ createRoot(document.getElementById("root")).render(
       <PostHogErrorBoundary>
         <Analytics />
         <BrowserRouter>
-          <AuthProvider>
-            <App />
-          </AuthProvider>
+          <ConvexProvider client={convex}>
+            <AuthProvider>
+              <App />
+            </AuthProvider>
+          </ConvexProvider>
         </BrowserRouter>
       </PostHogErrorBoundary>
     </PostHogProvider>

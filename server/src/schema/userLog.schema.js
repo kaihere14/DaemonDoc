@@ -2,6 +2,13 @@ import { Schema, model } from "mongoose";
 
 const UserLogSchema = new Schema(
   {
+    logId: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
+
     userId: {
       type: String,
       required: true,

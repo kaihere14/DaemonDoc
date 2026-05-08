@@ -8,13 +8,16 @@ import {
   Loader2,
   History,
   SkipForward,
+  ChevronDown,
 } from "lucide-react";
+import { useQuery } from "convex/react";
 import AuthNavigation from "../../components/AuthNavigation";
 import SEO from "../../components/SEO";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { api, ENDPOINTS } from "../api";
 import { usePostHog } from "@posthog/react";
 import { WalkthroughLogsBanner } from "../../components/WalkthroughOverlay";
+import { api as convexApi } from "../../../../convex-server/convex/_generated/api";
 
 const STATUS_CONFIG = {
   success: {
@@ -92,6 +95,7 @@ const Logs = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
+  const [expandedLogId, setExpandedLogId] = useState(null);
 
   const [showWtBanner, setShowWtBanner] = useState(() => {
     return false; // resolved after user loads
@@ -129,6 +133,12 @@ const Logs = () => {
       setLoading(false);
       setRefreshing(false);
     }
+  };
+
+  const handleToggleLog = (logId) => {
+    if (!logId) return;
+
+    setExpandedLogId((currentLogId) => (currentLogId === logId ? null : logId));
   };
 
   return (
@@ -294,7 +304,11 @@ const Logs = () => {
                       {showWtBanner && index === 0 && (
                         <div className="pointer-events-none absolute inset-0 z-10 border-2 border-dashed border-sky-400" />
                       )}
-                      <LogItem log={log} />
+                      <LogItem
+                        log={log}
+                        expandedLogId={expandedLogId}
+                        onToggle={handleToggleLog}
+                      />
                     </motion.div>
                   ))}
                 </AnimatePresence>
@@ -307,18 +321,19 @@ const Logs = () => {
   );
 };
 
-const LogItem = ({ log }) => {
+const LogItem = ({ log, expandedLogId, onToggle }) => {
   const commitUrl =
     log.commitId && log.repoOwner
       ? `https://github.com/${log.repoOwner}/${log.repoName}/commit/${log.commitId}`
       : null;
   const statusConfig = STATUS_CONFIG[log.status] || STATUS_CONFIG.ongoing;
+  const isExpanded = Boolean(log.logId) && log.logId === expandedLogId;
 
   return (
     <div className="group">
       <div
-        className={`flex flex-col justify-between gap-4 p-4 transition-colors sm:flex-row sm:items-center sm:p-6 ${commitUrl ? "cursor-pointer hover:bg-blue-50/40" : ""}`}
-        onClick={() => commitUrl && window.open(commitUrl, "_blank")}
+        className="flex cursor-pointer flex-col justify-between gap-4 p-4 transition-colors hover:bg-blue-50/40 sm:flex-row sm:items-center sm:p-6"
+        onClick={() => onToggle(log.logId)}
       >
         <div className="flex min-w-0 items-start gap-3 sm:gap-5">
           <div
@@ -341,16 +356,98 @@ const LogItem = ({ log }) => {
               <span className="text-xs font-medium text-slate-400">
                 {formatTimestamp(log.createdAt)}
               </span>
+              {commitUrl && (
+                <>
+                  <span className="hidden h-1 w-1 rounded-full bg-slate-200 sm:block" />
+                  <a
+                    href={commitUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(event) => event.stopPropagation()}
+                    className="text-xs font-bold text-blue-600 transition-colors hover:text-blue-700 hover:underline"
+                  >
+                    View commit
+                  </a>
+                </>
+              )}
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-4 self-start sm:self-center">
           <StatusBadge status={log.status} />
+          <ChevronDown
+            size={18}
+            className={`text-slate-400 transition-transform duration-200 ${
+              isExpanded ? "rotate-180" : ""
+            }`}
+          />
         </div>
       </div>
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="overflow-hidden border-t border-dashed border-slate-100 bg-slate-50/60"
+          >
+            <div className="px-4 py-3 sm:px-6 sm:py-4">
+              <LogMessages logId={log.logId} />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
+};
+
+const LogMessages = ({ logId }) => {
+  const messages = useQuery(convexApi.logs.getLogMessages, { logId });
+
+  if (messages === undefined) {
+    return (
+      <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
+        <Loader2 className="animate-spin" size={14} />
+        Loading detail messages
+      </div>
+    );
+  }
+
+  if (messages.length === 0) {
+    return (
+      <p className="text-xs font-medium text-slate-400">
+        No detail messages recorded.
+      </p>
+    );
+  }
+
+  return (
+    <div className="space-y-3 border-l-2 border-slate-100 pl-4">
+      {messages.map((message) => (
+        <div key={message._id} className="relative">
+          <span className="absolute top-1.5 -left-[1.35rem] h-2 w-2 rounded-full border-2 border-white bg-blue-500" />
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+            <p className="min-w-0 font-mono text-xs leading-relaxed text-slate-600">
+              {message.message}
+            </p>
+            <span className="shrink-0 text-[10px] font-semibold text-slate-400">
+              {formatMessageTimestamp(message.createdAt)}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const formatMessageTimestamp = (timestamp) => {
+  return new Date(timestamp).toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 };
 
 const formatTimestamp = (timestamp) => {
