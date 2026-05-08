@@ -28,6 +28,24 @@ import {
   validateContext,
 } from "./prompt.builder.js";
 import UserLogModel from "../schema/userLog.schema.js";
+import { makeFunctionReference } from "convex/server";
+import convexClient from "../services/convex.service.js";
+
+const logsCreate = makeFunctionReference("logs:createLog");
+const logsUpdate = makeFunctionReference("logs:updateLog");
+const logsAddMessage = makeFunctionReference("logs:addLogMessage");
+
+function liveUpdate(sharedLogId, message) {
+  if (!sharedLogId) return;
+  convexClient
+    .mutation(logsAddMessage, { logId: sharedLogId, message })
+    .catch((err) =>
+      console.warn(
+        "[Worker] Convex log message failed (non-fatal):",
+        err.message,
+      ),
+    );
+}
 
 export const connection = new IORedis({
   host: process.env.REDIS_HOST || "localhost",
@@ -81,7 +99,9 @@ new Worker(
   "readme-generation",
   async (job) => {
     console.log("Processing job:", job.data);
+    const sharedLogId = crypto.randomUUID();
     const userLog = await UserLogModel.create({
+      logId: sharedLogId,
       userId: job.data.userId,
       repoName: job.data.repoName,
       repoOwner: job.data.repoOwner,
@@ -90,7 +110,23 @@ new Worker(
     });
     await redis.del("admin_analytics");
     job.data.logId = userLog._id.toString();
+    job.data.sharedLogId = sharedLogId;
     console.log("Updated job data with logId:", job.data.logId);
+
+    convexClient
+      .mutation(logsCreate, {
+        logId: sharedLogId,
+        userId: job.data.userId,
+        repoName: job.data.repoName,
+        action: "README_GENERATION_STARTED",
+        status: "ongoing",
+      })
+      .catch((err) =>
+        console.warn(
+          "[Worker] Convex log create failed (non-fatal):",
+          err.message,
+        ),
+      );
     await aihandler(job.data);
   },
   {
@@ -101,7 +137,13 @@ new Worker(
 );
 
 // Errors here are swallowed so a logging failure never kills a generation job
-async function updateLogStatus(logId, action, status, commitId = null) {
+async function updateLogStatus(
+  logId,
+  action,
+  status,
+  commitId = null,
+  sharedLogId = null,
+) {
   try {
     const update = {
       action,
@@ -126,6 +168,17 @@ async function updateLogStatus(logId, action, status, commitId = null) {
   } catch (err) {
     console.error("[AI Handler] Failed to update log:", err.message);
   }
+
+  if (sharedLogId) {
+    convexClient
+      .mutation(logsUpdate, { logId: sharedLogId, status })
+      .catch((err) =>
+        console.warn(
+          "[Worker] Convex log status update failed (non-fatal):",
+          err.message,
+        ),
+      );
+  }
 }
 
 const aihandler = async (data) => {
@@ -137,6 +190,7 @@ const aihandler = async (data) => {
     repoOwner,
     defaultBranch,
     commitSha,
+    sharedLogId,
   } = data;
 
   // Resolve fetch limits up front — Gemini gets larger budgets than Groq
@@ -144,6 +198,10 @@ const aihandler = async (data) => {
 
   console.log(
     `[AI Handler] Starting README generation for ${repoFullName} at commit ${commitSha}`,
+  );
+  liveUpdate(
+    sharedLogId,
+    `Starting README generation for ${repoFullName} at commit ${commitSha.slice(0, 7)}`,
   );
 
   try {
@@ -162,6 +220,7 @@ const aihandler = async (data) => {
     if (!activeRepo) throw new Error("Active repository not found");
 
     console.log(`[AI Handler] Fetching commit details for ${commitSha}`);
+    liveUpdate(sharedLogId, `Fetching commit details`);
     const commitData = await getCommit(
       accessToken,
       repoOwner,
@@ -170,6 +229,7 @@ const aihandler = async (data) => {
     );
 
     console.log(`[AI Handler] Fetching repository structure`);
+    liveUpdate(sharedLogId, `Fetching repository structure`);
     let repoStructure = "";
     try {
       const treeData = await getRepoTree(
@@ -185,6 +245,7 @@ const aihandler = async (data) => {
     }
 
     console.log(`[AI Handler] Checking for existing README`);
+    liveUpdate(sharedLogId, `Checking for existing README`);
     const readmeFileName = process.env.README_FILE_NAME || "README.md";
     let existingReadme = null;
     let existingReadmeSha = null;
@@ -203,20 +264,36 @@ const aihandler = async (data) => {
         console.log(
           `[AI Handler] Found existing README (${readmeData.size} bytes)`,
         );
+        liveUpdate(
+          sharedLogId,
+          `Found existing README (${readmeData.size} bytes)`,
+        );
       }
     } catch (error) {
       console.log(
         `[AI Handler] No existing README found or error fetching: ${error.message}`,
       );
+      liveUpdate(
+        sharedLogId,
+        `No existing README found — will generate from scratch`,
+      );
     }
 
-    await updateLogStatus(data.logId, "GITHUB_REPO_CONNECTED", "ongoing");
+    await updateLogStatus(
+      data.logId,
+      "GITHUB_REPO_CONNECTED",
+      "ongoing",
+      null,
+      sharedLogId,
+    );
 
     const { mode, reason } = determineGenerationMode(existingReadme);
     console.log(`[AI Handler] Generation mode: ${mode} — ${reason}`);
+    liveUpdate(sharedLogId, `Mode: ${mode} — ${reason}`);
 
     if (mode === "full") {
       console.log(`[AI Handler] FULL mode — scanning entire repository`);
+      liveUpdate(sharedLogId, `Scanning entire repository for important files`);
 
       let fullCodebase = [];
       try {
@@ -230,6 +307,10 @@ const aihandler = async (data) => {
         );
         console.log(
           `[AI Handler] Scanned ${fullCodebase.length} important files from repository`,
+        );
+        liveUpdate(
+          sharedLogId,
+          `Scanned ${fullCodebase.length} important files`,
         );
       } catch (error) {
         console.error(
@@ -267,6 +348,10 @@ const aihandler = async (data) => {
 
       if (validation.warnings.length > 0) {
         console.warn(`[AI Handler] Context warnings:`, validation.warnings);
+        liveUpdate(
+          sharedLogId,
+          `Context: ${validation.estimatedTokens} tokens — optimizing`,
+        );
       }
 
       if (validation.estimatedTokens > limits.contextOptimizeAt) {
@@ -277,7 +362,9 @@ const aihandler = async (data) => {
       }
 
       console.log(`[AI Handler] Generating README (Gemini → Groq fallback)`);
-      const generatedReadme = await generateReadme(context);
+      const generatedReadme = await generateReadme(context, (msg) =>
+        liveUpdate(sharedLogId, msg),
+      );
 
       if (!generatedReadme || generatedReadme.trim().length === 0) {
         throw new Error("AI returned empty README");
@@ -285,6 +372,10 @@ const aihandler = async (data) => {
 
       console.log(
         `[AI Handler] Generated README (${generatedReadme.length} characters)`,
+      );
+      liveUpdate(
+        sharedLogId,
+        `Generated README (${generatedReadme.length} chars) — committing to repo`,
       );
 
       const commitResult = await commitFile(
@@ -300,6 +391,10 @@ const aihandler = async (data) => {
 
       console.log(
         `[AI Handler] README committed successfully: ${commitResult.commit.sha}`,
+      );
+      liveUpdate(
+        sharedLogId,
+        `✓ README committed: ${commitResult.commit.sha.slice(0, 7)}`,
       );
 
       // Store section hashes so the next push can use patch mode instead of full regen
@@ -320,6 +415,7 @@ const aihandler = async (data) => {
         "README_GENERATION_SUCCESS",
         "success",
         commitResult.commit.sha,
+        sharedLogId,
       );
 
       console.log(
@@ -332,6 +428,7 @@ const aihandler = async (data) => {
       };
     } else {
       console.log(`[AI Handler] PATCH mode — surgical section update`);
+      liveUpdate(sharedLogId, `Fetching changed files from commit`);
 
       const { sections: originalSections, orderedKeys } =
         parseReadmeSections(existingReadme);
@@ -348,6 +445,10 @@ const aihandler = async (data) => {
       );
       console.log(
         `[AI Handler] Fetched ${changedFilesContent.length} changed files`,
+      );
+      liveUpdate(
+        sharedLogId,
+        `Fetched ${changedFilesContent.length} changed file(s)`,
       );
 
       const { commitDiff } = buildReadmeContext({
@@ -368,16 +469,23 @@ const aihandler = async (data) => {
         originalSections,
         orderedKeys,
         originalHashes,
+        onProgress: (msg) => liveUpdate(sharedLogId, msg),
       });
 
       if (!patchResult) {
         console.log(
           `[AI Handler] Patch generation returned null — skipping commit`,
         );
+        liveUpdate(
+          sharedLogId,
+          `No sections needed updating — skipping commit`,
+        );
         await updateLogStatus(
           data.logId,
           "README_GENERATION_SKIPPED",
           "skipped",
+          null,
+          sharedLogId,
         );
         return { skipped: true };
       }
@@ -398,6 +506,10 @@ const aihandler = async (data) => {
       console.log(
         `[AI Handler] README patch committed successfully: ${commitResult.commit.sha}`,
       );
+      liveUpdate(
+        sharedLogId,
+        `✓ README committed: ${commitResult.commit.sha.slice(0, 7)}`,
+      );
 
       activeRepo.sectionHashes = newHashes;
       activeRepo.markModified("sectionHashes");
@@ -413,6 +525,7 @@ const aihandler = async (data) => {
         "README_GENERATION_SUCCESS",
         "success",
         commitResult.commit.sha,
+        sharedLogId,
       );
 
       console.log(
@@ -430,7 +543,14 @@ const aihandler = async (data) => {
       error.message,
     );
     console.error(error.stack);
-    await updateLogStatus(data.logId, "README_GENERATION_FAILED", "failed");
+    liveUpdate(sharedLogId, `✗ Failed: ${error.message}`);
+    await updateLogStatus(
+      data.logId,
+      "README_GENERATION_FAILED",
+      "failed",
+      null,
+      sharedLogId,
+    );
     throw error;
   }
 };

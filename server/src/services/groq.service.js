@@ -282,7 +282,7 @@ Respond with ONLY a JSON object (no markdown, no explanation):
   }
 }
 
-export async function generateReadme(context) {
+export async function generateReadme(context, onProgress = () => {}) {
   const providers = buildProviderList();
 
   if (providers.length === 0) {
@@ -299,6 +299,7 @@ export async function generateReadme(context) {
 
     try {
       console.log(`[README] Trying ${label} key ${keyIndex}/${keyTotal}`);
+      onProgress(`Trying ${label} key ${keyIndex}/${keyTotal}`);
 
       console.log(
         `[README] Step 1: Selecting files via ${label} (${modelMini})...`,
@@ -310,12 +311,14 @@ export async function generateReadme(context) {
         modelMini,
       );
       console.log(`[README] File selection: ${recommendations.reasoning}`);
+      onProgress(`File selection: ${recommendations.reasoning}`);
 
       const optimizedContext = buildOptimizedContext(context, recommendations);
 
       console.log(
         `[README] Step 2: Generating README via ${label} (${modelMain})...`,
       );
+      onProgress(`Generating README via ${label}...`);
       const systemPrompt = buildSystemPrompt();
       const userPrompt = buildUserPrompt(optimizedContext, recommendations);
 
@@ -335,6 +338,7 @@ export async function generateReadme(context) {
       console.log(
         `[README] ✓ Generated via ${label} key ${keyIndex}/${keyTotal}`,
       );
+      onProgress(`✓ Generated via ${label} key ${keyIndex}/${keyTotal}`);
       return content;
     } catch (error) {
       lastError = error;
@@ -821,6 +825,7 @@ export async function generateReadmePatch({
   originalSections,
   orderedKeys,
   originalHashes,
+  onProgress = () => {},
 }) {
   const providers = buildProviderList();
 
@@ -842,6 +847,7 @@ export async function generateReadmePatch({
       providers[i];
     try {
       console.log(`[Patch] Trying ${label} key ${keyIndex}/${keyTotal}`);
+      onProgress(`Trying ${label} key ${keyIndex}/${keyTotal}`);
 
       const { affectedSections, reasoning } = await mapSectionImpact(
         {
@@ -857,6 +863,8 @@ export async function generateReadmePatch({
       );
       console.log(`[Patch] Impact mapping: ${reasoning}`);
       console.log(`[Patch] Affected sections: ${affectedSections.join(", ")}`);
+      onProgress(`Analyzing impact: ${reasoning}`);
+      onProgress(`Sections to update: ${affectedSections.join(", ")}`);
 
       const editableKeys = affectedSections
         .filter(
@@ -904,6 +912,7 @@ export async function generateReadmePatch({
         console.log(
           `[Patch] Validation failed (${validation.reason}), retrying with strictMode`,
         );
+        onProgress(`Retrying patch with strict mode...`);
         patches = await generateSectionPatches(
           {
             repoName,
@@ -944,6 +953,9 @@ export async function generateReadmePatch({
 
       console.log(
         `[Patch] ✓ Patched [${editableKeys.join(", ")}] via ${label} key ${keyIndex}/${keyTotal}`,
+      );
+      onProgress(
+        `✓ Patched [${editableKeys.join(", ")}] via ${label} key ${keyIndex}/${keyTotal}`,
       );
       return { finalReadme, newHashes };
     } catch (error) {

@@ -1,0 +1,53 @@
+Read AGENTS.md and context/backend-context.md,convex-server/AGENTS.md before starting.
+
+We already have:
+
+An existing Express server with all API endpoints
+A separate convex-backend project already running with Convex DB configured
+
+We now need to connect the express-server with the separate convex-backend using Convex HTTP Actions.
+
+Set up the integration properly without breaking the current Express architecture.
+
+Requirements
+Convex Backend
+
+Configure the existing convex-backend project to expose HTTP actions.
+
+Set up:
+
+Convex HTTP router
+HTTP action handlers
+Proper route structure
+Response handling
+Environment variable support if required
+
+Create a simple test HTTP action endpoint that returns a JSON response.
+
+Example flow:
+
+Convex receives request
+Processes request
+Returns JSON response
+Express Server
+
+In the existing express-server:
+
+Set up:
+
+Convex HTTP communication layer
+Reusable Convex client/service module
+Environment variables for Convex backend URL
+Axios/fetch-based communication utility
+
+Create a test Express route that:
+
+Sends a request to the Convex HTTP action
+Receives the Convex response
+Returns the Convex response back to the client
+Architecture Rules
+Keep Express and Convex properly separated
+Do not tightly couple business logic
+Keep communication modular and reusable
+Do not modify or break existing APIs
+Follow clean folder structure

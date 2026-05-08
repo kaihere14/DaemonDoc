@@ -1,0 +1,100 @@
+Read AGENTS.md and context/architecture-context.md, context/ui-context.md, context/code-standards.md before starting.
+Read context/feature/02-logs-schema-update to understand the logId contract before touching any code.
+
+We already have:
+
+A Logs page (client/src/lib/pages/Logs.jsx) that fetches the last 10 UserLog records
+from Express GET /api/github/fetchUserLogs and renders them as a flat list.
+Each fetched log now contains a logId field (UUID) shared with Convex.
+Convex has a logMessages table (logId, message, createdAt) and a getLogMessages query
+that returns all messages for a given logId ordered ascending by createdAt.
+No Convex client is installed or configured in the client project yet.
+
+We need to add expand-on-click behaviour to each log row so that clicking a row
+fetches and streams real-time detail messages from Convex for that log's logId,
+displayed as a chronological message trail below the row summary.
+
+Requirements
+
+Client — Convex Setup
+
+Install convex in the client project:
+  npm install convex
+
+Add VITE_CONVEX_URL to client/.env pointing to the Convex deployment URL
+(same value as CONVEX_SITE_URL already in server/.env, but without the trailing /api path — it should be the base deployment URL).
+
+Wrap the React app with ConvexProvider in client/src/main.jsx:
+  import { ConvexProvider, ConvexReactClient } from "convex/react";
+  const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
+  // wrap <App /> with <ConvexProvider client={convex}>
+
+Do not add authentication to the Convex client — logMessages are read-only detail data
+fetched by logId, not by user session.
+
+Client — Logs.jsx Changes
+
+State additions (inside the Logs component):
+  const [expandedLogId, setExpandedLogId] = useState(null);
+
+  Toggle on row click:
+    - If the clicked row's logId equals expandedLogId, collapse (set null).
+    - Otherwise expand by setting expandedLogId to the clicked log's logId.
+  Remove the existing commitUrl click handler from the row wrapper div.
+  Make the entire row div always cursor-pointer.
+
+LogItem changes:
+  Pass expandedLogId and onToggle as props to LogItem.
+  Remove the onClick that opens commitUrl in a new tab from the row wrapper.
+  Add a small chevron icon (ChevronDown from lucide-react) on the right side of the
+  row that rotates 180° when the row is expanded (use a Tailwind transition).
+  Keep the commitUrl link as a small inline anchor inside the repo/commit metadata
+  area instead, so users can still open commits without it conflicting with the expand click.
+
+New LogMessages component (inside Logs.jsx, not a separate file):
+
+  const LogMessages = ({ logId }) => {
+    const messages = useQuery(api.logs.getLogMessages, { logId });
+    ...
+  };
+
+  Import useQuery from "convex/react".
+  Import api from the convex-server generated API:
+    import { api } from "../../../convex-server/convex/_generated/api";
+    (Adjust relative path to point from client/src/lib/pages/ to the convex-server project root.)
+
+  Render states:
+    - messages === undefined: show a small inline spinner (Loader2 animate-spin, size 14).
+    - messages.length === 0: show a single muted line "No detail messages recorded."
+    - messages.length > 0: render a vertical timeline list.
+
+  Timeline list design:
+    - Container: left-padded, subtle left border (border-l-2 border-slate-100), inside the
+      expanded area below the log row summary.
+    - Each message entry: small dot on the left border, message text in font-mono text-xs,
+      timestamp right-aligned in text-slate-400 text-[10px].
+    - Messages are already returned in ascending order (oldest first). Render in that order.
+      Newest messages appear at the bottom — no reversal needed.
+    - The list is live: Convex useQuery is a reactive subscription, so new messages
+      appear automatically without any polling or manual refresh.
+
+Expand area:
+  Use AnimatePresence + motion.div (already imported) for the expand/collapse animation.
+  Animate height from 0 to auto using initial={{ height: 0, opacity: 0 }} and
+  animate={{ height: "auto", opacity: 1 }} with a short duration (0.18s).
+  The expanded panel sits directly below the row summary, inside the same LogItem div,
+  separated by a thin dashed border (border-t border-dashed border-slate-100).
+  Background: bg-slate-50/60, padding: px-4 py-3 sm:px-6 sm:py-4.
+
+Architecture Rules
+
+Do not change the Express fetch logic or polling interval — Express remains the source
+of truth for the log list and its metadata.
+logId is the only field used to query Convex — never use MongoDB _id for Convex lookups.
+The Convex useQuery subscription handles all real-time updates — do not add a second
+polling interval for messages.
+Do not introduce TypeScript in Logs.jsx or any client file. Keep plain JSX/JS.
+Do not create a separate component file — keep LogMessages inside Logs.jsx.
+Do not add loading skeletons to the expand panel — an inline spinner is sufficient.
+Keep all existing STATUS_CONFIG, StatusBadge, formatTimestamp, and animation variants
+exactly as they are. Only modify LogItem and add LogMessages.

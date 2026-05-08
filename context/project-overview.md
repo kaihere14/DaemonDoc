@@ -63,6 +63,7 @@ Live at: [daemondoc.online](https://daemondoc.online)
 - Each log shows repo name, status (success / failed / ongoing / skipped), and timestamp.
 - Successful logs link to the commit SHA.
 - Ongoing jobs show a live spinner.
+- Log rows can be expanded to show live chronological detail messages streamed from Convex by `logId`.
 
 ### Subscription and Payments
 
