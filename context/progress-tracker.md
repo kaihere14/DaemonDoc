@@ -100,6 +100,7 @@ Identify the next improvement to work on and add it here.
 - [x] `convex` client dependency installed in `client/package.json`
 - [x] `client/.env` — `VITE_CONVEX_URL` added for the Convex React client
 - [x] `client/src/main.jsx` — app wrapped with `ConvexProvider` using `ConvexReactClient`
+- [x] `client/src/lib/convexApi.js` — client-local Convex API reference added so Vercel does not bundle from sibling `convex-server/`
 - [x] `client/src/lib/pages/Logs.jsx` — log rows expand/collapse on click using `logId`
 - [x] `client/src/lib/pages/Logs.jsx` — `LogMessages` component added with reactive `useQuery(api.logs.getLogMessages, { logId })`
 - [x] Commit links moved into the log metadata row so row clicks control expansion only

@@ -17,7 +17,7 @@ import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { api, ENDPOINTS } from "../api";
 import { usePostHog } from "@posthog/react";
 import { WalkthroughLogsBanner } from "../../components/WalkthroughOverlay";
-import { api as convexApi } from "../../../../convex-server/convex/_generated/api";
+import { convexApi } from "../convexApi";
 
 const STATUS_CONFIG = {
   success: {

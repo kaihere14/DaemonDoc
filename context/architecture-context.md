@@ -62,6 +62,7 @@
 - `server/src/utils/git.worker.js` — BullMQ worker that runs the full README generation pipeline.
 - `server/src/schema/` — Mongoose models; the authoritative data contract.
 - `client/src/lib/api.js` — Single Axios instance with auth interceptor; all client HTTP calls go through here.
+- `client/src/lib/convexApi.js` — Client-local Convex function references for browser subscriptions; avoids importing generated files from the sibling `convex-server` package.
 - `client/src/context/AuthContext.jsx` — Auth state (user, isAuthenticated, login, logout).
 - `client/src/lib/pages/` — Route-level components; one file per page.
 - `client/src/main.jsx` — Wraps the SPA with `ConvexProvider` for read-only live log subscriptions.
