@@ -25,36 +25,18 @@ The system features a sophisticated **dual-mode AI pipeline**:
 Powered by **Google Gemini** (primary, 1M token context) with a resilient fallback to **Groq**, DaemonDoc handles complex repository structures with ease. It includes a full-featured dashboard for repository management, real-time generation logs, and a Pro subscription tier powered by **Razorpay**.
 ## ✨ Features
 
-- **Real-time Log Streaming** — Live chronological detail messages for generation jobs powered by Convex reactive subscriptions.
-- **Expandable Activity Logs** — Interactive log rows that expand to reveal a live-updating message trail of the documentation pipeline.
-- **Dynamic Hero Experience** — Enhanced landing page featuring interactive video controls, floating tech stack iconography, and animated workflow steps (Connect, Push, Sync) for a high-conversion user introduction.
-- **Guided User Onboarding Walkthrough** — A multi-stage interactive experience including non-blocking dashboard banners, a post-activation success modal, and contextual guidance in the activity logs to help users navigate their first README generation.
+- **Real-time Log Detail Streaming** — Live-updating message trails for generation jobs powered by Convex reactive subscriptions.
+- **Expandable Activity Logs** — Interactive log rows that expand to reveal a live-updating message trail of the documentation pipeline using Framer Motion animations.
+- **Unified Log Correlation** — Seamlessly links MongoDB persistent logs with Convex transient message streams via unique log identifiers for real-time status tracking.
+- **Dynamic Hero Experience** — Enhanced landing page featuring interactive video controls, floating tech stack iconography, and animated workflow steps (Connect, Push, Sync).
+- **Guided User Onboarding Walkthrough** — A multi-stage interactive experience including non-blocking dashboard banners and contextual guidance in the activity logs.
 - **Pro Subscription Tier** — Unlock unlimited repositories, priority AI generation, and enhanced project/competitor analysis limits.
-- **Seamless Payment Integration** — Integrated upgrade flow with real-time plan synchronization and localized currency formatting (INR).
-- **Animated Technical Iconography** — Custom-engineered SVG animations (Hammer, Disc, PlugZap, Search) that visualize complex engine processes like AST scanning and context synthesis.
-- **Interactive Masonry Testimonials** — A sleek, grid-based testimonial section featuring hover-triggered focus effects and dynamic blur transitions for enhanced readability.
-- **Conversion Analytics** — Integrated PostHog tracking for the entire subscription funnel, from pricing views to successful upgrades.
-- **Interactive Onboarding Flow** — A guided 5-step visual tour on the login page demonstrating the technical pipeline: commit simulation, webhook triggers, file scanning, and real-time README generation.
-- **Deep Behavioral Analytics** — Integrated PostHog for tracking the full user lifecycle, from repository activations and deactivations to manual refresh events.
-- **Automated Error Capture** — Proactive client-side exception monitoring via PostHog to identify friction points in authentication and payment workflows.
-- **User Identity Resolution** — Synchronizes GitHub usernames and plan status with PostHog profiles for granular usage insights and churn analysis.
-- **Comprehensive Payment Administration** — Dedicated dashboard for monitoring revenue, managing user subscriptions, and adjusting plan pricing in real-time.
-- **Interactive Financial Analytics** — Visualized 7-day revenue and purchase trends using animated line charts and data-driven insights.
-- **Subscription Lifecycle Management** — Administrative controls to revoke premium plans, transition users to free tiers, and manage repository limits automatically.
-- **Advanced User Filtering** — Search and filter the user base by subscription plan, GitHub username, or email with paginated ledger views.
-- **Advanced Admin Analytics** — Real-time insights into system health and user activity with animated data counters and recent log tracking.
-- **Admin Identity Badging** — Visual distinction for administrative accounts within the profile system for enhanced security awareness.
-- **Docker-Ready Infrastructure** — Includes `docker-compose` configuration for seamless Redis service orchestration with built-in health checks.
-- **Refined Account Management** — Improved clarity in profile settings and account deletion workflows with explicit confirmation requirements.
-- **Modern Admin Dashboard** — Revamped UI with interactive cards, background decorations, and a sleek, professional aesthetic powered by Framer Motion.
-- **Multi-Step Announcement Wizard** — A guided 4-step process for creating feature announcements, including targeted recipient selection, email basics, descriptions, change lists, and final review.
-- **Intelligent Code Analysis** — Powered by `gemini-3.1-flash-lite-preview` for deep understanding of codebase structure, logic, and intent. Includes RAG-based context synthesis and efficient differential AST scanning.
-- **Professional Feature Announcements** — Integrated email system with categorized update tags (`New`, `Improved`, `Fixed`, `Security`) and dual-action CTAs for user engagement.
-- **Real-time Webhook Integration** — "Push once, sync forever" promise, listening for git events to keep your README always up-to-date.
-- **Enterprise-Grade Security** — Bank-level AES-256 encryption protects GitHub tokens and repository access keys at rest and in transit.
-- **Multi-Key AI Fallback** — Up to 3 Gemini keys and 3 Groq keys, ensuring continuous generation resilience.
-- **Async Job Queue** — BullMQ + Redis handles all generation in the background; webhooks return instantly.
-- **GitHub OAuth 2.0** — Secure handshake protocols ensuring precise permission scoping for private repositories.
+- **Seamless Payment Integration** — Integrated upgrade flow with real-time plan synchronization and localized currency formatting (INR) via Razorpay.
+- **Animated Technical Iconography** — Custom-engineered SVG animations (Hammer, Disc, PlugZap, Search) that visualize complex engine processes like AST scanning.
+- **Intelligent Code Analysis** — Powered by Gemini 1.5 Flash for deep understanding of codebase structure, logic, and intent with RAG-based context synthesis.
+- **Multi-Key AI Fallback** — Resilience through 3-key rotation for both Gemini and Groq providers, ensuring continuous generation availability.
+- **Async Job Queue** — BullMQ + Redis handles all generation in the background; webhooks return instantly to GitHub.
+- **Enterprise-Grade Security** — Bank-level AES-256 encryption protects GitHub tokens and repository access keys at rest.
 ## ⚙️ How It Works
 
 1. Connect GitHub Account → OAuth login, encrypted token stored
@@ -84,16 +66,12 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 | -------------------------- | ------------------------ | ------- |
 | React                      | UI framework             | 19.x    |
 | Vite                       | Build tool               | 7.x     |
-| Convex React Client        | Real-time subscriptions  | 1.37.x  |
+| Convex React Client        | Real-time subscriptions  | 1.17.x  |
 | React Router               | Client-side routing      | 7.x     |
 | Tailwind CSS               | Styling                  | 4.x     |
 | Framer Motion              | Animations & Transitions | 12.x    |
-| Zustand                    | State management         | 5.x     |
 | Lucide React               | Icons                    | 0.562.0 |
-| Sonner                     | Toast notifications      | 2.x     |
-| @base-ui/react             | UI primitives            | 1.x     |
-| @fontsource-variable/geist | Fonts                    | 5.x     |
-| tw-animate-css             | Tailwind animations      | 1.x     |
+| PostHog                    | Analytics                | —       |
 
 ### Backend (`/server`)
 
@@ -105,22 +83,18 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 | MongoDB + Mongoose | Database                      | —       |
 | Redis + IORedis    | Job queue backing & Cache     | —       |
 | BullMQ             | Job queue                     | 5.x     |
-| Docker Compose     | Service orchestration (Redis) | —       |
 | JWT                | Auth tokens                   | —       |
-| Axios              | HTTP client                   | —       |
-| HTML Templates     | Email announcement rendering  | —       |
 
 ### AI & External Services
 
 | Service                   | Role                                                |
 | ------------------------- | --------------------------------------------------- |
-| **Gemini 3 Flash**        | Primary README generation (1M context)              |
-| **Gemini 3.1 Flash Lite** | Primary file selection (mini model)                 |
+| **Gemini 1.5 Flash**      | Primary README generation (1M context)              |
 | **Groq**                  | Fallback provider for both generation and selection |
 | **Convex**                | Live log metadata and message details               |
 | **GitHub API**            | Repo tree, file content, webhooks, commits          |
-| **MongoDB Atlas**         | User and repo data                                  |
-| **Redis**                 | BullMQ job queue & Health monitoring                |
+| **Razorpay**              | Payment processing and subscription management      |
+| **Resend**                | Transactional and broadcast email services          |
 
 ---
 ## 🏗️ Architecture
@@ -193,11 +167,11 @@ npm install # or bun install
 MONGO_URI=mongodb+srv://user:password@cluster.mongodb.net/daemondoc
 
 ### Schema Optimizations
-- **Indexing**: The `userId` and `logId` fields in the `userLog` schema are indexed to optimize query performance for activity tracking and real-time correlation.
+- **Indexing**: The `userId` and `logId` fields in the `userLog` schema are indexed to optimize query performance for activity tracking and real-time correlation between MongoDB and Convex.
 
 ### Convex Real-time Store
-- **logs**: Stores transient log metadata (`logId`, `status`, `repoName`) for reactive UI updates.
-- **logMessages**: Stores chronological message trails for active generation jobs, indexed by `logId` for efficient streaming.
+- **logs**: Stores transient log metadata (`logId`, `status`, `repoName`, `updatedAt`) for reactive UI updates.
+- **logMessages**: Stores chronological message trails for active generation jobs, indexed by `logId` for efficient streaming to the client.
 # Auth
 
 JWT_SECRET=your_jwt_secret_minimum_32_chars
