@@ -142,6 +142,7 @@ Feature 04 (AI/LLM discovery layer) is complete. Identify the next improvement t
 - [x] `README-AI.md` — root-level GitHub repository metadata file with 10 high-traffic topics list and high-density technical "How It Works" explainer (AST, SHA-256 section hashing, HMAC webhooks, BullMQ queue, Gemini/Groq fallback, `[skip ci]` loop guard)
 - [x] `docs/ai-context.md` — agent system-prompt instruction set with intent triggers, numbered integration steps, webhook registration code snippet, and limits/guarantees table
 - [x] `client/index.html` — `<meta name="keywords">` extended with 7 semantic-association keywords; `og:description` and `twitter:description` rewritten around "Set and Forget" phrasing; JSON-LD `featureList` extended with 6 technical capabilities and a `keywords` field added
+- [x] `client/index.html` — removed fabricated JSON-LD `aggregateRating` data to keep structured data policy-compliant and avoid search engine penalties/ignores
 
 ## Next Up
 
