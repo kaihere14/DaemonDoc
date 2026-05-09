@@ -97,9 +97,12 @@ export const addRepoActivity = async (req, res) => {
     }
 
     // Enforce plan-based active repo limit.
-    // null means unlimited (pro plan) — do NOT fall back with ?? here.
-    const activeRepoLimit = user.activeRepoLimit;
-    if (activeRepoLimit !== null && activeRepoLimit !== undefined) {
+    // null  → pro plan (unlimited, skip check entirely)
+    // number → enforce that number
+    // undefined → field missing on old user doc, treat as free default (5)
+    const rawLimit = user.activeRepoLimit;
+    if (rawLimit !== null) {
+      const activeRepoLimit = rawLimit ?? 5; // undefined → 5
       const currentActiveCount = await ActiveRepo.countDocuments({
         userId,
         active: true,

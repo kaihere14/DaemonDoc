@@ -39,13 +39,25 @@ async function run() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 
-  // ── Step 1: Give all users without a plan the free plan defaults ──────────
+  // ── Step 1a: Give all users without a plan the free plan defaults ─────────
   const updateResult = await User.updateMany(
     { plan: { $exists: false } },
     { $set: FREE_PLAN_DEFAULTS },
   );
   console.log(
-    `Step 1: Set free plan on ${updateResult.modifiedCount} users (already-set users skipped).`,
+    `Step 1a: Set free plan on ${updateResult.modifiedCount} users (already-set users skipped).`,
+  );
+
+  // ── Step 1b: Patch free users who are missing the activeRepoLimit field ───
+  // These are accounts created after `plan` was added to the schema but before
+  // `activeRepoLimit` was added — the migration above skips them because their
+  // plan already exists, leaving activeRepoLimit undefined and bypassing enforcement.
+  const patchResult = await User.updateMany(
+    { plan: "free", activeRepoLimit: { $exists: false } },
+    { $set: { activeRepoLimit: 5 } },
+  );
+  console.log(
+    `Step 1b: Patched activeRepoLimit on ${patchResult.modifiedCount} free users missing the field.`,
   );
 
   // ── Step 2: Find users with >5 active repos ───────────────────────────────
