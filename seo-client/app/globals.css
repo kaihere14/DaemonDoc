@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+/* Custom color tokens — plain @theme so bg-primary / text-primary utilities are generated */
+@theme {
+  --color-primary: #1d4ed8;
+  --color-secondary: #3b82f6;
+  --color-ring: #3b82f6;
+}
+
+/* Map background/foreground to the root CSS vars (separate block) */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-feature-settings:
+    "kern" 1,
+    "liga" 1;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Landing gradient utilities */
+.hero-gradient {
+  background: radial-gradient(
+    circle at 50% 120%,
+    rgba(29, 78, 216, 0.2) 0%,
+    rgba(56, 189, 248, 0.15) 30%,
+    rgba(251, 191, 36, 0.1) 55%,
+    rgba(255, 255, 255, 0) 70%
+  );
+}
+
+.feature-gradient-1 {
+  background: radial-gradient(
+    circle at top right,
+    rgba(29, 78, 216, 0.07) 0%,
+    transparent 60%
+  );
+}
+
+.feature-gradient-2 {
+  background: radial-gradient(
+    circle at top left,
+    rgba(56, 189, 248, 0.08) 0%,
+    transparent 60%
+  );
+}
+
+.feature-gradient-3 {
+  background: radial-gradient(
+    circle at bottom right,
+    rgba(16, 185, 129, 0.08) 0%,
+    transparent 60%
+  );
+}
+
+/* Floating animations */
+@keyframes float-slow-anim {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes pulse-slow-anim {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow-anim 12s ease-in-out infinite;
+}
+
+.animate-float-slow-delayed {
+  animation: float-slow-anim 12s ease-in-out 6s infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow-anim 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
