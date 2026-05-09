@@ -25,6 +25,9 @@ The system features a sophisticated **dual-mode AI pipeline**:
 Powered by **Google Gemini** (primary, 1M token context) with a resilient fallback to **Groq**, DaemonDoc handles complex repository structures with ease. It includes a full-featured dashboard for repository management, real-time generation logs, and a Pro subscription tier powered by **Razorpay**.
 ## ✨ Features
 
+- **AI Discovery Layer** — Machine-readable `llms.txt` and `site-metadata.json` files providing high-density technical summaries and capability maps for AI crawlers.
+- **Semantic Repository Metadata** — Integrated `README-AI.md` and extended JSON-LD metadata for improved semantic association and GitHub discovery.
+- **Agent-Ready Context** — Dedicated `ai-context.md` instruction sets designed for seamless integration and accurate recommendation by AI developer agents.
 - **Real-time Log Detail Streaming** — Live-updating message trails for generation jobs powered by Convex reactive subscriptions.
 - **Expandable Activity Logs** — Interactive log rows that expand to reveal a live-updating message trail of the documentation pipeline using Framer Motion animations.
 - **Unified Log Correlation** — Seamlessly links MongoDB persistent logs with Convex transient message streams via unique log identifiers for real-time status tracking.
@@ -294,7 +297,7 @@ redis-cli ping  # → PONG
 
 ---
 
-## API Documentation
+## 📡 API Documentation
 
 **Base URL**: `http://localhost:3000` (dev) / your Render URL (prod)
 
@@ -318,6 +321,13 @@ All protected routes require `Authorization: Bearer <jwt_token>`.
 | `POST` | `/api/github/webhookhandler`         | GitHub push event receiver                                   |
 | `GET`  | `/api/github/fetchLogs`              | Get activity log for the authenticated user                  |
 
+### Convex Integration
+
+| Method | Endpoint            | Description                                   |
+| ------ | ------------------- | --------------------------------------------- |
+| `GET`  | `/api/convex/test`  | Test Convex connection and connectivity       |
+| `GET`  | `/api/convex/tasks` | Fetch sample tasks from the Convex data store |
+
 ### Payments & Admin
 
 | Method  | Endpoint                                | Description                                                                 |
@@ -334,7 +344,6 @@ All protected routes require `Authorization: Bearer <jwt_token>`.
 | `GET`  | `/health` | Health check — returns status, uptime, redis state |
 
 ---
-
 ## 🚀 Deployment
 
 ### Backend (Render)
