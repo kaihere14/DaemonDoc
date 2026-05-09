@@ -25,6 +25,9 @@ The system features a sophisticated **dual-mode AI pipeline**:
 Powered by **Google Gemini** (primary, 1M token context) with a resilient fallback to **Groq**, DaemonDoc handles complex repository structures with ease. It includes a full-featured dashboard for repository management, real-time generation logs, and a Pro subscription tier powered by **Razorpay**.
 ## ✨ Features
 
+- **SEO-Optimized Landing Port** — High-performance Next.js 16 (App Router) landing page with SSR, dynamic metadata, and JSON-LD structured data for superior search visibility.
+- **Server-Side Pricing Sync** — Real-time plan fetching via SSR with ISR revalidation, ensuring pricing accuracy without client-side waterfalls.
+- **Modern Typography & Design** — Professional aesthetic using Inter and Space Grotesk fonts, powered by Tailwind CSS v4 and custom-engineered gradients.
 - **AI Discovery Layer** — Machine-readable `llms.txt` and `site-metadata.json` files providing high-density technical summaries and capability maps for AI crawlers.
 - **Semantic Repository Metadata** — Integrated `README-AI.md` and extended JSON-LD metadata for improved semantic association and GitHub discovery.
 - **Agent-Ready Context** — Dedicated `ai-context.md` instruction sets designed for seamless integration and accurate recommendation by AI developer agents.
@@ -62,6 +65,16 @@ Gemini key 1 → Gemini key 2 → Gemini key 3 → Groq key 1 → Groq key 2 →
 Retriable errors (429 rate limit, 503 overload, network errors) move to the next key. Auth failures (401/403) and payload errors (413) also fall through.
 
 ## Tech Stack 🛠️
+
+### SEO Landing Port (`/seo-client`)
+
+| Technology    | Purpose       | Version |
+| ------------- | ------------- | ------- |
+| Next.js       | App Router    | 16.x    |
+| React         | UI framework  | 19.x    |
+| Tailwind CSS  | Styling       | 4.x     |
+| Framer Motion | Animations    | 12.x    |
+| Lucide React  | Icons         | 0.562.0 |
 
 ### Frontend (`/client`)
 
@@ -165,6 +178,12 @@ bash
 cd ../client
 npm install # or bun install
 
+
+### 6. SEO Landing Port setup
+
+bash
+cd ../seo-client
+npm install
 ## 🗄️ Database
 
 MONGO_URI=mongodb+srv://user:password@cluster.mongodb.net/daemondoc
@@ -242,10 +261,14 @@ VITE_BACKEND_URL=http://localhost:3000
 cd server && npm run dev
 
 # Terminal 2 — frontend
+
+# Vite SPA (Main App)
 cd client && npm run dev
 
+# Next.js (SEO Landing Port)
+cd seo-client && npm run dev
 
-Open **http://localhost:5173**
+Open **http://localhost:5173** (App) or **http://localhost:3000** (Landing)
 
 ---
 ## Configuration
@@ -374,10 +397,22 @@ Required vars:
 
 3. Environment variable: `VITE_BACKEND_URL` = your Render URL
 
+### SEO Landing Port (Vercel)
+
+1. New Project → import repo
+2. Settings:
+
+   Root Directory: seo-client
+   Build Command: npm run build
+   Output Directory: .next
+
+3. Environment variables:
+   - `NEXT_PUBLIC_APP_URL` = `https://daemondoc.online`
+   - `BACKEND_URL` = your Render URL
+
 ### Keepalive (Render free tier)
 
 Set up an uptime monitor at [UptimeRobot](https://uptimerobot.com) or [cron-job.org](https://cron-job.org) pinging `https://your-app.onrender.com/health` every 5 minutes.
-
 ## Troubleshooting
 
 **README not updating after push**
