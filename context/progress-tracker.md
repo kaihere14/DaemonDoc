@@ -162,6 +162,24 @@ Feature 04 (AI/LLM discovery layer) is complete. Identify the next improvement t
 - **No TypeScript**: The project uses plain JSX/JS throughout. Do not introduce TypeScript without an explicit decision to migrate.
 - **Tailwind v4**: Config lives entirely in `index.css`. No `tailwind.config.js` exists and none should be created.
 
+## Completed (continued)
+
+### SEO Landing Port (Feature 05)
+
+- [x] `seo-client/` — Next.js 16 (App Router) project initialized alongside the Vite SPA
+- [x] `seo-client/app/page.tsx` — async Server Component; exports full `metadata` (title, description, keywords, openGraph, twitter, alternates.canonical, robots) and a JSON-LD `SoftwareApplication` structured data block; fetches pricing plans via SSR (`getPlans()`) and passes them into the Pricing component
+- [x] `seo-client/app/layout.tsx` — Inter + Space Grotesk fonts via `next/font/google`; `metadataBase` set to `https://daemondoc.online`
+- [x] `seo-client/app/globals.css` — Tailwind v4 `@import`, `@theme` with `--color-primary`, `feature-gradient-1/2/3`, `hero-gradient`, `animate-float-slow`, `animate-pulse-slow` keyframes; `html { scroll-behavior: smooth }` replaces the React `useEffect` scroll mutation
+- [x] `seo-client/app/(landing)/_lib/plans.ts` — server-only `getPlans()` using native `fetch` with `next: { revalidate: 3600 }` ISR; falls back to `null` plans on error
+- [x] `seo-client/app/(landing)/_lib/utils.ts` — `cn()` helper (clsx + tailwind-merge)
+- [x] `seo-client/app/(landing)/_hooks/use-is-in-view.ts` — `"use client"` hook ported from `client/src/hooks/use-is-in-view.jsx`
+- [x] `seo-client/app/(landing)/animate-ui/` — all animate-ui icons (icon, unplug, activity, clipboard-check, key, plug-zap, search, layers, hammer, disc-3) and `primitives/animate/slot` ported as TSX with updated import paths
+- [x] Server Components: `Footer`, `CoreCapabilities`, `SocialProof`, `Testimonials` (shell), `Pricing` (shell), `EngineSection` (shell), `Features` (composition)
+- [x] Client Components (`"use client"`): `PageEntrance` (motion.div fade-in), `LandingNavigation` (scroll + mobile toggle), `Hero` (video hover + framer-motion button), `EngineCard` (hover icon), `TestimonialsGrid` (hover blur), `UpgradeButton` (link to app.daemondoc.online/upgrade)
+- [x] `seo-client/.env.example` — documents `NEXT_PUBLIC_APP_URL` and `BACKEND_URL`
+- [x] Public assets copied: `DaemonLogo.png`, `landing.png`, `main_og.png`, `siteLogo.png`, `x_og.png`, 6 testimonial `.webp` avatars
+- [x] Navigation CTAs link to `app.daemondoc.online/{route}` (separate app deployment); `react-router`, `axios`, and PostHog dropped; `<SEO>` runtime component replaced by `metadata` API
+
 ## Session Notes
 
 - The context files were rewritten on 2026-05-03 to reflect the actual DaemonDoc codebase. The previous versions described a different project ("Ghost AI" — a canvas-based architecture design tool) and were completely inaccurate.
