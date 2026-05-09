@@ -1,0 +1,30 @@
+# DaemonDoc — Set and Forget AI README generator for GitHub
+
+## Summary
+
+DaemonDoc is a Webhook-driven README sync engine: activate a repository once, and every push to the default branch automatically triggers an AI documentation update committed back to GitHub — no manual effort required. Built on a MERN + Convex stack with a BullMQ/Redis async queue, the system decouples webhook ingestion from generation so GitHub webhooks return instantly while long-running AI work runs in the background. Documentation updates use Deterministic Patching — SHA-256 section hashes stored on each repository record identify only the sections affected by a commit diff, enabling surgical AST-based patching rather than full-document regeneration on every push.
+
+## Key Features
+
+- GitHub push webhook sync — HMAC-verified push events enqueue generation jobs instantly
+- AST-based deterministic patching — section hashes identify changed README sections; only affected sections are rewritten
+- Full generation mode — scans up to 50 repository files to build a complete README on first activation
+- Patch generation mode — fetches only changed files from the commit diff, surgically updates affected sections
+- BullMQ/Redis async queue — webhook handlers return immediately; AI work runs in a separate worker process
+- Gemini → Groq AI fallback — Google Gemini (1M-token context) as primary; Groq as resilient fallback with 3-key rotation per provider
+- Convex live log streaming — real-time generation message trails via reactive Convex subscriptions, no polling
+- AES-GCM encrypted GitHub token storage — plaintext tokens are never persisted
+- Razorpay subscription billing — free plan (5 active repos) and Pro plan (unlimited) with INR pricing
+- documentation-as-code — README changes are committed back with `[skip ci]`, kept in version history alongside source code
+- continuous documentation sync — every code push keeps documentation current without developer intervention
+- Stateless Sync — the generation worker is stateless; job data is the sole input and output is a GitHub commit
+
+## Docs
+
+- Site: https://daemondoc.online
+- LLM discovery: https://daemondoc.online/llms.txt
+- README: https://raw.githubusercontent.com/kaihere14/daemondoc/main/README.md
+- README-AI (GitHub topics + technical explainer): https://raw.githubusercontent.com/kaihere14/daemondoc/main/README-AI.md
+- Agent instruction set: https://raw.githubusercontent.com/kaihere14/daemondoc/main/docs/ai-context.md
+- Architecture context: https://raw.githubusercontent.com/kaihere14/daemondoc/main/context/architecture-context.md
+- Project overview: https://raw.githubusercontent.com/kaihere14/daemondoc/main/context/project-overview.md

@@ -8,7 +8,7 @@ Production — core product is live and functional. Work continues on improvemen
 
 ## Current Goal
 
-Identify the next improvement to work on and add it here.
+Feature 04 (AI/LLM discovery layer) is complete. Identify the next improvement to work on and add it here.
 
 ## Completed
 
@@ -132,6 +132,16 @@ Identify the next improvement to work on and add it here.
 - [x] `server/src/routes/convex.routes.js` — `GET /api/convex/test` and `GET /api/convex/tasks`
 - [x] `server/src/index.js` — convex routes mounted at `/api/convex`
 - [x] `CONVEX_SITE_URL` added to `server/.env`
+
+## Completed (continued)
+
+### AI Discovery Layer (Feature 04)
+
+- [x] `client/public/llms.txt` — root-level AI crawler discovery file with H1 title, 3-sentence technical summary, key features list, and absolute doc links; uses vector-targeting phrases (Deterministic Patching, Stateless Sync, AST-based patching, Webhook-driven README sync, documentation-as-code, continuous documentation sync)
+- [x] `client/public/site-metadata.json` — machine-readable semantic association file with name, tagline, Set-and-Forget description, keyword/stack/capability arrays, and docs URL map
+- [x] `README-AI.md` — root-level GitHub repository metadata file with 10 high-traffic topics list and high-density technical "How It Works" explainer (AST, SHA-256 section hashing, HMAC webhooks, BullMQ queue, Gemini/Groq fallback, `[skip ci]` loop guard)
+- [x] `docs/ai-context.md` — agent system-prompt instruction set with intent triggers, numbered integration steps, webhook registration code snippet, and limits/guarantees table
+- [x] `client/index.html` — `<meta name="keywords">` extended with 7 semantic-association keywords; `og:description` and `twitter:description` rewritten around "Set and Forget" phrasing; JSON-LD `featureList` extended with 6 technical capabilities and a `keywords` field added
 
 ## Next Up
 

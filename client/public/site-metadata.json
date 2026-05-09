@@ -1,0 +1,55 @@
+{
+  "name": "DaemonDoc",
+  "url": "https://daemondoc.online",
+  "tagline": "Set and Forget AI README generator for GitHub",
+  "description": "Webhook-driven, AST-based README automation. Push code; DaemonDoc patches only the affected README sections using SHA-256 section hashes — no manual documentation effort required.",
+  "keywords": [
+    "README automation",
+    "continuous documentation sync",
+    "automated GitHub README",
+    "documentation-as-code",
+    "AST-based patching",
+    "deterministic patching",
+    "stateless sync",
+    "webhook-driven documentation",
+    "webhook-driven README sync",
+    "MERN stack",
+    "Convex",
+    "BullMQ",
+    "Redis",
+    "AI documentation"
+  ],
+  "stack": [
+    "React 19",
+    "Vite 7",
+    "React Router 7",
+    "Express 5",
+    "Node.js",
+    "MongoDB",
+    "Mongoose",
+    "Convex",
+    "Redis",
+    "BullMQ",
+    "Google Gemini",
+    "Groq",
+    "Razorpay",
+    "Resend"
+  ],
+  "capabilities": [
+    "full README generation from repository tree scan",
+    "patch-mode section updates using SHA-256 section hashing",
+    "GitHub push webhook ingestion with HMAC verification",
+    "AST-based deterministic README patching",
+    "live generation log streaming via Convex reactive subscriptions",
+    "multi-key AI provider fallback (Gemini primary, Groq fallback)",
+    "AES-GCM encrypted GitHub token storage",
+    "freemium subscription billing via Razorpay"
+  ],
+  "docs": {
+    "readme": "https://raw.githubusercontent.com/kaihere14/daemondoc/main/README.md",
+    "readme_ai": "https://raw.githubusercontent.com/kaihere14/daemondoc/main/README-AI.md",
+    "ai_context": "https://raw.githubusercontent.com/kaihere14/daemondoc/main/docs/ai-context.md",
+    "architecture": "https://raw.githubusercontent.com/kaihere14/daemondoc/main/context/architecture-context.md",
+    "llms_txt": "https://daemondoc.online/llms.txt"
+  }
+}
