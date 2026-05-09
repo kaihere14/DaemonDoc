@@ -214,11 +214,11 @@ REDIS_HOST=your-redis-host
 REDIS_PORT=6379
 REDIS_PASSWORD=your_redis_password
 
-# App URLs
+# App URLs 🌐
 
-FRONTEND_URL=http://localhost:5173
-BACKEND_URL=http://localhost:3000
-
+- **Production (Canonical):** `https://www.daemondoc.online`
+- **Frontend (Local):** `http://localhost:5173`
+- **Backend (Local):** `http://localhost:3000`
 # Gemini (primary AI provider — add up to 3 keys for rate limit resilience)
 
 GEMINI_API_KEY1=your_gemini_key_1
