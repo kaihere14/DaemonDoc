@@ -26,6 +26,7 @@ Powered by **Google Gemini** (primary, 1M token context) with a resilient fallba
 ## ✨ Features
 
 - **SEO-Optimized Landing Port** — High-performance Next.js 16 (App Router) landing page with SSR, dynamic metadata, and JSON-LD structured data for superior search visibility.
+- **Automated Sitemap Generation** — Dynamic `sitemap.xml` generation via Next.js Metadata API to ensure search engines crawl and index the latest landing page content efficiently.
 - **Server-Side Pricing Sync** — Real-time plan fetching via SSR with ISR revalidation, ensuring pricing accuracy without client-side waterfalls.
 - **Modern Typography & Design** — Professional aesthetic using Inter and Space Grotesk fonts, powered by Tailwind CSS v4 and custom-engineered gradients.
 - **AI Discovery Layer** — Machine-readable `llms.txt` and `site-metadata.json` files providing high-density technical summaries and capability maps for AI crawlers.
