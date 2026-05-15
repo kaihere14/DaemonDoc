@@ -14,7 +14,8 @@
     "build:client": "pnpm --filter client build",
     "build:seo": "pnpm --filter seo-client build",
     "start:server": "pnpm --filter server start",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "commitlint": "commitlint --edit"
   },
   "keywords": [],
   "author": "",
