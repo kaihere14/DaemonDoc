@@ -157,6 +157,8 @@ corepack enable
 pnpm install
 
 
+*Note: This project uses **Husky** and **commitlint** to enforce conventional commit messages. Git hooks are automatically initialized during the installation process.*
+
 ### 2. Infrastructure (Redis via Docker)
 
 bash
@@ -181,6 +183,12 @@ VITE_CONVEX_URL=your_convex_deployment_url
 Run components individually using workspace filters from the root:
 
 bash
+# Start development environments
+pnpm dev:convex
+pnpm dev:server
+pnpm dev:client
+pnpm dev:seo
+
 # Start Convex backend
 pnpm dev:convex
 
