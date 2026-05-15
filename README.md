@@ -1,3 +1,4 @@
+
 # DaemonDoc — AI-Powered README Generator
 
 <div align="center">
@@ -73,23 +74,23 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 
 | Technology    | Purpose      | Version |
 | ------------- | ------------ | ------- |
-| Next.js       | App Router   | 16.x    |
-| React         | UI framework | 19.x    |
-| Tailwind CSS  | Styling      | 4.x     |
-| Framer Motion | Animations   | 12.x    |
-| Lucide React  | Icons        | 0.562.0 |
+| Next.js       | App Router   | 16.2.x  |
+| React         | UI framework | 19.2.x  |
+| Tailwind CSS  | Styling      | 4.3.x   |
+| Framer Motion | Animations   | 12.3.x  |
+| Lucide React  | Icons        | 1.16.x  |
 
 ### Frontend (`/client`)
 
 | Technology          | Purpose                  | Version |
 | ------------------- | ------------------------ | ------- |
-| React               | UI framework             | 19.x    |
-| Vite                | Build tool               | 7.x     |
-| Convex React Client | Real-time subscriptions  | 1.17.x  |
-| React Router        | Client-side routing      | 7.x     |
-| Tailwind CSS        | Styling                  | 4.x     |
-| Framer Motion       | Animations & Transitions | 12.x    |
-| Lucide React        | Icons                    | 0.562.0 |
+| React               | UI framework             | 19.2.x  |
+| Vite                | Build tool               | 7.3.x   |
+| Convex React Client | Real-time subscriptions  | 1.39.x  |
+| React Router        | Client-side routing      | 7.15.x  |
+| Tailwind CSS        | Styling                  | 4.3.x   |
+| Framer Motion       | Animations & Transitions | 12.3.x  |
+| Lucide React        | Icons                    | 0.562.x |
 | PostHog             | Analytics                | —       |
 
 ### Backend (`/server`)
@@ -97,12 +98,12 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 | Technology         | Purpose                   | Version |
 | ------------------ | ------------------------- | ------- |
 | Node.js            | Runtime                   | 20+     |
-| pnpm               | Monorepo package manager  | 10.x    |
+| pnpm               | Monorepo package manager  | 10.20.x |
 | Express            | Web framework             | 5.x     |
-| Convex             | Real-time log store       | —       |
+| Convex             | Real-time log store       | 1.39.x  |
 | MongoDB + Mongoose | Database                  | —       |
 | Redis + IORedis    | Job queue backing & Cache | —       |
-| BullMQ             | Job queue                 | 5.x     |
+| BullMQ             | Job queue                 | 5.76.x  |
 | JWT                | Auth tokens               | —       |
 
 ### AI & External Services
@@ -117,7 +118,6 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 | **Resend**           | Transactional and broadcast email services          |
 
 ---
-
 ## 🏗️ Architecture
 
 DaemonDoc follows a modern decoupled architecture designed for scalability and reliability:
@@ -140,7 +140,7 @@ This repo is a **pnpm workspace** (`client`, `server`, `convex-server`, `seo-cli
 ### Prerequisites
 
 - Node.js 20+
-- [pnpm](https://pnpm.io/) 10.x (via Corepack: `corepack enable`)
+- [pnpm](https://pnpm.io/) 10.20.x (via Corepack: `corepack enable`)
 - MongoDB (local or [Atlas](https://www.mongodb.com/cloud/atlas))
 - Redis (local or via **Docker**)
 - [Convex Account](https://www.convex.dev/)
@@ -150,20 +150,20 @@ This repo is a **pnpm workspace** (`client`, `server`, `convex-server`, `seo-cli
 
 ### 1. Clone and install
 
-```bash
+bash
 git clone https://github.com/kaihere14/daemondoc.git
 cd daemondoc
 corepack enable
 pnpm install
-```
+
 
 ### 2. Infrastructure (Redis via Docker)
 
-```bash
+bash
 cd server
 docker compose up -d
 cd ..
-```
+
 
 ### 3. Environment files
 
@@ -171,15 +171,30 @@ Create `server/.env` with your backend variables (see Configuration below).
 
 Create `client/.env`:
 
-```env
+env
 VITE_BACKEND_URL=http://localhost:3000
 VITE_CONVEX_URL=your_convex_deployment_url
-```
 
-### 4. Convex setup
 
-```bash
+### 4. Development Workflow
+
+Run components individually using workspace filters from the root:
+
+bash
+# Start Convex backend
 pnpm dev:convex
+
+# Start Express server
+pnpm dev:server
+
+# Start Vite client
+pnpm dev:client
+
+# Start SEO landing page
+pnpm dev:seo
+
+
+---
 # or: cd convex-server && pnpm exec convex dev
 ```
 
