@@ -5,12 +5,23 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "husky"
+    "prepare": "husky",
+    "install:all": "pnpm install",
+    "dev:client": "pnpm --filter client dev",
+    "dev:server": "pnpm --filter server dev",
+    "dev:seo": "pnpm --filter seo-client dev",
+    "dev:convex": "pnpm --filter convex-server exec convex dev",
+    "build:client": "pnpm --filter client build",
+    "build:seo": "pnpm --filter seo-client build",
+    "start:server": "pnpm --filter server start",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=20"
+  },
   "packageManager": "pnpm@10.20.0",
   "devDependencies": {
     "husky": "^9.1.7",

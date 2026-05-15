@@ -1,4 +1,3 @@
-
 # DaemonDoc — AI-Powered README Generator
 
 <div align="center">
@@ -19,10 +18,12 @@
 DaemonDoc is an AI-powered documentation engine that automates the creation and maintenance of GitHub READMEs. By integrating directly with your repositories via webhooks, it analyzes your codebase and commit diffs to ensure your documentation remains accurate and up-to-date without manual intervention.
 
 The system features a sophisticated **dual-mode AI pipeline**:
+
 - **Full Generation**: Scans the repository tree and key files to build a comprehensive initial README.
 - **Patch Mode**: Uses stored section hashes to surgically update only the parts of the README affected by recent commits, preserving the rest of the document and minimizing token usage.
 
 Powered by **Google Gemini** (primary, 1M token context) with a resilient fallback to **Groq**, DaemonDoc handles complex repository structures with ease. It includes a full-featured dashboard for repository management, real-time generation logs, and a Pro subscription tier powered by **Razorpay**.
+
 ## ✨ Features
 
 - **SEO-Optimized Landing Port** — High-performance Next.js 16 (App Router) landing page with SSR, dynamic metadata, and JSON-LD structured data for superior search visibility.
@@ -44,6 +45,7 @@ Powered by **Google Gemini** (primary, 1M token context) with a resilient fallba
 - **Multi-Key AI Fallback** — Resilience through 3-key rotation for both Gemini and Groq providers, ensuring continuous generation availability.
 - **Async Job Queue** — BullMQ + Redis handles all generation in the background; webhooks return instantly to GitHub.
 - **Enterprise-Grade Security** — Bank-level AES-256 encryption protects GitHub tokens and repository access keys at rest.
+
 ## ⚙️ How It Works
 
 1. Connect GitHub Account → OAuth login, encrypted token stored
@@ -69,51 +71,53 @@ Retriable errors (429 rate limit, 503 overload, network errors) move to the next
 
 ### SEO Landing Port (`/seo-client`)
 
-| Technology    | Purpose       | Version |
-| ------------- | ------------- | ------- |
-| Next.js       | App Router    | 16.x    |
-| React         | UI framework  | 19.x    |
-| Tailwind CSS  | Styling       | 4.x     |
-| Framer Motion | Animations    | 12.x    |
-| Lucide React  | Icons         | 0.562.0 |
+| Technology    | Purpose      | Version |
+| ------------- | ------------ | ------- |
+| Next.js       | App Router   | 16.x    |
+| React         | UI framework | 19.x    |
+| Tailwind CSS  | Styling      | 4.x     |
+| Framer Motion | Animations   | 12.x    |
+| Lucide React  | Icons        | 0.562.0 |
 
 ### Frontend (`/client`)
 
-| Technology                 | Purpose                  | Version |
-| -------------------------- | ------------------------ | ------- |
-| React                      | UI framework             | 19.x    |
-| Vite                       | Build tool               | 7.x     |
-| Convex React Client        | Real-time subscriptions  | 1.17.x  |
-| React Router               | Client-side routing      | 7.x     |
-| Tailwind CSS               | Styling                  | 4.x     |
-| Framer Motion              | Animations & Transitions | 12.x    |
-| Lucide React               | Icons                    | 0.562.0 |
-| PostHog                    | Analytics                | —       |
+| Technology          | Purpose                  | Version |
+| ------------------- | ------------------------ | ------- |
+| React               | UI framework             | 19.x    |
+| Vite                | Build tool               | 7.x     |
+| Convex React Client | Real-time subscriptions  | 1.17.x  |
+| React Router        | Client-side routing      | 7.x     |
+| Tailwind CSS        | Styling                  | 4.x     |
+| Framer Motion       | Animations & Transitions | 12.x    |
+| Lucide React        | Icons                    | 0.562.0 |
+| PostHog             | Analytics                | —       |
 
 ### Backend (`/server`)
 
-| Technology         | Purpose                       | Version |
-| ------------------ | ----------------------------- | ------- |
-| Node.js            | Runtime                       | 18+     |
-| Express            | Web framework                 | 5.x     |
-| Convex             | Real-time log store           | —       |
-| MongoDB + Mongoose | Database                      | —       |
-| Redis + IORedis    | Job queue backing & Cache     | —       |
-| BullMQ             | Job queue                     | 5.x     |
-| JWT                | Auth tokens                   | —       |
+| Technology         | Purpose                   | Version |
+| ------------------ | ------------------------- | ------- |
+| Node.js            | Runtime                   | 20+     |
+| pnpm               | Monorepo package manager  | 10.x    |
+| Express            | Web framework             | 5.x     |
+| Convex             | Real-time log store       | —       |
+| MongoDB + Mongoose | Database                  | —       |
+| Redis + IORedis    | Job queue backing & Cache | —       |
+| BullMQ             | Job queue                 | 5.x     |
+| JWT                | Auth tokens               | —       |
 
 ### AI & External Services
 
-| Service                   | Role                                                |
-| ------------------------- | --------------------------------------------------- |
-| **Gemini 1.5 Flash**      | Primary README generation (1M context)              |
-| **Groq**                  | Fallback provider for both generation and selection |
-| **Convex**                | Live log metadata and message details               |
-| **GitHub API**            | Repo tree, file content, webhooks, commits          |
-| **Razorpay**              | Payment processing and subscription management      |
-| **Resend**                | Transactional and broadcast email services          |
+| Service              | Role                                                |
+| -------------------- | --------------------------------------------------- |
+| **Gemini 1.5 Flash** | Primary README generation (1M context)              |
+| **Groq**             | Fallback provider for both generation and selection |
+| **Convex**           | Live log metadata and message details               |
+| **GitHub API**       | Repo tree, file content, webhooks, commits          |
+| **Razorpay**         | Payment processing and subscription management      |
+| **Resend**           | Transactional and broadcast email services          |
 
 ---
+
 ## 🏗️ Architecture
 
 DaemonDoc follows a modern decoupled architecture designed for scalability and reliability:
@@ -128,11 +132,15 @@ DaemonDoc follows a modern decoupled architecture designed for scalability and r
   - **GitHub API**: For OAuth, webhook management, and committing documentation via the Contents API.
   - **Razorpay**: For secure INR payment processing and subscription lifecycle management.
   - **Resend**: For transactional and broadcast email delivery.
+
 ## Installation 🛠️
+
+This repo is a **pnpm workspace** (`client`, `server`, `convex-server`, `seo-client`). Install once from the root.
 
 ### Prerequisites
 
-- Node.js 18+ or **Bun**
+- Node.js 20+
+- [pnpm](https://pnpm.io/) 10.x (via Corepack: `corepack enable`)
 - MongoDB (local or [Atlas](https://www.mongodb.com/cloud/atlas))
 - Redis (local or via **Docker**)
 - [Convex Account](https://www.convex.dev/)
@@ -140,146 +148,66 @@ DaemonDoc follows a modern decoupled architecture designed for scalability and r
 - Gemini API keys from [Google AI Studio](https://aistudio.google.com/app/apikey)
 - Groq API keys from [Groq Console](https://console.groq.com) (fallback)
 
-### 1. Clone
+### 1. Clone and install
 
-bash
+```bash
 git clone https://github.com/kaihere14/daemondoc.git
 cd daemondoc
-
+corepack enable
+pnpm install
+```
 
 ### 2. Infrastructure (Redis via Docker)
 
-If you have Docker installed, you can quickly spin up the required Redis service:
-
-bash
-cd server
-docker-compose up -d
-
-
-### 3. Convex Setup
-
-bash
-cd ../convex-server
-npm install
-npx convex dev # This will set up your Convex project and generate types
-
-
-### 4. Server setup
-
-bash
-cd ../server
-npm install # or bun install
-
-
-Create `server/.env` with your environment variables (refer to the Configuration section).
-
-### 5. Client setup
-
-bash
-cd ../client
-npm install # or bun install
-
-
-### 6. SEO Landing Port setup
-
-bash
-cd ../seo-client
-npm install
-## 🗄️ Database
-
-MONGO_URI=mongodb+srv://user:password@cluster.mongodb.net/daemondoc
-
-### Schema Optimizations
-- **Indexing**: The `userId` and `logId` fields in the `userLog` schema are indexed to optimize query performance for activity tracking and real-time correlation between MongoDB and Convex.
-
-### Convex Real-time Store
-- **logs**: Stores transient log metadata (`logId`, `status`, `repoName`, `updatedAt`) for reactive UI updates.
-- **logMessages**: Stores chronological message trails for active generation jobs, indexed by `logId` for efficient streaming to the client.
-# Auth
-
-JWT_SECRET=your_jwt_secret_minimum_32_chars
-GITHUB_TOKEN_SECRET=64_char_hex_for_aes256_encryption
-
-# GitHub OAuth App
-
-GITHUB_CLIENT_ID=your_oauth_client_id
-GITHUB_CLIENT_SECRET=your_oauth_client_secret
-GITHUB_CALLBACK_URL=http://localhost:3000/auth/github/callback
-GITHUB_WEBHOOK_SECRET=your_webhook_secret
-
-> **Note:** The webhook handler now ignores pushes to non‑default branches, so README generation only occurs for pushes on the repository's default branch.
-
-# Redis (omit REDIS\_\* vars to use localhost:6379 with no auth)
-
-REDIS_HOST=your-redis-host
-REDIS_PORT=6379
-REDIS_PASSWORD=your_redis_password
-
-# App URLs 🌐
-
-- **Production (Canonical):** `https://www.daemondoc.online`
-- **Frontend (Local):** `http://localhost:5173`
-- **Backend (Local):** `http://localhost:3000`
-# Gemini (primary AI provider — add up to 3 keys for rate limit resilience)
-
-GEMINI_API_KEY1=your_gemini_key_1
-GEMINI_API_KEY2=your_gemini_key_2
-GEMINI_API_KEY3=your_gemini_key_3
-GEMINI_MODEL=gemini-3-flash-preview
-GEMINI_MODEL_MINI=gemini-3-flash-preview
-
-# Groq (fallback — add up to 3 keys) ⚡
-
-GROQ_API_KEY1=your_groq_key_1
-GROQ_API_KEY2=your_groq_key_2
-GROQ_API_KEY3=your_groq_key_3
-GROQ_MODEL=openai/gpt-oss-120b
-
-This provider includes intelligent prompt truncation to respect the 8,000 token context limit. It utilizes a middle-cut strategy to preserve critical context framing (head and tail) when processing large codebases.
-# Output
-
-README_FILE_NAME=README.md
-
-````
-
-### 3. Client setup
-
 ```bash
-cd client
-npm install
-````
+cd server
+docker compose up -d
+cd ..
+```
+
+### 3. Environment files
+
+Create `server/.env` with your backend variables (see Configuration below).
 
 Create `client/.env`:
 
 ```env
 VITE_BACKEND_URL=http://localhost:3000
+VITE_CONVEX_URL=your_convex_deployment_url
 ```
 
-### 4. Start development
+### 4. Convex setup
 
 ```bash
-# Terminal 1 — backend
-cd server && npm run dev
+pnpm dev:convex
+# or: cd convex-server && pnpm exec convex dev
+```
 
-# Terminal 2 — frontend
+This links your Convex project and generates types in `convex-server/convex/_generated/`.
 
-# Vite SPA (Main App)
-cd client && npm run dev
+### 5. Start development
 
-# Next.js (SEO Landing Port)
-cd seo-client && npm run dev
+From the repo root (separate terminals):
 
-Open **http://localhost:5173** (App) or **http://localhost:3000** (Landing)
+```bash
+pnpm dev:server    # Express API — http://localhost:3000
+pnpm dev:client    # Vite SPA — http://localhost:5173
+pnpm dev:seo       # Next.js landing — http://localhost:3000 (seo-client default port)
+```
+
+Open **http://localhost:5173** (app) or the SEO client URL from the Next.js dev output.
 
 ---
+
 ## Configuration
 
 ### Convex Integration
 
 1. Create a project on [Convex](https://www.convex.dev/)
-2. Add to `client/.env`:
+2. Deploy (production): `pnpm --filter convex-server exec convex deploy`
+3. Add to `client/.env`:
    - `VITE_CONVEX_URL=your_convex_deployment_url`
-3. Add to `server/.env`:
+4. Add to `server/.env`:
    - `CONVEX_SITE_URL=your_convex_site_url` (for HTTP actions)
 
 ### GitHub OAuth App
@@ -308,14 +236,18 @@ Open **http://localhost:5173** (App) or **http://localhost:3000** (Landing)
 1. Visit [Groq Console](https://console.groq.com) → **API Keys**
 2. Create up to 3 keys
 3. Add as `GROQ_API_KEY1`, `GROQ_API_KEY2`, `GROQ_API_KEY3` in `server/.env`
+
 # macOS
+
 brew install redis && brew services start redis
 
 # Ubuntu
+
 sudo apt-get install redis-server && sudo systemctl start redis-server
 
-redis-cli ping  # → PONG
-```
+redis-cli ping # → PONG
+
+````
 
 **Cloud:** [Redis Cloud](https://redis.com/try-free/) — copy host/port/password to `.env`
 
@@ -370,14 +302,18 @@ All protected routes require `Authorization: Bearer <jwt_token>`.
 ---
 ## 🚀 Deployment
 
+All apps share the root `pnpm-lock.yaml`. Use **frozen lockfile** installs in production.
+
 ### Backend (Render)
 
 1. New Web Service → connect repo
 2. Settings:
 
-   Root Directory: server
-   Build Command: npm install
-   Start Command: npm start
+   Root Directory: *(repo root)*
+   Build Command: `corepack enable && pnpm install --frozen-lockfile --filter server`
+   Start Command: `pnpm --filter server start`
+
+   Alternative (minimal Render change): keep Root Directory `server`, Build Command `cd .. && corepack enable && pnpm install --frozen-lockfile --filter server...`, Start Command `node src/index.js`
 
 3. Environment variables — add everything from `server/.env`, updating:
    - `GITHUB_CALLBACK_URL` → `https://your-app.onrender.com/auth/github/callback`
@@ -392,9 +328,12 @@ Required vars:
 1. New Project → import repo
 2. Settings:
 
-   Root Directory: client
-   Build Command: npm run build
-   Output Directory: dist
+   Root Directory: `client`
+   Install Command: `cd .. && corepack enable && pnpm install --frozen-lockfile`
+   Build Command: `pnpm run build` (or `cd .. && pnpm --filter client build`)
+   Output Directory: `dist`
+
+   Vercel auto-detects pnpm when the root `pnpm-lock.yaml` is in the same repo.
 
 3. Environment variable: `VITE_BACKEND_URL` = your Render URL
 
@@ -403,9 +342,10 @@ Required vars:
 1. New Project → import repo
 2. Settings:
 
-   Root Directory: seo-client
-   Build Command: npm run build
-   Output Directory: .next
+   Root Directory: `seo-client`
+   Install Command: `cd .. && corepack enable && pnpm install --frozen-lockfile`
+   Build Command: `pnpm run build`
+   Output Directory: `.next`
 
 3. Environment variables:
    - `NEXT_PUBLIC_APP_URL` = `https://daemondoc.online`
@@ -432,7 +372,7 @@ Set up an uptime monitor at [UptimeRobot](https://uptimerobot.com) or [cron-job.
 
 ```bash
 redis-cli ping  # should return PONG
-```
+````
 
 For cloud Redis, verify the IP whitelist includes your server's IP.
 
