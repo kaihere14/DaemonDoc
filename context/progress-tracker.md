@@ -14,6 +14,7 @@ Feature 04 (AI/LLM discovery layer) is complete. Identify the next improvement t
 
 ### Core Infrastructure
 
+- [x] pnpm workspace monorepo — single root `pnpm-lock.yaml` for `client`, `server`, `convex-server`, and `seo-client`; root scripts (`dev:*`, `build:*`, `start:server`); Husky/lint-staged use `pnpm exec`
 - [x] Express.js server with MongoDB (Mongoose) and JWT auth
 - [x] GitHub OAuth flow (code exchange → JWT → localStorage)
 - [x] `auth.middleware.js` — JWT verification on all protected routes

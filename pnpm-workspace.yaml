@@ -1,0 +1,5 @@
+packages:
+  - "client"
+  - "server"
+  - "convex-server"
+  - "seo-client"

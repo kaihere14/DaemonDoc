@@ -1,9 +1,12 @@
 export default {
-  // Client: ESLint (from client's own node_modules) + Prettier
-  "client/src/**/*.{js,jsx}": (files) => [
-    `./client/node_modules/.bin/eslint --fix --config client/eslint.config.js ${files.join(" ")}`,
-    `prettier --write ${files.join(" ")}`,
-  ],
+  // Client: ESLint + Prettier (via pnpm workspace filter)
+  "client/src/**/*.{js,jsx}": (files) => {
+    const clientPaths = files.map((f) => f.replace(/^client\//, ""));
+    return [
+      `pnpm --filter client exec eslint --fix --config eslint.config.js ${clientPaths.join(" ")}`,
+      `pnpm exec prettier --write ${files.join(" ")}`,
+    ];
+  },
 
   // Server: Prettier only
   "server/src/**/*.js": (files) => `prettier --write ${files.join(" ")}`,
