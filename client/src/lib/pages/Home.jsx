@@ -2,14 +2,8 @@ import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AuthNavigation from "../../components/AuthNavigation";
 import RepoCard from "../../components/RepoCard";
-import {
-  Loader2,
-  Github,
-  AlertCircle,
-  RefreshCw,
-  Search,
-  X,
-} from "lucide-react";
+import RepoCardSkeleton from "../../components/RepoCardSkeleton";
+import { Github, AlertCircle, RefreshCw, Search, X } from "lucide-react";
 import SEO from "../../components/SEO";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { useRepos } from "../../hooks/useRepos";
@@ -28,6 +22,7 @@ const FILTER_TABS = [
 ];
 
 const REPOS_PER_PAGE = 12;
+const REPO_SKELETON_COUNT = 6;
 
 const PAGINATION_NAV_BTN =
   "inline-flex h-8 shrink-0 items-center cursor-pointer justify-center whitespace-nowrap rounded-[0.9rem] border border-slate-200 bg-slate-50 px-2.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40 sm:px-3";
@@ -333,14 +328,14 @@ const Home = () => {
 
             {/* Content */}
             {loading ? (
-              <div className="flex flex-col items-center justify-center py-20">
-                <Loader2
-                  size={48}
-                  className="mb-4 animate-spin text-blue-500"
-                />
-                <p className="font-medium text-slate-600">
-                  Loading your repositories...
-                </p>
+              <div
+                className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 lg:grid-cols-3 lg:gap-6"
+                aria-busy="true"
+                aria-label="Loading repositories"
+              >
+                {Array.from({ length: REPO_SKELETON_COUNT }).map((_, index) => (
+                  <RepoCardSkeleton key={index} />
+                ))}
               </div>
             ) : error ? (
               <motion.div
