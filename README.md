@@ -39,6 +39,7 @@ Powered by **Google Gemini** (primary, 1M token context) with a resilient fallba
 - **Unified Log Correlation** — Seamlessly links MongoDB persistent logs with Convex transient message streams via unique log identifiers for real-time status tracking.
 - **Dynamic Hero Experience** — Enhanced landing page featuring interactive video controls, floating tech stack iconography, and animated workflow steps (Connect, Push, Sync).
 - **Guided User Onboarding Walkthrough** — A multi-stage interactive experience including non-blocking dashboard banners and contextual guidance in the activity logs.
+- **Skeleton Loading States** — Smooth, shimmer-effect loading UI for repository cards to improve perceived performance and user experience during data fetching.
 - **Pro Subscription Tier** — Unlock unlimited repositories, priority AI generation, and enhanced project/competitor analysis limits.
 - **Seamless Payment Integration** — Integrated upgrade flow with real-time plan synchronization and localized currency formatting (INR) via Razorpay.
 - **Animated Technical Iconography** — Custom-engineered SVG animations (Hammer, Disc, PlugZap, Search) that visualize complex engine processes like AST scanning.
@@ -46,7 +47,6 @@ Powered by **Google Gemini** (primary, 1M token context) with a resilient fallba
 - **Multi-Key AI Fallback** — Resilience through 3-key rotation for both Gemini and Groq providers, ensuring continuous generation availability.
 - **Async Job Queue** — BullMQ + Redis handles all generation in the background; webhooks return instantly to GitHub.
 - **Enterprise-Grade Security** — Bank-level AES-256 encryption protects GitHub tokens and repository access keys at rest.
-
 ## ⚙️ How It Works
 
 1. Connect GitHub Account → OAuth login, encrypted token stored
