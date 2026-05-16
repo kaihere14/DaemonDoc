@@ -6,7 +6,13 @@ import { api, ENDPOINTS } from "../lib/api";
 import PlanLimitModal from "./PlanLimitModal";
 import { usePostHog } from "@posthog/react";
 
-const RepoCard = ({ repo, showToggle = true, onToggle, onActivate, isWalkthroughTarget = false }) => {
+const RepoCard = ({
+  repo,
+  showToggle = true,
+  onToggle,
+  onActivate,
+  isWalkthroughTarget = false,
+}) => {
   const reduceMotion = useReducedMotion();
   const posthog = usePostHog();
   const [isActive, setIsActive] = useState(repo.activated);
@@ -78,7 +84,7 @@ const RepoCard = ({ repo, showToggle = true, onToggle, onActivate, isWalkthrough
         y: -4,
         boxShadow: "0 18px 40px rgba(29,78,216,0.08)",
       }}
-      className={`group relative flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-white/90 p-4 backdrop-blur-xl transition-all duration-200 sm:rounded-[2rem] sm:p-6 ${
+      className={`group relative flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-white/90 p-4 backdrop-blur-xl sm:rounded-[2rem] sm:p-6 ${
         isWalkthroughTarget && !isActive
           ? "border-2 border-dashed border-blue-400 shadow-[0_8px_30px_-18px_rgba(29,78,216,0.35)]"
           : "border border-slate-200/80 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.25)] hover:border-blue-200"
@@ -113,16 +119,22 @@ const RepoCard = ({ repo, showToggle = true, onToggle, onActivate, isWalkthrough
               className="flex shrink-0 items-center gap-2 self-start"
               onClick={(e) => e.stopPropagation()}
             >
-              {isWalkthroughTarget && !isActive && !loading &&
+              {isWalkthroughTarget &&
+                !isActive &&
+                !loading &&
                 (reduceMotion ? (
-                  <span className="select-none text-xs font-bold text-blue-500">
+                  <span className="text-xs font-bold text-blue-500 select-none">
                     Enable →
                   </span>
                 ) : (
                   <motion.span
                     animate={{ x: [0, 3, 0] }}
-                    transition={{ repeat: Infinity, duration: 1.0, ease: "easeInOut" }}
-                    className="select-none text-xs font-bold text-blue-500"
+                    transition={{
+                      repeat: Infinity,
+                      duration: 1.0,
+                      ease: "easeInOut",
+                    }}
+                    className="text-xs font-bold text-blue-500 select-none"
                   >
                     Enable →
                   </motion.span>

@@ -29,6 +29,16 @@ const FILTER_TABS = [
 
 const REPOS_PER_PAGE = 12;
 
+const PAGINATION_NAV_BTN =
+  "inline-flex h-8 shrink-0 items-center cursor-pointer justify-center whitespace-nowrap rounded-[0.9rem] border border-slate-200 bg-slate-50 px-2.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40 sm:px-3";
+
+const paginationPageBtnClass = (active) =>
+  `inline-flex h-8 min-w-8 shrink-0 items-center cursor-pointer justify-center whitespace-nowrap rounded-[0.9rem] px-2 text-xs font-bold transition-colors sm:px-2.5 ${
+    active
+      ? "bg-[#1d4ed8] text-white shadow-sm shadow-blue-500/20"
+      : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
+  }`;
+
 const WT_KEY = (username) => `dd_wt_v1_${username}`;
 
 const Home = () => {
@@ -388,20 +398,23 @@ const Home = () => {
                 {/* Pagination Bar */}
                 <div className="mt-8 min-h-[3.5rem] border-t border-dashed border-slate-200 pt-4">
                   {totalReposPages > 1 ? (
-                    <div className="flex items-center justify-between">
-                      <p className="text-xs text-slate-400">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <p className="shrink-0 text-center text-xs whitespace-nowrap text-slate-400 sm:text-left">
                         {filteredRepos.length} repo
                         {filteredRepos.length !== 1 ? "s" : ""} · page{" "}
                         {reposPage} of {totalReposPages}
                       </p>
-                      <div className="flex items-center gap-2">
+                      <nav
+                        aria-label="Repository pages"
+                        className="flex w-full shrink-0 items-center justify-center gap-1.5 sm:w-auto sm:justify-end sm:gap-2"
+                      >
                         <button
                           type="button"
                           onClick={() =>
                             setReposPage((p) => Math.max(1, p - 1))
                           }
                           disabled={reposPage <= 1}
-                          className="rounded-[0.9rem] border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40"
+                          className={PAGINATION_NAV_BTN}
                         >
                           ← Prev
                         </button>
@@ -409,7 +422,7 @@ const Home = () => {
                           item === "…" ? (
                             <span
                               key={`ellipsis-${index}`}
-                              className="px-1 text-xs text-slate-400"
+                              className="inline-flex h-8 shrink-0 items-center px-0.5 text-xs text-slate-400"
                             >
                               …
                             </span>
@@ -418,11 +431,12 @@ const Home = () => {
                               key={item}
                               type="button"
                               onClick={() => setReposPage(item)}
-                              className={`rounded-[0.9rem] px-3 py-1.5 text-xs font-bold transition-colors ${
-                                item === reposPage
-                                  ? "bg-[#1d4ed8] text-white shadow-sm shadow-blue-500/20"
-                                  : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
-                              }`}
+                              aria-current={
+                                item === reposPage ? "page" : undefined
+                              }
+                              className={paginationPageBtnClass(
+                                item === reposPage,
+                              )}
                             >
                               {item}
                             </button>
@@ -436,11 +450,11 @@ const Home = () => {
                             )
                           }
                           disabled={reposPage >= totalReposPages}
-                          className="rounded-[0.9rem] border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40"
+                          className={PAGINATION_NAV_BTN}
                         >
                           Next →
                         </button>
-                      </div>
+                      </nav>
                     </div>
                   ) : (
                     <p className="text-xs text-slate-400">

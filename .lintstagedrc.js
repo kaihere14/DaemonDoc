@@ -1,3 +1,5 @@
+const PRETTIER = "./node_modules/.bin/prettier";
+
 export default {
   // Client: ESLint + Prettier (via pnpm workspace filter)
   "client/src/**/*.{js,jsx}": (files) => {
@@ -9,8 +11,8 @@ export default {
   },
 
   // Server: Prettier only
-  "server/src/**/*.js": (files) => `prettier --write ${files.join(" ")}`,
+  "server/src/**/*.js": (files) => `${PRETTIER} --write ${files.join(" ")}`,
 
   // Config / misc files
-  "*.{json,md,css,html}": (files) => `prettier --write ${files.join(" ")}`,
+  "*.{json,md,css,html}": (files) => `${PRETTIER} --write ${files.join(" ")}`,
 };
