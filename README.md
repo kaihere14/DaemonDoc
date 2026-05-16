@@ -375,6 +375,8 @@ Required vars:
    - `NEXT_PUBLIC_APP_URL` = `https://daemondoc.online`
    - `BACKEND_URL` = your Render URL
 
+4. **Analytics**: Enable **Vercel Web Analytics** in the project dashboard under the "Analytics" tab to track page views and Web Vitals. 📈
+
 ### Keepalive (Render free tier)
 
 Set up an uptime monitor at [UptimeRobot](https://uptimerobot.com) or [cron-job.org](https://cron-job.org) pinging `https://your-app.onrender.com/health` every 5 minutes.
