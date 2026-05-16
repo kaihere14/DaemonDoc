@@ -135,20 +135,19 @@ DaemonDoc follows a modern decoupled architecture designed for scalability and r
 
 ## Installation 🛠️
 
-This repo is a **pnpm workspace** (`client`, `server`, `convex-server`, `seo-client`). Install once from the root.
+This repository is structured as a **pnpm workspace** comprising `client`, `server`, `convex-server`, and `seo-client`. Dependency management and workspace settings are configured via `pnpm-workspace.yaml` files and dedicated lockfiles in each sub-directory to ensure consistent builds across the stack.
 
 ### Prerequisites
 
-- Node.js 20+
-- [pnpm](https://pnpm.io/) 10.20.x (via Corepack: `corepack enable`)
-- MongoDB (local or [Atlas](https://www.mongodb.com/cloud/atlas))
-- Redis (local or via **Docker**)
-- [Convex Account](https://www.convex.dev/)
-- [GitHub OAuth App](https://github.com/settings/developers)
-- Gemini API keys from [Google AI Studio](https://aistudio.google.com/app/apikey)
-- Groq API keys from [Groq Console](https://console.groq.com) (fallback)
+- **Node.js**: 20+
+- **pnpm**: 10.20.x (via Corepack: `corepack enable`)
+- **MongoDB**: Local instance or [Atlas](https://www.mongodb.com/cloud/atlas)
+- **Redis**: Local or via **Docker**
+- **Convex Account**: [convex.dev](https://www.convex.dev/)
+- **GitHub OAuth App**: [Developer Settings](https://github.com/settings/developers)
+- **AI API Keys**: Gemini ([Google AI Studio](https://aistudio.google.com/app/apikey)) and Groq ([Groq Console](https://console.groq.com))
 
-### 1. Clone and install
+### 1. Clone and Install
 
 bash
 git clone https://github.com/kaihere14/daemondoc.git
@@ -157,7 +156,7 @@ corepack enable
 pnpm install
 
 
-*Note: This project uses **Husky** and **commitlint** to enforce conventional commit messages. Git hooks are automatically initialized during the installation process.*
+*Note: Husky and commitlint are used to enforce conventional commits. Git hooks are initialized automatically during installation.*
 
 ### 2. Infrastructure (Redis via Docker)
 
@@ -167,23 +166,25 @@ docker compose up -d
 cd ..
 
 
-### 3. Environment files
+### 3. Environment Configuration
 
-Create `server/.env` with your backend variables (see Configuration below).
-
-Create `client/.env`:
-
-env
-VITE_BACKEND_URL=http://localhost:3000
-VITE_CONVEX_URL=your_convex_deployment_url
-
+- Create `server/.env` with backend variables (see Configuration section).
+- Create `client/.env`:
+  env
+  VITE_BACKEND_URL=http://localhost:3000
+  VITE_CONVEX_URL=your_convex_deployment_url
+  
 
 ### 4. Development Workflow
 
 Run components individually using workspace filters from the root:
 
 bash
+pnpm --filter <package-name> <command>
+
 # Start development environments
+
+bash
 pnpm dev:convex
 pnpm dev:server
 pnpm dev:client
