@@ -6,6 +6,9 @@ import { api, ENDPOINTS } from "../lib/api";
 import PlanLimitModal from "./PlanLimitModal";
 import { usePostHog } from "@posthog/react";
 
+const restrictionsDisabled =
+  import.meta.env.VITE_DISABLE_PLAN_RESTRICTIONS === "true";
+
 const RepoCard = ({
   repo,
   showToggle = true,
@@ -56,7 +59,10 @@ const RepoCard = ({
       if (!isActive && onActivate) onActivate();
       if (onToggle) onToggle();
     } catch (err) {
-      if (err.response?.data?.code === "ACTIVE_REPO_LIMIT_REACHED") {
+      if (
+        !restrictionsDisabled &&
+        err.response?.data?.code === "ACTIVE_REPO_LIMIT_REACHED"
+      ) {
         const limit = err.response.data.limit ?? 5;
         setLimitValue(limit);
         setShowLimitModal(true);
@@ -216,11 +222,13 @@ const RepoCard = ({
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-b from-transparent via-transparent to-white" />
 
-      <PlanLimitModal
-        open={showLimitModal}
-        onClose={() => setShowLimitModal(false)}
-        limit={limitValue}
-      />
+      {!restrictionsDisabled && (
+        <PlanLimitModal
+          open={showLimitModal}
+          onClose={() => setShowLimitModal(false)}
+          limit={limitValue}
+        />
+      )}
     </motion.div>
   );
 };

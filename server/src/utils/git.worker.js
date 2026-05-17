@@ -31,6 +31,9 @@ import UserLogModel from "../schema/userLog.schema.js";
 import { makeFunctionReference } from "convex/server";
 import convexClient from "../services/convex.service.js";
 
+// No activeRepoLimit or plan checks in this worker — repo limits are enforced
+// at activation time in github.controller.js (addRepoActivity).
+
 const logsCreate = makeFunctionReference("logs:createLog");
 const logsUpdate = makeFunctionReference("logs:updateLog");
 const logsAddMessage = makeFunctionReference("logs:addLogMessage");

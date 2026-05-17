@@ -100,8 +100,10 @@ export const addRepoActivity = async (req, res) => {
     // null  → pro plan (unlimited, skip check entirely)
     // number → enforce that number
     // undefined → field missing on old user doc, treat as free default (5)
+    const restrictionsDisabled =
+      process.env.DISABLE_PLAN_RESTRICTIONS === "true";
     const rawLimit = user.activeRepoLimit;
-    if (rawLimit !== null) {
+    if (!restrictionsDisabled && rawLimit !== null) {
       const activeRepoLimit = rawLimit ?? 5; // undefined → 5
       const currentActiveCount = await ActiveRepo.countDocuments({
         userId,

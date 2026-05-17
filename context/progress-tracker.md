@@ -8,7 +8,7 @@ Production — core product is live and functional. Work continues on improvemen
 
 ## Current Goal
 
-Feature 04 (AI/LLM discovery layer) is complete. Identify the next improvement to work on and add it here.
+Build feature-flag infrastructure to replace the temporary `DISABLE_PLAN_RESTRICTIONS` env vars (see Fix 01 below).
 
 ## Completed
 
@@ -96,6 +96,18 @@ Feature 04 (AI/LLM discovery layer) is complete. Identify the next improvement t
 
 ## Completed (continued)
 
+### Temporarily Disable Free Plan Restrictions (Fix 01)
+
+- [x] `DISABLE_PLAN_RESTRICTIONS=true` in `server/.env`
+- [x] `VITE_DISABLE_PLAN_RESTRICTIONS=true` in `client/.env`
+- [x] `server/src/controllers/github.controller.js` — `addRepoActivity` active-repo limit check wrapped with env guard (logic unchanged when flag is off)
+- [x] `server/src/utils/git.worker.js` — verified no plan limit enforcement; comment added
+- [x] `client/src/components/RepoCard.jsx` — `PlanLimitModal` and `ACTIVE_REPO_LIMIT_REACHED` handling guarded with `VITE_DISABLE_PLAN_RESTRICTIONS` (client-side limit UX lives here; `Home.jsx` has no preemptive toggle disable)
+- [x] `reposDeactivatedNotification` banner on Home left unchanged (server-driven event, not a client-side limit gate)
+- [ ] Next: replace env reads with a feature-flag client at the same guard sites; remove both env vars
+
+## Completed (continued)
+
 ### Client-Side Convex Log Details (Feature 03)
 
 - [x] `convex` client dependency installed in `client/package.json`
@@ -147,6 +159,7 @@ Feature 04 (AI/LLM discovery layer) is complete. Identify the next improvement t
 
 ## Next Up
 
+- Feature-flag infrastructure to replace `DISABLE_PLAN_RESTRICTIONS` / `VITE_DISABLE_PLAN_RESTRICTIONS`.
 - Validate live message updates in the browser while a README generation job is ongoing.
 
 ## Open Questions
@@ -160,6 +173,7 @@ Feature 04 (AI/LLM discovery layer) is complete. Identify the next improvement t
 - **Delete not deactivate**: Deactivating a repo deletes the `ActiveRepo` document entirely rather than toggling `active: false`. This prevents duplicate records when the user re-activates the same repo.
 - **Razorpay webhook as fallback, not primary**: The `/verify` endpoint is the fast path (user stays on the page waiting). The webhook handles the case where the browser tab closes before verification runs.
 - **Redis cache for admin analytics**: The analytics aggregation is expensive. Result is cached in Redis with key `admin_analytics` and invalidated on every generation job completion and repo activation/deactivation.
+- **Temporary plan bypass**: `DISABLE_PLAN_RESTRICTIONS` (server) and `VITE_DISABLE_PLAN_RESTRICTIONS` (client) disable free-plan repo activation limits while payments are not user-ready. Restriction logic is wrapped, not removed. Default when unset is restrictions **on** (`undefined === "true"` is false).
 - **No TypeScript**: The project uses plain JSX/JS throughout. Do not introduce TypeScript without an explicit decision to migrate.
 - **Tailwind v4**: Config lives entirely in `index.css`. No `tailwind.config.js` exists and none should be created.
 
