@@ -1,3 +1,4 @@
+
 # DaemonDoc — AI-Powered README Automation
 
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
@@ -11,6 +12,11 @@ Automatically generate and maintain accurate GitHub READMEs using codebase analy
 - **Dual-mode AI pipeline**  
   - *Full generation*: Analyze repository structure to create initial READMEs  
   - *Patch mode*: Identify and update only changed sections via SHA-256 hashing
+
+- **AI-Powered Cleanup & Restructuring**  
+  - Aggressive redundancy removal and intelligent section merging  
+  - Automated restructuring for clarity using OpenRouter (Qwen 32B)  
+  - Real-time cleanup progress tracking with dynamic toast notifications
 
 - **AI Engine**  
   - Primary: Google Gemini 1.5 Flash (1M token context)  
@@ -28,7 +34,6 @@ Automatically generate and maintain accurate GitHub READMEs using codebase analy
   - 7-day JWT session expiration
 
 ---
-
 ## 🧠 Architecture
 
 ```
@@ -139,15 +144,17 @@ BACKEND_URL=http://localhost:3000
 |--------|---------------------------------|--------------------------------------|
 | GET    | `/api/github/getGithubRepos`    | List user repositories                 |
 | POST   | `/api/github/addRepoActivity`   | Activate repo (create webhook + queue generation) |
+| POST   | `/api/github/deactivateRepoActivity` | Deactivate repository tracking |
+| POST   | `/api/github/cleanUpReadme`     | Trigger AI-powered README restructuring and cleanup |
 | POST   | `/api/github/webhookhandler`    | Handle GitHub push events              |
 
-### System Monitoring
-| Method | Endpoint  | Description              |
-|--------|-----------|--------------------------|
-| GET    | `/health` | Redis status + uptime    |
+### System Monitoring & Activity
+| Method | Endpoint                  | Description              |
+|--------|---------------------------|--------------------------|
+| GET    | `/api/github/fetchUserLogs` | Retrieve automated documentation activity logs |
+| GET    | `/health`                 | Redis status + uptime    |
 
 ---
-
 ## 🚀 Deployment
 
 **1. Backend (Render)**  
