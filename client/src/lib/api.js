@@ -31,4 +31,5 @@ export const ENDPOINTS = {
   ADMIN_REVOKE_PLAN: "/api/payments/admin/revoke-plan",
   ADMIN_UPDATE_PLAN_PRICE: "/api/payments/admin/update-plan-price",
   ADMIN_PAYMENT_ANALYTICS: "/api/payments/admin/analytics",
+  CLEAN_UP_README: "/api/github/cleanUpReadme",
 };

@@ -10,7 +10,7 @@ const COMPANIES = [
 ];
 
 const SocialProof = () => (
-  <section className="bg-linear-to-b from-white via-slate-50/50 to-white ">
+  <section className="bg-linear-to-b from-white via-slate-50/50 to-white">
     <div className="mx-auto max-w-7xl px-4 text-center">
       {/* <p className="mb-8 text-xs font-semibold tracking-widest text-slate-400 uppercase">
         Trusted by developers at

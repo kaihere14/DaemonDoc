@@ -1,7 +1,7 @@
 import React from "react";
-import { AnimatedTestimonials } from "./ui/animated-testimonials";
+import { AnimatedTestimonials } from "@/components/ui/animated-testimonials";
 import { cn } from "@/lib/utils";
-import SocialProof from "./features/SocialProof";
+import SocialProof from "./sections/SocialProof";
 
 const Testemonials = () => {
   const content = [

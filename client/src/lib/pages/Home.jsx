@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import AuthNavigation from "../../components/AuthNavigation";
-import RepoCard from "../../components/RepoCard";
-import RepoCardSkeleton from "../../components/RepoCardSkeleton";
+import AuthNavigation from "@/components/common/AuthNavigation";
+import RepoCard from "@/components/repos/RepoCard";
+import RepoCardSkeleton from "@/components/repos/RepoCardSkeleton";
 import { Github, AlertCircle, RefreshCw, Search, X } from "lucide-react";
-import SEO from "../../components/SEO";
+import SEO from "@/components/common/SEO";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { useRepos } from "../../hooks/useRepos";
 import { useAuth } from "../../context/AuthContext";
@@ -13,7 +13,7 @@ import { usePostHog } from "@posthog/react";
 import {
   WalkthroughBanner,
   WalkthroughModal,
-} from "../../components/WalkthroughOverlay";
+} from "@/components/repos/WalkthroughOverlay";
 
 const FILTER_TABS = [
   { key: "all", label: "All Repositories" },

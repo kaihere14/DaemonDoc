@@ -14,8 +14,8 @@ import {
   Infinity as InfinityIcon,
 } from "lucide-react";
 import { toast } from "sonner";
-import AuthNavigation from "../../components/AuthNavigation";
-import SEO from "../../components/SEO";
+import AuthNavigation from "@/components/common/AuthNavigation";
+import SEO from "@/components/common/SEO";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { useAuth } from "../../context/AuthContext";
 import { api, ENDPOINTS } from "../api";

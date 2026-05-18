@@ -12,6 +12,8 @@ import {
 } from "../utils/githubApiClient.js";
 import { RedisConnection } from "bullmq";
 import { redis } from "../utils/redis.js";
+import { commitFile, getFileContent } from "../services/github.service.js";
+import { cleanReadmeWithAI } from "../services/readmeCleanup.service.js";
 
 export function verifyGithubSignature(req) {
   const signature = req.headers["x-hub-signature-256"];
@@ -540,5 +542,78 @@ export const fetchAdminAnalytics = async (_req, res) => {
   } catch (error) {
     console.error("Error fetching admin analytics:", error);
     return res.status(500).json({ message: "Error fetching admin analytics" });
+  }
+};
+
+export const cleanUpReadme = async (req, res) => {
+  try {
+    console.log("[cleanUpReadme] Started");
+
+    const { repoId } = req.body;
+    if (!repoId) {
+      console.log("[cleanUpReadme] Missing repoId");
+      return res.status(400).json({ message: "repoId is required" });
+    }
+
+    const userId = req.userId;
+    const activeRepo = await ActiveRepo.findOne({ repoId, userId });
+    if (!activeRepo) {
+      console.log("[cleanUpReadme] Active repository not found");
+      return res.status(404).json({ message: "Active repository not found" });
+    }
+
+    console.log(
+      "[cleanUpReadme] Active repository found:",
+      `${activeRepo.repoOwner}/${activeRepo.repoName}`,
+    );
+
+    const user = await User.findById(userId);
+    if (!user?.githubAccessToken) {
+      console.log("[cleanUpReadme] GitHub access token not found");
+      return res.status(404).json({ message: "GitHub access token not found" });
+    }
+
+    const accessToken = decrypt(user.githubAccessToken);
+
+    console.log("[cleanUpReadme] Fetching README.md");
+    const readmeFile = await getFileContent(
+      accessToken,
+      activeRepo.repoOwner,
+      activeRepo.repoName,
+      "README.md",
+      activeRepo.defaultBranch,
+    );
+    if (!readmeFile?.content?.trim()) {
+      console.log("[cleanUpReadme] README.md not found");
+      return res
+        .status(404)
+        .json({ message: "README.md not found in repository" });
+    }
+
+    console.log("[cleanUpReadme] README fetched");
+    console.log("[cleanUpReadme] Running AI cleanup");
+    const cleanedReadme = await cleanReadmeWithAI(readmeFile.content);
+    console.log("[cleanUpReadme] AI cleanup complete");
+
+    console.log("[cleanUpReadme] Committing README");
+    const commitResult = await commitFile(
+      accessToken,
+      activeRepo.repoOwner,
+      activeRepo.repoName,
+      "README.md",
+      cleanedReadme,
+      "chore: cleanup README [skip ci]",
+      activeRepo.defaultBranch,
+      readmeFile.sha,
+    );
+
+    console.log("[cleanUpReadme] README committed:", commitResult.commit.sha);
+    return res.status(200).json({
+      message: "Readme cleaned up successfully",
+      commitSha: commitResult.commit.sha,
+    });
+  } catch (error) {
+    console.error("[cleanUpReadme] Failed:", error.message);
+    return res.status(500).json({ message: "Error cleaning up readme" });
   }
 };
