@@ -1,8 +1,20 @@
 import React, { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { GitBranch, Lock, Unlock, Loader2, ExternalLink } from "lucide-react";
+import {
+  GitBranch,
+  Lock,
+  Unlock,
+  Loader2,
+  ExternalLink,
+  BrushCleaning,
+  Loader,
+} from "lucide-react";
 import { toast } from "sonner";
 import { api, ENDPOINTS } from "@/lib/api";
+import {
+  startCleanupProgressToast,
+  completeCleanupProgressToast,
+} from "@/lib/cleanupProgressToast";
 import PlanLimitModal from "./PlanLimitModal";
 import { usePostHog } from "@posthog/react";
 
@@ -20,6 +32,7 @@ const RepoCard = ({
   const posthog = usePostHog();
   const [isActive, setIsActive] = useState(repo.activated);
   const [loading, setLoading] = useState(false);
+  const [isCleaningUp, setIsCleaningUp] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const [limitValue, setLimitValue] = useState(5);
   const ownerLabel =
@@ -82,12 +95,39 @@ const RepoCard = ({
     }
   };
 
+  const handleCleanUp = async (e) => {
+    e.stopPropagation();
+    if (isCleaningUp) return;
+
+    setIsCleaningUp(true);
+    const progress = startCleanupProgressToast();
+
+    try {
+      await api.post(ENDPOINTS.CLEAN_UP_README, { repoId: repo.id });
+      completeCleanupProgressToast(progress, {
+        success: true,
+        message: "Your README is now clean and tidy",
+      });
+      posthog?.capture("readme_cleanup_completed", {
+        repo_name: repo.name,
+        repo_full_name: repo.full_name,
+      });
+    } catch (error) {
+      completeCleanupProgressToast(progress, {
+        success: false,
+        message:
+          error.response?.data?.message || "Failed to clean up your README",
+      });
+    } finally {
+      setIsCleaningUp(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{
-        y: -4,
         boxShadow: "0 18px 40px rgba(29,78,216,0.08)",
       }}
       className={`group relative flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-white/90 p-4 backdrop-blur-xl sm:rounded-[2rem] sm:p-6 ${
@@ -217,6 +257,25 @@ const RepoCard = ({
               {isActive ? "AI README updates enabled" : "AI updates disabled"}
             </span>
           </div>
+
+          <motion.div
+            className="absolute right-5 bottom-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              disabled={isCleaningUp}
+              onClick={handleCleanUp}
+              aria-label="Clean up README"
+              className="flex cursor-pointer items-center justify-center rounded-2xl border border-blue-100 bg-blue-50/80 p-2 shadow-inner shadow-blue-400/50 transition-all duration-200 hover:bg-blue-50/90 hover:shadow-blue-400/70 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {!isCleaningUp ? (
+                <BrushCleaning size={16} className="text-blue-600" />
+              ) : (
+                <Loader size={16} className="animate-spin text-blue-600" />
+              )}
+            </button>
+          </motion.div>
         </div>
       </div>
 
