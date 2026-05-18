@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { GitBranch, Lock, Unlock, Loader2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-import { api, ENDPOINTS } from "../lib/api";
+import { api, ENDPOINTS } from "@/lib/api";
 import PlanLimitModal from "./PlanLimitModal";
 import { usePostHog } from "@posthog/react";
 

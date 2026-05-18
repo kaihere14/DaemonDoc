@@ -12,8 +12,8 @@ import {
   Check,
   Crown,
 } from "lucide-react";
-import AuthNavigation from "../../components/AuthNavigation";
-import SEO from "../../components/SEO";
+import AuthNavigation from "@/components/common/AuthNavigation";
+import SEO from "@/components/common/SEO";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { useRepos } from "../../hooks/useRepos";
 import { api, ENDPOINTS } from "../api";

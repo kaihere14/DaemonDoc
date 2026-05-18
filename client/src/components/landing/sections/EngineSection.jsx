@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Share2, GitCompare, Layers, GitBranch, Filter } from "lucide-react";
 import { Key } from "@/components/animate-ui/icons/key";
-import { Search } from "../animate-ui/icons/search";
-import { LayersIcon } from "../animate-ui/icons/layers";
-import { Slot } from "../animate-ui/primitives/animate/slot";
-import { PlugZap } from "../animate-ui/icons/plug-zap";
-import { Disc3 } from "../animate-ui/icons/disc-3";
-import { Hammer } from "../animate-ui/icons/hammer";
+import { Search } from "@/components/animate-ui/icons/search";
+import { LayersIcon } from "@/components/animate-ui/icons/layers";
+import { Slot } from "@/components/animate-ui/primitives/animate/slot";
+import { PlugZap } from "@/components/animate-ui/icons/plug-zap";
+import { Disc3 } from "@/components/animate-ui/icons/disc-3";
+import { Hammer } from "@/components/animate-ui/icons/hammer";
 
 const ENGINE_FEATURES = [
   {

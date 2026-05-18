@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import AuthNavigation from "../../components/AuthNavigation";
+import AuthNavigation from "@/components/common/AuthNavigation";
 import { api, ENDPOINTS } from "../api";
 import { toast } from "sonner";
 import { useReducedMotion } from "framer-motion";
@@ -84,15 +84,7 @@ const Admin = () => {
     loadRecipients();
   }, [showEmailModal, user]);
 
-  React.useEffect(() => {
-    if (!user?.admin) {
-      return;
-    }
-
-    fetchAnalytics();
-  }, [user]);
-
-  const fetchAnalytics = async (isRefresh = false) => {
+  const fetchAnalytics = React.useCallback(async (isRefresh = false) => {
     if (isRefresh) {
       setIsAnalyticsRefreshing(true);
     } else {
@@ -112,7 +104,39 @@ const Admin = () => {
       setIsAnalyticsLoading(false);
       setIsAnalyticsRefreshing(false);
     }
-  };
+  }, []);
+
+  React.useEffect(() => {
+    if (!user?.admin) {
+      return;
+    }
+
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const { data } = await api.get(ENDPOINTS.ADMIN_ANALYTICS);
+        if (cancelled) return;
+        setAnalytics(data);
+        setAnalyticsError("");
+      } catch (error) {
+        if (cancelled) return;
+        console.error("Error loading analytics:", error);
+        setAnalyticsError(
+          error.response?.data?.message || "Failed to load analytics",
+        );
+      } finally {
+        if (!cancelled) {
+          setIsAnalyticsLoading(false);
+          setIsAnalyticsRefreshing(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   const handleChangeUpdate = (index, field, value) => {
     const newChanges = [...changes];

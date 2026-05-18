@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2,
@@ -11,12 +11,12 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { useQuery } from "convex/react";
-import AuthNavigation from "../../components/AuthNavigation";
-import SEO from "../../components/SEO";
+import AuthNavigation from "@/components/common/AuthNavigation";
+import SEO from "@/components/common/SEO";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { api, ENDPOINTS } from "../api";
 import { usePostHog } from "@posthog/react";
-import { WalkthroughLogsBanner } from "../../components/WalkthroughOverlay";
+import { WalkthroughLogsBanner } from "@/components/repos/WalkthroughOverlay";
 import { convexApi } from "../convexApi";
 
 const STATUS_CONFIG = {
@@ -97,43 +97,67 @@ const Logs = () => {
   const [error, setError] = useState(null);
   const [expandedLogId, setExpandedLogId] = useState(null);
 
-  const [showWtBanner, setShowWtBanner] = useState(() => {
-    return false; // resolved after user loads
-  });
-
-  useEffect(() => {
-    if (user?.githubUsername) {
-      const key = `dd_wt_v1_${user.githubUsername}`;
-      setShowWtBanner(localStorage.getItem(key) === "step2");
-    }
-  }, [user?.githubUsername]);
+  const wtKey = user?.githubUsername ? `dd_wt_v1_${user.githubUsername}` : null;
+  const [wtBannerDismissed, setWtBannerDismissed] = useState(false);
+  const showWtBanner =
+    !wtBannerDismissed &&
+    wtKey !== null &&
+    localStorage.getItem(wtKey) === "step2";
 
   const handleWtDismiss = () => {
-    if (user?.githubUsername) {
-      localStorage.setItem(`dd_wt_v1_${user.githubUsername}`, "done");
+    if (wtKey) {
+      localStorage.setItem(wtKey, "done");
     }
-    setShowWtBanner(false);
+    setWtBannerDismissed(true);
   };
 
-  useEffect(() => {
-    fetchLogs();
-    const interval = setInterval(fetchLogs, 10000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchLogs = async (isRefresh = false) => {
+  const fetchLogs = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
     else setLoading(true);
     try {
       const { data } = await api.get(ENDPOINTS.FETCH_LOGS);
       setLogs(data.logs || []);
+      setError(null);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  };
+  }, []);
+
+  const pollLogs = useCallback(async () => {
+    try {
+      const { data } = await api.get(ENDPOINTS.FETCH_LOGS);
+      setLogs(data.logs || []);
+    } catch (err) {
+      setError(err.message);
+    }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const { data } = await api.get(ENDPOINTS.FETCH_LOGS);
+        if (cancelled) return;
+        setLogs(data.logs || []);
+        setError(null);
+      } catch (err) {
+        if (cancelled) return;
+        setError(err.message);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    const interval = setInterval(() => void pollLogs(), 10000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [pollLogs]);
 
   const handleToggleLog = (logId) => {
     if (!logId) return;

@@ -21,8 +21,14 @@
 - `useCallback` and `useMemo` are used to stabilize references passed to children or used in `useEffect` dependency arrays — not as a premature optimization everywhere.
 - Custom hooks live in `client/src/hooks/`. Name them `useXxx`.
 - Page-level components live in `client/src/lib/pages/`. One file per route.
-- Shared UI components live in `client/src/components/`.
+- Shared UI components live in `client/src/components/`, grouped by domain:
+  - `components/common/` — cross-route pieces (e.g. `SEO`, `AuthNavigation`)
+  - `components/landing/` — marketing page (`Hero`, `Footer`, section composers); sub-sections in `landing/sections/`
+  - `components/repos/` — authenticated repo dashboard (`RepoCard`, walkthrough, plan modals)
+  - `components/admin/` — admin console sections and modals
+  - `components/animate-ui/` — animated icon primitives (vendor-style; treat like `ui/`)
 - `components/ui/` is shadcn/ui generated output — do not modify these files unless a task explicitly requires it.
+- Prefer `@/components/...` import paths from pages and moved components.
 
 ## Express (Server)
 

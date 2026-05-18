@@ -11,7 +11,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { usePostHog } from "@posthog/react";
 
 const AuthNavigation = () => {

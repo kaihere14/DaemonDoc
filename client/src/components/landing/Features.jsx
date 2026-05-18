@@ -1,8 +1,7 @@
 import React from "react";
-import CoreCapabilities from "./features/CoreCapabilities";
-import SocialProof from "./features/SocialProof";
-import Pricing from "./features/Pricing";
-import EngineSection from "./features/EngineSection";
+import CoreCapabilities from "./sections/CoreCapabilities";
+import Pricing from "./sections/Pricing";
+import EngineSection from "./sections/EngineSection";
 import Testemonials from "./Testemonials";
 
 const Features = () => (
