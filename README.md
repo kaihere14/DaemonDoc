@@ -13,10 +13,10 @@ Automatically generate and maintain accurate GitHub READMEs using codebase analy
   - *Full generation*: Analyze repository structure to create initial READMEs  
   - *Patch mode*: Identify and update only changed sections via SHA-256 hashing
 
-- **AI-Powered Cleanup & Restructuring**  
-  - Aggressive redundancy removal and intelligent section merging  
+- **AI-Powered Cleanup & Restructuring** ✨
+  - Manual cleanup trigger via repo card "Brush" icon to aggressively trim noise and merge duplicate sections
   - Automated restructuring for clarity using OpenRouter (Qwen 32B)  
-  - Real-time cleanup progress tracking with dynamic toast notifications
+  - Interactive feature spotlight onboarding and real-time progress tracking with dynamic toasts
 
 - **AI Engine**  
   - Primary: Google Gemini 1.5 Flash (1M token context)  
@@ -26,7 +26,7 @@ Automatically generate and maintain accurate GitHub READMEs using codebase analy
 - **GitHub Integration**  
   - Webhook-based commit tracking  
   - Secure OAuth with encrypted token storage  
-  - Automatic README commits via GitHub API
+  - Automatic README commits to default branch with `[skip ci]` support
 
 - **Background Processing**  
   - BullMQ + Redis job queue for async operations  
