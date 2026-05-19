@@ -27,6 +27,8 @@ const RepoCard = ({
   onToggle,
   onActivate,
   isWalkthroughTarget = false,
+  isPreview = false,
+  highlightCleanupButton = false,
 }) => {
   const reduceMotion = useReducedMotion();
   const posthog = usePostHog();
@@ -123,19 +125,14 @@ const RepoCard = ({
     }
   };
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{
-        boxShadow: "0 18px 40px rgba(29,78,216,0.08)",
-      }}
-      className={`group relative flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-white/90 p-4 backdrop-blur-xl sm:rounded-[2rem] sm:p-6 ${
-        isWalkthroughTarget && !isActive
-          ? "border-2 border-dashed border-blue-400 shadow-[0_8px_30px_-18px_rgba(29,78,216,0.35)]"
-          : "border border-slate-200/80 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.25)] hover:border-blue-200"
-      }`}
-    >
+  const cardClassName = `group relative flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-white/90 p-4 backdrop-blur-xl sm:rounded-[2rem] sm:p-6 ${
+    isWalkthroughTarget && !isActive
+      ? "border-2 border-dashed border-blue-400 shadow-[0_8px_30px_-18px_rgba(29,78,216,0.35)]"
+      : "border border-slate-200/80 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.25)] hover:border-blue-200"
+  }${isPreview ? " pointer-events-none" : ""}`;
+
+  const cardContent = (
+    <>
       <div className="flex flex-col gap-3 sm:gap-4">
         <div className="flex items-start justify-between gap-3 sm:gap-4">
           <div
@@ -267,7 +264,11 @@ const RepoCard = ({
               disabled={isCleaningUp}
               onClick={handleCleanUp}
               aria-label="Clean up README"
-              className="flex cursor-pointer items-center justify-center rounded-2xl border border-blue-100 bg-blue-50/80 p-2 shadow-inner shadow-blue-400/50 transition-all duration-200 hover:bg-blue-50/90 hover:shadow-blue-400/70 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className={`flex items-center justify-center rounded-2xl border border-blue-100 bg-blue-50/80 p-2 shadow-inner shadow-blue-400/50 transition-all duration-200 ${
+                isPreview
+                  ? ""
+                  : "cursor-pointer hover:bg-blue-50/90 hover:shadow-blue-400/70 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+              }${highlightCleanupButton ? " ring-2 ring-blue-500 ring-offset-2" : ""}`}
             >
               {!isCleaningUp ? (
                 <BrushCleaning size={16} className="text-blue-600" />
@@ -281,13 +282,30 @@ const RepoCard = ({
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-b from-transparent via-transparent to-white" />
 
-      {!restrictionsDisabled && (
+      {!isPreview && !restrictionsDisabled && (
         <PlanLimitModal
           open={showLimitModal}
           onClose={() => setShowLimitModal(false)}
           limit={limitValue}
         />
       )}
+    </>
+  );
+
+  if (isPreview) {
+    return <div className={cardClassName}>{cardContent}</div>;
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{
+        boxShadow: "0 18px 40px rgba(29,78,216,0.08)",
+      }}
+      className={cardClassName}
+    >
+      {cardContent}
     </motion.div>
   );
 };

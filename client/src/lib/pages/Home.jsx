@@ -14,6 +14,7 @@ import {
   WalkthroughBanner,
   WalkthroughModal,
 } from "@/components/repos/WalkthroughOverlay";
+import CleanupFeatureSpotlight from "@/components/repos/CleanupFeatureSpotlight";
 
 const FILTER_TABS = [
   { key: "all", label: "All Repositories" },
@@ -35,6 +36,7 @@ const paginationPageBtnClass = (active) =>
   }`;
 
 const WT_KEY = (username) => `dd_wt_v1_${username}`;
+const CLEANUP_INTRO_KEY = (username) => `dd_cleanup_intro_v1_${username}`;
 
 const Home = () => {
   const { user } = useRequireAuth();
@@ -62,6 +64,33 @@ const Home = () => {
   const handleRepoActivated = useCallback(() => {
     if (wtStep === "step0") advanceWalkthrough("step1");
   }, [wtStep, advanceWalkthrough]);
+
+  const cleanupIntroDismissed = user?.githubUsername
+    ? localStorage.getItem(CLEANUP_INTRO_KEY(user.githubUsername)) === "done"
+    : true;
+
+  const showCleanupIntro =
+    Boolean(user?.githubUsername) &&
+    !loading &&
+    repos.length > 0 &&
+    !cleanupIntroDismissed &&
+    wtStep !== "step0" &&
+    wtStep !== "step1";
+
+  const dismissCleanupIntro = useCallback(() => {
+    if (!user?.githubUsername) return;
+    localStorage.setItem(CLEANUP_INTRO_KEY(user.githubUsername), "done");
+    posthog?.capture("cleanup_intro_dismissed");
+    forceUpdate((n) => n + 1);
+  }, [user, posthog]);
+
+  const cleanupIntroShownRef = React.useRef(false);
+  React.useEffect(() => {
+    if (showCleanupIntro && !cleanupIntroShownRef.current) {
+      cleanupIntroShownRef.current = true;
+      posthog?.capture("cleanup_intro_shown");
+    }
+  }, [showCleanupIntro, posthog]);
 
   const handleDismissReposNotification = async () => {
     try {
@@ -135,6 +164,10 @@ const Home = () => {
         open={wtStep === "step1"}
         onGoToLogs={() => advanceWalkthrough("step2")}
         onSkip={() => advanceWalkthrough("done")}
+      />
+      <CleanupFeatureSpotlight
+        open={showCleanupIntro}
+        onDismiss={dismissCleanupIntro}
       />
       <div className="min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-indigo-100">
         <AuthNavigation />
