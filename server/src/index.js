@@ -8,6 +8,7 @@ import paymentRoutes from "./routes/payment.routes.js";
 import convexRoutes from "./routes/convex.routes.js";
 import { razorpayWebhook } from "./controllers/payment.controller.js";
 import { connectDB } from "./db/connectDB.js";
+import { recoverInterruptedCleanupLogs } from "./services/logRecovery.service.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -59,9 +60,25 @@ app.use((err, req, res, next) => {
 
 connectDB()
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
+    recoverInterruptedCleanupLogs()
+      .then((recoveredCount) => {
+        if (recoveredCount > 0) {
+          console.warn(
+            `[startup] Marked ${recoveredCount} interrupted cleanup log(s) as failed`,
+          );
+        }
+      })
+      .catch((error) => {
+        console.error(
+          "[startup] Failed to recover interrupted cleanup logs:",
+          error.message,
+        );
+      })
+      .finally(() => {
+        app.listen(PORT, () => {
+          console.log(`Server is running on port ${PORT}`);
+        });
+      });
   })
   .catch((error) => {
     console.error("Failed to connect to the database:", error);
