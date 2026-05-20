@@ -14,6 +14,24 @@ import { RedisConnection } from "bullmq";
 import { redis } from "../utils/redis.js";
 import { commitFile, getFileContent } from "../services/github.service.js";
 import { cleanReadmeWithAI } from "../services/readmeCleanup.service.js";
+import { makeFunctionReference } from "convex/server";
+import convexClient from "../services/convex.service.js";
+
+const logsCreate = makeFunctionReference("logs:createLog");
+const logsUpdate = makeFunctionReference("logs:updateLog");
+const logsAddMessage = makeFunctionReference("logs:addLogMessage");
+
+function liveUpdate(sharedLogId, message) {
+  if (!sharedLogId) return;
+  convexClient
+    .mutation(logsAddMessage, { logId: sharedLogId, message })
+    .catch((err) =>
+      console.warn(
+        "[cleanUpReadme] Convex log message failed (non-fatal):",
+        err.message,
+      ),
+    );
+}
 
 export function verifyGithubSignature(req) {
   const signature = req.headers["x-hub-signature-256"];
@@ -546,6 +564,9 @@ export const fetchAdminAnalytics = async (_req, res) => {
 };
 
 export const cleanUpReadme = async (req, res) => {
+  let userLog = null;
+  let sharedLogId = null;
+
   try {
     console.log("[cleanUpReadme] Started");
 
@@ -591,11 +612,50 @@ export const cleanUpReadme = async (req, res) => {
     }
 
     console.log("[cleanUpReadme] README fetched");
+    sharedLogId = crypto.randomUUID();
+    userLog = await UserLogModel.create({
+      logId: sharedLogId,
+      userId,
+      repoName: activeRepo.repoName,
+      repoOwner: activeRepo.repoOwner,
+      action: "README_CLEANUP_STARTED",
+      status: "ongoing",
+    });
+    await redis.del("admin_analytics");
+
+    try {
+      await convexClient.mutation(logsCreate, {
+        logId: sharedLogId,
+        userId,
+        repoName: activeRepo.repoName,
+        action: "README_CLEANUP_STARTED",
+        status: "ongoing",
+      });
+    } catch (err) {
+      console.warn(
+        "[cleanUpReadme] Convex log create failed (non-fatal):",
+        err.message,
+      );
+    }
+
+    liveUpdate(
+      sharedLogId,
+      `Starting README cleanup for ${activeRepo.repoOwner}/${activeRepo.repoName}`,
+    );
     console.log("[cleanUpReadme] Running AI cleanup");
-    const cleanedReadme = await cleanReadmeWithAI(readmeFile.content);
+    liveUpdate(sharedLogId, "Fetched existing README.md");
+    liveUpdate(sharedLogId, "Cleaning README content with AI");
+    const cleanedReadme = await cleanReadmeWithAI(readmeFile.content, (msg) =>
+      liveUpdate(sharedLogId, msg),
+    );
     console.log("[cleanUpReadme] AI cleanup complete");
+    liveUpdate(
+      sharedLogId,
+      `Cleanup complete (${cleanedReadme.length} chars)`,
+    );
 
     console.log("[cleanUpReadme] Committing README");
+    liveUpdate(sharedLogId, "Committing cleaned README to GitHub");
     const commitResult = await commitFile(
       accessToken,
       activeRepo.repoOwner,
@@ -608,12 +668,74 @@ export const cleanUpReadme = async (req, res) => {
     );
 
     console.log("[cleanUpReadme] README committed:", commitResult.commit.sha);
+    liveUpdate(
+      sharedLogId,
+      `✓ README committed: ${commitResult.commit.sha.slice(0, 7)}`,
+    );
+    await UserLogModel.findByIdAndUpdate(
+      userLog._id,
+      {
+        action: "README_CLEANUP_SUCCESS",
+        status: "success",
+        commitId: commitResult.commit.sha,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+    await redis.del("admin_analytics");
+
+    convexClient
+      .mutation(logsUpdate, { logId: sharedLogId, status: "success" })
+      .catch((err) =>
+        console.warn(
+          "[cleanUpReadme] Convex log update failed (non-fatal):",
+          err.message,
+        ),
+      );
+
     return res.status(200).json({
       message: "Readme cleaned up successfully",
       commitSha: commitResult.commit.sha,
     });
   } catch (error) {
     console.error("[cleanUpReadme] Failed:", error.message);
+    liveUpdate(sharedLogId, `✗ Failed: ${error.message}`);
+
+    if (userLog) {
+      try {
+        await UserLogModel.findByIdAndUpdate(
+          userLog._id,
+          {
+            action: "README_CLEANUP_FAILED",
+            status: "failed",
+          },
+          {
+            new: true,
+            runValidators: true,
+          },
+        );
+        await redis.del("admin_analytics");
+      } catch (logError) {
+        console.error(
+          "[cleanUpReadme] Failed to update Mongo log:",
+          logError.message,
+        );
+      }
+    }
+
+    if (sharedLogId) {
+      convexClient
+        .mutation(logsUpdate, { logId: sharedLogId, status: "failed" })
+        .catch((err) =>
+          console.warn(
+            "[cleanUpReadme] Convex log failure update failed (non-fatal):",
+            err.message,
+          ),
+        );
+    }
+
     return res.status(500).json({ message: "Error cleaning up readme" });
   }
 };

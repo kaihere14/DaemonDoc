@@ -96,6 +96,15 @@ Build feature-flag infrastructure to replace the temporary `DISABLE_PLAN_RESTRIC
 
 ## Completed (continued)
 
+### README Cleanup Logging (Fix 02)
+
+- [x] `server/src/schema/userLog.schema.js` — added `README_CLEANUP_STARTED`, `README_CLEANUP_SUCCESS`, and `README_CLEANUP_FAILED` action enums
+- [x] `server/src/controllers/github.controller.js` — `cleanUpReadme` now creates a MongoDB `UserLog` row at start, mirrors it to Convex, and updates both sources on success/failure so manual cleanup runs appear on `/logs`
+- [x] `server/src/controllers/github.controller.js` and `server/src/services/readmeCleanup.service.js` — cleanup runs now append Convex `logMessages` during fetch, AI cleanup, commit, and failure paths so expanded log rows show live detail messages like normal generation runs
+- [x] `server/src/services/logRecovery.service.js` and `server/src/index.js` — unfinished cleanup logs are marked failed on server startup after an interrupted backend restart, with the Convex status and detail trail updated to match
+
+## Completed (continued)
+
 ### Temporarily Disable Free Plan Restrictions (Fix 01)
 
 - [x] `DISABLE_PLAN_RESTRICTIONS=true` in `server/.env`

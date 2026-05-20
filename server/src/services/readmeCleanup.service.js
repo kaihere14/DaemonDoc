@@ -33,10 +33,14 @@ function normalizeMarkdownOutput(text) {
   return cleaned;
 }
 
-export async function cleanReadmeWithAI(existingReadme) {
+export async function cleanReadmeWithAI(existingReadme, onProgress = null) {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
     throw new Error("OPENROUTER_API_KEY is not configured");
+  }
+
+  if (onProgress) {
+    onProgress(`Sending README to cleanup model ${CLEANUP_MODEL}`);
   }
 
   const response = await fetch(OPENROUTER_URL, {
@@ -68,6 +72,10 @@ export async function cleanReadmeWithAI(existingReadme) {
 
   if (!content?.trim()) {
     throw new Error("OpenRouter returned empty README content");
+  }
+
+  if (onProgress) {
+    onProgress("Cleanup model returned rewritten README");
   }
 
   return normalizeMarkdownOutput(content);
