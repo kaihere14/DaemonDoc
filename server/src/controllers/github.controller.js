@@ -623,20 +623,20 @@ export const cleanUpReadme = async (req, res) => {
     });
     await redis.del("admin_analytics");
 
-    convexClient
-      .mutation(logsCreate, {
+    try {
+      await convexClient.mutation(logsCreate, {
         logId: sharedLogId,
         userId,
         repoName: activeRepo.repoName,
         action: "README_CLEANUP_STARTED",
         status: "ongoing",
-      })
-      .catch((err) =>
-        console.warn(
-          "[cleanUpReadme] Convex log create failed (non-fatal):",
-          err.message,
-        ),
+      });
+    } catch (err) {
+      console.warn(
+        "[cleanUpReadme] Convex log create failed (non-fatal):",
+        err.message,
       );
+    }
 
     liveUpdate(
       sharedLogId,
