@@ -16,7 +16,11 @@ Automatically generate and maintain accurate GitHub READMEs using codebase analy
 - **AI-Powered Cleanup & Restructuring** ✨
   - Manual cleanup trigger via repo card "Brush" icon to aggressively trim noise and merge duplicate sections
   - Automated restructuring for clarity using OpenRouter (Qwen 32B)  
-  - Interactive feature spotlight onboarding and real-time progress tracking with dynamic toasts
+  - **Live Activity Logging**: Cleanup runs now stream real-time progress to the dashboard via Convex, providing the same visibility as standard generation runs.
+
+- **Resilient Logging & Recovery** 🛡️
+  - **Log Recovery Service**: Automatically detects and marks interrupted cleanup tasks as "failed" during server startup to prevent stale "ongoing" states.
+  - **Unified Audit Trail**: MongoDB `UserLog` records for all cleanup actions (`STARTED`, `SUCCESS`, `FAILED`) with correlated `logId` for cross-system tracking.
 
 - **AI Engine**  
   - Primary: Google Gemini 1.5 Flash (1M token context)  
@@ -187,18 +191,21 @@ Set up a 5-minute cron job to ping:
   - Check webhook secret HMAC validation  
   - Ensure backend is publicly accessible (use ngrok for local testing)
 
-- **AI Generation Errors**:  
+- **AI Generation & Cleanup Errors**:  
   - 429 errors: Add more API keys or wait for rate limits  
   - 401/403: Rotate API keys  
-  - View failed jobs in Activity Logs
+  - **Stuck "Ongoing" Logs**: If the server restarts during a cleanup, the `LogRecovery` service will mark them as failed with the message "Cleanup interrupted because the backend restarted".
+
+- **Live Log Sync Issues**:  
+  - Ensure `CONVEX_SITE_URL` is correctly configured in the server environment.  
+  - Check browser console for Convex connection errors if live updates are missing in the UI.
 
 - **Redis Connectivity**:  
-  ```bash
+  bash
   redis-cli ping  # Should return PONG
-  ```
+  
 
 ---
-
 ## 🔐 Security
 
 - GitHub tokens encrypted with AES-256-GCM  
