@@ -83,7 +83,7 @@ export default function Pricing({ monthly, yearly }: PricingProps) {
 
                 <button
                   disabled
-                  className="w-full cursor-not-allowed rounded-full border border-neutral-300 bg-transparent py-3 text-lg font-semibold text-neutral-300"
+                  className="w-full cursor-not-allowed rounded-xl border border-neutral-300 bg-transparent py-3 text-lg font-semibold text-neutral-300"
                 >
                   Current Plan
                 </button>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
+import { CandyLink } from "@/components/ui/candy-button";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daemondoc.online";
 
@@ -68,12 +69,12 @@ export default function LandingNavigation() {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex">
-            <a
+            <CandyLink
               href={`${APP_URL}/login`}
-              className="cursor-pointer rounded-full bg-[#1d4ed8] px-6 py-2.5 text-sm font-medium text-white shadow-lg shadow-blue-500/30 transition-all text-shadow-sm hover:bg-[#1e40af]"
+              className="px-6 py-2.5 text-sm"
             >
               Get Started
-            </a>
+            </CandyLink>
           </div>
 
           {/* Mobile toggle */}
@@ -101,12 +102,9 @@ export default function LandingNavigation() {
             </a>
           ))}
           <div className="pt-2">
-            <a
-              href={`${APP_URL}/login`}
-              className="block w-full rounded-full bg-[#1d4ed8] px-6 py-3 text-center font-medium text-white"
-            >
+            <CandyLink href={`${APP_URL}/login`} className="w-full">
               Get Started
-            </a>
+            </CandyLink>
           </div>
         </div>
       )}

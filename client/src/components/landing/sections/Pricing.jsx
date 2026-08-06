@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Check } from "lucide-react";
 import axios from "axios";
 import { usePostHog } from "@posthog/react";
+import { CandyButton } from "@/components/ui/candy-button";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -99,7 +100,7 @@ const Pricing = () => {
 
                 <button
                   disabled
-                  className="w-full cursor-not-allowed rounded-full border border-neutral-300 bg-transparent py-3 text-lg font-semibold text-neutral-300"
+                  className="w-full cursor-not-allowed rounded-xl border border-neutral-300 bg-transparent py-3 text-lg font-semibold text-neutral-300"
                 >
                   Current Plan
                 </button>
@@ -162,15 +163,15 @@ const Pricing = () => {
                   year (save ~33%)
                 </p>
 
-                <button
+                <CandyButton
                   onClick={() => {
                     posthog?.capture("pricing_cta_clicked", { plan: "pro" });
                     navigate("/upgrade");
                   }}
-                  className="relative isolate w-full cursor-pointer overflow-hidden rounded-full bg-blue-600 py-3 text-lg font-semibold text-white transition-all after:absolute after:inset-y-0 after:-left-1/2 after:w-1/2 after:translate-x-[-180%] after:skew-x-[-20deg] after:bg-white/40 after:blur-sm after:transition-transform after:duration-700 after:content-[''] hover:brightness-110 hover:after:translate-x-[320%]"
+                  className="w-full py-3 text-lg"
                 >
-                  <span className="relative z-10">Upgrade to Pro</span>
-                </button>
+                  Upgrade to Pro
+                </CandyButton>
 
                 <div className="mt-8 mb-7 border-t border-dashed border-neutral-700" />
                 <p className="mb-5 text-[11px] font-semibold tracking-[0.18em] text-neutral-500 uppercase">

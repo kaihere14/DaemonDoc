@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { CandyButton } from "@/components/ui/candy-button";
 
 const NAV_LINKS = [
   { label: "Solutions", href: "#features" },
@@ -63,12 +64,12 @@ const LandingNavigation = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex">
-            <button
+            <CandyButton
               onClick={() => navigate("/login")}
-              className="cursor-pointer rounded-full bg-[#1d4ed8] px-6 py-2.5 text-sm font-medium text-white shadow-lg shadow-blue-500/30 transition-all text-shadow-sm hover:bg-[#1e40af]"
+              className="px-6 py-2.5 text-sm"
             >
               Get Started
-            </button>
+            </CandyButton>
           </div>
 
           {/* Mobile toggle */}
@@ -96,12 +97,9 @@ const LandingNavigation = () => {
             </a>
           ))}
           <div className="pt-2">
-            <button
-              onClick={() => navigate("/login")}
-              className="w-full rounded-full bg-[#1d4ed8] px-6 py-3 font-medium text-white"
-            >
+            <CandyButton onClick={() => navigate("/login")} className="w-full">
               Get Started
-            </button>
+            </CandyButton>
           </div>
         </div>
       )}

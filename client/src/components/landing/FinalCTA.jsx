@@ -8,6 +8,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { CandyButton } from "@/components/ui/candy-button";
 
 const FinalCTA = () => {
   const navigate = useNavigate();
@@ -64,11 +65,9 @@ const FinalCTA = () => {
               </h2>
 
               <div className="flex w-full flex-col items-center gap-8">
-                <motion.button
+                <CandyButton
                   onClick={() => navigate("/login")}
-                  whileHover={{ scale: 1.02, y: -4 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="group relative flex w-full items-center justify-center gap-4 rounded-2xl bg-slate-900 px-10 py-6 text-lg font-black text-white uppercase shadow-[0_20px_40px_-10px_rgba(15,23,42,0.3)] transition-all hover:shadow-[0_25px_50px_-12px_rgba(15,23,42,0.4)] sm:w-auto"
+                  className="group flex w-full items-center justify-center gap-4 px-10 py-6 text-lg font-black uppercase sm:w-auto"
                 >
                   <Github size={24} />
                   <span>Initialize Engine</span>
@@ -76,7 +75,7 @@ const FinalCTA = () => {
                     size={20}
                     className="transition-transform group-hover:translate-x-1"
                   />
-                </motion.button>
+                </CandyButton>
 
                 {/* Technical Trust Footer */}
                 <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 opacity-40">

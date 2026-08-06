@@ -3,11 +3,12 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { Play, ArrowRight, Lock } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Unplug } from "@/app/(landing)/_animate-ui/icons/unplug";
 import { Activity } from "@/app/(landing)/_animate-ui/icons/activity";
 import { ClipboardCheck } from "@/app/(landing)/_animate-ui/icons/clipboard-check";
 import { AnimateIcon } from "@/app/(landing)/_animate-ui/icons/icon";
+import { CandyLink } from "@/components/ui/candy-button";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daemondoc.online";
 
@@ -193,35 +194,17 @@ export default function Hero() {
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
-            <motion.a
+            <CandyLink
               href={`${APP_URL}/login`}
-              whileHover="hover"
-              initial="rest"
-              animate="rest"
-              className="group bg-primary relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-full px-8 py-3.5 font-medium text-white shadow-xl drop-shadow-2xl transition-colors duration-200 ease-in-out text-shadow-md"
+              className="w-full gap-2 sm:w-auto"
             >
-              <motion.span
-                variants={{
-                  rest: { clipPath: "circle(16px at calc(100% - 28px) 50%)" },
-                  hover: { clipPath: "circle(240px at calc(100% - 28px) 50%)" },
-                }}
-                transition={{ duration: 0.35, ease: "easeInOut" }}
-                className="absolute inset-0 z-0 bg-white"
-              />
-              <span className="group-hover:text-primary relative z-10 pr-6 transition-colors duration-200 ease-in-out">
-                Try Now
-              </span>
-              <span className="absolute right-4 z-10 rounded-full bg-white p-1 text-slate-900 drop-shadow-2xl transition-all duration-300 ease-out">
-                <ArrowRight
-                  size={18}
-                  className="group-hover:text-primary transition-colors duration-200 ease-in-out"
-                />
-              </span>
-            </motion.a>
+              Try Now
+              <ArrowRight size={18} />
+            </CandyLink>
 
             <a
               href="#features"
-              className="flex items-center justify-center gap-1 rounded-full p-4 font-medium text-slate-600 transition duration-300 hover:bg-neutral-300/30"
+              className="flex items-center justify-center gap-1 rounded-xl px-9 py-3 font-medium text-slate-600 transition duration-300 hover:bg-neutral-300/30"
             >
               View Capabilities
               <ArrowRight size={16} />
