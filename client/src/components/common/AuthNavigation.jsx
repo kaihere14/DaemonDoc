@@ -14,6 +14,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { usePostHog } from "@posthog/react";
 
+import { MARKETING_URL } from "@/lib/urls";
+
 const AuthNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -44,18 +46,18 @@ const AuthNavigation = () => {
     posthog?.reset();
     logout();
     setShowDropdown(false);
-    navigate("/");
+    window.location.href = MARKETING_URL;
   };
 
   return (
     <nav className="fixed top-0 right-0 left-0 z-50 mx-auto max-w-[1450px] bg-linear-to-t from-white/10 via-white/50 to-white/95 backdrop-blur-xs">
       <div className="flex h-16 items-center justify-between pr-4 sm:pr-20 sm:pl-10">
         {/* Logo */}
-        <motion.div
+        <motion.a
+          href={MARKETING_URL}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           className="group flex w-40 cursor-pointer items-center gap-2 overflow-hidden sm:w-60 sm:gap-3"
-          onClick={() => navigate("/")}
         >
           <motion.div>
             <img
@@ -64,7 +66,7 @@ const AuthNavigation = () => {
               className="w-40 scale-120 pt-1 sm:ml-2 sm:w-48"
             />
           </motion.div>
-        </motion.div>
+        </motion.a>
 
         {/* Navigation & User Menu */}
         <motion.div

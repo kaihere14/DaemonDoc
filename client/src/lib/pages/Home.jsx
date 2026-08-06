@@ -15,6 +15,7 @@ import {
   WalkthroughModal,
 } from "@/components/repos/WalkthroughOverlay";
 import CleanupFeatureSpotlight from "@/components/repos/CleanupFeatureSpotlight";
+import { APP_ORIGIN } from "../urls";
 
 const FILTER_TABS = [
   { key: "all", label: "All Repositories" },
@@ -157,8 +158,8 @@ const Home = () => {
       <SEO
         title="Dashboard - DaemonDoc | Manage Your Repositories"
         description="Manage AI-powered README updates for your GitHub repositories. View, enable, and configure automatic documentation generation."
-        ogUrl="https://daemondoc.online/home"
-        canonical="https://daemondoc.online/home"
+        ogUrl={`${APP_ORIGIN}/home`}
+        canonical={`${APP_ORIGIN}/home`}
       />
       <WalkthroughModal
         open={wtStep === "step1"}

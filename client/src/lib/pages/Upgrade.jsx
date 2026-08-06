@@ -20,6 +20,7 @@ import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { useAuth } from "../../context/AuthContext";
 import { api, ENDPOINTS } from "../api";
 import { usePostHog } from "@posthog/react";
+import { APP_ORIGIN } from "../urls";
 
 const formatPrice = (paise) =>
   new Intl.NumberFormat("en-IN", {
@@ -183,8 +184,8 @@ const Upgrade = () => {
       <SEO
         title="Upgrade to Pro — DaemonDoc"
         description="Unlock unlimited repositories, more reviews and competitor analyses with DaemonDoc Pro."
-        ogUrl="https://daemondoc.online/upgrade"
-        canonical="https://daemondoc.online/upgrade"
+        ogUrl={`${APP_ORIGIN}/upgrade`}
+        canonical={`${APP_ORIGIN}/upgrade`}
       />
       <div className="min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-indigo-100">
         <AuthNavigation />

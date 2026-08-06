@@ -19,6 +19,8 @@ import {
   Package,
 } from "lucide-react";
 
+import { MARKETING_URL } from "../urls";
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const README_CONTENT = `# MyProject
@@ -58,12 +60,12 @@ const SCAN_FILES = [
 
 // ─── Layout shells — defined OUTSIDE Login so React never remounts them ────────
 
-const Shell = ({ step, setStep, nav, children }) => (
+const Shell = ({ step, setStep, children }) => (
   <div className="selection:bg-primary relative mx-auto flex min-h-dvh flex-col overflow-x-hidden bg-white font-sans selection:text-white md:h-dvh md:max-w-600 md:flex-row md:overflow-hidden 2xl:max-w-300">
     <div className="bg-primary/5 pointer-events-none absolute top-[-20%] left-[-10%] h-[50%] w-[50%] rounded-full blur-[160px]" />
     <div className="pointer-events-none absolute right-[-10%] bottom-[-20%] h-[50%] w-[50%] rounded-full bg-blue-100/10 blur-[160px]" />
     <div className="pointer-events-none absolute top-0 left-0 z-50 flex w-full items-center justify-between p-4 lg:p-6">
-      <a href="/" className="pointer-events-auto">
+      <a href={MARKETING_URL} className="pointer-events-auto">
         <img
           src="/DaemonLogo.png"
           alt="DaemonDoc"
@@ -71,7 +73,11 @@ const Shell = ({ step, setStep, nav, children }) => (
         />
       </a>
       <button
-        onClick={() => (step > 0 ? setStep((s) => s - 1) : nav("/"))}
+        onClick={() =>
+          step > 0
+            ? setStep((s) => s - 1)
+            : (window.location.href = MARKETING_URL)
+        }
         className="hover:text-primary group pointer-events-auto flex cursor-pointer items-center gap-2 text-xs font-bold tracking-widest text-slate-400 uppercase transition-colors"
       >
         <ArrowLeft
@@ -217,12 +223,18 @@ const Login = () => {
   }, [readmeText]);
 
   // Auto-play each step's animation. Replays when step changes or playKey increments.
+  //
+  // Each branch starts by rewinding its own state. That rewind is scheduled rather
+  // than run inline: a synchronous setState in an effect body triggers a cascading
+  // render (react-hooks/set-state-in-effect). At 0ms it still lands well before the
+  // first real transition at `d`, and it is cleaned up with every other timer.
   useEffect(() => {
     const d = 550; // lead-in delay after step transition animation
     const timers = [];
+    const rewind = (fn) => timers.push(setTimeout(fn, 0));
 
     if (step === 0) {
-      setCommitStage("idle");
+      rewind(() => setCommitStage("idle"));
       timers.push(setTimeout(() => setCommitStage("pushing"), d));
       timers.push(setTimeout(() => setCommitStage("webhook"), d + 1200));
       timers.push(setTimeout(() => setCommitStage("processing"), d + 2200));
@@ -230,15 +242,17 @@ const Login = () => {
     }
 
     if (step === 1) {
-      setPipelineStage(0);
+      rewind(() => setPipelineStage(0));
       timers.push(setTimeout(() => setPipelineStage(1), d));
       timers.push(setTimeout(() => setPipelineStage(2), d + 900));
       timers.push(setTimeout(() => setPipelineStage(3), d + 1800));
     }
 
     if (step === 2) {
-      setFetchedCount(0);
-      setIsFetching(true);
+      rewind(() => {
+        setFetchedCount(0);
+        setIsFetching(true);
+      });
       FETCH_FILES.forEach((_, i) =>
         timers.push(
           setTimeout(
@@ -253,8 +267,10 @@ const Login = () => {
     }
 
     if (step === 3) {
-      setScannedCount(0);
-      setIsScanning(true);
+      rewind(() => {
+        setScannedCount(0);
+        setIsScanning(true);
+      });
       SCAN_FILES.forEach((_, i) =>
         timers.push(
           setTimeout(
@@ -269,10 +285,13 @@ const Login = () => {
     }
 
     if (step === 4) {
+      // Ref, not state — stop any in-flight typewriter immediately.
       clearTimeout(typewriterRef.current);
-      setReadmeText("");
-      setReadmeDone(false);
-      setIsGenerating(false);
+      rewind(() => {
+        setReadmeText("");
+        setReadmeDone(false);
+        setIsGenerating(false);
+      });
       const startT = setTimeout(() => {
         setIsGenerating(true);
         let i = 0;
@@ -345,7 +364,7 @@ const Login = () => {
     );
 
     return (
-      <Shell step={step} setStep={setStep} nav={navigate}>
+      <Shell step={step} setStep={setStep}>
         <OnboardingLeft
           step={step}
           badge="How it works"
@@ -447,7 +466,7 @@ const Login = () => {
     const isRunning = pipelineStage > 0 && pipelineStage < 3;
 
     return (
-      <Shell step={step} setStep={setStep} nav={navigate}>
+      <Shell step={step} setStep={setStep}>
         <OnboardingLeft
           step={step}
           badge="Trigger"
@@ -524,7 +543,7 @@ const Login = () => {
     const fetchDone = fetchedCount === FETCH_FILES.length && !isFetching;
 
     return (
-      <Shell step={step} setStep={setStep} nav={navigate}>
+      <Shell step={step} setStep={setStep}>
         <OnboardingLeft
           step={step}
           badge="Fetch"
@@ -623,7 +642,7 @@ const Login = () => {
     };
 
     return (
-      <Shell step={step} setStep={setStep} nav={navigate}>
+      <Shell step={step} setStep={setStep}>
         <OnboardingLeft
           step={step}
           badge="Analysis"
@@ -712,7 +731,7 @@ const Login = () => {
   // Typewriter runs automatically. Replay restarts it from the beginning.
   if (step === 4) {
     return (
-      <Shell step={step} setStep={setStep} nav={navigate}>
+      <Shell step={step} setStep={setStep}>
         <OnboardingLeft
           step={step}
           badge="Generation"

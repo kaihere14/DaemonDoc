@@ -17,6 +17,7 @@ import SEO from "@/components/common/SEO";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { useRepos } from "../../hooks/useRepos";
 import { api, ENDPOINTS } from "../api";
+import { APP_ORIGIN, MARKETING_URL } from "../urls";
 import { usePostHog } from "@posthog/react";
 
 const Profile = () => {
@@ -37,7 +38,7 @@ const Profile = () => {
       posthog?.capture("account_deleted");
       posthog?.reset();
       localStorage.removeItem("accessToken");
-      navigate("/");
+      window.location.href = MARKETING_URL;
     } catch {
       console.log("Error deleting account");
     } finally {
@@ -77,6 +78,8 @@ const Profile = () => {
       <SEO
         title="Profile - DaemonDoc"
         description="Review your DaemonDoc account, GitHub connection, repository activity, and account settings."
+        ogUrl={`${APP_ORIGIN}/profile`}
+        canonical={`${APP_ORIGIN}/profile`}
       />
       <div className="min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-blue-50">
         <AuthNavigation />

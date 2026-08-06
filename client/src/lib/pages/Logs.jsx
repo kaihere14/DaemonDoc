@@ -18,6 +18,7 @@ import { api, ENDPOINTS } from "../api";
 import { usePostHog } from "@posthog/react";
 import { WalkthroughLogsBanner } from "@/components/repos/WalkthroughOverlay";
 import { convexApi } from "../convexApi";
+import { APP_ORIGIN } from "../urls";
 
 const STATUS_CONFIG = {
   success: {
@@ -167,7 +168,11 @@ const Logs = () => {
 
   return (
     <>
-      <SEO title="Activity Logs - DaemonDoc" />
+      <SEO
+        title="Activity Logs - DaemonDoc"
+        ogUrl={`${APP_ORIGIN}/logs`}
+        canonical={`${APP_ORIGIN}/logs`}
+      />
       <div className="min-h-screen bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-sky-100">
         <AuthNavigation />
         <div className="pointer-events-none absolute inset-0 overflow-hidden">

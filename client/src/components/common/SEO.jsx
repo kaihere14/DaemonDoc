@@ -1,13 +1,20 @@
 import { useEffect } from "react";
+import { APP_ORIGIN, MARKETING_URL } from "@/lib/urls";
 
+/**
+ * Every route in this app is a signed-in dashboard or auth screen — the public
+ * landing lives on the marketing domain. So `noindex` defaults to true here:
+ * these pages have no search value and must not compete with daemondoc.online.
+ */
 const SEO = ({
   title = "DaemonDoc - AI-Powered README Generator for GitHub | Automate Your Documentation",
   description = "Stop wasting hours on documentation. DaemonDoc automatically generates and updates your GitHub README files using AI. Connect your repos and keep documentation fresh as your code evolves.",
   keywords = "README generator, AI documentation, GitHub automation, automatic README, documentation tool",
-  ogImage = "https://daemondoc.online/main_og.png",
-  ogUrl = "https://daemondoc.online/",
+  ogImage = `${MARKETING_URL}/main_og.png`,
+  ogUrl = `${APP_ORIGIN}/`,
   twitterHandle = "@daemondoc",
-  canonical = "https://daemondoc.online/",
+  canonical = `${APP_ORIGIN}/`,
+  noindex = true,
 }) => {
   useEffect(() => {
     document.title = title;
@@ -28,6 +35,7 @@ const SEO = ({
 
     updateMetaTag("description", description);
     updateMetaTag("keywords", keywords);
+    updateMetaTag("robots", noindex ? "noindex, follow" : "index, follow");
 
     updateMetaTag("og:title", title, true);
     updateMetaTag("og:description", description, true);
@@ -48,7 +56,16 @@ const SEO = ({
       canonicalLink.setAttribute("href", canonical);
       document.head.appendChild(canonicalLink);
     }
-  }, [title, description, keywords, ogImage, ogUrl, twitterHandle, canonical]);
+  }, [
+    title,
+    description,
+    keywords,
+    ogImage,
+    ogUrl,
+    twitterHandle,
+    canonical,
+    noindex,
+  ]);
 
   return null;
 };
