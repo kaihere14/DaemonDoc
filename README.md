@@ -37,6 +37,9 @@ Automatically generate and maintain accurate GitHub READMEs using codebase analy
   - Rate-limit handling with automatic provider fallback  
   - 7-day JWT session expiration
 
+- **Unified Design System** 🎨
+  - Standardized interactive `CandyButton` and `CandyLink` components across both the React client and Next.js SEO-client to deliver a consistent, high-performance visual identity.
+
 ---
 ## 🧠 Architecture
 
@@ -59,7 +62,7 @@ Automatically generate and maintain accurate GitHub READMEs using codebase analy
 
 | Layer         | Technologies                                                                 |
 |---------------|------------------------------------------------------------------------------|
-| **Frontend**  | React 19, Vite 7, Tailwind CSS 4.3, Convex React Client, React Router       |
+| **Frontend**  | React 19, Next.js, Vite 7, Tailwind CSS 4, Shadcn UI, Convex React Client, React Router |
 | **Backend**   | Node.js 20+, Express 5, Mongoose, pnpm workspace                            |
 | **Workers**   | BullMQ 5.76, Redis (IORedis)                                                |
 | **Real-time** | Convex 1.39                                                                 |
@@ -69,7 +72,6 @@ Automatically generate and maintain accurate GitHub READMEs using codebase analy
 | **Email**     | Resend for transactional communications                                       |
 
 ---
-
 ## 🧪 Installation
 
 1. **Prerequisites**  
