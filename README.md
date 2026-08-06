@@ -1,53 +1,48 @@
-
 # DaemonDoc — AI-Powered README Automation
 
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 
-Automatically generate and maintain accurate GitHub READMEs using codebase analysis and commit tracking.
+Automate and maintain accurate GitHub READMEs through codebase analysis, commit tracking, and intelligent document restructuring.
 
 ---
 
-## 📌 Core Features
+## ✨ Core Features
 
-- **Dual-mode AI pipeline**  
-  - *Full generation*: Analyze repository structure to create initial READMEs  
-  - *Patch mode*: Identify and update only changed sections via SHA-256 hashing
+### AI-Powered README Management
+- **Dual-mode Generation**  
+  - *Initial Generation*: Analyze repository structure to create new READMEs  
+  - *Patch Mode*: Update only changed sections using SHA-256 hashing for precision  
 
-- **AI-Powered Cleanup & Restructuring** ✨
-  - Manual cleanup trigger via repo card "Brush" icon to aggressively trim noise and merge duplicate sections
-  - Automated restructuring for clarity using OpenRouter (Qwen 32B)  
-  - **Live Activity Logging**: Cleanup runs now stream real-time progress to the dashboard via Convex, providing the same visibility as standard generation runs.
+- **Intelligent Cleanup**  
+  - Manual trigger via "Brush" icon to eliminate redundancy and merge duplicate sections  
+  - Automated restructuring with OpenRouter (Qwen 32B) for clarity and consistency  
 
-- **Resilient Logging & Recovery** 🛡️
-  - **Log Recovery Service**: Automatically detects and marks interrupted cleanup tasks as "failed" during server startup to prevent stale "ongoing" states.
-  - **Unified Audit Trail**: MongoDB `UserLog` records for all cleanup actions (`STARTED`, `SUCCESS`, `FAILED`) with correlated `logId` for cross-system tracking.
+- **Real-Time Monitoring**  
+  - Live log streaming via Convex during cleanup operations  
+  - Log recovery on server restarts to prevent stale "ongoing" states  
 
-- **Multi-Domain Architecture & SEO Isolation** 🌐
-  - **Apex Domain Routing**: The public marketing landing page is isolated on the apex domain (`daemondoc.online`), while the dashboard app runs on the `app.daemondoc.online` subdomain.
-  - **Automatic Redirects**: Root traffic hitting the dashboard app (`/`) is automatically redirected to the marketing site.
-  - **SEO Protection**: All dashboard and authentication routes are configured with strict `noindex, follow` robots directives to prevent search engines from indexing private app pages and competing with the marketing domain.
-  - **Unified URL Helper**: Centralized cross-domain link management ensures seamless navigation between the marketing site and the dashboard.
+### Infrastructure & Security
+- **Domain Architecture**  
+  - Marketing site: `daemondoc.online`  
+  - Dashboard: `app.daemondoc.online` with automatic root redirects  
+  - SEO protection: Noindex directives for private routes  
 
 - **AI Engine**  
   - Primary: Google Gemini 1.5 Flash (1M token context)  
   - Fallback: Groq with 3-key rotation for resilience  
-  - RAG-based code analysis for contextual understanding
 
 - **GitHub Integration**  
   - Webhook-based commit tracking  
   - Secure OAuth with encrypted token storage  
-  - Automatic README commits to default branch with `[skip ci]` support
+  - Automatic README commits to default branch (supports `[skip ci]`)  
 
 - **Background Processing**  
-  - BullMQ + Redis job queue for async operations  
-  - Rate-limit handling with automatic provider fallback  
-  - 7-day JWT session expiration
-
-- **Unified Design System** 🎨
-  - Standardized interactive `CandyButton` and `CandyLink` components across both the React client and Next.js SEO-client to deliver a consistent, high-performance visual identity.
+  - BullMQ + Redis for async task management  
+  - Rate-limit handling with provider fallback  
 
 ---
-## 🧠 Architecture
+
+## 🧠 Architecture Overview
 
 ```
 [GitHub Push] → Webhook → BullMQ Queue → AI Worker Tier → MongoDB
@@ -56,28 +51,28 @@ Automatically generate and maintain accurate GitHub READMEs using codebase analy
 ```
 
 **Key Components**:
-- **Frontend**: React 19 + Vite 7 SPA with Convex real-time subscriptions
-- **Backend**: Express.js 5 API with MongoDB (Mongoose) persistence
-- **Worker Tier**: BullMQ/Redis for async AI generation
-- **Real-time Layer**: Convex for live log streaming
-- **AI Providers**: Gemini (primary) with Groq fallback chain
+- **Frontend**: React 19 + Vite 7 SPA with Convex subscriptions  
+- **Backend**: Express.js 5 API using Mongoose for MongoDB  
+- **Workers**: BullMQ 5.76 for async AI tasks  
+- **AI Providers**: Gemini (primary), Groq (fallback)  
+- **Payments**: Razorpay for INR subscriptions  
+- **Email**: Resend for transactional communications  
 
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer         | Technologies                                                                 |
-|---------------|------------------------------------------------------------------------------|
-| **Frontend**  | React 19, Next.js, Vite 7, Tailwind CSS 4, Shadcn UI, Convex React Client, React Router |
-| **Backend**   | Node.js 20+, Express 5, Mongoose, pnpm workspace                            |
-| **Workers**   | BullMQ 5.76, Redis (IORedis)                                                |
-| **Real-time** | Convex 1.39                                                                 |
-| **Database**  | MongoDB (user profiles, logs)                                               |
-| **AI**        | Google Gemini (1M context), Groq (fallback)                                 |
-| **Payments**  | Razorpay for INR subscriptions                                                |
-| **Email**     | Resend for transactional communications                                       |
+| Layer       | Technologies                                                                 |
+|-------------|------------------------------------------------------------------------------|
+| **Frontend**| React 19, Vite 7, Tailwind CSS 4, Shadcn UI, React Router, Convex Client     |
+| **Backend** | Node.js 20+, Express 5, Mongoose, pnpm workspace                             |
+| **Workers** | BullMQ 5.76, Redis (IORedis)                                                |
+| **Real-time**| Convex 1.39                                                                |
+| **Database**| MongoDB (user profiles, logs)                                                |
+| **AI**      | Google Gemini (1M context), Groq (fallback)                                 |
 
 ---
+
 ## 🧪 Installation
 
 1. **Prerequisites**  
@@ -89,7 +84,7 @@ Automatically generate and maintain accurate GitHub READMEs using codebase analy
    - GitHub OAuth app (https://github.com/settings/developers)  
    - 3+ API keys for Gemini and Groq  
 
-2. **Clone & Setup**  
+2. **Setup**  
    ```bash
    git clone https://github.com/kaihere14/daemondoc.git
    cd daemondoc
@@ -142,91 +137,68 @@ BACKEND_URL=http://localhost:3000
 
 ---
 
-## 📡 API Endpoints
-
-### Authentication
-| Method | Endpoint                  | Description           |
-|--------|---------------------------|-----------------------|
-| GET    | `/auth/github`            | Initiate OAuth flow   |
-| GET    | `/auth/github/callback`   | Handle OAuth callback |
-| POST   | `/auth/verify`            | JWT validation        |
-
-### Repository Management
-| Method | Endpoint                        | Description                          |
-|--------|---------------------------------|--------------------------------------|
-| GET    | `/api/github/getGithubRepos`    | List user repositories                 |
-| POST   | `/api/github/addRepoActivity`   | Activate repo (create webhook + queue generation) |
-| POST   | `/api/github/deactivateRepoActivity` | Deactivate repository tracking |
-| POST   | `/api/github/cleanUpReadme`     | Trigger AI-powered README restructuring and cleanup |
-| POST   | `/api/github/webhookhandler`    | Handle GitHub push events              |
-
-### System Monitoring & Activity
-| Method | Endpoint                  | Description              |
-|--------|---------------------------|--------------------------|
-| GET    | `/api/github/fetchUserLogs` | Retrieve automated documentation activity logs |
-| GET    | `/health`                 | Redis status + uptime    |
-
----
 ## 🚀 Deployment
 
 **1. Backend (Render)**  
 - Root: Project root directory  
 - Build: `corepack enable && pnpm install --frozen-lockfile --filter server`  
 - Start: `pnpm --filter server start`  
-- Required env vars: All backend variables + public URLs
+- Required env vars: All backend variables + public URLs  
 
 **2. Frontend Dashboard (Vercel)**  
 - Root: `client` directory  
 - Build: `pnpm run build`  
 - Env vars:  
   - `VITE_BACKEND_URL=production_url`  
-  - `VITE_MARKETING_URL=https://daemondoc.online` (optional, defaults to production apex domain)
+  - `VITE_MARKETING_URL=https://daemondoc.online` (optional)  
 
 **3. SEO Landing (Vercel)**  
 - Root: `seo-client` directory  
 - Env vars:  
   - `NEXT_PUBLIC_APP_URL=https://daemondoc.online`  
-  - `BACKEND_URL=production_url`
+  - `BACKEND_URL=production_url`  
 
 **4. Redis (Free Tier Keepalive)**  
 Set up a 5-minute cron job to ping:  
 `https://your-app.onrender.com/health`
 
 ---
+
 ## ⚠️ Troubleshooting
 
-- **Webhook Failures**:  
-  - Verify `GITHUB_CALLBACK_URL` matches OAuth app settings  
-  - Check webhook secret HMAC validation  
-  - Ensure backend is publicly accessible (use ngrok for local testing)
+- **Webhook Failures**  
+  - Confirm `GITHUB_CALLBACK_URL` matches OAuth app settings  
+  - Validate webhook secret HMAC  
+  - Ensure backend is publicly accessible (use ngrok for local testing)  
 
-- **AI Generation & Cleanup Errors**:  
+- **AI Generation Errors**  
   - 429 errors: Add more API keys or wait for rate limits  
   - 401/403: Rotate API keys  
-  - **Stuck "Ongoing" Logs**: If the server restarts during a cleanup, the `LogRecovery` service will mark them as failed with the message "Cleanup interrupted because the backend restarted".
+  - **Stuck Logs**: Server restarts automatically mark interrupted cleanups as "failed"  
 
-- **Live Log Sync Issues**:  
-  - Ensure `CONVEX_SITE_URL` is correctly configured in the server environment.  
-  - Check browser console for Convex connection errors if live updates are missing in the UI.
+- **Live Log Sync Issues**  
+  - Verify `CONVEX_SITE_URL` in server env  
+  - Check browser console for Convex connection errors  
 
-- **Redis Connectivity**:  
-  bash
+- **Redis Connectivity**  
+  ```bash
   redis-cli ping  # Should return PONG
-  
+  ```
 
 ---
+
 ## 🔐 Security
 
 - GitHub tokens encrypted with AES-256-GCM  
-- Webhook payloads verified with HMAC-SHA256  
-- JWT session expiration: 7 days  
-- Never commit `.env` files (included in .gitignore)
+- Webhook HMAC-SHA256 payload verification  
+- 7-day JWT session expiration  
+- Never commit `.env` files (included in `.gitignore`)  
 
 ---
 
 ## 📄 License
 
-AGPL v3 - See [LICENSE](LICENSE) file
+AGPL v3 - See [LICENSE](LICENSE) file  
 
 ---
 
