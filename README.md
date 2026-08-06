@@ -22,6 +22,12 @@ Automatically generate and maintain accurate GitHub READMEs using codebase analy
   - **Log Recovery Service**: Automatically detects and marks interrupted cleanup tasks as "failed" during server startup to prevent stale "ongoing" states.
   - **Unified Audit Trail**: MongoDB `UserLog` records for all cleanup actions (`STARTED`, `SUCCESS`, `FAILED`) with correlated `logId` for cross-system tracking.
 
+- **Multi-Domain Architecture & SEO Isolation** 🌐
+  - **Apex Domain Routing**: The public marketing landing page is isolated on the apex domain (`daemondoc.online`), while the dashboard app runs on the `app.daemondoc.online` subdomain.
+  - **Automatic Redirects**: Root traffic hitting the dashboard app (`/`) is automatically redirected to the marketing site.
+  - **SEO Protection**: All dashboard and authentication routes are configured with strict `noindex, follow` robots directives to prevent search engines from indexing private app pages and competing with the marketing domain.
+  - **Unified URL Helper**: Centralized cross-domain link management ensures seamless navigation between the marketing site and the dashboard.
+
 - **AI Engine**  
   - Primary: Google Gemini 1.5 Flash (1M token context)  
   - Fallback: Groq with 3-key rotation for resilience  
@@ -169,10 +175,12 @@ BACKEND_URL=http://localhost:3000
 - Start: `pnpm --filter server start`  
 - Required env vars: All backend variables + public URLs
 
-**2. Frontend (Vercel)**  
+**2. Frontend Dashboard (Vercel)**  
 - Root: `client` directory  
 - Build: `pnpm run build`  
-- Env var: `VITE_BACKEND_URL=production_url`
+- Env vars:  
+  - `VITE_BACKEND_URL=production_url`  
+  - `VITE_MARKETING_URL=https://daemondoc.online` (optional, defaults to production apex domain)
 
 **3. SEO Landing (Vercel)**  
 - Root: `seo-client` directory  
@@ -185,7 +193,6 @@ Set up a 5-minute cron job to ping:
 `https://your-app.onrender.com/health`
 
 ---
-
 ## ⚠️ Troubleshooting
 
 - **Webhook Failures**:  
