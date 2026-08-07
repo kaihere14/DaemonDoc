@@ -1,3 +1,4 @@
+
 # DaemonDoc — AI-Powered README Automation
 
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
@@ -64,7 +65,8 @@ Automate and maintain accurate GitHub READMEs through codebase analysis, commit 
 
 | Layer       | Technologies                                                                 |
 |-------------|------------------------------------------------------------------------------|
-| **Frontend**| React 19, Vite 7, Tailwind CSS 4, Shadcn UI, React Router, Convex Client     |
+| **Frontend (App)**| React 19, Vite 7, Tailwind CSS 4, Shadcn UI, React Router, Convex Client     |
+| **Frontend (SEO)**| Next.js 15, Tailwind CSS, TypeScript                                         |
 | **Backend** | Node.js 20+, Express 5, Mongoose, pnpm workspace                             |
 | **Workers** | BullMQ 5.76, Redis (IORedis)                                                |
 | **Real-time**| Convex 1.39                                                                |
@@ -72,7 +74,6 @@ Automate and maintain accurate GitHub READMEs through codebase analysis, commit 
 | **AI**      | Google Gemini (1M context), Groq (fallback)                                 |
 
 ---
-
 ## 🧪 Installation
 
 1. **Prerequisites**  
@@ -85,23 +86,22 @@ Automate and maintain accurate GitHub READMEs through codebase analysis, commit 
    - 3+ API keys for Gemini and Groq  
 
 2. **Setup**  
-   ```bash
+   bash
    git clone https://github.com/kaihere14/daemondoc.git
    cd daemondoc
    corepack enable
    pnpm install
-   ```
+   
 
 3. **Run Services**  
-   ```bash
+   bash
    pnpm dev:server    # Express API
    pnpm dev:client    # Vite SPA
-   pnpm dev:seo       # Next.js landing page
+   pnpm dev:seo       # Next.js SEO Landing Page
    pnpm dev:convex    # Convex backend
-   ```
+   
 
 ---
-
 ## 🔧 Configuration
 
 ### Required Environment Variables
