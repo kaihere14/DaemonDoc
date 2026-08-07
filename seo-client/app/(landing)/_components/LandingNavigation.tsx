@@ -9,7 +9,6 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daemondoc.online
 
 const NAV_LINKS = [
   { label: "Solutions", href: "#features" },
-  { label: "Pricing", href: "#pricing" },
   { label: "Features", href: "#engine" },
 ];
 

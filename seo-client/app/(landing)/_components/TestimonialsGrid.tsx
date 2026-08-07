@@ -26,7 +26,7 @@ export default function TestimonialsGrid({ testimonials }: TestimonialsGridProps
           onMouseEnter={() => setActiveIndex(index)}
           onMouseLeave={() => setActiveIndex(-1)}
           className={cn(
-            "relative flex h-75 justify-end flex-col items-start rounded-lg p-10",
+            "relative flex min-h-75 justify-end flex-col items-start rounded-lg p-10",
             activeIndex === index ? "blur-none" : "blur-xs",
             activeIndex === -1
               ? "blur-none"
@@ -52,7 +52,9 @@ export default function TestimonialsGrid({ testimonials }: TestimonialsGridProps
             </svg>
           </div>
 
-          <p className="mb-4 text-gray-600">{testimonial.quote}</p>
+          <p className="mb-4 text-sm leading-normal text-gray-600">
+            {testimonial.quote}
+          </p>
 
           <div className="flex items-center justify-center gap-3">
             <div className="relative size-13 shrink-0">

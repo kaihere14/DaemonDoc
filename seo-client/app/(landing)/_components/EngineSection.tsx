@@ -73,7 +73,7 @@ export default function EngineSection() {
           >
             Everything the Engine Does
           </h2>
-          <p className="text-lg font-light text-slate-600">
+          <p className="text-lg font-light tracking-[-0.035em] text-slate-600">
             Deep-tech capabilities powering the next generation of automated
             documentation.
           </p>

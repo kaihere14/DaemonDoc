@@ -13,8 +13,8 @@ Live at: [daemondoc.online](https://daemondoc.online)
 3. Automatically trigger README generation on every push to the default branch.
 4. Use AI to generate a full README on first activation, then patch only changed sections on subsequent pushes.
 5. Let users view generation logs per repo to understand what happened and when.
-6. Support a freemium subscription model with plan-gated repo limits.
-7. Provide an admin dashboard for analytics, user management, and payment oversight.
+6. Stay completely free and open source — no plans, limits, or paid tiers.
+7. Provide an admin dashboard for analytics and user management.
 
 ## Core User Flow
 
@@ -25,7 +25,6 @@ Live at: [daemondoc.online](https://daemondoc.online)
 5. On first activation, an AI README generation job is triggered immediately.
 6. On each subsequent push to the default branch, a generation job is queued.
 7. User visits `/logs` to see recent generation history and statuses.
-8. User can upgrade to Pro on `/upgrade` to unlock unlimited active repositories.
 
 ## Features
 
@@ -45,8 +44,7 @@ Live at: [daemondoc.online](https://daemondoc.online)
 - Stats bar on the dashboard shows total, active, inactive, and private repo counts.
 - Filter by All / Active / Inactive tabs plus a search bar.
 - Pagination (12 repos per page).
-- Free plan cap: 5 active repos. Pro plan: unlimited.
-- Auto-deactivation notification banner when free plan limit is exceeded after a downgrade.
+- Unlimited active repos — no cap of any kind.
 
 ### AI README Generation
 
@@ -65,29 +63,17 @@ Live at: [daemondoc.online](https://daemondoc.online)
 - Ongoing jobs show a live spinner.
 - Log rows can be expanded to show live chronological detail messages streamed from Convex by `logId`.
 
-### Subscription and Payments
-
-- Free plan: 5 active repos, 1 AI review, 1 competitor analysis.
-- Pro plan: unlimited active repos, 20 AI reviews, 10 competitor analyses.
-- Pricing in INR via Razorpay: ₹499/month or ₹3,999/year.
-- Payment flow: create order → Razorpay checkout → verify signature → activate plan.
-- Webhook fallback: Razorpay sends `payment.captured` event as a reliable second path.
-- Plan expiry with 4-day grace buffer. Usage resets every 30 days from activation.
-
 ### Admin Dashboard
 
 - `/admin` is accessible only to users with `admin: true`.
 - Analytics: total users, active repos, total generation runs, live jobs, success rate, last-24h activity.
 - 7-day activity chart (total / success / failed / skipped / ongoing).
 - Top 5 repos by generation count.
-- Payment analytics: paid users, MRR, ARR, revenue chart, recent payment log.
-- User plan management: search, filter, view plan details, revoke Pro plan.
-- Admin can update plan prices in the DB.
 - Admin can broadcast emails to all users.
 
 ### User Profile
 
-- View GitHub username, email, avatar, and plan details.
+- View GitHub username, email, and avatar.
 - Toggle email notifications.
 - Toggle global auto-README.
 - Account deletion.
@@ -105,12 +91,11 @@ Live at: [daemondoc.online](https://daemondoc.online)
 ### In Scope
 
 - GitHub OAuth authentication and JWT session management
-- Repository activation, deactivation, and plan-gated limits
+- Repository activation and deactivation (unlimited)
 - GitHub push webhook registration and handling
 - AI README generation pipeline (full + patch modes)
 - BullMQ background job queue for generation work
 - Generation log tracking per user
-- Freemium subscription via Razorpay (INR)
 - Admin dashboard for analytics and user management
 - Email delivery via Resend
 - PostHog analytics and Vercel Analytics
@@ -131,5 +116,4 @@ Live at: [daemondoc.online](https://daemondoc.online)
 3. Every push to the default branch fires a generation job without user intervention.
 4. The generated README is committed back and visible on GitHub.
 5. Users can view their generation history on the Logs page.
-6. Free plan enforces the 5-repo limit; Pro plan removes it.
-7. Payment creates a Razorpay order, signature is verified, and the Pro plan is applied.
+6. Every feature is available to every authenticated user with no limits or gating.

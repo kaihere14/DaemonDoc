@@ -4,9 +4,7 @@ import "dotenv/config";
 import authRoutes from "./routes/auth.routes.js";
 import githubRoutes from "./routes/github.routes.js";
 import emailRoutes from "./routes/email.routes.js";
-import paymentRoutes from "./routes/payment.routes.js";
 import convexRoutes from "./routes/convex.routes.js";
-import { razorpayWebhook } from "./controllers/payment.controller.js";
 import { connectDB } from "./db/connectDB.js";
 import { recoverInterruptedCleanupLogs } from "./services/logRecovery.service.js";
 
@@ -25,18 +23,11 @@ app.use(
   }),
 );
 
-app.post(
-  "/api/webhook/razorpay",
-  express.raw({ type: "application/json" }),
-  razorpayWebhook,
-);
-
 app.use(express.json());
 
 app.use("/auth", authRoutes);
 app.use("/api/github", githubRoutes);
 app.use("/api/email", emailRoutes);
-app.use("/api/payments", paymentRoutes);
 app.use("/api/convex", convexRoutes);
 
 app.get("/", (req, res) => {

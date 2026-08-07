@@ -116,28 +116,6 @@ export const addRepoActivity = async (req, res) => {
         .json({ message: "Repository activity already exists" });
     }
 
-    // Enforce plan-based active repo limit.
-    // null  → pro plan (unlimited, skip check entirely)
-    // number → enforce that number
-    // undefined → field missing on old user doc, treat as free default (5)
-    const restrictionsDisabled =
-      process.env.DISABLE_PLAN_RESTRICTIONS === "true";
-    const rawLimit = user.activeRepoLimit;
-    if (!restrictionsDisabled && rawLimit !== null) {
-      const activeRepoLimit = rawLimit ?? 5; // undefined → 5
-      const currentActiveCount = await ActiveRepo.countDocuments({
-        userId,
-        active: true,
-      });
-      if (currentActiveCount >= activeRepoLimit) {
-        return res.status(403).json({
-          message: `Active repo limit reached. Your plan allows up to ${activeRepoLimit} active ${activeRepoLimit === 1 ? "repo" : "repos"}.`,
-          code: "ACTIVE_REPO_LIMIT_REACHED",
-          limit: activeRepoLimit,
-        });
-      }
-    }
-
     const accessToken = decrypt(user.githubAccessToken);
 
     let webhookId;
@@ -563,6 +541,60 @@ export const fetchAdminAnalytics = async (_req, res) => {
   }
 };
 
+const ADMIN_USERS_PAGE_SIZE = 10;
+
+export const fetchAdminUsers = async (req, res) => {
+  try {
+    const { search = "", page = "1" } = req.query;
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+
+    const filter = {};
+    if (search) {
+      // Escape regex metacharacters so a search like "a.b" is treated literally
+      const safe = String(search).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      filter.$or = [
+        { githubUsername: { $regex: safe, $options: "i" } },
+        { email: { $regex: safe, $options: "i" } },
+      ];
+    }
+
+    const [users, total] = await Promise.all([
+      User.find(filter)
+        .select("githubUsername email avatarUrl admin createdAt")
+        .sort({ createdAt: -1, _id: -1 })
+        .skip((pageNum - 1) * ADMIN_USERS_PAGE_SIZE)
+        .limit(ADMIN_USERS_PAGE_SIZE)
+        .lean(),
+      User.countDocuments(filter),
+    ]);
+
+    // Active repo counts for just this page of users — one grouped query
+    const repoCounts = await ActiveRepo.aggregate([
+      { $match: { userId: { $in: users.map((u) => u._id) }, active: true } },
+      { $group: { _id: "$userId", count: { $sum: 1 } } },
+    ]);
+    const countByUserId = new Map(
+      repoCounts.map((entry) => [String(entry._id), entry.count]),
+    );
+
+    return res.status(200).json({
+      users: users.map((user) => ({
+        ...user,
+        activeRepoCount: countByUserId.get(String(user._id)) || 0,
+      })),
+      meta: {
+        total,
+        page: pageNum,
+        limit: ADMIN_USERS_PAGE_SIZE,
+        pages: Math.max(1, Math.ceil(total / ADMIN_USERS_PAGE_SIZE)),
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching admin users:", error);
+    return res.status(500).json({ message: "Error fetching admin users" });
+  }
+};
+
 export const cleanUpReadme = async (req, res) => {
   let userLog = null;
   let sharedLogId = null;
@@ -649,10 +681,7 @@ export const cleanUpReadme = async (req, res) => {
       liveUpdate(sharedLogId, msg),
     );
     console.log("[cleanUpReadme] AI cleanup complete");
-    liveUpdate(
-      sharedLogId,
-      `Cleanup complete (${cleanedReadme.length} chars)`,
-    );
+    liveUpdate(sharedLogId, `Cleanup complete (${cleanedReadme.length} chars)`);
 
     console.log("[cleanUpReadme] Committing README");
     liveUpdate(sharedLogId, "Committing cleaned README to GitHub");

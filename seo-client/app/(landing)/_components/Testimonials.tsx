@@ -56,7 +56,7 @@ export default function Testimonials() {
         >
           Trusted by Developers Who Ship
         </h2>
-        <p className="text-lg font-light text-slate-600">
+        <p className="text-lg font-light tracking-[-0.035em] text-slate-600">
           See what engineers and developers are saying about DaemonDoc.
         </p>
       </div>

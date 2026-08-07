@@ -24,7 +24,7 @@
 - Shared UI components live in `client/src/components/`, grouped by domain:
   - `components/common/` — cross-route pieces (e.g. `SEO`, `AuthNavigation`)
   - `components/landing/` — marketing page (`Hero`, `Footer`, section composers); sub-sections in `landing/sections/`
-  - `components/repos/` — authenticated repo dashboard (`RepoCard`, walkthrough, plan modals)
+  - `components/repos/` — authenticated repo dashboard (`RepoCard`, walkthrough)
   - `components/admin/` — admin console sections and modals
   - `components/animate-ui/` — animated icon primitives (vendor-style; treat like `ui/`)
 - `components/ui/` is shadcn/ui generated output — do not modify these files unless a task explicitly requires it.
@@ -66,12 +66,12 @@
 - MongoDB is the single datastore. Mongoose schemas are the authoritative contracts.
 - GitHub access tokens are stored AES-GCM encrypted. Never log or return them plaintext.
 - Section hashes on `ActiveRepo` drive generation mode selection — treat them as first-class data.
-- Payment amounts are always in paise (₹1 = 100 paise). Never store fractional amounts.
+- No plan, credit, quota, or billing fields belong on any schema. v1 is free and open source.
 
 ## Security
 
-- HMAC signatures are verified for both GitHub webhooks and Razorpay webhooks before processing.
-- Payment idempotency is enforced by checking `razorpayPaymentId` uniqueness in `PaymentLedger` before crediting a plan.
+- HMAC signatures are verified for GitHub webhooks before processing.
+- Authorization is the only gate: `authenticate` (JWT) and `requireAdmin`. Never add plan or payment middleware.
 - Admin routes check `user.admin === true` in the middleware chain.
 - JWT secret must be set via `process.env.JWT_SECRET`. Do not hardcode secrets.
 

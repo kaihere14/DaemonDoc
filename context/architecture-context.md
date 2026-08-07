@@ -17,7 +17,6 @@
 | Queue           | BullMQ + Redis (IORedis)     | Async README generation jobs                                |
 | AI — Primary    | Google Gemini API            | Large context window (1M tokens); preferred provider        |
 | AI — Fallback   | Groq (OpenAI-compatible SDK) | Fallback when Gemini keys are exhausted or unavailable      |
-| Payments        | Razorpay                     | INR payment orders; webhook for reliable activation         |
 | Email           | Resend                       | Transactional email and admin broadcasts                    |
 | Analytics       | PostHog + Vercel Analytics   | User behavior tracking on the client                        |
 
@@ -42,7 +41,6 @@
 │       └── schema.ts       # Convex tables and indexes
 └── server/          # Express.js API
     └── src/
-        ├── config/         # Pricing plan definitions
         ├── controllers/    # Route handler logic
         ├── db/             # Mongoose connection
         ├── email/          # Email templates and rendering
@@ -50,7 +48,6 @@
         ├── routes/         # Express route registrations
         ├── schema/         # Mongoose models
         ├── services/       # Gemini, Groq, GitHub, email services
-        ├── scripts/        # One-off migration and seed scripts
         └── utils/          # git.worker (BullMQ), redis, crypto, prompt builder, etc.
 ```
 
@@ -77,12 +74,6 @@
 githubId, githubUsername, email, avatarUrl
 githubAccessToken: { iv, content, tag }   // AES-GCM encrypted
 autoReadmeEnabled, emailNotificationsEnabled, admin
-plan: "free" | "pro"
-planInterval: "free" | "monthly" | "yearly"
-reviewLimit, competitorLimit, activeRepoLimit (null = unlimited)
-planExpiry, usagePeriodStart
-reviewsUsed, competitorAnalysesUsed
-reposDeactivatedNotification
 ```
 
 ### ActiveRepo
@@ -112,30 +103,6 @@ logId, userId, repoName, action, status, updatedAt
 
 ```
 logId, message, createdAt
-```
-
-### PaymentLedger
-
-```
-userId (ref User)
-razorpayOrderId, razorpayPaymentId
-type, planBefore, planAfter
-amount (paise), currency, status
-note, razorpayResponse
-```
-
-### Plan
-
-```
-planId, name, interval, amount (paise), currency, billingDays
-reviewLimit, competitorLimit, activeRepoLimit
-active
-```
-
-### Subscription
-
-```
-(see subscription.schema.js — tracks subscription lifecycle)
 ```
 
 ## Auth Flow
@@ -191,23 +158,12 @@ active
 - `client/src/lib/pages/Logs.jsx` fetches the recent log list from Express, then subscribes to `api.logs.getLogMessages` only for the currently expanded row.
 - Convex message subscriptions are read-only and unauthenticated on the client; the log list itself stays protected by the Express JWT route.
 
-## Payment Flow
-
-1. Client fetches available plans from `/api/payments/plans`.
-2. User selects a plan; client calls `/api/payments/create-order` → returns Razorpay order ID.
-3. Razorpay checkout renders in the browser.
-4. On success, client calls `/api/payments/verify` with the three Razorpay IDs.
-5. Server verifies HMAC signature, fetches the order from Razorpay, validates amount/currency/userId match, then calls `applyProPlan()`.
-6. `applyProPlan()` updates `User` with pro limits and expiry, and writes a `PaymentLedger` record.
-7. As a reliable fallback, Razorpay sends `payment.captured` webhook → `razorpayWebhook` → idempotent `handlePaymentCaptured()`.
-
 ## Invariants
 
 1. The BullMQ worker is the only place AI generation runs — never in a request handler.
 2. GitHub access tokens are always stored encrypted (AES-GCM); plaintext tokens are never persisted.
 3. Auth and `req.userId` ownership are verified before every mutation.
 4. The webhook handler skips bot commits (`[skip ci]`, `auto-update README`) to prevent infinite loops.
-5. Payment activation is idempotent — duplicate `razorpayPaymentId` is rejected silently.
-6. Free plan repo limit is enforced at activation time; paid users have `activeRepoLimit: null` (unlimited).
-7. Section hashes on `ActiveRepo` are the canonical signal for patch vs. full generation mode.
-8. Live log detail lookups use `logId` only — never MongoDB `_id` — and do not add client polling.
+5. Every feature is free and unmetered — never introduce plan, credit, quota, or billing gates in v1.
+6. Section hashes on `ActiveRepo` are the canonical signal for patch vs. full generation mode.
+7. Live log detail lookups use `logId` only — never MongoDB `_id` — and do not add client polling.

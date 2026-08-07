@@ -7,7 +7,6 @@ import Home from "./lib/pages/Home";
 import Profile from "./lib/pages/Profile";
 import Logs from "./lib/pages/Logs";
 import Admin from "./lib/pages/Admin";
-import Upgrade from "./lib/pages/Upgrade";
 import { MARKETING_URL } from "./lib/urls";
 
 /**
@@ -43,7 +42,6 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/logs" element={<Logs />} />
         <Route path="/admin" element={<Admin />} />
-        <Route path="/upgrade" element={<Upgrade />} />
       </Routes>
     </div>
   );

@@ -188,7 +188,7 @@ export default function Hero() {
             with a click
           </h1>
 
-          <p className="mx-auto max-w-2xl text-xl leading-relaxed font-light text-slate-600 md:text-2xl">
+          <p className="mx-auto max-w-2xl text-xl leading-relaxed font-light tracking-[-0.045em] text-slate-600 md:text-2xl">
             Connect once. We handle the rest. Your README updates automatically
             with every git push.
           </p>

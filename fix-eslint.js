@@ -13,8 +13,6 @@ fs.writeFileSync(eslintConfigPath, eslintConfig);
 // 2. Remove invalid eslint-disables
 const filesWithInvalidDisables = [
   'client/src/components/admin/AdminBroadcastSection.jsx',
-  'client/src/components/admin/AdminPaymentsSection.jsx',
-  'client/src/components/admin/AdminSubscriptionSection.jsx',
   'client/src/components/admin/ConfirmBroadcastModal.jsx',
   'client/src/components/admin/EmailComposerModal.jsx'
 ];

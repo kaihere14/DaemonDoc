@@ -8,7 +8,7 @@ Production — core product is live and functional. Work continues on improvemen
 
 ## Current Goal
 
-Build feature-flag infrastructure to replace the temporary `DISABLE_PLAN_RESTRICTIONS` env vars (see Fix 01 below).
+DaemonDoc v1 is free and open source forever. The payment, subscription, and usage-limit layer has been removed entirely (see "Payments Removal" below). Premium features are deferred to DaemonDoc v2, a separate paid SaaS product.
 
 ## Completed
 
@@ -29,8 +29,7 @@ Build feature-flag infrastructure to replace the temporary `DISABLE_PLAN_RESTRIC
 - [x] Activate repo: create GitHub webhook + save `ActiveRepo` + trigger initial generation
 - [x] Deactivate repo: delete GitHub webhook + delete `ActiveRepo` record
 - [x] GitHub webhook handler: verify HMAC signature, skip bot commits and non-default branches, enqueue job
-- [x] Plan-based active repo limit enforcement at activation time
-- [x] Free plan auto-deactivation notification (`reposDeactivatedNotification` flag)
+- [x] Unlimited active repos — no plan gating at activation time
 
 ### AI README Generation Pipeline
 
@@ -60,22 +59,9 @@ Build feature-flag infrastructure to replace the temporary `DISABLE_PLAN_RESTRIC
 - [x] `RepoCard` — shows repo name, language, privacy, activation toggle
 - [x] Logs page (`/logs`) — last 10 generation events with status indicators
 - [x] Profile page (`/profile`) — user info, settings toggles, account deletion
-- [x] Upgrade page (`/upgrade`) — plan comparison, Razorpay checkout integration
-- [x] Admin page (`/admin`) — analytics, payment management, user plan table, broadcast email UI
+- [x] Admin page (`/admin`) — analytics and broadcast email UI
 - [x] PostHog analytics integration
 - [x] Vercel Analytics integration
-
-### Payments
-
-- [x] `Plan` schema seeded with `pro_monthly` (₹499) and `pro_yearly` (₹3,999)
-- [x] `PaymentLedger` schema for idempotent payment records
-- [x] Razorpay order creation → checkout → signature verification → plan activation
-- [x] Razorpay `payment.captured` webhook as idempotent fallback
-- [x] `applyProPlan()` — sets unlimited repo limit, review limits, expiry date
-- [x] Admin: revoke Pro plan (enforces free limit, deactivates excess repos)
-- [x] Admin: update plan price in DB
-- [x] Admin: view all users with plan, paginated, filterable
-- [x] Usage tracking and reset queue (`services/reset.queue.js`)
 
 ### Email
 
@@ -105,15 +91,21 @@ Build feature-flag infrastructure to replace the temporary `DISABLE_PLAN_RESTRIC
 
 ## Completed (continued)
 
-### Temporarily Disable Free Plan Restrictions (Fix 01)
+### Payments Removal — v1 is Free and Open Source
 
-- [x] `DISABLE_PLAN_RESTRICTIONS=true` in `server/.env`
-- [x] `VITE_DISABLE_PLAN_RESTRICTIONS=true` in `client/.env`
-- [x] `server/src/controllers/github.controller.js` — `addRepoActivity` active-repo limit check wrapped with env guard (logic unchanged when flag is off)
-- [x] `server/src/utils/git.worker.js` — verified no plan limit enforcement; comment added
-- [x] `client/src/components/RepoCard.jsx` — `PlanLimitModal` and `ACTIVE_REPO_LIMIT_REACHED` handling guarded with `VITE_DISABLE_PLAN_RESTRICTIONS` (client-side limit UX lives here; `Home.jsx` has no preemptive toggle disable)
-- [x] `reposDeactivatedNotification` banner on Home left unchanged (server-driven event, not a client-side limit gate)
-- [ ] Next: replace env reads with a feature-flag client at the same guard sites; remove both env vars
+DaemonDoc v1 carries no payment, subscription, credit, or usage-limit code. Premium features move to DaemonDoc v2 (separate paid SaaS product).
+
+- [x] Deleted server: `payment.controller.js`, `payment.routes.js`, `config/pricingPlans.js`, `schema/{subscription,plan,paymentLedger}.schema.js`, `scripts/{seed-plans,migrate-free-plan}.js`, `services/reset.queue.js`, `utils/usageTracker.js`
+- [x] `index.js` — dropped `/api/payments` mount and the raw-body `/api/webhook/razorpay` route
+- [x] `user.schema.js` — dropped `plan`, `planInterval`, `reviewLimit`, `competitorLimit`, `activeRepoLimit`, `planExpiry`, `reviewsUsed`, `competitorAnalysesUsed`, `usagePeriodStart`, `reposDeactivatedNotification`
+- [x] `github.controller.js` — removed the active-repo limit gate; activation is unlimited
+- [x] Removed `dismissReposDeactivatedNotification` controller and its `/auth/dismiss-repos-notification` route
+- [x] `razorpay` dependency dropped from `server/package.json` and the lockfile
+- [x] Deleted client: `pages/Upgrade.jsx`, `repos/PlanLimitModal.jsx`, `admin/AdminPaymentsSection.jsx`, `admin/AdminSubscriptionSection.jsx`
+- [x] Removed `/upgrade` route, upgrade CTAs in `AuthNavigation`, the plan card in `Profile`, the deactivation banner in `Home`, payment endpoints in `api.js`, and the Subscriptions / Paid Users admin tabs
+- [x] Deleted landing: `_components/Pricing.tsx`, `_components/UpgradeButton.tsx`, `_lib/plans.ts`; removed `#pricing` nav/footer links and the SSR `getPlans()` fetch — `app/page.tsx` is now fully static
+- [x] Both `DISABLE_PLAN_RESTRICTIONS` and `VITE_DISABLE_PLAN_RESTRICTIONS` env vars are obsolete and can be deleted from all `.env` files
+- [ ] Optional: drop the now-unused plan fields from existing MongoDB user documents (see note below)
 
 ## Completed (continued)
 
@@ -168,21 +160,20 @@ Build feature-flag infrastructure to replace the temporary `DISABLE_PLAN_RESTRIC
 
 ## Next Up
 
-- Feature-flag infrastructure to replace `DISABLE_PLAN_RESTRICTIONS` / `VITE_DISABLE_PLAN_RESTRICTIONS`.
 - Validate live message updates in the browser while a README generation job is ongoing.
+- Scope DaemonDoc v2 (paid SaaS) as a separate product; v1 stays free forever.
 
 ## Open Questions
 
 - Is there a plan to support multiple GitHub accounts per user (orgs)?
-- Should `reviewLimit` and `competitorLimit` be exposed as a working feature on the frontend, or are they reserved for a future feature?
 
 ## Architecture Decisions
 
 - **Patch vs. full generation**: Section hashes on `ActiveRepo` are the signal. No section hashes = full mode. This avoids re-reading the README file to decide — the stored hash state is authoritative.
 - **Delete not deactivate**: Deactivating a repo deletes the `ActiveRepo` document entirely rather than toggling `active: false`. This prevents duplicate records when the user re-activates the same repo.
-- **Razorpay webhook as fallback, not primary**: The `/verify` endpoint is the fast path (user stays on the page waiting). The webhook handles the case where the browser tab closes before verification runs.
 - **Redis cache for admin analytics**: The analytics aggregation is expensive. Result is cached in Redis with key `admin_analytics` and invalidated on every generation job completion and repo activation/deactivation.
-- **Temporary plan bypass**: `DISABLE_PLAN_RESTRICTIONS` (server) and `VITE_DISABLE_PLAN_RESTRICTIONS` (client) disable free-plan repo activation limits while payments are not user-ready. Restriction logic is wrapped, not removed. Default when unset is restrictions **on** (`undefined === "true"` is false).
+- **Free and open source forever (v1)**: No payment, subscription, credit, or quota code lives in this repo. Authorization (`authenticate`, `requireAdmin`) is the only gate. Monetization belongs to DaemonDoc v2, a separate product — do not reintroduce plan gating here.
+- **Legacy plan fields in MongoDB**: Existing user documents may still carry `plan`, `activeRepoLimit`, and friends. They are absent from the Mongoose schema, so they are ignored on read and stripped on write. Dropping them is optional cleanup, not a correctness requirement.
 - **No TypeScript**: The project uses plain JSX/JS throughout. Do not introduce TypeScript without an explicit decision to migrate.
 - **Tailwind v4**: Config lives entirely in `index.css`. No `tailwind.config.js` exists and none should be created.
 
@@ -191,15 +182,14 @@ Build feature-flag infrastructure to replace the temporary `DISABLE_PLAN_RESTRIC
 ### SEO Landing Port (Feature 05)
 
 - [x] `seo-client/` — Next.js 16 (App Router) project initialized alongside the Vite SPA
-- [x] `seo-client/app/page.tsx` — async Server Component; exports full `metadata` (title, description, keywords, openGraph, twitter, alternates.canonical, robots) and a JSON-LD `SoftwareApplication` structured data block; fetches pricing plans via SSR (`getPlans()`) and passes them into the Pricing component
+- [x] `seo-client/app/page.tsx` — static Server Component; exports full `metadata` (title, description, keywords, openGraph, twitter, alternates.canonical, robots) and a JSON-LD `SoftwareApplication` structured data block
 - [x] `seo-client/app/layout.tsx` — Inter + Space Grotesk fonts via `next/font/google`; `metadataBase` set to `https://daemondoc.online`
 - [x] `seo-client/app/globals.css` — Tailwind v4 `@import`, `@theme` with `--color-primary`, `feature-gradient-1/2/3`, `hero-gradient`, `animate-float-slow`, `animate-pulse-slow` keyframes; `html { scroll-behavior: smooth }` replaces the React `useEffect` scroll mutation
-- [x] `seo-client/app/(landing)/_lib/plans.ts` — server-only `getPlans()` using native `fetch` with `next: { revalidate: 3600 }` ISR; falls back to `null` plans on error
 - [x] `seo-client/app/(landing)/_lib/utils.ts` — `cn()` helper (clsx + tailwind-merge)
 - [x] `seo-client/app/(landing)/_hooks/use-is-in-view.ts` — `"use client"` hook ported from `client/src/hooks/use-is-in-view.jsx`
 - [x] `seo-client/app/(landing)/animate-ui/` — all animate-ui icons (icon, unplug, activity, clipboard-check, key, plug-zap, search, layers, hammer, disc-3) and `primitives/animate/slot` ported as TSX with updated import paths
-- [x] Server Components: `Footer`, `CoreCapabilities`, `SocialProof`, `Testimonials` (shell), `Pricing` (shell), `EngineSection` (shell), `Features` (composition)
-- [x] Client Components (`"use client"`): `PageEntrance` (motion.div fade-in), `LandingNavigation` (scroll + mobile toggle), `Hero` (video hover + framer-motion button), `EngineCard` (hover icon), `TestimonialsGrid` (hover blur), `UpgradeButton` (link to app.daemondoc.online/upgrade)
+- [x] Server Components: `Footer`, `CoreCapabilities`, `SocialProof`, `Testimonials` (shell), `EngineSection` (shell), `Features` (composition)
+- [x] Client Components (`"use client"`): `PageEntrance` (motion.div fade-in), `LandingNavigation` (scroll + mobile toggle), `Hero` (video hover + framer-motion button), `EngineCard` (hover icon), `TestimonialsGrid` (hover blur)
 - [x] `seo-client/.env.example` — documents `NEXT_PUBLIC_APP_URL` and `BACKEND_URL`
 - [x] Public assets copied: `DaemonLogo.png`, `landing.png`, `main_og.png`, `siteLogo.png`, `x_og.png`, 6 testimonial `.webp` avatars
 - [x] Navigation CTAs link to `app.daemondoc.online/{route}` (separate app deployment); `react-router`, `axios`, and PostHog dropped; `<SEO>` runtime component replaced by `metadata` API
@@ -208,5 +198,5 @@ Build feature-flag infrastructure to replace the temporary `DISABLE_PLAN_RESTRIC
 
 - The context files were rewritten on 2026-05-03 to reflect the actual DaemonDoc codebase. The previous versions described a different project ("Ghost AI" — a canvas-based architecture design tool) and were completely inaccurate.
 - Live domain: daemondoc.online
-- Payments in INR via Razorpay (not Stripe).
+- v1 is free and open source forever — no payments, no plans, no usage limits. Paid features are deferred to DaemonDoc v2.
 - AI providers: Gemini (primary) → Groq (fallback). Not the Anthropic/Claude API.

@@ -32,7 +32,6 @@
     "BullMQ",
     "Google Gemini",
     "Groq",
-    "Razorpay",
     "Resend"
   ],
   "capabilities": [
@@ -43,7 +42,7 @@
     "live generation log streaming via Convex reactive subscriptions",
     "multi-key AI provider fallback (Gemini primary, Groq fallback)",
     "AES-GCM encrypted GitHub token storage",
-    "freemium subscription billing via Razorpay"
+    "free and open source — no usage limits, no paid tiers"
   ],
   "docs": {
     "readme": "https://raw.githubusercontent.com/kaihere14/daemondoc/main/README.md",

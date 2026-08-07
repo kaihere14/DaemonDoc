@@ -15,11 +15,7 @@ import {
   startCleanupProgressToast,
   completeCleanupProgressToast,
 } from "@/lib/cleanupProgressToast";
-import PlanLimitModal from "./PlanLimitModal";
 import { usePostHog } from "@posthog/react";
-
-const restrictionsDisabled =
-  import.meta.env.VITE_DISABLE_PLAN_RESTRICTIONS === "true";
 
 const RepoCard = ({
   repo,
@@ -35,8 +31,6 @@ const RepoCard = ({
   const [isActive, setIsActive] = useState(repo.activated);
   const [loading, setLoading] = useState(false);
   const [isCleaningUp, setIsCleaningUp] = useState(false);
-  const [showLimitModal, setShowLimitModal] = useState(false);
-  const [limitValue, setLimitValue] = useState(5);
   const ownerLabel =
     repo.owner || repo.full_name?.split("/")?.[0] || "Repository";
   const branchLabel = repo.default_branch || "main";
@@ -74,24 +68,10 @@ const RepoCard = ({
       if (!isActive && onActivate) onActivate();
       if (onToggle) onToggle();
     } catch (err) {
-      if (
-        !restrictionsDisabled &&
-        err.response?.data?.code === "ACTIVE_REPO_LIMIT_REACHED"
-      ) {
-        const limit = err.response.data.limit ?? 5;
-        setLimitValue(limit);
-        setShowLimitModal(true);
-        posthog?.capture("plan_limit_reached", {
-          limit_type: "active_repos",
-          limit_value: limit,
-          repo_name: repo.name,
-        });
-      } else {
-        toast.error(
-          err.response?.data?.message ||
-            `Failed to ${isActive ? "deactivate" : "activate"} repository`,
-        );
-      }
+      toast.error(
+        err.response?.data?.message ||
+          `Failed to ${isActive ? "deactivate" : "activate"} repository`,
+      );
     } finally {
       setLoading(false);
     }
@@ -281,14 +261,6 @@ const RepoCard = ({
       </div>
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-b from-transparent via-transparent to-white" />
-
-      {!isPreview && !restrictionsDisabled && (
-        <PlanLimitModal
-          open={showLimitModal}
-          onClose={() => setShowLimitModal(false)}
-          limit={limitValue}
-        />
-      )}
     </>
   );
 

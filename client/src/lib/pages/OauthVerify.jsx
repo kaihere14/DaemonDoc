@@ -30,11 +30,8 @@ const OauthVerify = () => {
           posthog?.identify(result.user.githubUsername, {
             email: result.user.email,
             name: result.user.name,
-            plan: result.user.plan,
           });
-          posthog?.capture("user_logged_in", {
-            plan: result.user.plan,
-          });
+          posthog?.capture("user_logged_in");
           setStatus("success");
           setTimeout(() => {
             navigate("/home");

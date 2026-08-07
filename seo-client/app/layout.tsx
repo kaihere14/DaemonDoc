@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Space_Grotesk } from "next/font/google";
+import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
+// Body/UI font — self-hosted from public/, same setup as daemondoc-v2
+const interDisplay = localFont({
+  src: "../public/inter-display.p.woff2",
+  variable: "--font-inter-display",
   display: "swap",
 });
 
+// Headings keep Space Grotesk
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
   subsets: ["latin"],
@@ -30,8 +33,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${spaceGrotesk.variable} h-full`}
-      style={{ fontFamily: "var(--font-inter), ui-sans-serif, system-ui, sans-serif" }}
+      className={`${interDisplay.variable} ${spaceGrotesk.variable} h-full`}
+      style={{
+        fontFamily: "var(--font-inter-display), ui-sans-serif, system-ui, sans-serif",
+      }}
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />

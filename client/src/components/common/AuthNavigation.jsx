@@ -1,15 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  User,
-  LogOut,
-  Home,
-  Activity,
-  Menu,
-  X,
-  Shield,
-  Zap,
-} from "lucide-react";
+import { User, LogOut, Home, Activity, Menu, X, Shield } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { usePostHog } from "@posthog/react";
@@ -82,18 +73,6 @@ const AuthNavigation = () => {
           >
             {showMobileMenu ? <X size={20} /> : <Menu size={20} />}
           </motion.button>
-
-          {/* Upgrade pill — shown only for free plan users */}
-          {user && user.plan !== "pro" && (
-            <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={() => navigate("/upgrade")}
-              className="hidden cursor-pointer items-center gap-1.5 rounded-full bg-[#1d4ed8] px-3.5 py-1.5 text-xs font-bold text-white shadow-md shadow-blue-500/20 transition-all hover:bg-[#1e40af] md:flex"
-            >
-              <Zap size={11} />
-              Upgrade
-            </motion.button>
-          )}
 
           {/* Navigation Links - Desktop */}
           <div className="hidden items-center gap-2 md:flex">
@@ -275,20 +254,6 @@ const AuthNavigation = () => {
                 >
                   <Shield size={18} strokeWidth={2} />
                   <span>Admin</span>
-                </motion.button>
-              )}
-
-              {user && user.plan !== "pro" && (
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => {
-                    navigate("/upgrade");
-                    setShowMobileMenu(false);
-                  }}
-                  className="flex w-full items-center gap-3 rounded-lg bg-blue-50 px-4 py-3 text-sm font-bold text-blue-700 transition-all hover:bg-blue-100"
-                >
-                  <Zap size={18} strokeWidth={2} />
-                  <span>Upgrade to Pro</span>
                 </motion.button>
               )}
             </div>

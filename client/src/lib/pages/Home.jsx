@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import AuthNavigation from "@/components/common/AuthNavigation";
 import RepoCard from "@/components/repos/RepoCard";
 import RepoCardSkeleton from "@/components/repos/RepoCardSkeleton";
@@ -7,8 +7,6 @@ import { Github, AlertCircle, RefreshCw, Search, X } from "lucide-react";
 import SEO from "@/components/common/SEO";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { useRepos } from "../../hooks/useRepos";
-import { useAuth } from "../../context/AuthContext";
-import { api, ENDPOINTS } from "../api";
 import { usePostHog } from "@posthog/react";
 import {
   WalkthroughBanner,
@@ -41,7 +39,6 @@ const CLEANUP_INTRO_KEY = (username) => `dd_cleanup_intro_v1_${username}`;
 
 const Home = () => {
   const { user } = useRequireAuth();
-  const { setUser } = useAuth();
   const { repos, setRepos, loading, error, fetchRepos } = useRepos(user);
   const posthog = usePostHog();
   const [filter, setFilter] = useState("all"); // all, active, inactive
@@ -92,15 +89,6 @@ const Home = () => {
       posthog?.capture("cleanup_intro_shown");
     }
   }, [showCleanupIntro, posthog]);
-
-  const handleDismissReposNotification = async () => {
-    try {
-      await api.post(ENDPOINTS.DISMISS_REPOS_NOTIFICATION);
-      setUser((prev) => ({ ...prev, reposDeactivatedNotification: false }));
-    } catch {
-      // Non-critical — banner just stays visible if the request fails
-    }
-  };
 
   const handleSilentToggle = (repoId) => {
     setRepos((prevRepos) =>
@@ -172,42 +160,6 @@ const Home = () => {
       />
       <div className="min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-indigo-100">
         <AuthNavigation />
-
-        {/* One-time banner: shown when repos were auto-deactivated due to free plan limit */}
-        <AnimatePresence>
-          {user?.reposDeactivatedNotification && (
-            <motion.div
-              initial={{ opacity: 0, y: -12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="relative z-20 mx-4 mt-20 sm:mx-6 lg:mx-8"
-            >
-              <div className="mx-auto flex max-w-7xl items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 shadow-sm">
-                <AlertCircle
-                  size={20}
-                  className="mt-0.5 shrink-0 text-amber-500"
-                />
-                <div className="flex-1 text-sm text-amber-800">
-                  <span className="font-bold">
-                    Some repositories were deactivated.
-                  </span>{" "}
-                  Your free plan supports up to 5 active repos. Repos beyond
-                  that limit were automatically deactivated.{" "}
-                  <span className="font-semibold">Upgrade to Pro</span> for
-                  unlimited active repositories.
-                </div>
-                <button
-                  onClick={handleDismissReposNotification}
-                  aria-label="Dismiss notification"
-                  className="shrink-0 rounded-lg p-1 text-amber-500 transition-colors hover:bg-amber-100"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute top-24 left-[-8rem] h-72 w-72 rounded-full bg-blue-100/60 blur-3xl" />

@@ -3,7 +3,6 @@ import Image from "next/image";
 const PRODUCT_LINKS = [
   { label: "Solutions", href: "#features" },
   { label: "Product Engine", href: "#engine" },
-  { label: "Pricing", href: "#pricing" },
 ];
 
 const LEGAL_LINKS = [

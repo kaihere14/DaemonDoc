@@ -65,8 +65,7 @@ The webhook handler verifies the `X-Hub-Signature-256` HMAC header before proces
 | Branch scope                      | default branch only                              |
 | Bot commit guard                  | `[skip ci]` in commit message                    |
 | Generation trigger                | idempotent — duplicate SHA is skipped            |
-| Free plan repo limit              | 5 active repositories                            |
-| Pro plan repo limit               | unlimited                                        |
+| Active repo limit                 | unlimited — free and open source, no paid tiers  |
 | Token storage                     | AES-256-GCM encrypted at rest                    |
 
 ---

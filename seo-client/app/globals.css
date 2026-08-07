@@ -16,6 +16,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  /* Body/UI font. Headings opt into Space Grotesk explicitly. */
+  --font-sans: var(--font-inter-display), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), sans-serif;
 }
 
 body {
@@ -28,6 +31,9 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Inter Display runs wide; pull the default tracking in so body copy reads
+     tight and premium rather than airy. Explicit tracking-* utilities still win. */
+  letter-spacing: -0.025em;
 }
 
 html {

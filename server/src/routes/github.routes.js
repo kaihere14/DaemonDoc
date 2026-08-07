@@ -7,6 +7,7 @@ import {
   deactivateRepoActivity,
   fetchUserLogs,
   fetchAdminAnalytics,
+  fetchAdminUsers,
   cleanUpReadme,
 } from "../controllers/github.controller.js";
 
@@ -18,6 +19,7 @@ router.post("/deactivateRepoActivity", authenticate, deactivateRepoActivity);
 router.post("/webhookhandler", githubWebhookHandler);
 router.get("/fetchUserLogs", authenticate, fetchUserLogs);
 router.get("/admin/analytics", authenticate, requireAdmin, fetchAdminAnalytics);
+router.get("/admin/users", authenticate, requireAdmin, fetchAdminUsers);
 router.post("/cleanUpReadme", authenticate, cleanUpReadme);
 
 export default router;

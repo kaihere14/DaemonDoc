@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { getPlans } from "./(landing)/_lib/plans";
 import PageEntrance from "./(landing)/_components/PageEntrance";
 import LandingNavigation from "./(landing)/_components/LandingNavigation";
 import Hero from "./(landing)/_components/Hero";
@@ -93,9 +92,7 @@ const jsonLd = {
     "README automation, continuous documentation sync, automated GitHub README, documentation-as-code, AST-based patching, deterministic patching, stateless sync, webhook-driven documentation, MERN stack, BullMQ, Convex",
 };
 
-export default async function Home() {
-  const { monthly, yearly } = await getPlans();
-
+export default function Home() {
   return (
     <>
       <script
@@ -105,7 +102,7 @@ export default async function Home() {
       <PageEntrance>
         <LandingNavigation />
         <Hero />
-        <Features monthly={monthly} yearly={yearly} />
+        <Features />
         <Footer />
       </PageEntrance>
     </>

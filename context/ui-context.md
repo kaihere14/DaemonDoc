@@ -8,30 +8,30 @@ Light mode only. No dark mode in the app UI (the dark variant is defined in `ind
 
 Defined as CSS custom properties in `client/src/index.css` via `@theme inline` and `:root`. Components use Tailwind utility classes that map to these variables — no raw hex values in JSX except for the single brand blue `#1d4ed8` used for primary buttons.
 
-| Role              | Value / Variable           | Usage                                        |
-| ----------------- | -------------------------- | -------------------------------------------- |
-| Page background   | `white` / `bg-white`       | Landing, dashboard, all pages                |
-| Surface           | `slate-50` / `bg-slate-50` | Cards, filter bars, stat panels              |
-| Border            | `slate-200`                | Dividers, card outlines                      |
-| Primary text      | `slate-900`                | Headings and body copy                       |
-| Secondary text    | `slate-600`                | Subheadings and descriptions                 |
-| Muted text        | `slate-400`                | Labels, placeholders, meta info              |
-| Brand blue        | `#1d4ed8` / `--primary`    | Primary CTA buttons, active tabs, accent bar |
-| Sky blue          | `sky-600`                  | Secondary accent (Private repo stat)         |
-| Active/success    | `blue-700`                 | Active repos, success log entries            |
-| Error/failed      | `rose-500` / `rose-600`    | Failed log entries, error states             |
-| In-progress       | `sky-700`                  | Ongoing log entries                          |
-| Skipped           | `amber-700`                | Skipped log entries                          |
-| Warning           | `amber-500`                | Notification banners (plan limit)            |
+| Role            | Value / Variable           | Usage                                        |
+| --------------- | -------------------------- | -------------------------------------------- |
+| Page background | `white` / `bg-white`       | Landing, dashboard, all pages                |
+| Surface         | `slate-50` / `bg-slate-50` | Cards, filter bars, stat panels              |
+| Border          | `slate-200`                | Dividers, card outlines                      |
+| Primary text    | `slate-900`                | Headings and body copy                       |
+| Secondary text  | `slate-600`                | Subheadings and descriptions                 |
+| Muted text      | `slate-400`                | Labels, placeholders, meta info              |
+| Brand blue      | `#1d4ed8` / `--primary`    | Primary CTA buttons, active tabs, accent bar |
+| Sky blue        | `sky-600`                  | Secondary accent (Private repo stat)         |
+| Active/success  | `blue-700`                 | Active repos, success log entries            |
+| Error/failed    | `rose-500` / `rose-600`    | Failed log entries, error states             |
+| In-progress     | `sky-700`                  | Ongoing log entries                          |
+| Skipped         | `amber-700`                | Skipped log entries                          |
+| Warning         | `amber-500`                | Notification and warning banners             |
 
 ## Typography
 
-| Role        | Font            | Source                                  |
-| ----------- | --------------- | --------------------------------------- |
-| Body / UI   | Geist Variable  | `@fontsource-variable/geist` via CSS    |
-| Headings    | same as body    | `--font-heading: var(--font-sans)`      |
-| Fallback    | Inter, system   | `--font-sans` initial declaration       |
-| Mono labels | Tailwind `font-mono` | Used for uppercase section labels  |
+| Role        | Font                 | Source                               |
+| ----------- | -------------------- | ------------------------------------ |
+| Body / UI   | Geist Variable       | `@fontsource-variable/geist` via CSS |
+| Headings    | same as body         | `--font-heading: var(--font-sans)`   |
+| Fallback    | Inter, system        | `--font-sans` initial declaration    |
+| Mono labels | Tailwind `font-mono` | Used for uppercase section labels    |
 
 Fonts are loaded via `@import "@fontsource-variable/geist"` in `index.css` and applied globally via `@theme inline`. Antialiasing is applied globally (`-webkit-font-smoothing: antialiased`).
 
@@ -39,12 +39,12 @@ Fonts are loaded via `@import "@fontsource-variable/geist"` in `index.css` and a
 
 Uses a graduated scale. Smaller for inline interactive elements, larger for cards and page containers.
 
-| Context                      | Class / Value         |
-| ---------------------------- | --------------------- |
-| Buttons, tabs, badges        | `rounded-xl`          |
-| Stat cards, filter bars      | `rounded-2xl`         |
-| Main content cards           | `rounded-[2rem]`      |
-| Full-page overlays / modals  | `rounded-3xl`         |
+| Context                     | Class / Value    |
+| --------------------------- | ---------------- |
+| Buttons, tabs, badges       | `rounded-xl`     |
+| Stat cards, filter bars     | `rounded-2xl`    |
+| Main content cards          | `rounded-[2rem]` |
+| Full-page overlays / modals | `rounded-3xl`    |
 
 ## Shadows
 
@@ -67,13 +67,13 @@ Framer Motion handles all page entry animations and component transitions.
 
 Custom CSS animation classes are defined in `index.css` for decorative elements on the landing page:
 
-| Class                    | Effect                        |
-| ------------------------ | ----------------------------- |
-| `animate-float`          | Slow vertical float (6s)      |
-| `animate-float-slow`     | Very slow float (12s)         |
-| `animate-float-slow-delayed` | Same, 6s delay            |
-| `animate-ping-slow`      | Slow ping ring pulse          |
-| `animate-pulse-slow`     | Slow opacity pulse            |
+| Class                        | Effect                   |
+| ---------------------------- | ------------------------ |
+| `animate-float`              | Slow vertical float (6s) |
+| `animate-float-slow`         | Very slow float (12s)    |
+| `animate-float-slow-delayed` | Same, 6s delay           |
+| `animate-ping-slow`          | Slow ping ring pulse     |
+| `animate-pulse-slow`         | Slow opacity pulse       |
 
 ## Icons
 
@@ -89,9 +89,11 @@ Animated icons from `components/animate-ui/icons/` (custom animated variants of 
 ## Layout Patterns
 
 ### Landing Page
+
 Full-width sections: `LandingNavigation` → `Hero` → `Features` → `Footer`. White background with `hero-gradient` radial overlay behind the Hero. Language logo icons float decoratively on both sides of the hero.
 
-### Dashboard (Home, Logs, Profile, Upgrade)
+### Dashboard (Home, Logs, Profile)
+
 - Top navigation bar: `AuthNavigation` fixed at the top.
 - Content starts at `pt-22–pt-24` to clear the nav.
 - Max width `max-w-7xl` centered with `px-4 sm:px-6`.
@@ -99,11 +101,13 @@ Full-width sections: `LandingNavigation` → `Hero` → `Features` → `Footer`.
 - Decorative blur blobs (`blur-3xl`) positioned absolutely for visual depth.
 
 ### Repo Grid
+
 - Responsive: 1 col mobile → 2 col md → 3 col lg.
 - Gap `gap-4 sm:gap-5 lg:gap-6`.
 - Pagination bar below the grid.
 
 ### Modals and Overlays
+
 - Walkthrough modal: centered overlay with `rounded-3xl`, white card, dark backdrop.
 - Notification banners: full-width top bar with amber border and background.
 
