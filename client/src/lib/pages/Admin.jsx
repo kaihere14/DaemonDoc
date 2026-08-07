@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import AuthNavigation from "@/components/common/AuthNavigation";
 import { api, ENDPOINTS } from "../api";
 import { toast } from "sonner";
 import { useReducedMotion } from "framer-motion";
@@ -349,8 +348,6 @@ const Admin = () => {
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white">
-      <AuthNavigation />
-
       {/* Background Decorations */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <div className="absolute top-24 left-[-8rem] h-72 w-72 rounded-full bg-blue-100/60 blur-3xl" />

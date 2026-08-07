@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import AuthNavigation from "@/components/common/AuthNavigation";
 import RepoCard from "@/components/repos/RepoCard";
 import RepoCardSkeleton from "@/components/repos/RepoCardSkeleton";
 import { Github, AlertCircle, RefreshCw, Search, X } from "lucide-react";
@@ -159,8 +158,6 @@ const Home = () => {
         onDismiss={dismissCleanupIntro}
       />
       <div className="min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-indigo-100">
-        <AuthNavigation />
-
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute top-24 left-[-8rem] h-72 w-72 rounded-full bg-blue-100/60 blur-3xl" />
           <div className="absolute top-52 right-[-6rem] h-80 w-80 rounded-full bg-sky-100/40 blur-3xl" />

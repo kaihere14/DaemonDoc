@@ -10,7 +10,6 @@ import {
   AlertTriangle,
   Check,
 } from "lucide-react";
-import AuthNavigation from "@/components/common/AuthNavigation";
 import SEO from "@/components/common/SEO";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { useRepos } from "../../hooks/useRepos";
@@ -79,7 +78,6 @@ const Profile = () => {
         canonical={`${APP_ORIGIN}/profile`}
       />
       <div className="min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-blue-50">
-        <AuthNavigation />
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute top-24 left-[-8rem] h-72 w-72 rounded-full bg-blue-100/60 blur-3xl" />
           <div className="absolute top-56 right-[-7rem] h-80 w-80 rounded-full bg-sky-100/45 blur-3xl" />

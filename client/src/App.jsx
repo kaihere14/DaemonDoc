@@ -7,6 +7,7 @@ import Home from "./lib/pages/Home";
 import Profile from "./lib/pages/Profile";
 import Logs from "./lib/pages/Logs";
 import Admin from "./lib/pages/Admin";
+import DashboardLayout from "./components/common/DashboardLayout";
 import { MARKETING_URL } from "./lib/urls";
 
 /**
@@ -38,10 +39,12 @@ const App = () => {
         <Route path="/" element={<MarketingRedirect />} />
         <Route path="/login" element={<Login />} />
         <Route path="/oauth-success" element={<OauthVerify />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/logs" element={<Logs />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route element={<DashboardLayout />}>
+          <Route path="/home" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/logs" element={<Logs />} />
+          <Route path="/admin" element={<Admin />} />
+        </Route>
       </Routes>
     </div>
   );

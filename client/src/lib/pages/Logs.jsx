@@ -11,7 +11,6 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { useQuery } from "convex/react";
-import AuthNavigation from "@/components/common/AuthNavigation";
 import SEO from "@/components/common/SEO";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { api, ENDPOINTS } from "../api";
@@ -174,7 +173,6 @@ const Logs = () => {
         canonical={`${APP_ORIGIN}/logs`}
       />
       <div className="min-h-screen bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-sky-100">
-        <AuthNavigation />
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute top-24 left-[-7rem] h-72 w-72 rounded-full bg-blue-100/55 blur-3xl" />
           <div className="absolute top-72 right-[-8rem] h-96 w-96 rounded-full bg-sky-100/45 blur-3xl" />
