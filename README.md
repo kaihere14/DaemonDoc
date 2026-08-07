@@ -1,3 +1,4 @@
+
 # DaemonDoc — AI-Powered README Automation
 
 [![License](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
@@ -23,6 +24,9 @@ Automate and maintain accurate GitHub READMEs through codebase analysis, commit 
   - Live log streaming via Convex during cleanup operations
   - Log recovery on server restarts to prevent stale "ongoing" states
 
+- **Free & Open Source Forever** 🆓
+  - No paid tiers, subscriptions, credits, or usage limits. Every feature is available to every user, and unlimited repositories can be activated.
+
 ### Infrastructure & Security
 
 - **Domain Architecture**
@@ -46,10 +50,10 @@ Automate and maintain accurate GitHub READMEs through codebase analysis, commit 
   - 7-day JWT session expiration
 
 - **Unified Design System** 🎨
-  - Standardized interactive `CandyButton` and `CandyLink` components across both the React client and Next.js SEO-client to deliver a consistent, high-performance visual identity.
+  - Self-hosted Inter Display font for consistent, high-performance styling across both the React client and Next.js SEO-client.
+  - Standardized interactive `CandyButton` and `CandyLink` components.
 
 ---
-
 ## 🧠 Architecture
 
 ```
@@ -81,7 +85,6 @@ Automate and maintain accurate GitHub READMEs through codebase analysis, commit 
 | **Email**     | Resend for transactional communications                                                 |
 
 ---
-
 ## 🧪 Installation
 
 1. **Prerequisites**
@@ -162,6 +165,7 @@ BACKEND_URL=http://localhost:3000
 | GET    | `/auth/github`          | Initiate OAuth flow   |
 | GET    | `/auth/github/callback` | Handle OAuth callback |
 | POST   | `/auth/verify`          | JWT validation        |
+| DELETE | `/auth/delete`          | Delete user account   |
 
 ### Repository Management
 
@@ -180,8 +184,14 @@ BACKEND_URL=http://localhost:3000
 | GET    | `/api/github/fetchUserLogs` | Retrieve automated documentation activity logs |
 | GET    | `/health`                   | Redis status + uptime                          |
 
----
+### Admin Operations
 
+| Method | Endpoint                      | Description                                    |
+| ------ | ----------------------------- | ---------------------------------------------- |
+| GET    | `/api/github/admin/analytics` | Retrieve system-wide analytics (cached)        |
+| GET    | `/api/github/admin/users`     | Browse and search all registered users         |
+
+---
 ## 🚀 Deployment
 
 **1. Backend (Render)**
@@ -234,13 +244,13 @@ Set up a 5-minute cron job to ping:
 
 ## 🔐 Security
 
-- GitHub tokens encrypted with AES-256-GCM
-- Webhook payloads verified with HMAC-SHA256
-- JWT session expiration: 7 days
-- Never commit `.env` files (included in .gitignore)
+- **Token Encryption**: GitHub access tokens are stored encrypted using AES-GCM; plaintext tokens are never persisted or logged.
+- **Webhook Verification**: GitHub webhook payloads are verified using HMAC-SHA256 signatures.
+- **Strict Authorization**: Access is governed strictly by JWT authentication and role-based checks (`requireAdmin`). No payment, billing, or plan-gating middleware exists in the codebase.
+- **Session Security**: JWT session expiration is set to 7 days.
+- **Environment Protection**: Sensitive credentials and API keys are managed strictly via environment variables (never committed to source control).
 
 ---
-
 ## 📄 License
 
 AGPL v3 - See [LICENSE](LICENSE) file
