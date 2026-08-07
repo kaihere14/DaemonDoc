@@ -80,7 +80,7 @@ export default function Footer() {
 
           <div className="flex items-center gap-6">
             <a
-              href="#"
+              href="https://x.com/armankiyotaka"
               className="text-slate-400 transition-colors hover:text-slate-900"
               aria-label="X (Twitter)"
             >
