@@ -4,6 +4,8 @@
 
 Automate accurate GitHub README maintenance through codebase analysis, commit tracking, and intelligent document restructuring. DaemonDoc v1 is fully open source with no paid features or usage limits.
 
+> **Free and open source, forever.** DaemonDoc v1 has no paid tiers, subscriptions, credits, or usage limits — every feature is available to every user, and unlimited repositories can be activated. There is no payment or billing code in this repository. Paid features are planned for DaemonDoc v2, a separate SaaS product; this version stays free.
+
 ---
 
 ## ✨ Key Features
