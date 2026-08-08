@@ -1,112 +1,75 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { Menu, X } from "lucide-react";
+import { useCallback, useState } from "react";
+import {
+  Navbar,
+  NavBody,
+  NavItems,
+  MobileNav,
+  NavbarLogo,
+  MobileNavHeader,
+  MobileNavToggle,
+  MobileNavMenu,
+} from "@/components/ui/resizable-navbar";
 import { CandyLink } from "@/components/ui/candy-button";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daemondoc.online";
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daemondoc.online";
 
 const NAV_LINKS = [
-  { label: "Solutions", href: "#features" },
-  { label: "Features", href: "#engine" },
+  { name: "Solutions", link: "#features" },
+  { name: "Features", link: "#engine" },
 ];
 
 export default function LandingNavigation() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
 
   return (
-    <nav
-      className={`fixed z-50 w-full transition-all duration-500 ease-in-out ${
-        scrolled
-          ? "border-b border-slate-200/50 bg-white/70 py-2 shadow-sm backdrop-blur-md"
-          : "border-b border-transparent bg-transparent"
-      }`}
-    >
-      <div className="w-full max-w-[1400px] px-4 sm:mx-auto sm:px-6 lg:pr-22 lg:pl-6">
-        <div
-          className={`flex items-center justify-between transition-all duration-500 ${
-            scrolled ? "h-14" : "h-20"
-          } w-full`}
-        >
-          {/* Logo */}
-          <a href="#" className="flex items-center justify-center gap-2">
-            <Image
-              src="/DaemonLogo.png"
-              alt="DaemonDoc"
-              width={240}
-              height={60}
-              className={`absolute left-0 transition-all duration-500 sm:relative ${
-                scrolled
-                  ? "w-32 scale-148 sm:w-36 sm:scale-100 md:w-48"
-                  : "w-40 scale-150 sm:w-45 sm:scale-100 md:w-60"
-              } self-center pt-2`}
-            />
-          </a>
-
-          {/* Desktop nav links */}
-          <div className="hidden items-center gap-8 md:flex lg:pr-25">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="text-sm font-medium text-slate-600 transition-colors hover:text-[#1d4ed8]"
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
-
-          {/* Desktop CTA */}
-          <div className="hidden md:flex">
-            <CandyLink
-              href={`${APP_URL}/login`}
-              className="px-6 py-2.5 text-sm"
-            >
-              Get Started
-            </CandyLink>
-          </div>
-
-          {/* Mobile toggle */}
-          <button
-            className="cursor-pointer p-2 text-slate-600 hover:text-slate-900 md:hidden"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
+    <Navbar className="fixed inset-x-0 top-0 z-50">
+      {/* Desktop */}
+      <NavBody>
+        <NavbarLogo />
+        <NavItems items={NAV_LINKS} />
+        <div className="flex transform-gpu items-center">
+          <CandyLink href={`${APP_URL}/login`} className="px-6 py-2.5 text-sm">
+            Get Started
+          </CandyLink>
         </div>
-      </div>
+      </NavBody>
 
-      {/* Mobile dropdown */}
-      {mobileOpen && (
-        <div className="space-y-1 border-t border-slate-100 bg-white px-4 py-4 md:hidden">
+      {/* Mobile */}
+      <MobileNav>
+        <MobileNavHeader>
+          <NavbarLogo />
+          <MobileNavToggle
+            isOpen={mobileOpen}
+            onClick={() => setMobileOpen((open) => !open)}
+          />
+        </MobileNavHeader>
+
+        <MobileNavMenu isOpen={mobileOpen} onClose={closeMobile}>
           {NAV_LINKS.map((link) => (
             <a
-              key={link.label}
-              href={link.href}
-              onClick={() => setMobileOpen(false)}
-              className="block rounded-lg px-2 py-2.5 font-medium text-slate-600 transition-colors hover:bg-slate-50 hover:text-[#1d4ed8]"
+              key={link.name}
+              href={link.link}
+              onClick={closeMobile}
+              className="hover:text-primary w-full rounded-lg px-2 py-2.5 font-medium text-slate-600 transition-colors hover:bg-slate-50"
             >
-              {link.label}
+              {link.name}
             </a>
           ))}
-          <div className="pt-2">
-            <CandyLink href={`${APP_URL}/login`} className="w-full">
+          <div className="flex w-full flex-col">
+            <CandyLink
+              href={`${APP_URL}/login`}
+              className="w-full"
+              onClick={closeMobile}
+            >
               Get Started
             </CandyLink>
           </div>
-        </div>
-      )}
-    </nav>
+        </MobileNavMenu>
+      </MobileNav>
+    </Navbar>
   );
 }
