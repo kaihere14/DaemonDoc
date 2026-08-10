@@ -10,14 +10,13 @@ const COMPANIES = [
 
 export default function SocialProof() {
   return (
-    <section className="bg-linear-to-b from-white via-slate-50/50 to-white">
-      <div className="mx-auto max-w-7xl px-4 text-center">
+    <div aria-label="Teams using DaemonDoc" role="group">
+      <div className="text-center">
         <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
           {COMPANIES.map((c) => (
             <div
               key={c.name}
-              className="flex cursor-default items-center gap-1.5 text-lg font-bold text-slate-800 opacity-50 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              className="font-display flex cursor-default items-center gap-1.5 text-lg font-bold text-slate-800 opacity-50 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0"
             >
               <c.icon size={18} />
               {c.name}
@@ -25,6 +24,6 @@ export default function SocialProof() {
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }

@@ -1,6 +1,7 @@
 import React from "react";
 import { Send, ChevronRight, Check, X, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useDialog } from "../../hooks/useDialog";
 
 const EmailComposerModal = ({
   isOpen,
@@ -34,6 +35,8 @@ const EmailComposerModal = ({
   goToNextStep,
   onClose,
 }) => {
+  useDialog(isOpen && !showConfirmModal, onClose);
+
   return (
     <AnimatePresence>
       {isOpen && !showConfirmModal && (
@@ -45,11 +48,14 @@ const EmailComposerModal = ({
           onClick={onClose}
         >
           <motion.div
-            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="composer-step-title"
+            initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            exit={{ scale: 0.95, opacity: 0, y: 20 }}
             onClick={(e) => e.stopPropagation()}
-            className="flex h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_24px_70px_-36px_rgba(15,23,42,0.55)] sm:h-[90vh] lg:flex-row"
+            className="rounded-panel-lg shadow-overlay flex h-[92vh] w-full max-w-5xl flex-col overflow-hidden border border-slate-200 bg-white sm:h-[90vh] lg:flex-row"
           >
             <div className="border-b border-slate-100 bg-linear-to-b from-slate-50 to-white p-5 sm:p-6 lg:w-72 lg:border-r lg:border-b-0">
               <div className="mb-8 hidden lg:block">
@@ -62,7 +68,7 @@ const EmailComposerModal = ({
                 <p className="text-xs text-slate-500">Configure your update</p>
               </div>
 
-              <div className="mb-5 rounded-[1.5rem] border border-blue-100 bg-blue-50/70 p-4">
+              <div className="rounded-panel mb-5 border border-blue-100 bg-blue-50/70 p-4">
                 <p className="mb-1 font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                   Progress
                 </p>
@@ -126,13 +132,17 @@ const EmailComposerModal = ({
                   <p className="mb-1 font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                     Step {currentStep}
                   </p>
-                  <h2 className="text-xl font-black text-slate-900 sm:text-2xl">
+                  <h2
+                    id="composer-step-title"
+                    className="text-xl font-black text-slate-900 sm:text-2xl"
+                  >
                     {steps[currentStep - 1].title}
                   </h2>
                 </div>
                 <button
                   onClick={onClose}
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-colors hover:bg-slate-200"
+                  aria-label="Close composer"
+                  className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-colors hover:bg-slate-200"
                 >
                   <X size={16} />
                 </button>
@@ -171,7 +181,7 @@ const EmailComposerModal = ({
                       />
                     </div>
 
-                    <div className="rounded-[1.5rem] border border-slate-200 bg-white/85 p-4 shadow-[0_16px_40px_-32px_rgba(15,23,42,0.28)] sm:rounded-[2rem] sm:p-5">
+                    <div className="rounded-panel shadow-panel sm:rounded-panel-lg border border-slate-200 bg-white/85 p-4 sm:p-5">
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                           <p className="mb-2 font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
@@ -314,7 +324,7 @@ const EmailComposerModal = ({
                       {changes.map((change, index) => (
                         <div
                           key={index}
-                          className="relative rounded-[1.5rem] border border-slate-200 bg-white/85 p-4 shadow-[0_16px_40px_-32px_rgba(15,23,42,0.2)] sm:p-5"
+                          className="rounded-panel shadow-panel relative border border-slate-200 bg-white/85 p-4 sm:p-5"
                         >
                           {changes.length > 1 && (
                             <button
@@ -431,7 +441,7 @@ const EmailComposerModal = ({
                       </div>
                     </div>
 
-                    <div className="flex gap-4 rounded-[1.5rem] border border-blue-100 bg-blue-50/60 p-4 sm:p-6">
+                    <div className="rounded-panel flex gap-4 border border-blue-100 bg-blue-50/60 p-4 sm:p-6">
                       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-200">
                         <AlertCircle size={24} />
                       </div>
@@ -461,7 +471,7 @@ const EmailComposerModal = ({
                 </button>
                 <button
                   onClick={goToNextStep}
-                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-[#1d4ed8] px-4 py-3 text-sm font-bold text-white shadow-xl shadow-blue-200 transition-all hover:bg-[#1e40af] hover:shadow-blue-300 sm:flex-[1.2] sm:px-6 sm:py-4"
+                  className="bg-primary flex flex-1 items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold text-white shadow-xl shadow-blue-200 transition-all hover:bg-blue-800 hover:shadow-blue-300 sm:flex-[1.2] sm:px-6 sm:py-4"
                 >
                   {currentStep === 4 ? "Review Broadcast" : "Continue"}
                   {currentStep < 4 && <ChevronRight size={20} />}

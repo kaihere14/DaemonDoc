@@ -5,6 +5,7 @@ import { LayersIcon } from "@/app/(landing)/_animate-ui/icons/layers";
 import { PlugZap } from "@/app/(landing)/_animate-ui/icons/plug-zap";
 import { Disc3 } from "@/app/(landing)/_animate-ui/icons/disc-3";
 import { Hammer } from "@/app/(landing)/_animate-ui/icons/hammer";
+import { SECTION_X, SECTION_Y } from "@/app/(landing)/_lib/section";
 
 type AnimateIconComponent = React.ComponentType<Record<string, unknown>>;
 
@@ -63,17 +64,14 @@ export default function EngineSection() {
   return (
     <section
       id="engine"
-      className="bg-linear-to-b from-white via-slate-50/50 to-white py-20 lg:py-28"
+      className={`bg-linear-to-b from-white via-slate-50/50 to-white ${SECTION_Y}`}
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className={SECTION_X}>
         <div className="mx-auto mb-16 max-w-3xl text-center">
-          <h2
-            className="mb-4 text-3xl font-bold tracking-tight text-slate-900 uppercase md:text-4xl"
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-          >
+          <h2 className="font-display mb-4 text-3xl font-bold text-slate-900 md:text-4xl">
             Everything the Engine Does
           </h2>
-          <p className="text-lg font-light tracking-[-0.035em] text-slate-600">
+          <p className="text-lg font-light tracking-[-0.012em] text-slate-600">
             Deep-tech capabilities powering the next generation of automated
             documentation.
           </p>

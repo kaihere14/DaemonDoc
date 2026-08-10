@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import RepoCard from "./RepoCard";
+import { useDialog } from "../../hooks/useDialog";
 
 const PREVIEW_REPO = {
   id: "cleanup-intro-preview",
@@ -33,7 +34,10 @@ const CleanupButtonCallout = () => (
       },
     }}
     viewport={{ once: true }}
-    className="pointer-events-none absolute right-[18px] bottom-15 z-10 flex flex-col items-center sm:right-[17px] sm:bottom-[3.79rem]"
+    /* Width matches the cleanup button (34px) and shares its right offset, so
+       the arrow stays centred on the button at both breakpoints instead of
+       being nudged with hand-tuned pixel values. */
+    className="pointer-events-none absolute right-4 bottom-[3.25rem] z-10 flex w-[34px] flex-col items-center sm:right-6 sm:bottom-[3.75rem]"
     aria-hidden
   >
     <p className="mb-1 text-[10px] font-bold whitespace-nowrap text-blue-700">
@@ -43,8 +47,10 @@ const CleanupButtonCallout = () => (
   </motion.div>
 );
 
-const CleanupFeatureSpotlight = ({ open, onDismiss }) =>
-  createPortal(
+const CleanupFeatureSpotlight = ({ open, onDismiss }) => {
+  useDialog(open, onDismiss);
+
+  return createPortal(
     <AnimatePresence>
       {open && (
         <>
@@ -69,13 +75,16 @@ const CleanupFeatureSpotlight = ({ open, onDismiss }) =>
             onClick={onDismiss}
           >
             <motion.div
-              className="relative w-full max-w-xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_20px_60px_-34px_rgba(15,23,42,0.36)] sm:p-8"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="cleanup-spotlight-title"
+              className="rounded-panel-lg shadow-overlay relative w-full max-w-xl overflow-hidden border border-slate-200 bg-white p-6 sm:p-8"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 type="button"
                 onClick={onDismiss}
-                className="absolute top-4 right-4 rounded-xl p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                className="rounded-control absolute top-4 right-4 cursor-pointer p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
                 aria-label="Close"
               >
                 <X size={18} />
@@ -85,7 +94,10 @@ const CleanupFeatureSpotlight = ({ open, onDismiss }) =>
                 New
               </span>
 
-              <h2 className="mb-2 pr-8 text-xl font-black tracking-tight text-slate-900 uppercase sm:text-2xl">
+              <h2
+                id="cleanup-spotlight-title"
+                className="mb-2 pr-8 text-xl font-black tracking-tight text-slate-900 uppercase sm:text-2xl"
+              >
                 Clean up bloated READMEs
               </h2>
 
@@ -122,14 +134,14 @@ const CleanupFeatureSpotlight = ({ open, onDismiss }) =>
                 <button
                   type="button"
                   onClick={onDismiss}
-                  className="inline-flex flex-1 items-center justify-center rounded-[1.1rem] bg-[#1d4ed8] px-5 py-3 text-sm font-bold tracking-[0.12em] text-white uppercase shadow-lg shadow-blue-500/20 transition-all hover:bg-[#1e40af]"
+                  className="rounded-action bg-primary inline-flex flex-1 cursor-pointer items-center justify-center px-5 py-3 text-sm font-bold tracking-[0.12em] text-white uppercase shadow-lg shadow-blue-500/20 transition-colors hover:bg-blue-800 active:scale-[0.98]"
                 >
                   Got it
                 </button>
                 <button
                   type="button"
                   onClick={onDismiss}
-                  className="flex-1 rounded-[1.1rem] border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-bold text-slate-600 transition-all hover:bg-slate-100"
+                  className="rounded-action flex-1 cursor-pointer border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-100 active:scale-[0.98]"
                 >
                   Maybe later
                 </button>
@@ -141,5 +153,6 @@ const CleanupFeatureSpotlight = ({ open, onDismiss }) =>
     </AnimatePresence>,
     document.body,
   );
+};
 
 export default CleanupFeatureSpotlight;

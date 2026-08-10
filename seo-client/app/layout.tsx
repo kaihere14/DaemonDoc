@@ -31,18 +31,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    // next/font self-hosts both faces at build time, so there is nothing to
+    // preconnect to — the fonts ship from this origin.
     <html
       lang="en"
       className={`${interDisplay.variable} ${spaceGrotesk.variable} h-full`}
-      style={{
-        fontFamily: "var(--font-inter-display), ui-sans-serif, system-ui, sans-serif",
-      }}
     >
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      </head>
-      <body className="min-h-full flex flex-col bg-white text-slate-900 antialiased">
+      <body className="font-sans flex min-h-full flex-col bg-white text-slate-900 antialiased">
         {children}
         <Analytics />
       </body>

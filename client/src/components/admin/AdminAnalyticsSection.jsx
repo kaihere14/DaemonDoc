@@ -98,7 +98,7 @@ const AdminAnalyticsSection = ({
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.05 }}
-        className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/90 p-6 shadow-[0_20px_60px_-34px_rgba(15,23,42,0.32)] sm:p-8"
+        className="rounded-panel-lg shadow-raised overflow-hidden border border-slate-200 bg-white/90 p-6 sm:p-8"
       >
         <div className="mb-8 flex flex-col gap-5 border-b border-dashed border-slate-200 pb-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="flex items-start gap-4">
@@ -127,7 +127,7 @@ const AdminAnalyticsSection = ({
         </div>
 
         {isAnalyticsLoading ? (
-          <div className="flex min-h-[320px] flex-1 flex-col items-center justify-center gap-4 rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50/70 px-6 py-10 text-center">
+          <div className="rounded-panel flex min-h-[320px] flex-1 flex-col items-center justify-center gap-4 border border-dashed border-slate-200 bg-slate-50/70 px-6 py-10 text-center">
             <Loader2 size={28} className="animate-spin text-blue-600" />
             <div>
               <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
@@ -139,7 +139,7 @@ const AdminAnalyticsSection = ({
             </div>
           </div>
         ) : analyticsError ? (
-          <div className="flex min-h-[320px] flex-1 flex-col justify-between rounded-[1.5rem] border border-rose-100 bg-rose-50/60 p-5">
+          <div className="rounded-panel flex min-h-[320px] flex-1 flex-col justify-between border border-rose-100 bg-rose-50/60 p-5">
             <div>
               <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-rose-500">
                 <AlertCircle size={22} />
@@ -180,7 +180,7 @@ const AdminAnalyticsSection = ({
                   <motion.div
                     key={stat.label}
                     variants={fadeUpVariant}
-                    className="rounded-[1.35rem] border border-slate-200 bg-linear-to-b from-white to-slate-50/70 p-4"
+                    className="rounded-tile border border-slate-200 bg-linear-to-b from-white to-slate-50/70 p-4"
                   >
                     <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                       {stat.label}
@@ -194,7 +194,7 @@ const AdminAnalyticsSection = ({
 
               <motion.div
                 variants={fadeUpVariant}
-                className="rounded-[1.5rem] border border-slate-200 bg-linear-to-r from-blue-50/80 via-white to-white p-4 sm:p-5"
+                className="rounded-panel border border-slate-200 bg-linear-to-r from-blue-50/80 via-white to-white p-4 sm:p-5"
               >
                 <div className="flex items-center gap-3">
                   <motion.div
@@ -281,7 +281,7 @@ const AdminAnalyticsSection = ({
 
               <motion.div
                 variants={fadeUpVariant}
-                className="rounded-[1.5rem] border border-slate-200 bg-white p-4 sm:p-5"
+                className="rounded-panel border border-slate-200 bg-white p-4 sm:p-5"
               >
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <div>
@@ -342,7 +342,7 @@ const AdminAnalyticsSection = ({
 
               <motion.div
                 variants={fadeUpVariant}
-                className="rounded-[1.5rem] border border-slate-200 bg-white px-4 py-5 sm:p-6"
+                className="rounded-panel border border-slate-200 bg-white px-4 py-5 sm:p-6"
               >
                 <div className="flex flex-col gap-2">
                   <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
@@ -408,7 +408,7 @@ const AdminAnalyticsSection = ({
             <div className="space-y-5">
               <motion.div
                 variants={fadeUpVariant}
-                className="rounded-[1.5rem] border border-slate-200 bg-slate-50/80 p-4 sm:p-5"
+                className="rounded-panel border border-slate-200 bg-slate-50/80 p-4 sm:p-5"
               >
                 <div className="mb-4">
                   <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
@@ -460,7 +460,7 @@ const AdminAnalyticsSection = ({
 
               <motion.div
                 variants={fadeUpVariant}
-                className="rounded-[1.5rem] border border-slate-200 bg-linear-to-b from-slate-50 to-white p-4 sm:p-5"
+                className="rounded-panel border border-slate-200 bg-linear-to-b from-slate-50 to-white p-4 sm:p-5"
               >
                 <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
                   Reliability Notes

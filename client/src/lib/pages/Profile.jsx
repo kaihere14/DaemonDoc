@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import {
   Github,
   Zap,
@@ -16,6 +17,7 @@ import { useRepos } from "../../hooks/useRepos";
 import { api, ENDPOINTS } from "../api";
 import { APP_ORIGIN, MARKETING_URL } from "../urls";
 import { usePostHog } from "@posthog/react";
+import { useDialog } from "../../hooks/useDialog";
 
 const Profile = () => {
   const posthog = usePostHog();
@@ -26,6 +28,13 @@ const Profile = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
+  const closeDeleteModal = useCallback(() => {
+    setShowDeleteModal(false);
+    setDeleteConfirmText("");
+  }, []);
+
+  useDialog(showDeleteModal, closeDeleteModal);
+
   const handleDelete = async () => {
     if (deleteConfirmText.toLowerCase() !== "delete") return;
     setIsDeleting(true);
@@ -35,12 +44,15 @@ const Profile = () => {
       posthog?.reset();
       localStorage.removeItem("accessToken");
       window.location.href = MARKETING_URL;
-    } catch {
-      console.log("Error deleting account");
-    } finally {
+    } catch (error) {
+      // The modal used to close silently here, so a failed delete was
+      // indistinguishable from a successful one.
+      toast.error(
+        error.response?.data?.message ||
+          "Could not delete your account. Please try again.",
+      );
       setIsDeleting(false);
-      setShowDeleteModal(false);
-      setDeleteConfirmText("");
+      closeDeleteModal();
     }
   };
 
@@ -77,7 +89,7 @@ const Profile = () => {
         ogUrl={`${APP_ORIGIN}/profile`}
         canonical={`${APP_ORIGIN}/profile`}
       />
-      <div className="min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-blue-50">
+      <div className="relative min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-blue-50">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute top-24 left-[-8rem] h-72 w-72 rounded-full bg-blue-100/60 blur-3xl" />
           <div className="absolute top-56 right-[-7rem] h-80 w-80 rounded-full bg-sky-100/45 blur-3xl" />
@@ -114,7 +126,7 @@ const Profile = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="mb-8 rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.35)] backdrop-blur-sm sm:rounded-[2rem] sm:p-8"
+            className="rounded-panel shadow-raised sm:rounded-panel-lg mb-8 border border-slate-200 bg-white/90 p-5 backdrop-blur-sm sm:p-8"
           >
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex min-w-0 items-center gap-4 sm:gap-5">
@@ -168,7 +180,7 @@ const Profile = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="rounded-[1.5rem] border border-slate-200/60 bg-white/90 p-4 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.28)] sm:rounded-[2rem] sm:p-5"
+              className="rounded-panel shadow-panel sm:rounded-panel-lg border border-slate-200/60 bg-white/90 p-4 sm:p-5"
             >
               <div className="mb-3 flex items-center justify-between">
                 <div className="rounded-xl bg-slate-100 p-2 text-slate-500">
@@ -192,7 +204,7 @@ const Profile = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15 }}
-              className={`rounded-[1.5rem] border p-4 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.28)] sm:rounded-[2rem] sm:p-5 ${
+              className={`rounded-panel shadow-panel sm:rounded-panel-lg border p-4 sm:p-5 ${
                 hasActiveRepos
                   ? "border-blue-100 bg-blue-50/80"
                   : "border-slate-200/60 bg-white/90"
@@ -234,7 +246,7 @@ const Profile = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="rounded-[1.5rem] border border-slate-200/60 bg-slate-50/80 p-4 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.22)] sm:rounded-[2rem] sm:p-5"
+              className="rounded-panel shadow-panel sm:rounded-panel-lg border border-slate-200/60 bg-slate-50/80 p-4 sm:p-5"
             >
               <div className="mb-3 flex items-center justify-between">
                 <div className="rounded-xl bg-slate-100 p-2 text-slate-500">
@@ -253,7 +265,7 @@ const Profile = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.25 }}
-              className="rounded-[1.5rem] border border-sky-100 bg-sky-50/80 p-4 shadow-[0_16px_40px_-28px_rgba(14,165,233,0.2)] sm:rounded-[2rem] sm:p-5"
+              className="rounded-panel sm:rounded-panel-lg border border-sky-100 bg-sky-50/80 p-4 shadow-[0_16px_40px_-28px_rgba(14,165,233,0.2)] sm:p-5"
             >
               <div className="mb-3 flex items-center justify-between">
                 <div className="rounded-xl bg-white/80 p-2 text-sky-700">
@@ -275,7 +287,7 @@ const Profile = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="rounded-[1.5rem] border border-slate-200 bg-white/90 p-5 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.3)] backdrop-blur-sm sm:rounded-[2rem] sm:p-6"
+              className="rounded-panel shadow-raised sm:rounded-panel-lg border border-slate-200 bg-white/90 p-5 backdrop-blur-sm sm:p-6"
             >
               <div className="mb-5 flex items-center gap-2">
                 <div className="h-1 w-6 rounded-full bg-blue-600" />
@@ -285,7 +297,7 @@ const Profile = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center justify-between gap-4 rounded-[1.25rem] border border-slate-200 bg-slate-50/80 p-4">
+                <div className="rounded-tile flex items-center justify-between gap-4 border border-slate-200 bg-slate-50/80 p-4">
                   <div className="flex min-w-0 items-center gap-3">
                     <div className="rounded-xl bg-slate-900 p-2 text-white">
                       <Github size={16} />
@@ -308,7 +320,7 @@ const Profile = () => {
                 </div>
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <div className="rounded-[1.25rem] border border-slate-200 bg-white p-4">
+                  <div className="rounded-tile border border-slate-200 bg-white p-4">
                     <p className="mb-1 font-mono text-[10px] font-black tracking-[0.22em] text-slate-400 uppercase">
                       Username
                     </p>
@@ -316,7 +328,7 @@ const Profile = () => {
                       @{user.githubUsername}
                     </p>
                   </div>
-                  <div className="rounded-[1.25rem] border border-slate-200 bg-white p-4">
+                  <div className="rounded-tile border border-slate-200 bg-white p-4">
                     <p className="mb-1 font-mono text-[10px] font-black tracking-[0.22em] text-slate-400 uppercase">
                       Auto README
                     </p>
@@ -333,11 +345,12 @@ const Profile = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white/90 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.3)] backdrop-blur-sm sm:rounded-[2rem]"
+            className="rounded-panel shadow-raised sm:rounded-panel-lg overflow-hidden border border-slate-200 bg-white/90 backdrop-blur-sm"
           >
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="flex w-full items-center justify-between p-5 transition-all hover:bg-slate-50 sm:p-6"
+              aria-expanded={showSettings}
+              className="flex w-full cursor-pointer items-center justify-between p-5 transition-colors hover:bg-slate-50 sm:p-6"
             >
               <div className="flex items-center gap-3">
                 <div className="rounded-xl bg-slate-100 p-2 text-slate-500">
@@ -370,23 +383,23 @@ const Profile = () => {
                   className="overflow-hidden"
                 >
                   <div className="border-t border-slate-100 px-5 pt-3 pb-5 sm:px-6 sm:pb-6">
-                    <div className="rounded-[1.5rem] border border-rose-100 bg-rose-50/60 p-4">
+                    <div className="rounded-panel border border-rose-100 bg-rose-50/60 p-4">
                       <div className="flex items-start gap-3">
                         <AlertTriangle
                           size={18}
                           className="mt-0.5 shrink-0 text-rose-500"
                         />
                         <div className="flex-1">
-                          <h5 className="mb-1 text-sm font-black tracking-tight text-rose-900 uppercase">
+                          <h3 className="mb-1 text-sm font-black tracking-tight text-rose-900 uppercase">
                             Danger Zone
-                          </h5>
+                          </h3>
                           <p className="mb-3 text-xs text-rose-700/80">
                             Permanently delete your account and all associated
                             data. This action cannot be undone.
                           </p>
                           <button
                             onClick={() => setShowDeleteModal(true)}
-                            className="text-xs font-semibold text-rose-700 underline underline-offset-2 transition-colors hover:text-rose-800"
+                            className="cursor-pointer rounded text-xs font-semibold text-rose-700 underline underline-offset-2 transition-colors hover:text-rose-800"
                           >
                             Delete my account
                           </button>
@@ -407,23 +420,26 @@ const Profile = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md"
-              onClick={() => {
-                setShowDeleteModal(false);
-                setDeleteConfirmText("");
-              }}
+              onClick={closeDeleteModal}
             >
               <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="delete-account-title"
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="w-full max-w-md rounded-[2rem] border border-slate-200 bg-white p-8 text-center shadow-[0_24px_70px_-36px_rgba(15,23,42,0.55)] sm:p-10"
+                className="rounded-panel-lg shadow-overlay w-full max-w-md border border-slate-200 bg-white p-8 text-center sm:p-10"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="mb-6 text-center">
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-rose-100 text-rose-600">
                     <AlertTriangle className="h-8 w-8" />
                   </div>
-                  <h3 className="mb-2 text-xl font-black tracking-tight text-slate-900 uppercase">
+                  <h3
+                    id="delete-account-title"
+                    className="mb-2 text-xl font-black tracking-tight text-slate-900 uppercase"
+                  >
                     Delete Account
                   </h3>
                   <p className="text-sm text-slate-500">
@@ -433,27 +449,28 @@ const Profile = () => {
                 </div>
 
                 <div className="mb-6">
-                  <label className="mb-2 block text-left font-mono text-[10px] font-black tracking-[0.22em] text-slate-400 uppercase">
+                  <label
+                    htmlFor="delete-confirm"
+                    className="mb-2 block text-left font-mono text-[10px] font-black tracking-[0.22em] text-slate-400 uppercase"
+                  >
                     Type <span className="text-rose-600">delete</span> to
                     confirm
                   </label>
                   <input
+                    id="delete-confirm"
                     type="text"
                     value={deleteConfirmText}
                     onChange={(e) => setDeleteConfirmText(e.target.value)}
                     placeholder="Type 'delete' here"
-                    className="w-full rounded-xl border border-slate-200 px-4 py-3 text-slate-900 transition-all focus:border-transparent focus:ring-2 focus:ring-rose-500 focus:outline-none"
+                    className="rounded-control w-full border border-slate-200 px-4 py-3 text-slate-900 transition-colors focus:border-rose-500 focus:ring-2 focus:ring-rose-500/40 focus:outline-none"
                     autoFocus
                   />
                 </div>
 
                 <div className="flex gap-3">
                   <button
-                    onClick={() => {
-                      setShowDeleteModal(false);
-                      setDeleteConfirmText("");
-                    }}
-                    className="flex-1 rounded-xl bg-slate-100 px-4 py-3 font-semibold text-slate-700 transition-all hover:bg-slate-200"
+                    onClick={closeDeleteModal}
+                    className="rounded-control flex-1 cursor-pointer bg-slate-100 px-4 py-3 font-semibold text-slate-700 transition-colors hover:bg-slate-200"
                   >
                     Cancel
                   </button>
@@ -462,10 +479,10 @@ const Profile = () => {
                     disabled={
                       deleteConfirmText.toLowerCase() !== "delete" || isDeleting
                     }
-                    className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold transition-all ${
+                    className={`rounded-control flex flex-1 items-center justify-center gap-2 px-4 py-3 font-semibold transition-colors ${
                       deleteConfirmText.toLowerCase() === "delete" &&
                       !isDeleting
-                        ? "bg-rose-600 text-white hover:bg-rose-700"
+                        ? "cursor-pointer bg-rose-600 text-white hover:bg-rose-700"
                         : "cursor-not-allowed bg-rose-200 text-rose-400"
                     }`}
                   >

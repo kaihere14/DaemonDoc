@@ -105,10 +105,10 @@ const RepoCard = ({
     }
   };
 
-  const cardClassName = `group relative flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-white/90 p-4 backdrop-blur-xl sm:rounded-[2rem] sm:p-6 ${
+  const cardClassName = `group relative flex h-full flex-col overflow-hidden rounded-panel bg-white/90 p-4 backdrop-blur-xl transition-[box-shadow,border-color] duration-200 sm:rounded-panel-lg sm:p-6 ${
     isWalkthroughTarget && !isActive
       ? "border-2 border-dashed border-blue-400 shadow-[0_8px_30px_-18px_rgba(29,78,216,0.35)]"
-      : "border border-slate-200/80 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.25)] hover:border-blue-200"
+      : "border border-slate-200/80 shadow-card hover:border-blue-200 hover:shadow-raised"
   }${isPreview ? " pointer-events-none" : ""}`;
 
   const cardContent = (
@@ -132,7 +132,7 @@ const RepoCard = ({
                   className="shrink-0 text-slate-400 opacity-60 transition-all group-hover/title:text-blue-600 group-hover/title:opacity-100"
                 />
               </div>
-              <p className="max-w-[220px] truncate font-mono text-[11px] text-slate-500 sm:max-w-[240px]">
+              <p className="truncate font-mono text-[11px] text-slate-500">
                 {repo.full_name}
               </p>
             </div>
@@ -166,6 +166,11 @@ const RepoCard = ({
                 <Loader2 size={20} className="animate-spin text-slate-400" />
               ) : repo.canActivate === false && !isActive ? (
                 <button
+                  type="button"
+                  role="switch"
+                  aria-checked={false}
+                  aria-disabled="true"
+                  aria-label={`Enable AI README updates for ${repo.name} (admin access required)`}
                   onClick={() =>
                     toast.info(
                       "Admin access required to enable webhooks on this repo.",
@@ -177,9 +182,13 @@ const RepoCard = ({
                 </button>
               ) : (
                 <button
+                  type="button"
+                  role="switch"
+                  aria-checked={isActive}
+                  aria-label={`AI README updates for ${repo.name}`}
                   onClick={handleToggle}
                   disabled={loading}
-                  className={`relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:outline-none ${
+                  className={`relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:outline-none ${
                     isActive ? "bg-blue-600" : "bg-slate-300"
                   }`}
                 >
@@ -235,8 +244,10 @@ const RepoCard = ({
             </span>
           </div>
 
-          <motion.div
-            className="absolute right-5 bottom-5"
+          {/* Anchored to the card's own padding (p-4 / sm:p-6) — right-5/bottom-5
+              matched neither breakpoint, so it sat 4px off at every width. */}
+          <div
+            className="absolute right-4 bottom-4 sm:right-6 sm:bottom-6"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -256,11 +267,11 @@ const RepoCard = ({
                 <Loader size={16} className="animate-spin text-blue-600" />
               )}
             </button>
-          </motion.div>
+          </div>
         </div>
       </div>
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-b from-transparent via-transparent to-white" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-linear-to-b from-transparent via-transparent to-white" />
     </>
   );
 
@@ -269,12 +280,13 @@ const RepoCard = ({
   }
 
   return (
+    // Hover elevation is a CSS transition on the card class, not a framer
+    // `whileHover` — JS-driven box-shadow forces a style recalc per frame on
+    // every card in the grid.
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{
-        boxShadow: "0 18px 40px rgba(29,78,216,0.08)",
-      }}
+      transition={{ duration: reduceMotion ? 0.15 : 0.3, ease: "easeOut" }}
       className={cardClassName}
     >
       {cardContent}

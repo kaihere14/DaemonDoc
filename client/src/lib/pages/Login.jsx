@@ -65,11 +65,19 @@ const Shell = ({ step, setStep, children }) => (
     <div className="bg-primary/5 pointer-events-none absolute top-[-20%] left-[-10%] h-[50%] w-[50%] rounded-full blur-[160px]" />
     <div className="pointer-events-none absolute right-[-10%] bottom-[-20%] h-[50%] w-[50%] rounded-full bg-blue-100/10 blur-[160px]" />
     <div className="pointer-events-none absolute top-0 left-0 z-50 flex w-full items-center justify-between p-4 lg:p-6">
-      <a href={MARKETING_URL} className="pointer-events-auto">
+      {/* The cropped 406x120 asset. DaemonLogo.png is a mostly-transparent
+          1536x1024 canvas, which is why this needed scale-300 to look right. */}
+      <a
+        href={MARKETING_URL}
+        aria-label="DaemonDoc home"
+        className="pointer-events-auto rounded-lg"
+      >
         <img
-          src="/DaemonLogo.png"
+          src="/DaemonLogo-nav.png"
           alt="DaemonDoc"
-          className="h-12 w-auto scale-300 pl-3 sm:scale-190 sm:pl-9 lg:h-16"
+          width={406}
+          height={120}
+          className="h-8 w-auto lg:h-9"
         />
       </a>
       <button
@@ -78,7 +86,7 @@ const Shell = ({ step, setStep, children }) => (
             ? setStep((s) => s - 1)
             : (window.location.href = MARKETING_URL)
         }
-        className="hover:text-primary group pointer-events-auto flex cursor-pointer items-center gap-2 text-xs font-bold tracking-widest text-slate-400 uppercase transition-colors"
+        className="hover:text-primary group pointer-events-auto flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-xs font-bold tracking-widest text-slate-400 uppercase transition-colors"
       >
         <ArrowLeft
           size={20}
@@ -140,7 +148,7 @@ const OnboardingLeft = ({ step, badge, headline, sub, onNext, isLast }) => (
       </p>
       <button
         onClick={onNext}
-        className="bg-primary hover:bg-primary/90 group shadow-primary/20 flex h-13 w-full cursor-pointer items-center justify-center gap-3 rounded-2xl font-bold text-white shadow-lg transition-all duration-300 md:h-14"
+        className="bg-primary hover:bg-primary/90 group shadow-primary/20 rounded-tile flex h-13 w-full cursor-pointer items-center justify-center gap-3 font-bold text-white shadow-lg transition-colors duration-200 active:scale-[0.98] md:h-14"
       >
         <span className="font-display text-base tracking-tight md:text-lg">
           {isLast ? "Connect GitHub" : "Next"}
@@ -160,7 +168,7 @@ const OnboardingLeft = ({ step, badge, headline, sub, onNext, isLast }) => (
 const ReplayBtn = ({ onClick, running, idleLabel = "Run again" }) => (
   <button
     onClick={onClick}
-    className="flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-slate-200 py-2.5 text-xs font-bold text-slate-400 transition hover:border-slate-300 hover:text-slate-600"
+    className="rounded-control flex w-full cursor-pointer items-center justify-center gap-1.5 border border-slate-200 py-2.5 text-xs font-bold text-slate-500 transition hover:border-slate-300 hover:text-slate-700 active:scale-[0.98]"
   >
     {running ? (
       <>

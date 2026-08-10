@@ -10,15 +10,27 @@
   --color-primary: #1d4ed8;
   --color-secondary: #3b82f6;
   --color-ring: #3b82f6;
+
+  /* ── Elevation scale ───────────────────────────────────────────────────────
+     Three steps, not seven one-off box-shadows. Bigger surfaces read as
+     thicker: a deeper, softer shadow. Use shadow-card on grid cards,
+     shadow-raised on floating chrome, shadow-overlay on modals/hero frames. */
+  --shadow-card:
+    0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px -20px rgba(15, 23, 42, 0.28);
+  --shadow-raised:
+    0 1px 2px rgba(15, 23, 42, 0.05), 0 18px 44px -24px rgba(15, 23, 42, 0.32);
+  --shadow-overlay:
+    0 2px 6px rgba(15, 23, 42, 0.06), 0 32px 72px -32px rgba(15, 23, 42, 0.4);
 }
 
 /* Map background/foreground to the root CSS vars (separate block) */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  /* Body/UI font. Headings opt into Space Grotesk explicitly. */
+  /* Body/UI font. Headings opt into Space Grotesk via `font-display`. */
   --font-sans: var(--font-inter-display), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-space-grotesk), sans-serif;
+  --font-display:
+    var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
@@ -31,19 +43,47 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Inter Display runs wide; pull the default tracking in so body copy reads
-     tight and premium rather than airy. Explicit tracking-* utilities still win. */
-  letter-spacing: -0.025em;
+  /* Tracking is size-specific (see the heading rules below): body copy sits
+     close to 0 so small text stays legible, and only large display type gets
+     pulled tight. Explicit tracking-* utilities still win. */
+  letter-spacing: -0.011em;
+}
+
+/* Optical sizing: large type reads too loose as it grows, small type too tight.
+   These are defaults — any explicit `tracking-*` utility still overrides them. */
+h1,
+h2 {
+  letter-spacing: -0.032em;
+  line-height: 1.08;
+}
+
+h3,
+h4 {
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+/* Uppercase eyebrow/label text needs positive tracking to stay readable. */
+.font-mono {
+  letter-spacing: 0;
 }
 
 html {
-  scroll-behavior: smooth;
   overflow-x: hidden;
 }
 
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* One visible focus treatment for the whole site. Keyboard users get a ring on
+   every interactive element instead of the near-invisible UA outline over a
+   gradient button. */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* Landing gradient utilities */
@@ -112,4 +152,39 @@ html {
 
 .animate-pulse-slow {
   animation: pulse-slow-anim 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Smooth scrolling is motion too — only offer it when motion is welcome. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Reduced motion doesn't mean no feedback — it means no vestibular motion.
+   Looping drifts and pulses stop; instant color/opacity feedback stays. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-slow,
+  .animate-float-slow-delayed,
+  .animate-pulse-slow {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Translucent chrome becomes frosted-solid rather than see-through. */
+@media (prefers-reduced-transparency: reduce) {
+  .backdrop-blur-sm,
+  .backdrop-blur-md {
+    backdrop-filter: none;
+    background-color: #ffffff;
+  }
 }

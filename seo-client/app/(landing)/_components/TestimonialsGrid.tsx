@@ -19,7 +19,7 @@ export default function TestimonialsGrid({ testimonials }: TestimonialsGridProps
   const [activeIndex, setActiveIndex] = useState(-1);
 
   return (
-    <div className="mx-auto mt-12 grid max-w-300 grid-cols-1 items-end gap-10 sm:grid-cols-2 md:grid-cols-3">
+    <div className="mx-auto mt-16 grid grid-cols-1 items-end gap-10 sm:grid-cols-2 md:grid-cols-3">
       {testimonials.map((testimonial, index) => (
         <div
           key={index}
@@ -66,7 +66,7 @@ export default function TestimonialsGrid({ testimonials }: TestimonialsGridProps
               />
             </div>
             <div className="flex flex-col">
-              <h3 className="text-md font-semibold text-shadow-2xs">
+              <h3 className="text-base font-semibold text-slate-900">
                 {testimonial.name}
               </h3>
               <p className="text-sm text-gray-500">{testimonial.designation}</p>

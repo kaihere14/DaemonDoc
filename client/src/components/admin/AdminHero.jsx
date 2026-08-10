@@ -8,7 +8,7 @@ const AdminHero = () => {
       animate={{ opacity: 1, y: 0 }}
       className="mb-10"
     >
-      <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/85 p-6 shadow-[0_20px_60px_-34px_rgba(15,23,42,0.32)] backdrop-blur-sm sm:rounded-[2.5rem] sm:p-8">
+      <div className="rounded-panel-lg shadow-raised sm:rounded-panel-lg overflow-hidden border border-slate-200 bg-white/85 p-6 backdrop-blur-sm sm:p-8">
         <div className="flex flex-col gap-4">
           <div>
             <div className="mb-3 flex items-center gap-2">

@@ -73,7 +73,7 @@ const AdminUsersSection = ({ sectionNumber = "03" }) => {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/90 p-6 shadow-[0_20px_60px_-34px_rgba(15,23,42,0.32)] sm:p-8"
+        className="rounded-panel-lg shadow-raised overflow-hidden border border-slate-200 bg-white/90 p-6 sm:p-8"
       >
         <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-blue-100 bg-blue-50 text-blue-600">
           <Users size={28} strokeWidth={1.5} />
@@ -101,7 +101,7 @@ const AdminUsersSection = ({ sectionNumber = "03" }) => {
               placeholder="Search by username or email…"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full rounded-[1.1rem] border border-slate-200 bg-slate-50 py-2.5 pr-4 pl-9 text-sm text-slate-800 placeholder-slate-400 transition outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
+              className="rounded-action w-full border border-slate-200 bg-slate-50 py-2.5 pr-4 pl-9 text-sm text-slate-800 placeholder-slate-400 transition outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100"
             />
           </div>
         </div>
@@ -115,7 +115,7 @@ const AdminUsersSection = ({ sectionNumber = "03" }) => {
             Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between gap-3 rounded-[1.35rem] border border-slate-200 bg-slate-50/70 px-5 py-3.5"
+                className="rounded-tile flex items-center justify-between gap-3 border border-slate-200 bg-slate-50/70 px-5 py-3.5"
               >
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="h-9 w-9 shrink-0 animate-pulse rounded-xl bg-slate-200" />
@@ -126,7 +126,7 @@ const AdminUsersSection = ({ sectionNumber = "03" }) => {
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
                   <div className="h-5 w-10 animate-pulse rounded-full bg-slate-200" />
-                  <div className="h-7 w-16 animate-pulse rounded-[0.9rem] bg-slate-100" />
+                  <div className="rounded-control h-7 w-16 animate-pulse bg-slate-100" />
                 </div>
               </div>
             ))
@@ -138,7 +138,7 @@ const AdminUsersSection = ({ sectionNumber = "03" }) => {
             users.map((u) => (
               <div
                 key={u._id}
-                className="flex items-center justify-between gap-3 rounded-[1.35rem] border border-slate-200 bg-slate-50/70 px-5 py-3.5"
+                className="rounded-tile flex items-center justify-between gap-3 border border-slate-200 bg-slate-50/70 px-5 py-3.5"
               >
                 <div className="flex min-w-0 items-center gap-3">
                   {u.avatarUrl ? (
@@ -170,7 +170,7 @@ const AdminUsersSection = ({ sectionNumber = "03" }) => {
                       Admin
                     </span>
                   )}
-                  <span className="inline-flex items-center gap-1.5 rounded-[0.9rem] border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600">
+                  <span className="rounded-control inline-flex items-center gap-1.5 border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-600">
                     <GitBranch size={13} className="text-slate-400" />
                     {u.activeRepoCount}
                     <span className="hidden sm:inline">
@@ -194,7 +194,7 @@ const AdminUsersSection = ({ sectionNumber = "03" }) => {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1 || usersLoading}
-                className="rounded-[0.9rem] border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40"
+                className="rounded-control border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40"
               >
                 ← Prev
               </button>
@@ -220,9 +220,9 @@ const AdminUsersSection = ({ sectionNumber = "03" }) => {
                       key={item}
                       onClick={() => setPage(item)}
                       disabled={usersLoading}
-                      className={`rounded-[0.9rem] px-3 py-1.5 text-xs font-bold transition-colors ${
+                      className={`rounded-control px-3 py-1.5 text-xs font-bold transition-colors ${
                         item === page
-                          ? "bg-[#1d4ed8] text-white shadow-sm shadow-blue-500/20"
+                          ? "bg-primary text-white shadow-sm shadow-blue-500/20"
                           : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
                       }`}
                     >
@@ -233,7 +233,7 @@ const AdminUsersSection = ({ sectionNumber = "03" }) => {
               <button
                 onClick={() => setPage((p) => Math.min(meta.pages, p + 1))}
                 disabled={page >= meta.pages || usersLoading}
-                className="rounded-[0.9rem] border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40"
+                className="rounded-control border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40"
               >
                 Next →
               </button>

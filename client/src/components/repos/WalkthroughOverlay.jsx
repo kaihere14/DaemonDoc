@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { X, CheckCircle2, ChevronRight, Info, Zap } from "lucide-react";
+import { useDialog } from "../../hooks/useDialog";
 
 // Step 0: non-blocking guide banner shown above the repo grid on /home
 export const WalkthroughBanner = ({ onSkip }) => (
@@ -28,7 +29,7 @@ export const WalkthroughBanner = ({ onSkip }) => (
       <button
         onClick={onSkip}
         aria-label="Skip walkthrough"
-        className="shrink-0 rounded-lg p-1 text-blue-400 transition-colors hover:bg-blue-100 hover:text-blue-600"
+        className="shrink-0 cursor-pointer rounded-lg p-1 text-blue-400 transition-colors hover:bg-blue-100 hover:text-blue-600"
       >
         <X size={16} />
       </button>
@@ -39,6 +40,7 @@ export const WalkthroughBanner = ({ onSkip }) => (
 // Step 1: modal shown after the first repo is successfully enabled
 export const WalkthroughModal = ({ open, onGoToLogs, onSkip }) => {
   const navigate = useNavigate();
+  useDialog(open, onSkip);
 
   const handleGoToLogs = () => {
     onGoToLogs();
@@ -68,12 +70,15 @@ export const WalkthroughModal = ({ open, onGoToLogs, onSkip }) => {
             onClick={onSkip}
           >
             <div
-              className="relative w-full max-w-md overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8 shadow-[0_20px_60px_-34px_rgba(15,23,42,0.36)]"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="walkthrough-title"
+              className="rounded-panel-lg shadow-overlay relative w-full max-w-md overflow-hidden border border-slate-200 bg-white p-8"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={onSkip}
-                className="absolute top-4 right-4 rounded-xl p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                className="rounded-control absolute top-4 right-4 cursor-pointer p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
                 aria-label="Close"
               >
                 <X size={18} />
@@ -86,7 +91,10 @@ export const WalkthroughModal = ({ open, onGoToLogs, onSkip }) => {
               <p className="mb-1 font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
                 Repo Enabled
               </p>
-              <h2 className="mb-3 text-xl font-black tracking-tight text-slate-900 uppercase">
+              <h2
+                id="walkthrough-title"
+                className="mb-3 text-xl font-black tracking-tight text-slate-900 uppercase"
+              >
                 Your first README is being generated!
               </h2>
               <p className="mb-7 text-sm leading-relaxed text-slate-500">
@@ -101,14 +109,14 @@ export const WalkthroughModal = ({ open, onGoToLogs, onSkip }) => {
               <div className="flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={handleGoToLogs}
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-[1.1rem] bg-[#1d4ed8] px-5 py-3 text-sm font-bold tracking-[0.14em] text-white uppercase shadow-lg shadow-blue-500/20 transition-all hover:bg-[#1e40af]"
+                  className="rounded-action bg-primary inline-flex flex-1 cursor-pointer items-center justify-center gap-2 px-5 py-3 text-sm font-bold tracking-[0.14em] text-white uppercase shadow-lg shadow-blue-500/20 transition-colors hover:bg-blue-800 active:scale-[0.98]"
                 >
                   Go to Logs
                   <ChevronRight size={16} />
                 </button>
                 <button
                   onClick={onSkip}
-                  className="flex-1 rounded-[1.1rem] border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-bold text-slate-600 transition-all hover:bg-slate-100"
+                  className="rounded-action flex-1 cursor-pointer border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-bold text-slate-600 transition-colors hover:bg-slate-100 active:scale-[0.98]"
                 >
                   Maybe later
                 </button>
@@ -142,7 +150,7 @@ export const WalkthroughLogsBanner = ({ onDismiss }) => (
       <button
         onClick={onDismiss}
         aria-label="Dismiss"
-        className="shrink-0 rounded-lg p-1 text-sky-400 transition-colors hover:bg-sky-100 hover:text-sky-600"
+        className="shrink-0 cursor-pointer rounded-lg p-1 text-sky-400 transition-colors hover:bg-sky-100 hover:text-sky-600"
       >
         <X size={16} />
       </button>

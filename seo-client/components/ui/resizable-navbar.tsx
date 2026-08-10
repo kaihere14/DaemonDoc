@@ -72,7 +72,7 @@ interface MobileNavMenuProps {
 }
 
 export const Navbar = ({ children, className }: NavbarProps) => {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLElement>(null);
   // Page scroll only — passing a `target` makes framer re-measure this element on
   // every scroll event, which is wasted work for a position:fixed navbar.
   const { scrollY } = useScroll();
@@ -84,8 +84,9 @@ export const Navbar = ({ children, className }: NavbarProps) => {
   });
 
   return (
-    <motion.div
+    <motion.nav
       ref={ref}
+      aria-label="Main"
       // Own compositing layer, so scrolling the page doesn't repaint the bar.
       style={{ willChange: "transform", transform: "translateZ(0)" }}
       className={cn("sticky inset-x-0 top-20 z-40 w-full", className)}
@@ -98,7 +99,7 @@ export const Navbar = ({ children, className }: NavbarProps) => {
             )
           : child,
       )}
-    </motion.div>
+    </motion.nav>
   );
 };
 
@@ -138,7 +139,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
         <a
           onMouseEnter={() => setHovered(idx)}
           onClick={onItemClick}
-          className="hover:text-primary relative px-4 py-2 text-slate-600 transition-colors"
+          className="hover:text-primary relative rounded-full px-4 py-2 text-slate-600 transition-colors"
           key={`link-${idx}`}
           href={item.link}
         >
@@ -202,19 +203,29 @@ export const MobileNavMenu = ({
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+
+    // An open sheet owns the viewport: let the page scroll under it and the
+    // menu drifts away from the toggle that opened it.
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
   }, [isOpen, onClose]);
 
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
+          id="mobile-nav-menu"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
           className={cn(
-            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-4 rounded-lg bg-white px-4 py-8 shadow-[0_4px_24px_rgba(34,42,53,0.12)]",
+            "absolute inset-x-0 top-16 z-50 flex w-full flex-col items-start justify-start gap-2 rounded-2xl bg-white px-4 py-6 shadow-[var(--shadow-overlay)]",
             className,
           )}
         >
@@ -236,9 +247,10 @@ export const MobileNavToggle = ({
     <button
       type="button"
       onClick={onClick}
-      aria-label="Toggle menu"
+      aria-label={isOpen ? "Close menu" : "Open menu"}
       aria-expanded={isOpen}
-      className="cursor-pointer p-2 text-slate-600 hover:text-slate-900"
+      aria-controls="mobile-nav-menu"
+      className="cursor-pointer rounded-lg p-2 text-slate-600 transition-colors hover:text-slate-900 active:bg-slate-100"
     >
       {isOpen ? <X size={22} /> : <Menu size={22} />}
     </button>
@@ -249,7 +261,8 @@ export const NavbarLogo = () => {
   return (
     <a
       href="#"
-      className="relative z-20 mr-4 flex shrink-0 transform-gpu items-center px-2 py-1 text-sm font-normal text-black"
+      aria-label="DaemonDoc home"
+      className="relative z-20 mr-4 flex shrink-0 transform-gpu items-center rounded-lg px-2 py-1 text-sm font-normal text-black"
     >
       <Image
         src="/DaemonLogo-nav.png"

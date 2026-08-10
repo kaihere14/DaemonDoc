@@ -24,12 +24,12 @@ const REPOS_PER_PAGE = 12;
 const REPO_SKELETON_COUNT = 6;
 
 const PAGINATION_NAV_BTN =
-  "inline-flex h-8 shrink-0 items-center cursor-pointer justify-center whitespace-nowrap rounded-[0.9rem] border border-slate-200 bg-slate-50 px-2.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40 sm:px-3";
+  "inline-flex h-8 shrink-0 items-center cursor-pointer justify-center whitespace-nowrap rounded-control border border-slate-200 bg-slate-50 px-2.5 text-xs font-bold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-40 sm:px-3";
 
 const paginationPageBtnClass = (active) =>
-  `inline-flex h-8 min-w-8 shrink-0 items-center cursor-pointer justify-center whitespace-nowrap rounded-[0.9rem] px-2 text-xs font-bold transition-colors sm:px-2.5 ${
+  `inline-flex h-8 min-w-8 shrink-0 items-center cursor-pointer justify-center whitespace-nowrap rounded-control px-2 text-xs font-bold transition-colors sm:px-2.5 ${
     active
-      ? "bg-[#1d4ed8] text-white shadow-sm shadow-blue-500/20"
+      ? "bg-primary text-white shadow-sm shadow-blue-500/20"
       : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
   }`;
 
@@ -157,13 +157,13 @@ const Home = () => {
         open={showCleanupIntro}
         onDismiss={dismissCleanupIntro}
       />
-      <div className="min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-indigo-100">
+      <div className="relative min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-indigo-100">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute top-24 left-[-8rem] h-72 w-72 rounded-full bg-blue-100/60 blur-3xl" />
           <div className="absolute top-52 right-[-6rem] h-80 w-80 rounded-full bg-sky-100/40 blur-3xl" />
         </div>
 
-        <div className="relative px-4 pt-22 pb-14 sm:px-6 sm:pt-24 sm:pb-16">
+        <div className="relative px-4 pt-24 pb-16 sm:px-6 sm:pt-32 sm:pb-20">
           <div className="mx-auto max-w-7xl">
             {/* Header Section */}
             <motion.div
@@ -188,7 +188,7 @@ const Home = () => {
                     repositories
                   </p>
                 </div>
-                <div className="w-full rounded-[1.5rem] border border-slate-200 bg-white/80 p-2 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.35)] backdrop-blur-sm sm:w-auto sm:rounded-[1.75rem]">
+                <div className="rounded-panel shadow-raised sm:rounded-panel-lg w-full border border-slate-200 bg-white/80 p-2 backdrop-blur-sm sm:w-auto">
                   <motion.button
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
@@ -197,7 +197,7 @@ const Home = () => {
                       fetchRepos();
                     }}
                     disabled={loading}
-                    className="flex w-full items-center justify-center gap-2 rounded-[1rem] bg-[#1d4ed8] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-[#1e40af] disabled:opacity-50 sm:w-auto sm:rounded-[1.1rem] sm:px-5"
+                    className="rounded-action bg-primary sm:rounded-action flex w-full items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-800 disabled:opacity-50 sm:w-auto sm:px-5"
                   >
                     <RefreshCw
                       size={16}
@@ -210,7 +210,7 @@ const Home = () => {
 
               {/* Stats Bar */}
               <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
-                <div className="rounded-[1.5rem] border border-slate-200/60 bg-white/90 p-4 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.28)] sm:rounded-[2rem] sm:p-5">
+                <div className="rounded-panel shadow-panel sm:rounded-panel-lg border border-slate-200/60 bg-white/90 p-4 sm:p-5">
                   <p className="mb-1 font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
                     Total
                   </p>
@@ -218,7 +218,7 @@ const Home = () => {
                     {repos.length}
                   </p>
                 </div>
-                <div className="rounded-[1.5rem] border border-blue-100 bg-blue-50/80 p-4 shadow-[0_16px_40px_-28px_rgba(29,78,216,0.22)] sm:rounded-[2rem] sm:p-5">
+                <div className="rounded-panel sm:rounded-panel-lg border border-blue-100 bg-blue-50/80 p-4 shadow-[0_16px_40px_-28px_rgba(29,78,216,0.22)] sm:p-5">
                   <p className="mb-1 font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
                     Active
                   </p>
@@ -226,7 +226,7 @@ const Home = () => {
                     {activeCount}
                   </p>
                 </div>
-                <div className="rounded-[1.5rem] border border-slate-200/60 bg-slate-50/80 p-4 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.22)] sm:rounded-[2rem] sm:p-5">
+                <div className="rounded-panel shadow-panel sm:rounded-panel-lg border border-slate-200/60 bg-slate-50/80 p-4 sm:p-5">
                   <p className="mb-1 font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
                     Inactive
                   </p>
@@ -234,7 +234,7 @@ const Home = () => {
                     {repos.length - activeCount}
                   </p>
                 </div>
-                <div className="rounded-[1.5rem] border border-sky-100 bg-sky-50/80 p-4 shadow-[0_16px_40px_-28px_rgba(14,165,233,0.2)] sm:rounded-[2rem] sm:p-5">
+                <div className="rounded-panel sm:rounded-panel-lg border border-sky-100 bg-sky-50/80 p-4 shadow-[0_16px_40px_-28px_rgba(14,165,233,0.2)] sm:p-5">
                   <p className="mb-1 font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
                     Private
                   </p>
@@ -250,10 +250,10 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
-              className="mb-8 flex flex-col gap-4 rounded-[1.5rem] border border-slate-200 bg-white/75 p-3 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.3)] backdrop-blur-sm sm:flex-row sm:items-center sm:rounded-[2rem] sm:p-4"
+              className="rounded-panel shadow-raised sm:rounded-panel-lg mb-8 flex flex-col gap-4 border border-slate-200 bg-white/75 p-3 backdrop-blur-sm sm:flex-row sm:items-center sm:p-4"
             >
               {/* Filter Tabs */}
-              <div className="-mx-1 flex items-center gap-2 overflow-x-auto rounded-2xl border border-slate-200 bg-slate-50/80 p-1.5">
+              <div className="rounded-tile flex items-center gap-2 overflow-x-auto border border-slate-200 bg-slate-50/80 p-1.5">
                 {FILTER_TABS.map((tab) => (
                   <button
                     key={tab.key}
@@ -261,9 +261,9 @@ const Home = () => {
                       setFilter(tab.key);
                       setReposPage(1);
                     }}
-                    className={`shrink-0 rounded-xl px-3 py-2.5 text-sm font-bold transition-all sm:px-4 ${
+                    className={`rounded-control shrink-0 cursor-pointer px-3 py-2.5 text-sm font-bold transition-colors sm:px-4 ${
                       filter === tab.key
-                        ? "bg-[#1d4ed8] text-white shadow-lg shadow-blue-500/20"
+                        ? "bg-primary text-white shadow-lg shadow-blue-500/20"
                         : "text-slate-600 hover:text-slate-900"
                     }`}
                   >
@@ -285,7 +285,7 @@ const Home = () => {
                     setReposPage(1);
                   }}
                   placeholder="Search repositories..."
-                  className="w-full rounded-2xl border border-slate-200 bg-white py-3 pr-10 pl-10 text-sm text-slate-900 placeholder-slate-400 shadow-sm transition-all focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="rounded-tile w-full border border-slate-200 bg-white py-3 pr-10 pl-10 text-sm text-slate-900 placeholder-slate-400 shadow-sm transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 focus:outline-none"
                 />
                 {searchQuery && (
                   <button
@@ -293,7 +293,8 @@ const Home = () => {
                       setSearchQuery("");
                       setReposPage(1);
                     }}
-                    className="absolute inset-y-0 right-0 flex items-center rounded-r-xl pr-3 transition-colors hover:bg-slate-50"
+                    aria-label="Clear search"
+                    className="rounded-r-tile absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 transition-colors hover:bg-slate-50"
                   >
                     <X
                       size={18}
@@ -324,7 +325,7 @@ const Home = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-[2rem] border border-rose-200 bg-white p-8 text-center shadow-[0_16px_40px_-30px_rgba(244,63,94,0.35)]"
+                className="rounded-panel-lg border border-rose-200 bg-white p-8 text-center shadow-[0_16px_40px_-30px_rgba(244,63,94,0.35)]"
               >
                 <AlertCircle size={48} className="mx-auto mb-4 text-rose-500" />
                 <h3 className="mb-2 text-lg font-semibold text-rose-900">
@@ -333,7 +334,7 @@ const Home = () => {
                 <p className="mb-4 text-rose-700">{error}</p>
                 <button
                   onClick={fetchRepos}
-                  className="rounded-full bg-[#1d4ed8] px-6 py-3 font-semibold text-white transition-all hover:bg-[#1e40af]"
+                  className="bg-primary cursor-pointer rounded-full px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-800"
                 >
                   Try Again
                 </button>
@@ -446,7 +447,7 @@ const Home = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-[2rem] border border-dashed border-slate-300 bg-white/90 p-12 text-center shadow-[0_16px_40px_-28px_rgba(15,23,42,0.25)]"
+                className="rounded-panel-lg shadow-panel border border-dashed border-slate-300 bg-white/90 p-12 text-center"
               >
                 <Github size={64} className="mx-auto mb-4 text-blue-300" />
                 <h3 className="mb-2 text-xl font-black tracking-tight text-slate-900 uppercase">

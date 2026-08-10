@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { SECTION_X } from "@/app/(landing)/_lib/section";
 
 const PRODUCT_LINKS = [
   { label: "Solutions", href: "#features" },
@@ -10,23 +11,27 @@ const LEGAL_LINKS = [
   { label: "Terms of Service", href: "#" },
 ];
 
+const FOOTER_LINK =
+  "hover:text-primary rounded text-sm text-slate-600 transition-colors";
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative border-t border-slate-100 bg-linear-to-b from-white via-slate-50/50 to-white pt-24 pb-12">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-12 pb-16 md:grid-cols-12 lg:gap-16">
-          <div className="relative flex flex-col gap-6 md:col-span-8">
-            <div className="absolute top-0 -left-9 flex items-center gap-2 sm:-left-14">
-              <Image
-                src="/DaemonLogo.png"
-                alt="DaemonDoc"
-                width={240}
-                height={60}
-                className="w-48 sm:w-60"
-              />
-            </div>
+    <footer className="relative border-t border-slate-100 bg-linear-to-b from-white via-slate-50/50 to-white pt-14 pb-12 lg:pt-20">
+      <div className={SECTION_X}>
+        <div className="grid grid-cols-1 gap-12 pb-14 md:grid-cols-12 lg:gap-16">
+          <div className="flex flex-col gap-4 md:col-span-8">
+            {/* The cropped nav asset, not DaemonLogo.png — that one is a
+                1536x1024 canvas that is mostly transparent padding, which is
+                what forced the negative offsets and scale hacks here. */}
+            <Image
+              src="/DaemonLogo-nav.png"
+              alt="DaemonDoc"
+              width={406}
+              height={120}
+              className="h-10 w-auto self-start"
+            />
             <p className="max-w-xs text-sm leading-relaxed font-light text-slate-600">
               The automation layer for your codebase documentation.
             </p>
@@ -40,10 +45,7 @@ export default function Footer() {
               <ul className="space-y-4">
                 {PRODUCT_LINKS.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-primary hover:text-primary text-sm text-slate-600 transition-colors"
-                    >
+                    <a href={link.href} className={FOOTER_LINK}>
                       {link.label}
                     </a>
                   </li>
@@ -57,10 +59,7 @@ export default function Footer() {
               <ul className="space-y-4">
                 {LEGAL_LINKS.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="hover:text-primary text-sm text-slate-600 transition-colors"
-                    >
+                    <a href={link.href} className={FOOTER_LINK}>
                       {link.label}
                     </a>
                   </li>
@@ -80,7 +79,9 @@ export default function Footer() {
           <div className="flex items-center gap-6">
             <a
               href="https://x.com/armankiyotaka"
-              className="text-slate-400 transition-colors hover:text-slate-900"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded text-slate-400 transition-colors hover:text-slate-900"
               aria-label="X (Twitter)"
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -91,7 +92,7 @@ export default function Footer() {
               href="https://github.com/kaihere14/daemondoc"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-slate-400 transition-colors hover:text-slate-900"
+              className="rounded text-slate-400 transition-colors hover:text-slate-900"
               aria-label="GitHub"
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">

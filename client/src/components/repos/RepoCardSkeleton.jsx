@@ -1,7 +1,7 @@
 import React from "react";
 
 const RepoCardSkeleton = () => (
-  <div className="flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-slate-200/80 bg-white/90 p-4 shadow-[0_8px_30px_-18px_rgba(15,23,42,0.25)] backdrop-blur-xl sm:rounded-[2rem] sm:p-6">
+  <div className="rounded-panel shadow-card sm:rounded-panel-lg flex h-full flex-col overflow-hidden border border-slate-200/80 bg-white/90 p-4 backdrop-blur-xl sm:p-6">
     <div className="flex flex-col gap-3 sm:gap-4">
       <div className="flex items-start justify-between gap-3 sm:gap-4">
         <div className="flex min-w-0 flex-1 items-start gap-2.5 sm:gap-3">

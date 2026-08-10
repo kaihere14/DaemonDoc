@@ -18,7 +18,7 @@ const AdminBroadcastSection = ({ onOpenComposer, sectionNumber = "02" }) => {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/90 p-6 shadow-[0_20px_60px_-34px_rgba(15,23,42,0.32)] sm:p-8"
+        className="rounded-panel-lg shadow-raised overflow-hidden border border-slate-200 bg-white/90 p-6 sm:p-8"
       >
         <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
@@ -46,7 +46,7 @@ const AdminBroadcastSection = ({ onOpenComposer, sectionNumber = "02" }) => {
             ].map((line) => (
               <div
                 key={line}
-                className="rounded-[1.35rem] border border-slate-200 bg-slate-50/70 px-4 py-4 text-sm font-semibold text-slate-700"
+                className="rounded-tile border border-slate-200 bg-slate-50/70 px-4 py-4 text-sm font-semibold text-slate-700"
               >
                 {line}
               </div>
@@ -61,7 +61,7 @@ const AdminBroadcastSection = ({ onOpenComposer, sectionNumber = "02" }) => {
           </p>
           <button
             onClick={onOpenComposer}
-            className="inline-flex items-center justify-center gap-2 rounded-[1.1rem] bg-[#1d4ed8] px-5 py-3 text-sm font-bold tracking-[0.16em] text-white uppercase shadow-lg shadow-blue-500/20 transition-all hover:bg-[#1e40af]"
+            className="rounded-action bg-primary inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold tracking-[0.16em] text-white uppercase shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-800"
           >
             Open Composer
             <ChevronRight size={18} />

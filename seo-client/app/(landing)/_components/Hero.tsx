@@ -3,12 +3,13 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { Play, ArrowRight, Lock } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Unplug } from "@/app/(landing)/_animate-ui/icons/unplug";
 import { Activity } from "@/app/(landing)/_animate-ui/icons/activity";
 import { ClipboardCheck } from "@/app/(landing)/_animate-ui/icons/clipboard-check";
 import { AnimateIcon } from "@/app/(landing)/_animate-ui/icons/icon";
 import { CandyLink } from "@/components/ui/candy-button";
+import { SECTION_X } from "@/app/(landing)/_lib/section";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daemondoc.online";
 
@@ -87,6 +88,7 @@ const STEPS = [
 export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   const handleMouseEnter = () => {
     if (videoRef.current) {
@@ -113,9 +115,16 @@ export default function Hero() {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
   return (
     <main
-      className="relative overflow-hidden pt-36 pb-20 lg:pt-50 lg:pb-24"
+      className="relative overflow-hidden pt-32 pb-14 lg:pt-44 lg:pb-20"
       id="hero"
     >
       {/* SVG Grid Background */}
@@ -142,7 +151,7 @@ export default function Hero() {
 
       <div className="pointer-events-none absolute inset-0 z-0 bg-linear-to-b from-transparent via-cyan-50/30 to-white" />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+      <div className={`relative z-10 text-center ${SECTION_X}`}>
         {/* Floating tech icon chips */}
         {FLOATING_ICONS.map((icon) => (
           <div
@@ -150,21 +159,27 @@ export default function Hero() {
             className={`absolute hidden lg:block ${icon.pos} ${icon.anim}`}
           >
             <div
-              className={`flex h-8 w-8 items-center justify-center rounded-md shadow-lg shadow-slate-200/40 ${icon.rotate}`}
+              className={`flex h-9 w-9 items-center justify-center rounded-lg shadow-lg shadow-slate-200/40 ${icon.rotate}`}
               style={{ background: icon.bg }}
             >
+              {/* Purely decorative: the language set is conveyed by the copy, so
+                  these stay out of the accessibility tree. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={icon.logo} alt={icon.id} className="h-8 w-8" />
+              <img
+                src={icon.logo}
+                alt=""
+                aria-hidden="true"
+                width={20}
+                height={20}
+                className="h-5 w-5"
+              />
             </div>
           </div>
         ))}
 
         {/* Headline + CTAs */}
         <div className="mx-auto max-w-4xl space-y-8">
-          <h1
-            className="overflow-visible text-3xl leading-tight font-bold tracking-tight text-slate-900 sm:text-5xl md:text-6xl lg:text-7xl"
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-          >
+          <h1 className="font-display overflow-visible text-4xl leading-[1.06] font-bold tracking-[-0.038em] text-slate-900 sm:text-5xl md:text-6xl lg:text-7xl">
             Where your code turns into{" "}
             <span className="text-primary relative mx-1 inline-block transform-[perspective(800px)_rotateY(15deg)_rotateX(5deg)] rounded-t-lg border border-blue-100 bg-blue-50/50 px-2 leading-tight font-extrabold whitespace-nowrap shadow-sm drop-shadow-2xl text-shadow-md sm:mr-0 sm:ml-5">
               documentation
@@ -179,16 +194,24 @@ export default function Hero() {
                   strokeWidth="4"
                   fill="none"
                   strokeLinecap="round"
-                  initial={{ pathLength: 0, opacity: 0 }}
+                  initial={
+                    reduceMotion
+                      ? { pathLength: 1, opacity: 1 }
+                      : { pathLength: 0, opacity: 0 }
+                  }
                   animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
+                  transition={
+                    reduceMotion
+                      ? { duration: 0 }
+                      : { duration: 1.5, delay: 0.5, ease: "easeOut" }
+                  }
                 />
               </svg>
             </span>{" "}
             with a click
           </h1>
 
-          <p className="mx-auto max-w-2xl text-xl leading-relaxed font-light tracking-[-0.045em] text-slate-600 md:text-2xl">
+          <p className="mx-auto max-w-2xl text-lg leading-relaxed font-light tracking-[-0.012em] text-slate-600 sm:text-xl md:text-2xl">
             Connect once. We handle the rest. Your README updates automatically
             with every git push.
           </p>
@@ -204,7 +227,7 @@ export default function Hero() {
 
             <a
               href="#features"
-              className="flex items-center justify-center gap-1 rounded-xl px-9 py-3 font-medium text-slate-600 transition duration-300 hover:bg-neutral-300/30"
+              className="flex items-center justify-center gap-1 rounded-xl px-9 py-3 font-medium text-slate-600 transition duration-200 hover:bg-slate-200/50 active:scale-[0.98]"
             >
               View Capabilities
               <ArrowRight size={16} />
@@ -213,7 +236,10 @@ export default function Hero() {
         </div>
 
         {/* 3-step flow */}
-        <div className="mx-auto mt-16 mb-8 max-w-4xl px-4">
+        <section aria-labelledby="hero-steps" className="mx-auto mt-16 max-w-4xl">
+          <h2 id="hero-steps" className="sr-only">
+            How DaemonDoc works
+          </h2>
           <div className="relative grid grid-cols-1 gap-8 text-center md:grid-cols-3">
             {/* Connecting SVG Flow (desktop only) */}
             <div className="pointer-events-none absolute top-[28px] left-0 z-0 hidden h-[80px] w-full overflow-visible md:block">
@@ -230,24 +256,26 @@ export default function Hero() {
                   strokeWidth="1.5"
                   strokeDasharray="10 10"
                   className="opacity-40"
-                  animate={{ strokeDashoffset: [0, -20] }}
+                  animate={reduceMotion ? undefined : { strokeDashoffset: [0, -20] }}
                   transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                 />
-                <motion.circle
-                  r="4"
-                  fill="#1d4ed8"
-                  animate={{
-                    cx: [120, 500, 500, 880, 880, 120],
-                    opacity: [0, 1, 1, 1, 0, 0],
-                  }}
-                  transition={{
-                    duration: 8,
-                    repeat: Infinity,
-                    times: [0, 0.1, 0.45, 0.9, 0.95, 1],
-                    ease: "easeInOut",
-                  }}
-                  cy="40"
-                />
+                {!reduceMotion && (
+                  <motion.circle
+                    r="4"
+                    fill="#1d4ed8"
+                    animate={{
+                      cx: [120, 500, 500, 880, 880, 120],
+                      opacity: [0, 1, 1, 1, 0, 0],
+                    }}
+                    transition={{
+                      duration: 8,
+                      repeat: Infinity,
+                      times: [0, 0.1, 0.45, 0.9, 0.95, 1],
+                      ease: "easeInOut",
+                    }}
+                    cy="40"
+                  />
+                )}
               </svg>
             </div>
 
@@ -259,7 +287,7 @@ export default function Hero() {
                   >
                     <step.Icon size={24} />
                   </div>
-                  <h3 className="font-bold text-slate-900">
+                  <h3 className="font-display font-bold text-slate-900">
                     {i + 1}. {step.title}
                   </h3>
                   <p className="mt-1 text-sm text-slate-500">{step.desc}</p>
@@ -267,10 +295,10 @@ export default function Hero() {
               </AnimateIcon>
             ))}
           </div>
-        </div>
+        </section>
 
         {/* README Preview Card */}
-        <div className="relative mx-auto mt-12 max-w-5xl">
+        <div className="relative mx-auto mt-16 max-w-5xl">
           <div className="animate-pulse-slow absolute -inset-1 top-0 right-0 left-0 rounded-2xl bg-linear-to-r from-blue-500 to-sky-500 opacity-20 blur" />
 
           <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl">
@@ -288,11 +316,18 @@ export default function Hero() {
             </div>
 
             {/* Video content */}
+            {/* Reachable by keyboard: this is the only control for the demo
+                video, so it needs a role, a tab stop and Enter/Space. */}
             <div
+              role="button"
+              tabIndex={0}
+              aria-label={isPlaying ? "Pause demo video" : "Play demo video"}
+              aria-pressed={isPlaying}
               className="relative aspect-video w-full cursor-pointer overflow-hidden bg-slate-900"
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
               onClick={handleClick}
+              onKeyDown={handleKeyDown}
             >
               <video
                 ref={videoRef}

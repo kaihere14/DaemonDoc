@@ -172,7 +172,7 @@ const Logs = () => {
         ogUrl={`${APP_ORIGIN}/logs`}
         canonical={`${APP_ORIGIN}/logs`}
       />
-      <div className="min-h-screen bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-sky-100">
+      <div className="relative min-h-screen overflow-x-hidden bg-linear-to-b from-white via-slate-50/70 to-white font-sans text-slate-900 selection:bg-sky-100">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute top-24 left-[-7rem] h-72 w-72 rounded-full bg-blue-100/55 blur-3xl" />
           <div className="absolute top-72 right-[-8rem] h-96 w-96 rounded-full bg-sky-100/45 blur-3xl" />
@@ -182,28 +182,28 @@ const Logs = () => {
           {/* Header */}
           <div className="mb-10 flex flex-col gap-5 md:mb-12 md:flex-row md:items-center md:justify-between md:gap-8">
             <div>
-              <div className="mb-2 flex items-center gap-2">
+              <div className="mb-3 flex items-center gap-2">
                 <div className="h-1 w-8 rounded-full bg-blue-600" />
                 <span className="font-mono text-[10px] font-black tracking-[0.3em] text-slate-400 uppercase">
                   Activity System
                 </span>
               </div>
-              <h1 className="text-3xl font-[1000] tracking-tighter text-slate-900 uppercase sm:text-5xl">
+              <h1 className="mb-3 text-3xl leading-none font-black tracking-tighter text-slate-900 uppercase sm:text-5xl">
                 Event Logs
               </h1>
-              <p className="mt-3 max-w-2xl text-sm font-medium tracking-tight text-slate-500 sm:text-base">
+              <p className="max-w-2xl text-sm font-medium tracking-tight text-slate-500 sm:text-base">
                 Track every automated documentation run with the same clean
                 system language as the landing experience.
               </p>
             </div>
 
-            <div className="w-full rounded-[1.5rem] border border-slate-200 bg-white/80 p-2 shadow-[0_18px_40px_-28px_rgba(15,23,42,0.35)] backdrop-blur-sm sm:w-auto sm:rounded-[1.75rem]">
+            <div className="rounded-panel shadow-raised sm:rounded-panel-lg w-full border border-slate-200 bg-white/80 p-2 backdrop-blur-sm sm:w-auto">
               <button
                 onClick={() => {
                   posthog?.capture("logs_refreshed");
                   fetchLogs(true);
                 }}
-                className="flex w-full items-center justify-center gap-2.5 rounded-[1rem] bg-[#1d4ed8] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-[#1e40af] active:scale-95 sm:w-auto sm:rounded-[1.1rem] sm:px-6"
+                className="rounded-action bg-primary flex w-full cursor-pointer items-center justify-center gap-2.5 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-colors hover:bg-blue-800 active:scale-[0.97] sm:w-auto sm:px-6"
               >
                 <RefreshCw
                   size={16}
@@ -256,7 +256,7 @@ const Logs = () => {
             ].map((stat, i) => (
               <div
                 key={i}
-                className={`rounded-[1.5rem] border border-slate-200/60 p-4 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.28)] sm:rounded-[2rem] sm:p-5 ${stat.bg}`}
+                className={`rounded-panel shadow-panel sm:rounded-panel-lg border border-slate-200/60 p-4 sm:p-5 ${stat.bg}`}
               >
                 <p className="mb-1 font-mono text-[10px] font-black tracking-[0.28em] text-slate-400 uppercase">
                   {stat.label}
@@ -269,7 +269,7 @@ const Logs = () => {
           </div>
 
           {/* Glass Log Container */}
-          <div className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white/85 shadow-[0_20px_50px_-32px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:rounded-[2rem]">
+          <div className="rounded-panel shadow-raised sm:rounded-panel-lg overflow-hidden border border-slate-200 bg-white/85 backdrop-blur-xl">
             <div className="flex items-start gap-3 border-b border-dashed border-slate-200 bg-linear-to-r from-blue-50/70 via-white to-transparent px-4 py-4 sm:items-center sm:px-6">
               <div className="flex size-9 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-500/20 sm:size-10">
                 <History size={18} />
@@ -300,7 +300,7 @@ const Logs = () => {
                   <p className="mb-6 text-sm text-slate-500">{error}</p>
                   <button
                     onClick={() => fetchLogs(true)}
-                    className="rounded-full bg-[#1d4ed8] px-6 py-3 text-sm font-bold text-white transition-all hover:bg-[#1e40af]"
+                    className="bg-primary cursor-pointer rounded-full px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-800"
                   >
                     Retry
                   </button>

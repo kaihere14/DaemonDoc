@@ -366,7 +366,7 @@ const Admin = () => {
                 onClick={() => setActiveTab(tab.key)}
                 className={`shrink-0 rounded-xl px-4 py-2.5 text-sm font-bold transition-all ${
                   activeTab === tab.key
-                    ? "bg-[#1d4ed8] text-white shadow-lg shadow-blue-500/20"
+                    ? "bg-primary text-white shadow-lg shadow-blue-500/20"
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >

@@ -1,5 +1,6 @@
 import SocialProof from "./SocialProof";
 import TestimonialsGrid from "./TestimonialsGrid";
+import { SECTION_X, SECTION_Y } from "@/app/(landing)/_lib/section";
 
 const TESTIMONIALS = [
   {
@@ -48,24 +49,26 @@ const TESTIMONIALS = [
 
 export default function Testimonials() {
   return (
-    <div className="h-full w-full px-4">
-      <div className="mx-auto mb-12 max-w-3xl text-center">
+    <section
+      id="testimonials"
+      aria-labelledby="testimonials-heading"
+      className={`${SECTION_X} ${SECTION_Y}`}
+    >
+      <div className="mx-auto mb-16 max-w-3xl text-center">
         <h2
-          className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl"
-          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+          id="testimonials-heading"
+          className="font-display mb-4 text-3xl font-bold text-slate-900 md:text-4xl"
         >
           Trusted by Developers Who Ship
         </h2>
-        <p className="text-lg font-light tracking-[-0.035em] text-slate-600">
+        <p className="text-lg font-light tracking-[-0.012em] text-slate-600">
           See what engineers and developers are saying about DaemonDoc.
         </p>
       </div>
 
-      <div className="py-5">
-        <SocialProof />
-      </div>
+      <SocialProof />
 
       <TestimonialsGrid testimonials={TESTIMONIALS} />
-    </div>
+    </section>
   );
 }
