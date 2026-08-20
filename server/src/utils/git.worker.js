@@ -106,13 +106,7 @@ new Worker(
 );
 
 // Errors here are swallowed so a logging failure never kills a generation job
-async function updateLogStatus(
-  logId,
-  action,
-  status,
-  commitId = null,
-  sharedLogId = null,
-) {
+async function updateLogStatus(logId, action, status, commitId = null) {
   try {
     const update = {
       action,
