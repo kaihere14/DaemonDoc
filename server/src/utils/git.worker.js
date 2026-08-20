@@ -28,9 +28,7 @@ import {
   validateContext,
 } from "./prompt.builder.js";
 import UserLogModel from "../schema/userLog.schema.js";
-import { makeFunctionReference } from "convex/server";
-import { liveUpdate } from "../controllers/github.controller.js";
-
+import { liveUpdate } from "../services/convex.service.js";
 
 export const connection = new IORedis({
   host: process.env.REDIS_HOST || "localhost",
@@ -139,7 +137,6 @@ async function updateLogStatus(
   } catch (err) {
     console.error("[AI Handler] Failed to update log:", err.message);
   }
-
 }
 
 const aihandler = async (data) => {
