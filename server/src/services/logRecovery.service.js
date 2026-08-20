@@ -1,9 +1,5 @@
-import { makeFunctionReference } from "convex/server";
-import convexClient from "./convex.service.js";
+import { liveUpdate } from "./convex.service.js";
 import UserLogModel from "../schema/userLog.schema.js";
-
-const logsUpdate = makeFunctionReference("logs:updateLog");
-const logsAddMessage = makeFunctionReference("logs:addLogMessage");
 
 export async function recoverInterruptedCleanupLogs() {
   const interruptedLogs = await UserLogModel.find({
@@ -29,14 +25,10 @@ export async function recoverInterruptedCleanupLogs() {
 
   await Promise.allSettled(
     interruptedLogs.flatMap((log) => [
-      convexClient.mutation(logsAddMessage, {
-        logId: log.logId,
-        message: "Cleanup interrupted because the backend restarted",
-      }),
-      convexClient.mutation(logsUpdate, {
-        logId: log.logId,
-        status: "failed",
-      }),
+      liveUpdate(
+        log.logId,
+        "Cleanup interrupted because the backend restarted",
+      ),
     ]),
   );
 

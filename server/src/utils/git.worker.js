@@ -28,24 +28,7 @@ import {
   validateContext,
 } from "./prompt.builder.js";
 import UserLogModel from "../schema/userLog.schema.js";
-import { makeFunctionReference } from "convex/server";
-import convexClient from "../services/convex.service.js";
-
-const logsCreate = makeFunctionReference("logs:createLog");
-const logsUpdate = makeFunctionReference("logs:updateLog");
-const logsAddMessage = makeFunctionReference("logs:addLogMessage");
-
-function liveUpdate(sharedLogId, message) {
-  if (!sharedLogId) return;
-  convexClient
-    .mutation(logsAddMessage, { logId: sharedLogId, message })
-    .catch((err) =>
-      console.warn(
-        "[Worker] Convex log message failed (non-fatal):",
-        err.message,
-      ),
-    );
-}
+import { liveUpdate } from "../services/convex.service.js";
 
 export const connection = new IORedis({
   host: process.env.REDIS_HOST || "localhost",
@@ -113,20 +96,6 @@ new Worker(
     job.data.sharedLogId = sharedLogId;
     console.log("Updated job data with logId:", job.data.logId);
 
-    convexClient
-      .mutation(logsCreate, {
-        logId: sharedLogId,
-        userId: job.data.userId,
-        repoName: job.data.repoName,
-        action: "README_GENERATION_STARTED",
-        status: "ongoing",
-      })
-      .catch((err) =>
-        console.warn(
-          "[Worker] Convex log create failed (non-fatal):",
-          err.message,
-        ),
-      );
     await aihandler(job.data);
   },
   {
@@ -137,13 +106,7 @@ new Worker(
 );
 
 // Errors here are swallowed so a logging failure never kills a generation job
-async function updateLogStatus(
-  logId,
-  action,
-  status,
-  commitId = null,
-  sharedLogId = null,
-) {
+async function updateLogStatus(logId, action, status, commitId = null) {
   try {
     const update = {
       action,
@@ -167,17 +130,6 @@ async function updateLogStatus(
     }
   } catch (err) {
     console.error("[AI Handler] Failed to update log:", err.message);
-  }
-
-  if (sharedLogId) {
-    convexClient
-      .mutation(logsUpdate, { logId: sharedLogId, status })
-      .catch((err) =>
-        console.warn(
-          "[Worker] Convex log status update failed (non-fatal):",
-          err.message,
-        ),
-      );
   }
 }
 
