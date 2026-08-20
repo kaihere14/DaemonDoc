@@ -15,7 +15,12 @@
     "build:seo": "pnpm --filter seo-client build",
     "start:server": "pnpm --filter server start",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "commitlint": "commitlint --edit"
+    "commitlint": "commitlint --edit",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write .",
+    "lint": "pnpm -r --if-present run lint",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "build": "pnpm -r --if-present run build"
   },
   "keywords": [],
   "author": "",
