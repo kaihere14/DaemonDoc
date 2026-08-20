@@ -14,8 +14,7 @@ import { RedisConnection } from "bullmq";
 import { redis } from "../utils/redis.js";
 import { commitFile, getFileContent } from "../services/github.service.js";
 import { cleanReadmeWithAI } from "../services/readmeCleanup.service.js";
-import { makeFunctionReference } from "convex/server";
-import convexClient, { liveUpdate } from "../services/convex.service.js";
+import { liveUpdate } from "../services/convex.service.js";
 
 export function verifyGithubSignature(req) {
   const signature = req.headers["x-hub-signature-256"];
@@ -638,7 +637,6 @@ export const cleanUpReadme = async (req, res) => {
       status: "ongoing",
     });
     await redis.del("admin_analytics");
-
 
     liveUpdate(
       sharedLogId,
