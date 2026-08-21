@@ -1,6 +1,6 @@
 import IORedis from "ioredis";
 import { Queue } from "bullmq";
-import { Worker } from "bullmq";
+import { UnrecoverableError, Worker } from "bullmq";
 import { redis } from "./redis.js";
 import User from "../schema/user.schema.js";
 import ActiveRepo from "../schema/activeRepo.js";
@@ -29,6 +29,7 @@ import {
 } from "./prompt.builder.js";
 import UserLogModel from "../schema/userLog.schema.js";
 import { liveUpdate } from "../services/convex.service.js";
+import { cleanReadmeWithAI } from "../services/readmeCleanup.service.js";
 
 export const connection = new IORedis({
   host: process.env.REDIS_HOST || "localhost",
@@ -658,4 +659,154 @@ function getImportantFiles(tree) {
     });
 
   return categorized.map((item) => item.path);
+}
+
+export const cleanUpQueue = new Queue("cleanup-queue", { connection });
+
+new Worker("cleanup-queue", cleanupHandler, {
+  connection,
+  removeOnComplete: { count: 100 },
+  removeOnFail: { count: 50 },
+});
+
+// A retry reuses the sharedLogId minted by the controller, so upsert the row
+// instead of creating one — a stalled job re-run would otherwise leave a
+// second Mongo row for the same cleanup, and logRecovery would mark the
+// orphan failed while the retry is still running.
+async function startCleanupLog({ sharedLogId, userId, repoName, repoOwner }) {
+  const userLog = await UserLogModel.findOneAndUpdate(
+    { logId: sharedLogId },
+    {
+      logId: sharedLogId,
+      userId,
+      repoName,
+      repoOwner,
+      action: "README_CLEANUP_STARTED",
+      status: "ongoing",
+    },
+    {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true,
+      runValidators: true,
+    },
+  );
+  await redis.del("admin_analytics");
+  return userLog;
+}
+
+async function cleanupHandler(job) {
+  const {
+    userId,
+    repoName,
+    repoOwner,
+    defaultBranch,
+    encryptedAccessToken,
+    sharedLogId,
+  } = job.data;
+
+  const userLog = await startCleanupLog({
+    sharedLogId,
+    userId,
+    repoName,
+    repoOwner,
+  });
+
+  try {
+    const accessToken = decrypt(encryptedAccessToken);
+
+    liveUpdate(
+      sharedLogId,
+      `Starting README cleanup for ${repoOwner}/${repoName}`,
+    );
+    console.log("[cleanUpReadme] Fetching README.md");
+    const readmeFile = await getFileContent(
+      accessToken,
+      repoOwner,
+      repoName,
+      "README.md",
+      defaultBranch,
+    );
+
+    if (!readmeFile?.content?.trim()) {
+      console.log("[cleanUpReadme] README.md not found");
+      // Retrying cannot conjure a README — fail the job outright rather than
+      // burning every attempt plus its backoff on a job that cannot succeed.
+      throw new UnrecoverableError("README.md not found in repository");
+    }
+
+    console.log("[cleanUpReadme] README fetched");
+    liveUpdate(sharedLogId, "Fetched existing README.md");
+    liveUpdate(sharedLogId, "Cleaning README content with AI");
+    console.log("[cleanUpReadme] Running AI cleanup");
+    const cleanedReadme = await cleanReadmeWithAI(readmeFile.content, (msg) =>
+      liveUpdate(sharedLogId, msg),
+    );
+    console.log("[cleanUpReadme] AI cleanup complete");
+    liveUpdate(sharedLogId, `Cleanup complete (${cleanedReadme.length} chars)`);
+
+    console.log("[cleanUpReadme] Committing README");
+    liveUpdate(sharedLogId, "Committing cleaned README to GitHub");
+    const commitResult = await commitFile(
+      accessToken,
+      repoOwner,
+      repoName,
+      "README.md",
+      cleanedReadme,
+      "chore: cleanup README [skip ci]",
+      defaultBranch,
+      readmeFile.sha,
+    );
+
+    console.log("[cleanUpReadme] README committed:", commitResult.commit.sha);
+    liveUpdate(
+      sharedLogId,
+      `✓ README committed: ${commitResult.commit.sha.slice(0, 7)}`,
+    );
+    await UserLogModel.findByIdAndUpdate(
+      userLog._id,
+      {
+        action: "README_CLEANUP_SUCCESS",
+        status: "success",
+        commitId: commitResult.commit.sha,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+    await redis.del("admin_analytics");
+  } catch (error) {
+    console.error("[cleanUpReadme] Failed:", error.message);
+
+    // Only settle the log as failed once no attempt is left, so a transient
+    // failure does not flash "failed" in the UI before the retry reopens it.
+    const attemptsAllowed = job.opts.attempts ?? 1;
+    const attemptsUsed = job.attemptsStarted ?? job.attemptsMade + 1;
+    const isLastAttempt =
+      error instanceof UnrecoverableError || attemptsUsed >= attemptsAllowed;
+
+    if (isLastAttempt) {
+      liveUpdate(sharedLogId, `✗ README cleanup failed: ${error.message}`);
+      await UserLogModel.findByIdAndUpdate(
+        userLog._id,
+        {
+          action: "README_CLEANUP_FAILED",
+          status: "failed",
+        },
+        {
+          new: true,
+          runValidators: true,
+        },
+      );
+      await redis.del("admin_analytics");
+    } else {
+      liveUpdate(
+        sharedLogId,
+        `Attempt ${attemptsUsed}/${attemptsAllowed} failed (${error.message}) — retrying`,
+      );
+    }
+
+    throw error;
+  }
 }
