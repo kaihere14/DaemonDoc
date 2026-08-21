@@ -2,7 +2,7 @@ import User from "../schema/user.schema.js";
 import { decrypt } from "./oauthcontroller.js";
 import ActiveRepo from "../schema/activeRepo.js";
 import crypto from "node:crypto";
-import { readmeQueue } from "../utils/git.worker.js";
+import { cleanUpQueue, readmeQueue } from "../utils/git.worker.js";
 import UserLogModel from "../schema/userLog.schema.js";
 import {
   GITHUB_API_BASE,
@@ -12,8 +12,6 @@ import {
 } from "../utils/githubApiClient.js";
 import { RedisConnection } from "bullmq";
 import { redis } from "../utils/redis.js";
-import { commitFile, getFileContent } from "../services/github.service.js";
-import { cleanReadmeWithAI } from "../services/readmeCleanup.service.js";
 import { liveUpdate } from "../services/convex.service.js";
 
 export function verifyGithubSignature(req) {
@@ -579,8 +577,9 @@ export const fetchAdminUsers = async (req, res) => {
 };
 
 export const cleanUpReadme = async (req, res) => {
-  let userLog = null;
-  let sharedLogId = null;
+  // Minted here, not in the worker, so the 202 can hand the client a log id to
+  // subscribe to and so a retry reuses the same log row.
+  const sharedLogId = crypto.randomUUID();
 
   try {
     console.log("[cleanUpReadme] Started");
@@ -609,109 +608,37 @@ export const cleanUpReadme = async (req, res) => {
       return res.status(404).json({ message: "GitHub access token not found" });
     }
 
-    const accessToken = decrypt(user.githubAccessToken);
-
-    console.log("[cleanUpReadme] Fetching README.md");
-    const readmeFile = await getFileContent(
-      accessToken,
-      activeRepo.repoOwner,
-      activeRepo.repoName,
-      "README.md",
-      activeRepo.defaultBranch,
+    await cleanUpQueue.add(
+      "cleanup-queue",
+      {
+        userId,
+        repoName: activeRepo.repoName,
+        repoOwner: activeRepo.repoOwner,
+        defaultBranch: activeRepo.defaultBranch,
+        // Ciphertext only — the job payload sits in Redis for the lifetime of
+        // the job, so the worker does the decrypting.
+        encryptedAccessToken: {
+          iv: user.githubAccessToken.iv,
+          content: user.githubAccessToken.content,
+          tag: user.githubAccessToken.tag,
+        },
+        sharedLogId,
+      },
+      {
+        attempts: 3,
+        backoff: { type: "exponential", delay: 5000 },
+      },
     );
-    if (!readmeFile?.content?.trim()) {
-      console.log("[cleanUpReadme] README.md not found");
-      return res
-        .status(404)
-        .json({ message: "README.md not found in repository" });
-    }
 
-    console.log("[cleanUpReadme] README fetched");
-    sharedLogId = crypto.randomUUID();
-    userLog = await UserLogModel.create({
+    return res.status(202).json({
+      message: "Readme cleanup initiated",
       logId: sharedLogId,
-      userId,
-      repoName: activeRepo.repoName,
-      repoOwner: activeRepo.repoOwner,
-      action: "README_CLEANUP_STARTED",
-      status: "ongoing",
-    });
-    await redis.del("admin_analytics");
-
-    liveUpdate(
-      sharedLogId,
-      `Starting README cleanup for ${activeRepo.repoOwner}/${activeRepo.repoName}`,
-    );
-    console.log("[cleanUpReadme] Running AI cleanup");
-    liveUpdate(sharedLogId, "Fetched existing README.md");
-    liveUpdate(sharedLogId, "Cleaning README content with AI");
-    const cleanedReadme = await cleanReadmeWithAI(readmeFile.content, (msg) =>
-      liveUpdate(sharedLogId, msg),
-    );
-    console.log("[cleanUpReadme] AI cleanup complete");
-    liveUpdate(sharedLogId, `Cleanup complete (${cleanedReadme.length} chars)`);
-
-    console.log("[cleanUpReadme] Committing README");
-    liveUpdate(sharedLogId, "Committing cleaned README to GitHub");
-    const commitResult = await commitFile(
-      accessToken,
-      activeRepo.repoOwner,
-      activeRepo.repoName,
-      "README.md",
-      cleanedReadme,
-      "chore: cleanup README [skip ci]",
-      activeRepo.defaultBranch,
-      readmeFile.sha,
-    );
-
-    console.log("[cleanUpReadme] README committed:", commitResult.commit.sha);
-    liveUpdate(
-      sharedLogId,
-      `✓ README committed: ${commitResult.commit.sha.slice(0, 7)}`,
-    );
-    await UserLogModel.findByIdAndUpdate(
-      userLog._id,
-      {
-        action: "README_CLEANUP_SUCCESS",
-        status: "success",
-        commitId: commitResult.commit.sha,
-      },
-      {
-        new: true,
-        runValidators: true,
-      },
-    );
-    await redis.del("admin_analytics");
-
-    return res.status(200).json({
-      message: "Readme cleaned up successfully",
-      commitSha: commitResult.commit.sha,
     });
   } catch (error) {
     console.error("[cleanUpReadme] Failed:", error.message);
     liveUpdate(sharedLogId, `✗ Failed: ${error.message}`);
-
-    if (userLog) {
-      try {
-        await UserLogModel.findByIdAndUpdate(
-          userLog._id,
-          {
-            action: "README_CLEANUP_FAILED",
-            status: "failed",
-          },
-          {
-            new: true,
-            runValidators: true,
-          },
-        );
-        await redis.del("admin_analytics");
-      } catch (logError) {
-        console.error(
-          "[cleanUpReadme] Failed to update Mongo log:",
-          logError.message,
-        );
-      }
-    }
-    return res.status(500).json({ message: "Error cleaning up readme" });
+    return res
+      .status(500)
+      .json({ message: "Error cleaning up readme", logId: sharedLogId });
   }
 };

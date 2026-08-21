@@ -40,7 +40,7 @@ export async function cleanReadmeWithAI(existingReadme, onProgress = null) {
   }
 
   if (onProgress) {
-    onProgress(`Sending README to cleanup model ${CLEANUP_MODEL}`);
+    onProgress(`Sending README to cleanup model`);
   }
 
   const response = await fetch(OPENROUTER_URL, {
