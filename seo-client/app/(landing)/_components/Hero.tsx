@@ -10,6 +10,7 @@ import { ClipboardCheck } from "@/app/(landing)/_animate-ui/icons/clipboard-chec
 import { AnimateIcon } from "@/app/(landing)/_animate-ui/icons/icon";
 import { CandyLink } from "@/components/ui/candy-button";
 import { SECTION_X } from "@/app/(landing)/_lib/section";
+import GradientWaves from "@/components/GradientWaves"
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daemondoc.online";
 
@@ -69,13 +70,13 @@ const STEPS = [
     Icon: (props: Record<string, unknown>) => <Unplug {...props} />,
     title: "Connect Repo",
     desc: "Link your GitHub repository once",
-    iconClass: "bg-blue-100 text-blue-600 border-blue-200",
+    iconClass: "bg-[#D6EAFF] text-[#005FD6] border-[#A9D3FF]",
   },
   {
     Icon: (props: Record<string, unknown>) => <Activity {...props} />,
     title: "Push Code",
     desc: "Just code & commit as usual",
-    iconClass: "bg-sky-100 text-sky-600 border-sky-200",
+    iconClass: "bg-[#D6EAFF] text-[#005FD6] border-[#A9D3FF]",
   },
   {
     Icon: (props: Record<string, unknown>) => <ClipboardCheck {...props} />,
@@ -128,28 +129,11 @@ export default function Hero() {
       id="hero"
     >
       {/* SVG Grid Background */}
-      <div className="pointer-events-none absolute inset-0 z-0 mask-[radial-gradient(100%_100%_at_50%_0%,white,transparent)] opacity-[0.15]">
-        <svg className="h-full w-full" aria-hidden="true">
-          <defs>
-            <pattern
-              id="hero-grid"
-              width="60"
-              height="60"
-              patternUnits="userSpaceOnUse"
-            >
-              <path
-                d="M.5 60V.5H60"
-                fill="none"
-                stroke="currentColor"
-                className="text-blue-500"
-              />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#hero-grid)" />
-        </svg>
+      <div className="pointer-events-none absolute inset-0 z-0 ">
+        <GradientWaves horizonColor="#209BFF" opacity={1} detail="high" height={15}/>
       </div>
 
-      <div className="pointer-events-none absolute inset-0 z-0 bg-linear-to-b from-transparent via-cyan-50/30 to-white" />
+      <div className="pointer-events-none absolute inset-0 z-0 bg-linear-to-b from-transparent via-[#EAF4FF]/30 to-white" />
 
       <div className={`relative z-10 text-center ${SECTION_X}`}>
         {/* Floating tech icon chips */}
@@ -181,7 +165,7 @@ export default function Hero() {
         <div className="mx-auto max-w-4xl space-y-8">
           <h1 className="font-display overflow-visible text-4xl leading-[1.06] font-bold tracking-[-0.038em] text-slate-900 sm:text-5xl md:text-6xl lg:text-7xl">
             Where your code turns into{" "}
-            <span className="text-primary relative mx-1 inline-block transform-[perspective(800px)_rotateY(15deg)_rotateX(5deg)] rounded-t-lg border border-blue-100 bg-blue-50/50 px-2 leading-tight font-extrabold whitespace-nowrap shadow-sm drop-shadow-2xl text-shadow-md sm:mr-0 sm:ml-5">
+            <span className="text-primary relative mx-1 inline-block transform-[perspective(800px)_rotateY(15deg)_rotateX(5deg)] rounded-t-lg border border-[#D6EAFF] bg-[#EAF4FF]/50 px-2 leading-tight font-extrabold whitespace-nowrap shadow-sm drop-shadow-2xl text-shadow-md sm:mr-0 sm:ml-5">
               documentation
               <svg
                 className="text-primary/40 absolute -bottom-2 left-0 h-3 w-full"
@@ -227,7 +211,7 @@ export default function Hero() {
 
             <a
               href="#features"
-              className="flex items-center justify-center gap-1 rounded-xl px-9 py-3 font-medium text-slate-600 transition duration-200 hover:bg-slate-200/50 active:scale-[0.98]"
+              className="flex items-center justify-center gap-1 rounded-xl px-9 py-3 font-medium text-slate-600 transition-all duration-300 border-2 border-dashed border-transparent hover:border-white ease-in-out  active:scale-[0.98]"
             >
               View Capabilities
               <ArrowRight size={16} />
@@ -242,7 +226,7 @@ export default function Hero() {
           </h2>
           <div className="relative grid grid-cols-1 gap-8 text-center md:grid-cols-3">
             {/* Connecting SVG Flow (desktop only) */}
-            <div className="pointer-events-none absolute top-[28px] left-0 z-0 hidden h-[80px] w-full overflow-visible md:block">
+            <div className="pointer-events-none absolute top-121 left-0 z-0 hidden h-20 w-full overflow-visible md:block">
               <svg
                 width="100%"
                 height="80"
@@ -252,17 +236,17 @@ export default function Hero() {
               >
                 <motion.path
                   d="M 120 40 L 880 40"
-                  stroke="#3b82f6"
+                  stroke="#209BFF"
                   strokeWidth="1.5"
                   strokeDasharray="10 10"
-                  className="opacity-40"
+                  className="opacity-40 mt-10"
                   animate={reduceMotion ? undefined : { strokeDashoffset: [0, -20] }}
                   transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                 />
                 {!reduceMotion && (
                   <motion.circle
                     r="4"
-                    fill="#1d4ed8"
+                    fill="#005FD6"
                     animate={{
                       cx: [120, 500, 500, 880, 880, 120],
                       opacity: [0, 1, 1, 1, 0, 0],
@@ -281,7 +265,7 @@ export default function Hero() {
 
             {STEPS.map((step, i) => (
               <AnimateIcon key={i} animateOnHover asChild>
-                <div className="group relative z-10 rounded-xl border border-dashed border-neutral-200 bg-white/60 p-4 drop-shadow-xl backdrop-blur-sm transition-colors duration-300 hover:bg-white">
+                <div className="group relative z-10 rounded-xl border border-dashed border-neutral-200 bg-white p-4">
                   <div
                     className={`h-12 w-12 ${step.iconClass} mx-auto mb-3 flex items-center justify-center rounded-full border shadow-sm transition-shadow group-hover:shadow-md`}
                   >
@@ -299,7 +283,7 @@ export default function Hero() {
 
         {/* README Preview Card */}
         <div className="relative mx-auto mt-16 max-w-5xl">
-          <div className="animate-pulse-slow absolute -inset-1 top-0 right-0 left-0 rounded-2xl bg-linear-to-r from-blue-500 to-sky-500 opacity-20 blur" />
+          <div className="animate-pulse-slow absolute -inset-1 top-0 right-0 left-0 rounded-2xl bg-linear-to-r from-[#209BFF] to-[#54A1FD] opacity-20 blur" />
 
           <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl">
             {/* Browser chrome */}

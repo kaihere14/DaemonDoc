@@ -10,7 +10,7 @@ const CORE_FEATURES = [
       "Gemini 3.1 Flash Lite",
       " integration, our engine deeply understands your codebase structure, logic, and intent to generate human-quality documentation.",
     ],
-    iconClass: "bg-blue-50 text-blue-600",
+    iconClass: "bg-[#EAF4FF] text-[#005FD6]",
     gradientClass: "feature-gradient-1",
   },
   {
@@ -21,7 +21,7 @@ const CORE_FEATURES = [
       "push once, sync forever",
       " promise. We listen for git events in real-time, ensuring your README is never out of date with your actual code.",
     ],
-    iconClass: "bg-sky-50 text-sky-600",
+    iconClass: "bg-[#EAF4FF] text-[#209BFF]",
     gradientClass: "feature-gradient-2",
   },
   {
@@ -58,8 +58,13 @@ export default function CoreCapabilities() {
           {CORE_FEATURES.map((f) => (
             <div
               key={f.title}
-              className={`group relative rounded-2xl border border-slate-100 bg-white p-8 shadow-[var(--shadow-card)] transition-shadow duration-300 hover:shadow-[var(--shadow-raised)] ${f.gradientClass}`}
+              className={`group relative bg-white p-8 ${f.gradientClass}`}
             >
+              <div className="pointer-events-none absolute top-0 -left-4 w-[calc(100%+2rem)] border border-dashed border-neutral-200"></div>
+              <div className="pointer-events-none absolute -top-4 left-0 h-[calc(100%+2rem)] border border-dashed border-neutral-200"></div>
+              <div className="pointer-events-none absolute -top-4 right-0 h-[calc(100%+2rem)] border border-dashed border-neutral-200"></div>
+              <div className="pointer-events-none absolute bottom-0 -left-4 w-[calc(100%+2rem)] border border-dashed border-neutral-200"></div>
+
               <div
                 className={`h-14 w-14 ${f.iconClass} mb-6 flex items-center justify-center rounded-xl`}
               >

@@ -19,12 +19,17 @@ export default function EngineCard({ f }: EngineCardProps) {
 
   return (
     <div
-      className="rounded-2xl border border-slate-100 bg-white p-8 shadow-[var(--shadow-card)] transition-shadow duration-300 hover:shadow-[var(--shadow-raised)] focus-within:shadow-[var(--shadow-raised)]"
+      className="relative bg-white p-8"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setHovered(true)}
       onBlur={() => setHovered(false)}
     >
+      <div className="pointer-events-none absolute top-2 -left-1 w-[calc(100%+0.5rem)] border border-dashed border-neutral-200"></div>
+      <div className="pointer-events-none absolute -top-1 left-2 h-[calc(100%+0.5rem)] border border-dashed border-neutral-200"></div>
+      <div className="pointer-events-none absolute -top-1 right-2 h-[calc(100%+0.5rem)] border border-dashed border-neutral-200"></div>
+      <div className="pointer-events-none absolute bottom-2 -left-1 w-[calc(100%+0.5rem)] border border-dashed border-neutral-200"></div>
+
       <div
         className={`h-12 w-12 ${f.iconClass} mb-6 flex items-center justify-center rounded-xl transition-transform duration-300`}
       >

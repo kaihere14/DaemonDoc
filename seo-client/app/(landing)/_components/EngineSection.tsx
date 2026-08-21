@@ -21,14 +21,14 @@ const ENGINE_FEATURES: {
     animation: "path",
     title: "GitHub OAuth 2.0",
     desc: "Secure handshake protocols ensuring precise permission scoping for your private repositories.",
-    iconClass: "bg-blue-50 text-blue-600",
+    iconClass: "bg-[#EAF4FF] text-[#005FD6]",
   },
   {
     icon: PlugZap as AnimateIconComponent,
     animation: "path",
     title: "Context Synthesis",
     desc: "Advanced RAG-based engine that aggregates cross-file dependencies for holistic doc generation.",
-    iconClass: "bg-sky-50 text-sky-600",
+    iconClass: "bg-[#EAF4FF] text-[#209BFF]",
   },
   {
     icon: Search as AnimateIconComponent,

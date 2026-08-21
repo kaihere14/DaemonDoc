@@ -301,7 +301,7 @@ export const NavbarButton = ({
     secondary: "bg-transparent shadow-none",
     dark: "bg-black text-white shadow-[0_1px_0_rgba(0,0,0,0.04),0_4px_20px_rgba(34,42,53,0.10)]",
     gradient:
-      "bg-gradient-to-b from-blue-500 to-blue-700 text-white shadow-[0px_2px_0px_0px_rgba(255,255,255,0.3)_inset]",
+      "bg-gradient-to-b from-[#209BFF] to-[#005FD6] text-white shadow-[0px_2px_0px_0px_rgba(255,255,255,0.3)_inset]",
   };
 
   return (

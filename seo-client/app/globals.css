@@ -7,9 +7,9 @@
 
 /* Custom color tokens — plain @theme so bg-primary / text-primary utilities are generated */
 @theme {
-  --color-primary: #1d4ed8;
-  --color-secondary: #3b82f6;
-  --color-ring: #3b82f6;
+  --color-primary: #005fd6;
+  --color-secondary: #209bff;
+  --color-ring: #209bff;
 
   /* ── Elevation scale ───────────────────────────────────────────────────────
      Three steps, not seven one-off box-shadows. Bigger surfaces read as
@@ -90,8 +90,8 @@ html {
 .hero-gradient {
   background: radial-gradient(
     circle at 50% 120%,
-    rgba(29, 78, 216, 0.2) 0%,
-    rgba(56, 189, 248, 0.15) 30%,
+    rgba(0, 95, 214, 0.2) 0%,
+    rgba(32, 155, 255, 0.15) 30%,
     rgba(251, 191, 36, 0.1) 55%,
     rgba(255, 255, 255, 0) 70%
   );
@@ -100,7 +100,7 @@ html {
 .feature-gradient-1 {
   background: radial-gradient(
     circle at top right,
-    rgba(29, 78, 216, 0.07) 0%,
+    rgba(0, 95, 214, 0.07) 0%,
     transparent 60%
   );
 }
@@ -108,7 +108,7 @@ html {
 .feature-gradient-2 {
   background: radial-gradient(
     circle at top left,
-    rgba(56, 189, 248, 0.08) 0%,
+    rgba(32, 155, 255, 0.08) 0%,
     transparent 60%
   );
 }
