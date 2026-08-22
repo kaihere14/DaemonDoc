@@ -140,7 +140,7 @@ export const addRepoActivity = async (req, res) => {
       } else {
         return res
           .status(500)
-          .json({ message: "Error creating webhook", error: error });
+          .json({ message: "Error creating webhook", error: error.message });
       }
     }
     let activeRepo;
