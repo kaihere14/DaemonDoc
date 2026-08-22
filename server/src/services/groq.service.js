@@ -1,10 +1,6 @@
 import axios from "axios";
 import { getLanguageFromExtension } from "../utils/langMap.js";
-import {
-  parseReadmeSections,
-  hashSections,
-  mergePatchedSections,
-} from "../utils/readme.parser.js";
+import { hashSections, mergePatchedSections } from "../utils/readme.parser.js";
 import {
   validatePatches,
   FORBIDDEN_SECTIONS,

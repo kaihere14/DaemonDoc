@@ -10,7 +10,6 @@ import {
   githubPost,
   githubDelete,
 } from "../utils/githubApiClient.js";
-import { RedisConnection } from "bullmq";
 import { redis } from "../utils/redis.js";
 import { liveUpdate } from "../services/convex.service.js";
 

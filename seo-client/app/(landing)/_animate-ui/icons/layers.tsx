@@ -23,17 +23,29 @@ const animations = {
   "default-loop": {
     path1: {
       initial: { y: 0 },
-      animate: { y: [0, 5, 0], transition: { duration: 0.6, ease: "easeInOut" } },
+      animate: {
+        y: [0, 5, 0],
+        transition: { duration: 0.6, ease: "easeInOut" },
+      },
     },
     path2: {},
     path3: {
       initial: { y: 0 },
-      animate: { y: [0, -5, 0], transition: { duration: 0.6, ease: "easeInOut" } },
+      animate: {
+        y: [0, -5, 0],
+        transition: { duration: 0.6, ease: "easeInOut" },
+      },
     },
   },
 };
 
-function IconComponent({ size, ...props }: { size?: number; [key: string]: unknown }) {
+function IconComponent({
+  size,
+  ...props
+}: {
+  size?: number;
+  [key: string]: unknown;
+}) {
   const { controls } = useAnimateIconContext();
   const variants = getVariants(animations);
 
@@ -50,9 +62,24 @@ function IconComponent({ size, ...props }: { size?: number; [key: string]: unkno
       strokeLinejoin="round"
       {...props}
     >
-      <motion.path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" variants={variants.path1 as never} initial="initial" animate={controls} />
-      <motion.path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" variants={variants.path2 as never} initial="initial" animate={controls} />
-      <motion.path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" variants={variants.path3 as never} initial="initial" animate={controls} />
+      <motion.path
+        d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"
+        variants={variants.path1 as never}
+        initial="initial"
+        animate={controls}
+      />
+      <motion.path
+        d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"
+        variants={variants.path2 as never}
+        initial="initial"
+        animate={controls}
+      />
+      <motion.path
+        d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"
+        variants={variants.path3 as never}
+        initial="initial"
+        animate={controls}
+      />
     </motion.svg>
   );
 }

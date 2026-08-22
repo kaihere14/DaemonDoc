@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check, X, Loader2 } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/auth-context";
 import { usePostHog } from "@posthog/react";
 
 // Same three-part shape for every state, so the card doesn't jump as the

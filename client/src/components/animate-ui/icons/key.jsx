@@ -2,11 +2,11 @@
 import * as React from "react";
 import { motion } from "motion/react";
 
+import { IconWrapper } from "@/components/animate-ui/icons/icon";
 import {
   getVariants,
   useAnimateIconContext,
-  IconWrapper,
-} from "@/components/animate-ui/icons/icon";
+} from "@/components/animate-ui/icons/icon-context";
 
 const animations = {
   default: {
@@ -102,4 +102,4 @@ function Key(props) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export { animations, Key, Key as KeyIcon };
+export { Key, Key as KeyIcon };

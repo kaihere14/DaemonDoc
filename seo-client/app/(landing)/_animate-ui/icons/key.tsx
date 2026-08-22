@@ -36,7 +36,13 @@ const animations = {
   },
 };
 
-function IconComponent({ size, ...props }: { size?: number; [key: string]: unknown }) {
+function IconComponent({
+  size,
+  ...props
+}: {
+  size?: number;
+  [key: string]: unknown;
+}) {
   const { controls } = useAnimateIconContext();
   const variants = getVariants(animations);
 
@@ -53,10 +59,31 @@ function IconComponent({ size, ...props }: { size?: number; [key: string]: unkno
       strokeLinejoin="round"
       {...props}
     >
-      <motion.g variants={variants.group as never} initial="initial" animate={controls}>
-        <motion.path d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4" variants={variants.stem as never} initial="initial" animate={controls} />
-        <motion.path d="m21 2-9.6 9.6" variants={variants.teeth as never} initial="initial" animate={controls} />
-        <motion.circle cx="7.5" cy="15.5" r="5.5" variants={variants.circle as never} initial="initial" animate={controls} />
+      <motion.g
+        variants={variants.group as never}
+        initial="initial"
+        animate={controls}
+      >
+        <motion.path
+          d="m15.5 7.5 2.3 2.3a1 1 0 0 0 1.4 0l2.1-2.1a1 1 0 0 0 0-1.4L19 4"
+          variants={variants.stem as never}
+          initial="initial"
+          animate={controls}
+        />
+        <motion.path
+          d="m21 2-9.6 9.6"
+          variants={variants.teeth as never}
+          initial="initial"
+          animate={controls}
+        />
+        <motion.circle
+          cx="7.5"
+          cy="15.5"
+          r="5.5"
+          variants={variants.circle as never}
+          initial="initial"
+          animate={controls}
+        />
       </motion.g>
     </motion.svg>
   );

@@ -220,7 +220,7 @@ export function formatRepoTree(tree, maxDepth = 3) {
     });
   });
 
-  function formatNode(node, prefix = "", isLast = true) {
+  function formatNode(node, prefix = "") {
     let result = "";
     const entries = Object.entries(node);
 
@@ -233,7 +233,7 @@ export function formatRepoTree(tree, maxDepth = 3) {
 
       if (value !== null) {
         const newPrefix = prefix + (isLastEntry ? "    " : "│   ");
-        result += formatNode(value, newPrefix, isLastEntry);
+        result += formatNode(value, newPrefix);
       }
     });
 

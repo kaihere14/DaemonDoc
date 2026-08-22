@@ -1,7 +1,6 @@
 interface:
   display_name: "Convex Performance Audit"
-  short_description:
-    "Audit slow Convex reads, subscriptions, OCC conflicts, and limits."
+  short_description: "Audit slow Convex reads, subscriptions, OCC conflicts, and limits."
   icon_small: "./assets/icon.svg"
   icon_large: "./assets/icon.svg"
   brand_color: "#EF4444"

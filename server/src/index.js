@@ -42,6 +42,7 @@ app.get("/health", (req, res) => {
   });
 });
 
+// eslint-disable-next-line no-unused-vars -- 4-arg signature required for Express to treat this as error middleware
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err.message);
   res.status(500).json({ message: "Internal server error" });

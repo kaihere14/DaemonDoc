@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   authors: [{ name: "DaemonDoc" }],
   robots: { index: true, follow: true },
   alternates: {
-    canonical: 'https://www.daemondoc.online',
+    canonical: "https://www.daemondoc.online",
   },
   openGraph: {
     type: "website",

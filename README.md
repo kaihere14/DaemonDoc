@@ -11,6 +11,7 @@ Automate accurate GitHub README maintenance through codebase analysis, commit tr
 ## ✨ Key Features
 
 ### AI-Powered Document Lifecycle
+
 - **Dual-mode pipeline**:
   - _Full generation_: Create initial READMEs from repository structure
   - _Patch mode_: Update only changed sections using SHA-256 hashing
@@ -20,6 +21,7 @@ Automate accurate GitHub README maintenance through codebase analysis, commit tr
   - Live activity logging with real-time progress streaming
 
 ### Core Capabilities
+
 - **GitHub Integration**:
   - Webhook-based commit tracking
   - Secure OAuth with encrypted token storage
@@ -42,6 +44,7 @@ Automate accurate GitHub README maintenance through codebase analysis, commit tr
 ```
 
 **Key Components**:
+
 - **Frontend**: React 19 + Vite 7 SPA with Convex subscriptions
 - **Backend**: Express.js 5 API with MongoDB (Mongoose)
 - **Workers**: BullMQ/Redis for async AI generation
@@ -52,15 +55,15 @@ Automate accurate GitHub README maintenance through codebase analysis, commit tr
 
 ## 🧰 Tech Stack
 
-| Layer         | Technologies                                                                                      |
-|---------------|---------------------------------------------------------------------------------------------------|
-| **Frontend**  | React 19, Next.js, Vite 7, Tailwind CSS 4, Shadcn UI, Convex React Client                         |
-| **Backend**   | Node.js 20+, Express 5, Mongoose, pnpm workspace                                                  |
-| **Workers**   | BullMQ 5.76, Redis (IORedis)                                                                      |
-| **Real-time** | Convex 1.39                                                                                       |
-| **Database**  | MongoDB (user profiles, logs)                                                                     |
-| **AI**        | Google Gemini (1M context), Groq (fallback)                                                       |
-| **Email**     | Resend for transactional communications                                                           |
+| Layer         | Technologies                                                              |
+| ------------- | ------------------------------------------------------------------------- |
+| **Frontend**  | React 19, Next.js, Vite 7, Tailwind CSS 4, Shadcn UI, Convex React Client |
+| **Backend**   | Node.js 20+, Express 5, Mongoose, pnpm workspace                          |
+| **Workers**   | BullMQ 5.76, Redis (IORedis)                                              |
+| **Real-time** | Convex 1.39                                                               |
+| **Database**  | MongoDB (user profiles, logs)                                             |
+| **AI**        | Google Gemini (1M context), Groq (fallback)                               |
+| **Email**     | Resend for transactional communications                                   |
 
 ---
 
@@ -76,6 +79,7 @@ Automate accurate GitHub README maintenance through codebase analysis, commit tr
    - 3+ API keys for Gemini and Groq
 
 2. **Setup**
+
    ```bash
    git clone https://github.com/kaihere14/daemondoc.git
    cd daemondoc
@@ -98,6 +102,7 @@ Automate accurate GitHub README maintenance through codebase analysis, commit tr
 ### Required Environment Variables
 
 **Backend (server/.env)**:
+
 ```env
 MONGO_URI=
 JWT_SECRET=
@@ -115,12 +120,14 @@ README_FILE_NAME=README.md
 ```
 
 **Frontend (client/.env)**:
+
 ```env
 VITE_BACKEND_URL=http://localhost:3000
 VITE_CONVEX_URL=your_convex_deployment_url
 ```
 
 **SEO Landing (seo-client/.env)**:
+
 ```env
 NEXT_PUBLIC_APP_URL=https://daemondoc.online
 BACKEND_URL=http://localhost:3000
@@ -131,6 +138,7 @@ BACKEND_URL=http://localhost:3000
 ## 📡 API Endpoints
 
 ### Authentication
+
 | Method | Endpoint                | Description           |
 | ------ | ----------------------- | --------------------- |
 | GET    | `/auth/github`          | Initiate OAuth flow   |
@@ -139,6 +147,7 @@ BACKEND_URL=http://localhost:3000
 | DELETE | `/auth/delete`          | Delete user account   |
 
 ### Repository Management
+
 | Method | Endpoint                             | Description                                         |
 | ------ | ------------------------------------ | --------------------------------------------------- |
 | GET    | `/api/github/getGithubRepos`         | List user repositories                              |
@@ -148,33 +157,38 @@ BACKEND_URL=http://localhost:3000
 | POST   | `/api/github/webhookhandler`         | Handle GitHub push events                           |
 
 ### System Monitoring
-| Method | Endpoint                    | Description                                    |
-| ------ | --------------------------- | ---------------------------------------------- |
-| GET    | `/api/github/fetchUserLogs` | Retrieve documentation activity logs         |
-| GET    | `/health`                   | Redis status + uptime                          |
+
+| Method | Endpoint                    | Description                          |
+| ------ | --------------------------- | ------------------------------------ |
+| GET    | `/api/github/fetchUserLogs` | Retrieve documentation activity logs |
+| GET    | `/health`                   | Redis status + uptime                |
 
 ### Admin Operations
-| Method | Endpoint                      | Description                                    |
-| ------ | ----------------------------- | ---------------------------------------------- |
-| GET    | `/api/github/admin/analytics` | Retrieve system-wide analytics (cached)        |
-| GET    | `/api/github/admin/users`     | Browse and search all registered users         |
+
+| Method | Endpoint                      | Description                             |
+| ------ | ----------------------------- | --------------------------------------- |
+| GET    | `/api/github/admin/analytics` | Retrieve system-wide analytics (cached) |
+| GET    | `/api/github/admin/users`     | Browse and search all registered users  |
 
 ---
 
 ## 🚀 Deployment
 
 **1. Backend (Render)**
+
 - Root: Project root directory
 - Build: `corepack enable && pnpm install --frozen-lockfile --filter server`
 - Start: `pnpm --filter server start`
 - Required env vars: All backend variables + public URLs
 
 **2. Frontend (Vercel)**
+
 - Root: `client` directory
 - Build: `pnpm run build`
 - Env var: `VITE_BACKEND_URL=production_url`
 
 **3. SEO Landing (Vercel)**
+
 - Root: `seo-client` directory
 - Env vars:
   - `NEXT_PUBLIC_APP_URL=https://daemondoc.online`

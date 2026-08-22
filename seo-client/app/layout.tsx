@@ -37,7 +37,7 @@ export default function RootLayout({
       lang="en"
       className={`${interDisplay.variable} ${spaceGrotesk.variable} h-full`}
     >
-      <body className="font-sans flex min-h-full flex-col bg-white text-slate-900 antialiased">
+      <body className="flex min-h-full flex-col bg-white font-sans text-slate-900 antialiased">
         {children}
         <Analytics />
       </body>
