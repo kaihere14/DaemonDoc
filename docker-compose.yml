@@ -19,6 +19,6 @@ services:
 
 volumes:
   daemondoc-mongo-data:
-    external: true
+    name: daemondoc-mongo-data
   daemondoc-redis-data:
     name: daemondoc-redis-data
