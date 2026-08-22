@@ -89,12 +89,9 @@ export const addRepoActivity = async (req, res) => {
     const existedRepo = await ActiveRepo.findOne({
       userId,
       repoId,
-      active: true,
     });
-    if (existedRepo) {
-      return res
-        .status(400)
-        .json({ message: "Repository activity already exists" });
+    if (existedRepo && existedRepo.active == true) {
+      return res.status(400).json({ message: "Repository is already active" });
     }
 
     const accessToken = decrypt(user.githubAccessToken);
@@ -144,32 +141,32 @@ export const addRepoActivity = async (req, res) => {
       } else {
         return res
           .status(500)
-          .json({ message: "Error creating webhook", error: error.message });
+          .json({ message: "Error creating webhook", error: error });
       }
     }
+    let activeRepo;
+    if (existedRepo != null) {
+      activeRepo = await ActiveRepo.updateOne(
+        { _id: existedRepo._id },
+        {
+          webhookId,
+          active: true,
+        },
+      );
+    } else {
+      activeRepo = new ActiveRepo({
+        userId,
+        repoId,
+        repoName,
+        repoFullName,
+        repoOwner,
+        defaultBranch,
+        webhookId,
+        active: true,
+      });
 
-    const activeRepo = new ActiveRepo({
-      userId,
-      repoId,
-      repoName,
-      repoFullName,
-      repoOwner,
-      defaultBranch,
-      webhookId,
-      active: true,
-    });
+      await activeRepo.save();
 
-    await activeRepo.save();
-    await redis.del("admin_analytics");
-
-    // On first-ever activation, immediately trigger README generation
-    // so users don't have to make a commit themselves to see it work.
-    const hasBeenActivatedBefore = await ActiveRepo.findOne({
-      userId,
-      repoId,
-      active: false,
-    });
-    if (!hasBeenActivatedBefore) {
       try {
         const refRes = await githubGet(
           `${GITHUB_API_BASE}/repos/${repoOwner}/${repoName}/git/ref/heads/${defaultBranch}`,
@@ -194,12 +191,14 @@ export const addRepoActivity = async (req, res) => {
           "Failed to trigger initial README generation:",
           err.message,
         );
-        // Non-fatal: repo is still activated, pipeline just won't auto-start
       }
     }
 
+    await redis.del("admin_analytics");
+
     res.status(200).json({ message: "Repository activity added successfully" });
   } catch (error) {
+    console.error("Error adding repository activity:", error);
     res
       .status(500)
       .json({ message: "Error adding repository activity", error });
@@ -236,12 +235,15 @@ export const deactivateRepoActivity = async (req, res) => {
       console.error("Error deleting webhook:", error.message);
     }
 
-    //insted of turning the toggle of we are just removing the complete document from the db as there was a issue with the toggle where if the user deactivates and activates again then the document was created twice and it was creating an issue for the users so we are just removing the document from the db and when the user activates again then we will create a new document in the db and a new webhook in the github
-
-    const response = await ActiveRepo.deleteOne({ _id: activeRepo._id });
+    const response = await ActiveRepo.updateOne(
+      { _id: activeRepo._id },
+      { active: false },
+    );
+    if (!response) {
+      return res.status(404).json({ message: "Active repository not found" });
+    }
     await redis.del("admin_analytics");
 
-    console.log(response);
     res
       .status(200)
       .json({ message: "Repository activity deactivated successfully" });
