@@ -14,7 +14,12 @@ const animations = {
       initial: { rotate: 0 },
       animate: {
         rotate: 360,
-        transition: { duration: 1, ease: "linear", repeat: Infinity, repeatType: "loop" },
+        transition: {
+          duration: 1,
+          ease: "linear",
+          repeat: Infinity,
+          repeatType: "loop",
+        },
       },
     },
     circle1: {},
@@ -24,7 +29,13 @@ const animations = {
   },
 };
 
-function IconComponent({ size, ...props }: { size?: number; [key: string]: unknown }) {
+function IconComponent({
+  size,
+  ...props
+}: {
+  size?: number;
+  [key: string]: unknown;
+}) {
   const { controls } = useAnimateIconContext();
   const variants = getVariants(animations);
 
@@ -44,10 +55,34 @@ function IconComponent({ size, ...props }: { size?: number; [key: string]: unkno
       animate={controls}
       {...props}
     >
-      <motion.circle cx="12" cy="12" r="10" variants={variants.circle1 as never} initial="initial" animate={controls} />
-      <motion.path d="M6 12c0-1.7.7-3.2 1.8-4.2" variants={variants.path1 as never} initial="initial" animate={controls} />
-      <motion.circle cx="12" cy="12" r="2" variants={variants.circle2 as never} initial="initial" animate={controls} />
-      <motion.path d="M18 12c0 1.7-.7 3.2-1.8 4.2" variants={variants.path2 as never} initial="initial" animate={controls} />
+      <motion.circle
+        cx="12"
+        cy="12"
+        r="10"
+        variants={variants.circle1 as never}
+        initial="initial"
+        animate={controls}
+      />
+      <motion.path
+        d="M6 12c0-1.7.7-3.2 1.8-4.2"
+        variants={variants.path1 as never}
+        initial="initial"
+        animate={controls}
+      />
+      <motion.circle
+        cx="12"
+        cy="12"
+        r="2"
+        variants={variants.circle2 as never}
+        initial="initial"
+        animate={controls}
+      />
+      <motion.path
+        d="M18 12c0 1.7-.7 3.2-1.8 4.2"
+        variants={variants.path2 as never}
+        initial="initial"
+        animate={controls}
+      />
     </motion.svg>
   );
 }

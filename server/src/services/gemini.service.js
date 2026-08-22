@@ -3,8 +3,7 @@ import axios from "axios";
 const GEMINI_API_BASE =
   "https://generativelanguage.googleapis.com/v1beta/models";
 
-export const GEMINI_MODEL =
-  process.env.GEMINI_MODEL || "gemini-3.5-flash";
+export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash";
 export const GEMINI_MODEL_MINI =
   process.env.GEMINI_MODEL_MINI || "gemini-3.1-flash-lite";
 

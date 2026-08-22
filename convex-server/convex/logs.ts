@@ -1,7 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
-
 export const addLogMessage = mutation({
   args: {
     logId: v.string(),

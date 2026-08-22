@@ -10,9 +10,10 @@ import { ClipboardCheck } from "@/app/(landing)/_animate-ui/icons/clipboard-chec
 import { AnimateIcon } from "@/app/(landing)/_animate-ui/icons/icon";
 import { CandyLink } from "@/components/ui/candy-button";
 import { SECTION_X } from "@/app/(landing)/_lib/section";
-import GradientWaves from "@/components/GradientWaves"
+import GradientWaves from "@/components/GradientWaves";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daemondoc.online";
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daemondoc.online";
 
 const FLOATING_ICONS = [
   {
@@ -129,8 +130,13 @@ export default function Hero() {
       id="hero"
     >
       {/* SVG Grid Background */}
-      <div className="pointer-events-none absolute inset-0 z-0 ">
-        <GradientWaves horizonColor="#209BFF" opacity={1} detail="high" height={15}/>
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <GradientWaves
+          horizonColor="#209BFF"
+          opacity={1}
+          detail="high"
+          height={15}
+        />
       </div>
 
       <div className="pointer-events-none absolute inset-0 z-0 bg-linear-to-b from-transparent via-[#EAF4FF]/30 to-white" />
@@ -211,7 +217,7 @@ export default function Hero() {
 
             <a
               href="#features"
-              className="flex items-center justify-center gap-1 rounded-xl px-9 py-3 font-medium text-slate-600 transition-all duration-300 border-2 border-dashed border-transparent hover:border-white ease-in-out  active:scale-[0.98]"
+              className="flex items-center justify-center gap-1 rounded-xl border-2 border-dashed border-transparent px-9 py-3 font-medium text-slate-600 transition-all duration-300 ease-in-out hover:border-white active:scale-[0.98]"
             >
               View Capabilities
               <ArrowRight size={16} />
@@ -220,7 +226,10 @@ export default function Hero() {
         </div>
 
         {/* 3-step flow */}
-        <section aria-labelledby="hero-steps" className="mx-auto mt-16 max-w-4xl">
+        <section
+          aria-labelledby="hero-steps"
+          className="mx-auto mt-16 max-w-4xl"
+        >
           <h2 id="hero-steps" className="sr-only">
             How DaemonDoc works
           </h2>
@@ -239,8 +248,10 @@ export default function Hero() {
                   stroke="#209BFF"
                   strokeWidth="1.5"
                   strokeDasharray="10 10"
-                  className="opacity-40 mt-10"
-                  animate={reduceMotion ? undefined : { strokeDashoffset: [0, -20] }}
+                  className="mt-10 opacity-40"
+                  animate={
+                    reduceMotion ? undefined : { strokeDashoffset: [0, -20] }
+                  }
                   transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                 />
                 {!reduceMotion && (
@@ -332,7 +343,11 @@ export default function Hero() {
                 className={`pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/10 transition-opacity duration-300 ${isPlaying ? "opacity-0" : "opacity-100"}`}
               >
                 <div className="flex h-16 w-16 items-center justify-center rounded-full border border-white/20 bg-white/20 shadow-lg backdrop-blur-md">
-                  <Play size={28} className="ml-1 text-white" fill="currentColor" />
+                  <Play
+                    size={28}
+                    className="ml-1 text-white"
+                    fill="currentColor"
+                  />
                 </div>
               </div>
             </div>

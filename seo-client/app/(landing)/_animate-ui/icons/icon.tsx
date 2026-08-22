@@ -8,10 +8,13 @@ import { cn } from "@/app/(landing)/_lib/utils";
 import { useIsInView } from "@/app/(landing)/_hooks/use-is-in-view";
 import { Slot } from "@/app/(landing)/_animate-ui/primitives/animate/slot";
 
-const staticAnimations: Record<string, {
-  initial: Record<string, unknown>;
-  animate: Record<string, unknown>;
-}> = {
+const staticAnimations: Record<
+  string,
+  {
+    initial: Record<string, unknown>;
+    animate: Record<string, unknown>;
+  }
+> = {
   path: {
     initial: { pathLength: 1 },
     animate: {
@@ -41,7 +44,9 @@ interface AnimateIconContextValue {
   delay: number | undefined;
 }
 
-const AnimateIconContext = React.createContext<AnimateIconContextValue | null>(null);
+const AnimateIconContext = React.createContext<AnimateIconContextValue | null>(
+  null,
+);
 
 function useAnimateIconContext(): AnimateIconContextValue {
   const context = React.useContext(AnimateIconContext);
@@ -426,7 +431,11 @@ interface IconWrapperProps {
   animateOnView?: boolean | string;
   animateOnViewMargin?: string;
   animateOnViewOnce?: boolean;
-  icon: React.ComponentType<{ size?: number; className?: string; [key: string]: unknown }>;
+  icon: React.ComponentType<{
+    size?: number;
+    className?: string;
+    [key: string]: unknown;
+  }>;
   loop?: boolean;
   loopDelay?: number;
   persistOnAnimateEnd?: boolean;
@@ -618,7 +627,10 @@ function getVariants(animations: Record<string, Record<string, unknown>>) {
       result[key] = variant;
     }
   } else {
-    result = (animations[animationType] ?? animations.default) as Record<string, unknown>;
+    result = (animations[animationType] ?? animations.default) as Record<
+      string,
+      unknown
+    >;
   }
 
   return result;

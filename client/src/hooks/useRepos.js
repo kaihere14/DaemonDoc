@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { api, ENDPOINTS } from "../lib/api";
 
 export function useRepos(user) {
@@ -6,7 +6,7 @@ export function useRepos(user) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchRepos = async () => {
+  const fetchRepos = useCallback(async () => {
     if (!user) return;
     setLoading(true);
     setError(null);
@@ -18,11 +18,11 @@ export function useRepos(user) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchRepos();
-  }, [user]);
+  }, [fetchRepos]);
 
   return { repos, setRepos, loading, error, fetchRepos };
 }

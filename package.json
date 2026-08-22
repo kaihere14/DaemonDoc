@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "dev": "concurrently \"pnpm run dev:client\" \"pnpm run dev:seo\" \"pnpm run dev:server\"",
     "prepare": "husky",
     "install:all": "pnpm install",
     "dev:client": "pnpm --filter client dev",
@@ -32,9 +33,11 @@
   "devDependencies": {
     "@commitlint/cli": "^21.0.1",
     "@commitlint/config-conventional": "^21.0.1",
+    "concurrently": "^10.0.5",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.1",
-    "prettier-plugin-tailwindcss": "^0.7.2"
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "wait-on": "^9.1.0"
   }
 }

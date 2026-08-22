@@ -37,7 +37,13 @@ const animations = {
   },
 };
 
-function IconComponent({ size, ...props }: { size?: number; [key: string]: unknown }) {
+function IconComponent({
+  size,
+  ...props
+}: {
+  size?: number;
+  [key: string]: unknown;
+}) {
   const { controls } = useAnimateIconContext();
   const variants = getVariants(animations);
 
@@ -54,9 +60,29 @@ function IconComponent({ size, ...props }: { size?: number; [key: string]: unkno
       strokeLinejoin="round"
       {...props}
     >
-      <motion.rect width="8" height="4" x="8" y="2" rx="1" ry="1" variants={variants.rect as never} initial="initial" animate={controls} />
-      <motion.path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" variants={variants.path1 as never} initial="initial" animate={controls} />
-      <motion.path d="m9 14 2 2 4-4" variants={variants.path2 as never} initial="initial" animate={controls} />
+      <motion.rect
+        width="8"
+        height="4"
+        x="8"
+        y="2"
+        rx="1"
+        ry="1"
+        variants={variants.rect as never}
+        initial="initial"
+        animate={controls}
+      />
+      <motion.path
+        d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+        variants={variants.path1 as never}
+        initial="initial"
+        animate={controls}
+      />
+      <motion.path
+        d="m9 14 2 2 4-4"
+        variants={variants.path2 as never}
+        initial="initial"
+        animate={controls}
+      />
     </motion.svg>
   );
 }

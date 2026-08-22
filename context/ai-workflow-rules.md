@@ -52,6 +52,7 @@ Project-specific logic must go in app-level components, controllers, or services
 ## Adding a New Feature
 
 ### Server side
+
 1. Define the schema change (if any) in `server/src/schema/`.
 2. Add the service function if it calls an external API.
 3. Add the controller function with input validation and auth check.
@@ -59,6 +60,7 @@ Project-specific logic must go in app-level components, controllers, or services
 5. If the work is async/heavy, enqueue a BullMQ job instead of doing it in the handler.
 
 ### Client side
+
 1. Add the endpoint constant to `ENDPOINTS` in `client/src/lib/api.js`.
 2. Build the component or page. Page-level components go in `client/src/lib/pages/`.
 3. Add a `<Route>` in `client/src/App.jsx` if it is a new page.
