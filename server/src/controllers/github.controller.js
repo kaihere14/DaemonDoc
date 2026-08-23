@@ -148,6 +148,10 @@ export const addRepoActivity = async (req, res) => {
       activeRepo = await ActiveRepo.updateOne(
         { _id: existedRepo._id },
         {
+          repoName,
+          repoFullName,
+          repoOwner,
+          defaultBranch,
           webhookId,
           active: true,
         },
@@ -238,7 +242,7 @@ export const deactivateRepoActivity = async (req, res) => {
       { _id: activeRepo._id },
       { active: false },
     );
-    if (!response) {
+    if (response.matchedCount === 0) {
       return res.status(404).json({ message: "Active repository not found" });
     }
     await redis.del("admin_analytics");
