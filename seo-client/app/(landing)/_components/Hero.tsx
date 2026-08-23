@@ -1,13 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Image from "next/image";
 import { Play, ArrowRight, Lock } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Unplug } from "@/app/(landing)/_animate-ui/icons/unplug";
-import { Activity } from "@/app/(landing)/_animate-ui/icons/activity";
-import { ClipboardCheck } from "@/app/(landing)/_animate-ui/icons/clipboard-check";
-import { AnimateIcon } from "@/app/(landing)/_animate-ui/icons/icon";
+import Image from "next/image";
 import { CandyLink } from "@/components/ui/candy-button";
 import { SECTION_X } from "@/app/(landing)/_lib/section";
 import GradientWaves from "@/components/GradientWaves"
@@ -65,31 +61,13 @@ const FLOATING_ICONS = [
   },
 ];
 
-const STEPS = [
-  {
-    Icon: (props: Record<string, unknown>) => <Unplug {...props} />,
-    title: "Connect Repo",
-    desc: "Link your GitHub repository once",
-    iconClass: "bg-[#D6EAFF] text-[#005FD6] border-[#A9D3FF]",
-  },
-  {
-    Icon: (props: Record<string, unknown>) => <Activity {...props} />,
-    title: "Push Code",
-    desc: "Just code & commit as usual",
-    iconClass: "bg-[#D6EAFF] text-[#005FD6] border-[#A9D3FF]",
-  },
-  {
-    Icon: (props: Record<string, unknown>) => <ClipboardCheck {...props} />,
-    title: "README Updates",
-    desc: "Docs sync automatically instantly",
-    iconClass: "bg-emerald-100 text-emerald-600 border-emerald-200",
-  },
-];
+
 
 export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const reduceMotion = useReducedMotion();
+  
 
   const handleMouseEnter = () => {
     if (videoRef.current) {
@@ -220,66 +198,7 @@ export default function Hero() {
         </div>
 
         {/* 3-step flow */}
-        <section aria-labelledby="hero-steps" className="mx-auto mt-16 max-w-4xl">
-          <h2 id="hero-steps" className="sr-only">
-            How DaemonDoc works
-          </h2>
-          <div className="relative grid grid-cols-1 gap-8 text-center md:grid-cols-3">
-            {/* Connecting SVG Flow (desktop only) */}
-            <div className="pointer-events-none absolute top-121 left-0 z-0 hidden h-20 w-full overflow-visible md:block">
-              <svg
-                width="100%"
-                height="80"
-                viewBox="0 0 1000 80"
-                fill="none"
-                preserveAspectRatio="none"
-              >
-                <motion.path
-                  d="M 120 40 L 880 40"
-                  stroke="#209BFF"
-                  strokeWidth="1.5"
-                  strokeDasharray="10 10"
-                  className="opacity-40 mt-10"
-                  animate={reduceMotion ? undefined : { strokeDashoffset: [0, -20] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                />
-                {!reduceMotion && (
-                  <motion.circle
-                    r="4"
-                    fill="#005FD6"
-                    animate={{
-                      cx: [120, 500, 500, 880, 880, 120],
-                      opacity: [0, 1, 1, 1, 0, 0],
-                    }}
-                    transition={{
-                      duration: 8,
-                      repeat: Infinity,
-                      times: [0, 0.1, 0.45, 0.9, 0.95, 1],
-                      ease: "easeInOut",
-                    }}
-                    cy="40"
-                  />
-                )}
-              </svg>
-            </div>
-
-            {STEPS.map((step, i) => (
-              <AnimateIcon key={i} animateOnHover asChild>
-                <div className="group relative z-10 rounded-xl border border-dashed border-neutral-200 bg-white p-4">
-                  <div
-                    className={`h-12 w-12 ${step.iconClass} mx-auto mb-3 flex items-center justify-center rounded-full border shadow-sm transition-shadow group-hover:shadow-md`}
-                  >
-                    <step.Icon size={24} />
-                  </div>
-                  <h3 className="font-display font-bold text-slate-900">
-                    {i + 1}. {step.title}
-                  </h3>
-                  <p className="mt-1 text-sm text-slate-500">{step.desc}</p>
-                </div>
-              </AnimateIcon>
-            ))}
-          </div>
-        </section>
+        
 
         {/* README Preview Card */}
         <div className="relative mx-auto mt-16 max-w-5xl">
