@@ -6,6 +6,7 @@ import githubRoutes from "./routes/github.routes.js";
 import emailRoutes from "./routes/email.routes.js";
 import { connectDB } from "./db/connectDB.js";
 import { recoverInterruptedCleanupLogs } from "./services/logRecovery.service.js";
+import { githubWebhookHandler } from "./controllers/github.controller.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +21,12 @@ app.use(
     ],
     credentials: true,
   }),
+);
+
+app.use(
+  "/api/github/webhookhandler",
+  express.raw({ type: "application/json" }),
+  githubWebhookHandler,
 );
 
 app.use(express.json());
