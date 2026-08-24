@@ -15,6 +15,8 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@ai-sdk/google": "^4.0.50",
+    "ai": "^7.0.77",
     "axios": "^1.13.2",
     "bullmq": "^5.66.4",
     "convex": "^1.37.0",
