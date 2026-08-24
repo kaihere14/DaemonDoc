@@ -14,17 +14,23 @@ import { redis } from "../utils/redis.js";
 import { liveUpdate } from "../services/convex.service.js";
 
 export function verifyGithubSignature(req) {
+  if (!Buffer.isBuffer(req.body)) return false;
   const signature = req.headers["x-hub-signature-256"];
+
   if (!signature) return false;
 
   const hmac = crypto.createHmac("sha256", process.env.GITHUB_WEBHOOK_SECRET);
 
-  const payload =
-    typeof req.body === "string" ? req.body : JSON.stringify(req.body);
+  const digest = "sha256=" + hmac.update(req.body).digest("hex");
 
-  const digest = "sha256=" + hmac.update(payload).digest("hex");
+  const signatureBuffer = Buffer.from(signature, "utf8");
+  const digestBuffer = Buffer.from(digest, "utf8");
 
-  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest));
+  if (signatureBuffer.length !== digestBuffer.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(signatureBuffer, digestBuffer);
 }
 
 export const getGithubRepos = async (req, res) => {
@@ -269,9 +275,7 @@ export const githubWebhookHandler = async (req, res) => {
       return res.status(200).send("Event ignored");
     }
 
-    const payload =
-      typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-
+    const payload = JSON.parse(req.body.toString("utf8"));
     const repoId = payload.repository.id;
     const commitSha = payload.after;
     const commitMessage = payload.head_commit?.message || "";
