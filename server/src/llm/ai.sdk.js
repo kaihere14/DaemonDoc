@@ -1,10 +1,12 @@
 import { generateText } from "ai";
 
-export async function aiCall({ model, prompt, constraints = {} }) {
+// Thin wrapper over the AI SDK. No custom option abstraction —
+// callers pass real generateText() options straight through.
+export async function aiCall({ model, prompt, ...options }) {
   const { text } = await generateText({
     model,
     prompt,
-    constraints,
+    ...options,
   });
 
   return text;
