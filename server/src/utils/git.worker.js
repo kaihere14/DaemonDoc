@@ -10,7 +10,10 @@ import {
   generateReadmePatch,
   determineGenerationMode,
 } from "../services/groq.service.js";
-import { getActiveLimits } from "../services/gemini.service.js";
+import {
+  getActiveLimits,
+  PROVIDER_LIMITS,
+} from "../services/gemini.service.js";
 import { parseReadmeSections, hashSections } from "./readme.parser.js";
 import {
   getCommit,
@@ -147,6 +150,8 @@ const aihandler = async (data) => {
     sharedLogId,
   } = data;
 
+  const limits = PROVIDER_LIMITS.gemini;
+
   console.log(
     `[AI Handler] Starting README generation for ${repoFullName} at commit ${commitSha}`,
   );
@@ -238,21 +243,95 @@ const aihandler = async (data) => {
       sharedLogId,
     );
 
+    let fullCodebase = [];
+    try {
+      fullCodebase = await fetchFilesFromTree(
+        accessToken,
+        repoOwner,
+        repoName,
+        defaultBranch,
+        limits.maxFilesFullScan,
+        limits.maxLinesPerFile,
+      );
+      console.log(
+        `[AI Handler] Scanned ${fullCodebase.length} important files from repository`,
+      );
+      liveUpdate(sharedLogId, `Scanned ${fullCodebase.length} important files`);
+    } catch (error) {
+      console.error(`[AI Handler] Error scanning repository: ${error.message}`);
+    }
+
+    const fullCodebasePathSet = new Set(fullCodebase.map((f) => f.path));
+    const changedFilesContent = await fetchChangedFiles(
+      accessToken,
+      repoOwner,
+      repoName,
+      defaultBranch,
+      commitData.files,
+      limits.maxChangedFiles,
+      limits.maxChangedFileLines,
+      fullCodebasePathSet,
+    );
+
     let llm = new LlmService();
-    
-    const response = await llm.generate({
+
+    const readme = await llm.generate({
       repoName,
       repoOwner,
       repoStructure,
       existingReadme,
       existingReadmeSha,
+      changedFilesContent,
       commitData,
-      sharedLogId
+      sharedLogId,
     });
 
-    console.log(`[AI Handler] Response: ${response}`);
-    liveUpdate(sharedLogId, `Response: ${response}`);
-    
+    let commitResult;
+
+    try {
+      commitResult = await commitFile(
+        accessToken,
+        repoOwner,
+        repoName,
+        readmeFileName,
+        readme,
+        "chore: auto-update README [skip ci]",
+        defaultBranch,
+        existingReadmeSha,
+      );
+
+      liveUpdate(sharedLogId, `Readme commited successfully `);
+
+      await updateLogStatus(
+        data.logId,
+        "README_GENERATION_SUCCESS",
+        "success",
+        commitResult.commit.sha,
+        sharedLogId,
+      );
+
+      console.log("Readme is commited successfully");
+    } catch {
+      liveUpdate(sharedLogId, `Readme failed to commit `);
+
+      await updateLogStatus(
+        data.logId,
+        "README_GENERATION_FAILED",
+        "failed",
+        commitResult.commit.sha,
+        sharedLogId,
+      );
+
+      console.log("Readme failed to commit");
+    }
+
+    //   await updateLogStatus(
+    //     data.logId,
+    //     "README_GENERATION_SUCCESS",
+    //     "success",
+    //     commitResult.commit.sha,
+    //     sharedLogId,
+    //   );
 
     // if (mode === "full") {
     //   console.log(`[AI Handler] FULL mode — scanning entire repository`);

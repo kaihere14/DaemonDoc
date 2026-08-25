@@ -3,7 +3,6 @@ import { buildDetectPrompt } from "../prompts/detect.prompt.js";
 import { extractJson } from "../utils/response.js";
 
 export class GeminiProvider {
-  
   constructor({ detectionModel, generationModel }) {
     this.detectionModel = detectionModel;
     this.generationModel = generationModel;
@@ -23,11 +22,15 @@ export class GeminiProvider {
     return extractJson(response);
   }
 
-  async generate(prompt, constraints) {
+  async generate(prompt) {
     return aiCall({
       model: this.generationModel,
       prompt,
-      constraints,
+      constraints: {
+        temperature: 0,
+        responseFormat: "json",
+        maxOutputTokens: 200,
+      },
     });
   }
 }
