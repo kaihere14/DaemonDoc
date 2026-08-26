@@ -1,6 +1,7 @@
 import { buildFUllReadmePrompt } from "./prompts/full.generate.prompt.js";
 
-function formatCommitDiff(commitData) {
+// Exported so the patch pipeline renders commit diffs identically to full mode.
+export function formatCommitDiff(commitData) {
   let diff = "";
 
   if (commitData.message) {
@@ -59,7 +60,7 @@ function estimateContextSize(context) {
   return JSON.stringify(context).length;
 }
 
-function truncateText(text, maxLines) {
+export function truncateText(text, maxLines) {
   if (!text) return text;
 
   const lines = text.split("\n");

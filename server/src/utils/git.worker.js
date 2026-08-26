@@ -5,16 +5,7 @@ import { redis } from "./redis.js";
 import User from "../schema/user.schema.js";
 import ActiveRepo from "../schema/activeRepo.js";
 import { decrypt } from "./crypto.js";
-import {
-  generateReadme,
-  generateReadmePatch,
-  determineGenerationMode,
-} from "../services/groq.service.js";
-import {
-  getActiveLimits,
-  PROVIDER_LIMITS,
-} from "../services/gemini.service.js";
-import { parseReadmeSections, hashSections } from "./readme.parser.js";
+import { REPOSITORY_LIMITS } from "./repo.limits.js";
 import {
   getCommit,
   getRepoTree,
@@ -25,11 +16,6 @@ import {
   shouldIncludeFile,
   truncateContent,
 } from "../services/github.service.js";
-import {
-  buildReadmeContext,
-  optimizeContext,
-  validateContext,
-} from "./prompt.builder.js";
 import UserLogModel from "../schema/userLog.schema.js";
 import { liveUpdate } from "../services/convex.service.js";
 import { cleanReadmeWithAI } from "../services/readmeCleanup.service.js";
@@ -150,7 +136,7 @@ const aihandler = async (data) => {
     sharedLogId,
   } = data;
 
-  const limits = PROVIDER_LIMITS.gemini;
+  const repo_limits = REPOSITORY_LIMITS;
 
   console.log(
     `[AI Handler] Starting README generation for ${repoFullName} at commit ${commitSha}`,
@@ -250,8 +236,8 @@ const aihandler = async (data) => {
         repoOwner,
         repoName,
         defaultBranch,
-        limits.maxFilesFullScan,
-        limits.maxLinesPerFile,
+        repo_limits.maxFilesFullScan,
+        repo_limits.maxLinesPerFile,
       );
       console.log(
         `[AI Handler] Scanned ${fullCodebase.length} important files from repository`,
@@ -268,14 +254,14 @@ const aihandler = async (data) => {
       repoName,
       defaultBranch,
       commitData.files,
-      limits.maxChangedFiles,
-      limits.maxChangedFileLines,
+      repo_limits.maxChangedFiles,
+      repo_limits.maxChangedFileLines,
       fullCodebasePathSet,
     );
 
     let llm = new LlmService();
 
-    const readme = await llm.generate({
+    const result = await llm.generate({
       repoName,
       repoOwner,
       repoStructure,
@@ -285,6 +271,29 @@ const aihandler = async (data) => {
       commitData,
       sharedLogId,
     });
+
+    // Nothing worth documenting changed — this is a normal outcome, not a
+    // failure, so settle the log as skipped and commit nothing.
+    if (result.skipped) {
+      console.log(
+        `[AI Handler] No README update needed for ${repoFullName} — ${result.reason}`,
+      );
+      liveUpdate(
+        sharedLogId,
+        `No major section update — skipping README commit`,
+      );
+      await updateLogStatus(
+        data.logId,
+        "README_GENERATION_SKIPPED",
+        "skipped",
+        null,
+        sharedLogId,
+      );
+
+      return { skipped: true, reason: result.reason };
+    }
+
+    const readme = result.readme;
 
     let commitResult;
 
@@ -318,267 +327,12 @@ const aihandler = async (data) => {
         data.logId,
         "README_GENERATION_FAILED",
         "failed",
-        commitResult.commit.sha,
+        null,
         sharedLogId,
       );
 
       console.log("Readme failed to commit");
     }
-
-    //   await updateLogStatus(
-    //     data.logId,
-    //     "README_GENERATION_SUCCESS",
-    //     "success",
-    //     commitResult.commit.sha,
-    //     sharedLogId,
-    //   );
-
-    // if (mode === "full") {
-    //   console.log(`[AI Handler] FULL mode — scanning entire repository`);
-    //   liveUpdate(sharedLogId, `Scanning entire repository for important files`);
-
-    //   let fullCodebase = [];
-    //   try {
-    //     fullCodebase = await fetchFilesFromTree(
-    //       accessToken,
-    //       repoOwner,
-    //       repoName,
-    //       defaultBranch,
-    //       limits.maxFilesFullScan,
-    //       limits.maxLinesPerFile,
-    //     );
-    //     console.log(
-    //       `[AI Handler] Scanned ${fullCodebase.length} important files from repository`,
-    //     );
-    //     liveUpdate(
-    //       sharedLogId,
-    //       `Scanned ${fullCodebase.length} important files`,
-    //     );
-    //   } catch (error) {
-    //     console.error(
-    //       `[AI Handler] Error scanning repository: ${error.message}`,
-    //     );
-    //   }
-
-    //   const fullCodebasePathSet = new Set(fullCodebase.map((f) => f.path));
-    //   const changedFilesContent = await fetchChangedFiles(
-    //     accessToken,
-    //     repoOwner,
-    //     repoName,
-    //     defaultBranch,
-    //     commitData.files,
-    //     limits.maxChangedFiles,
-    //     limits.maxChangedFileLines,
-    //     fullCodebasePathSet,
-    //   );
-
-    //   let context = buildReadmeContext({
-    //     repoName,
-    //     repoOwner,
-    //     repoStructure,
-    //     existingReadme,
-    //     commitData,
-    //     changedFilesContent,
-    //     fullCodebase,
-    //   });
-
-    //   const validation = validateContext(context);
-    //   console.log(`[AI Handler] Context validation:`, validation);
-
-    //   if (!validation.valid)
-    //     throw new Error(`Invalid context: ${validation.errors.join(", ")}`);
-
-    //   if (validation.warnings.length > 0) {
-    //     console.warn(`[AI Handler] Context warnings:`, validation.warnings);
-    //     liveUpdate(
-    //       sharedLogId,
-    //       `Context: ${validation.estimatedTokens} tokens — optimizing`,
-    //     );
-    //   }
-
-    //   if (validation.estimatedTokens > limits.contextOptimizeAt) {
-    //     console.log(
-    //       `[AI Handler] Optimizing context (${validation.estimatedTokens} tokens > ${limits.contextOptimizeAt} limit)`,
-    //     );
-    //     context = optimizeContext(context, limits.contextOptimizeAt);
-    //   }
-
-    //   console.log(`[AI Handler] Generating README (Gemini → Groq fallback)`);
-    //   const generatedReadme = await generateReadme(context, (msg) =>
-    //     liveUpdate(sharedLogId, msg),
-    //   );
-
-    //   if (!generatedReadme || generatedReadme.trim().length === 0) {
-    //     throw new Error("AI returned empty README");
-    //   }
-
-    //   console.log(
-    //     `[AI Handler] Generated README (${generatedReadme.length} characters)`,
-    //   );
-    //   liveUpdate(
-    //     sharedLogId,
-    //     `Generated README (${generatedReadme.length} chars) — committing to repo`,
-    //   );
-
-    //   const commitResult = await commitFile(
-    //     accessToken,
-    //     repoOwner,
-    //     repoName,
-    //     readmeFileName,
-    //     generatedReadme,
-    //     "chore: auto-update README [skip ci]",
-    //     defaultBranch,
-    //     existingReadmeSha,
-    //   );
-
-    //   console.log(
-    //     `[AI Handler] README committed successfully: ${commitResult.commit.sha}`,
-    //   );
-    //   liveUpdate(
-    //     sharedLogId,
-    //     `✓ README committed: ${commitResult.commit.sha.slice(0, 7)}`,
-    //   );
-
-    //   // Store section hashes so the next push can use patch mode instead of full regen
-    //   const { sections: newSections } = parseReadmeSections(generatedReadme);
-    //   const newHashes = hashSections(newSections);
-
-    //   activeRepo.sectionHashes = newHashes;
-    //   activeRepo.markModified("sectionHashes");
-    //   activeRepo.lastSectionHashesUpdatedAt = new Date();
-    //   activeRepo.lastReadmeGeneratedAt = new Date();
-    //   activeRepo.readmeGenerationCount =
-    //     (activeRepo.readmeGenerationCount || 0) + 1;
-    //   activeRepo.lastReadmeSha = commitResult.commit.sha;
-    //   await activeRepo.save();
-
-    //   await updateLogStatus(
-    //     data.logId,
-    //     "README_GENERATION_SUCCESS",
-    //     "success",
-    //     commitResult.commit.sha,
-    //     sharedLogId,
-    //   );
-
-    //   console.log(
-    //     `[AI Handler] ✓ Full README generation completed for ${repoFullName}`,
-    //   );
-    //   return {
-    //     success: true,
-    //     commitSha: commitResult.commit.sha,
-    //     readmeLength: generatedReadme.length,
-    //   };
-    // } else {
-    //   console.log(`[AI Handler] PATCH mode — surgical section update`);
-    //   liveUpdate(sharedLogId, `Fetching changed files from commit`);
-
-    //   const { sections: originalSections, orderedKeys } =
-    //     parseReadmeSections(existingReadme);
-    //   const originalHashes = hashSections(originalSections);
-
-    //   const changedFilesContent = await fetchChangedFiles(
-    //     accessToken,
-    //     repoOwner,
-    //     repoName,
-    //     defaultBranch,
-    //     commitData.files,
-    //     limits.maxPatchFiles,
-    //     limits.maxPatchFileLines,
-    //   );
-    //   console.log(
-    //     `[AI Handler] Fetched ${changedFilesContent.length} changed files`,
-    //   );
-    //   liveUpdate(
-    //     sharedLogId,
-    //     `Fetched ${changedFilesContent.length} changed file(s)`,
-    //   );
-
-    //   const { commitDiff } = buildReadmeContext({
-    //     repoName,
-    //     repoOwner,
-    //     repoStructure: "",
-    //     existingReadme: null,
-    //     commitData,
-    //     changedFilesContent: [],
-    //   });
-
-    //   const patchResult = await generateReadmePatch({
-    //     repoName,
-    //     repoOwner,
-    //     repoStructure,
-    //     commitDiff,
-    //     changedFiles: changedFilesContent,
-    //     originalSections,
-    //     orderedKeys,
-    //     originalHashes,
-    //     onProgress: (msg) => liveUpdate(sharedLogId, msg),
-    //   });
-
-    //   if (!patchResult) {
-    //     console.log(
-    //       `[AI Handler] Patch generation returned null — skipping commit`,
-    //     );
-    //     liveUpdate(
-    //       sharedLogId,
-    //       `No sections needed updating — skipping commit`,
-    //     );
-    //     await updateLogStatus(
-    //       data.logId,
-    //       "README_GENERATION_SKIPPED",
-    //       "skipped",
-    //       null,
-    //       sharedLogId,
-    //     );
-    //     return { skipped: true };
-    //   }
-
-    //   const { finalReadme, newHashes } = patchResult;
-
-    //   const commitResult = await commitFile(
-    //     accessToken,
-    //     repoOwner,
-    //     repoName,
-    //     readmeFileName,
-    //     finalReadme,
-    //     "chore: auto-update README [skip ci]",
-    //     defaultBranch,
-    //     existingReadmeSha,
-    //   );
-
-    //   console.log(
-    //     `[AI Handler] README patch committed successfully: ${commitResult.commit.sha}`,
-    //   );
-    //   liveUpdate(
-    //     sharedLogId,
-    //     `✓ README committed: ${commitResult.commit.sha.slice(0, 7)}`,
-    //   );
-
-    //   activeRepo.sectionHashes = newHashes;
-    //   activeRepo.markModified("sectionHashes");
-    //   activeRepo.lastSectionHashesUpdatedAt = new Date();
-    //   activeRepo.lastReadmeGeneratedAt = new Date();
-    //   activeRepo.readmeGenerationCount =
-    //     (activeRepo.readmeGenerationCount || 0) + 1;
-    //   activeRepo.lastReadmeSha = commitResult.commit.sha;
-    //   await activeRepo.save();
-
-    //   await updateLogStatus(
-    //     data.logId,
-    //     "README_GENERATION_SUCCESS",
-    //     "success",
-    //     commitResult.commit.sha,
-    //     sharedLogId,
-    //   );
-
-    //   console.log(
-    //     `[AI Handler] ✓ Patch README generation completed for ${repoFullName}`,
-    //   );
-    //   return {
-    //     success: true,
-    //     commitSha: commitResult.commit.sha,
-    //     mode: "patch",
-    //   };
-    // }
   } catch (error) {
     console.error(
       `[AI Handler] ✗ Error generating README for ${repoFullName}:`,

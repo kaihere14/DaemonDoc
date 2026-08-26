@@ -9,5 +9,7 @@ export async function aiCall({ model, prompt, ...options }) {
     ...options,
   });
 
+  console.log(text);
+
   return text;
 }

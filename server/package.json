@@ -27,7 +27,6 @@
     "ioredis": "^5.10.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.2",
-    "openai": "^6.32.0",
     "resend": "^6.9.4"
   },
   "devDependencies": {

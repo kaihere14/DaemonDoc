@@ -1,15 +1,16 @@
 import { liveUpdate } from "../services/convex.service.js";
 import { GeminiProvider } from "./providers/gemini.provider.js";
-import { google } from "@ai-sdk/google";
 import { generateReadme } from "./readme.generate.js";
+import { patchReadme } from "./readme.patch.js";
 
 export class LlmService {
   // Main abstraction layer called at the start of the LLM workflow.
   // Detection and generation (full or patch) are handled internally,
   // and the final generated result is returned to the caller.
 
-  detectionModel = google("gemini-3.5-flash-lite");
-  generationModel = google("gemini-3.5-flash");
+  // Model ids only — GeminiProvider binds them to whichever API key is live.
+  detectionModel = "gemini-3.5-flash-lite";
+  generationModel = "gemini-3.6-flash";
 
   geminiProvider = new GeminiProvider({
     detectionModel: this.detectionModel,
@@ -37,7 +38,7 @@ export class LlmService {
       console.log(`[LLM] FULL mode — scanning entire repository`);
       liveUpdate(sharedLogId, `FULL mode — scanning entire repository`);
 
-      return await generateReadme({
+      const readme = await generateReadme({
         repoName,
         repoOwner,
         repoStructure,
@@ -48,6 +49,8 @@ export class LlmService {
         sharedLogId,
         provider: this.geminiProvider,
       });
+
+      return { skipped: false, readme };
     }
 
     //patch pipeline setup
@@ -55,7 +58,16 @@ export class LlmService {
       console.log(`[LLM] PATCH mode — scanning modified files only`);
       liveUpdate(sharedLogId, `PATCH mode — scanning modified files only`);
 
-      return reason;
+      return await patchReadme({
+        repoName,
+        repoOwner,
+        repoStructure,
+        existingReadme,
+        changedFilesContent,
+        commitData,
+        sharedLogId,
+        provider: this.geminiProvider,
+      });
     }
 
     throw new Error(`Unknown generation mode: ${mode}`);
