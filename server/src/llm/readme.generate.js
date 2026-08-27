@@ -276,11 +276,18 @@ export async function generateReadme({
   // Nothing but the repo name reached the model — the scan found no readable
   // files and the commit carried nothing. Generation still runs, but say so
   // loudly instead of silently shipping a guessed README.
-  if (fileCount === 0 && context.changedFiles.length === 0 && !context.commitDiff) {
+  if (
+    fileCount === 0 &&
+    context.changedFiles.length === 0 &&
+    !context.commitDiff
+  ) {
     console.warn(
       `[LLM] No code context available — README will be limited to repository metadata`,
     );
-    liveUpdate(sharedLogId, `No code context available — README will be limited`);
+    liveUpdate(
+      sharedLogId,
+      `No code context available — README will be limited`,
+    );
   }
 
   if (validation.estimatedTokens > 8000) {

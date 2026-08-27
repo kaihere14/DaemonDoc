@@ -374,7 +374,11 @@ async function fetchFilesFromTree(
   limit = 25,
   linesPerFile = 200,
 ) {
-  if (!treeData || !Array.isArray(treeData.tree) || treeData.tree.length === 0) {
+  if (
+    !treeData ||
+    !Array.isArray(treeData.tree) ||
+    treeData.tree.length === 0
+  ) {
     return [];
   }
 
