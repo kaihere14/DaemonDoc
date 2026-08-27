@@ -24,6 +24,7 @@ export class LlmService {
     existingReadme,
     existingReadmeSha,
     changedFilesContent,
+    fullCodebase,
     commitData,
     sharedLogId,
   }) {
@@ -45,6 +46,7 @@ export class LlmService {
         existingReadme,
         existingReadmeSha,
         changedFilesContent,
+        fullCodebase,
         commitData,
         sharedLogId,
         provider: this.geminiProvider,
@@ -76,6 +78,15 @@ export class LlmService {
   // Detection function uses the small LLM to determine
   // the mode of operation (full or patch).
   async detect(existingReadme) {
+    // No README to analyze — full is the only possible outcome, so skip the
+    // detection model call entirely instead of paying a round trip to learn it.
+    if (!existingReadme || !existingReadme.trim()) {
+      return {
+        mode: "full",
+        reason: "No existing README — generating from scratch",
+      };
+    }
+
     return this.geminiProvider.detect(existingReadme);
   }
 }
