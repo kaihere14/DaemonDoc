@@ -1,3 +1,4 @@
+import { liveUpdate } from "../services/convex.service.js";
 import { buildFUllReadmePrompt } from "./prompts/full.generate.prompt.js";
 
 // Exported so the patch pipeline renders commit diffs identically to full mode.
@@ -80,6 +81,7 @@ function buildReadmeContext({
   repoOwner,
   repoStructure,
   existingReadme,
+  existingReadmeSha,
   commitData,
   changedFilesContent,
   fullCodebase,
@@ -89,6 +91,7 @@ function buildReadmeContext({
     repoOwner,
     repoStructure,
     existingReadme: existingReadme || null,
+    existingReadmeSha: existingReadmeSha || null,
     commitDiff: null,
     changedFiles: changedFilesContent || [],
     fullCodebase: fullCodebase || [],
@@ -230,16 +233,22 @@ export async function generateReadme({
   repoOwner,
   repoStructure,
   existingReadme,
+  existingReadmeSha,
   commitData,
   changedFilesContent,
   fullCodebase,
+  sharedLogId,
   provider,
 }) {
+  console.log(`[LLM] Building full generation context`);
+  liveUpdate(sharedLogId, `Building full generation context`);
+
   let context = buildReadmeContext({
     repoName,
     repoOwner,
     repoStructure,
     existingReadme,
+    existingReadmeSha,
     commitData,
     changedFilesContent,
     fullCodebase,
@@ -255,15 +264,45 @@ export async function generateReadme({
     console.warn("[LLM] Context warnings:", validation.warnings);
   }
 
+  const fileCount = context.fullCodebase.length;
+  console.log(
+    `[LLM] Full context ready — ${fileCount} codebase file(s), ~${validation.estimatedTokens} tokens`,
+  );
+  liveUpdate(
+    sharedLogId,
+    `Context ready — ${fileCount} codebase file(s) (~${validation.estimatedTokens} tokens)`,
+  );
+
+  // Nothing but the repo name reached the model — the scan found no readable
+  // files and the commit carried nothing. Generation still runs, but say so
+  // loudly instead of silently shipping a guessed README.
+  if (fileCount === 0 && context.changedFiles.length === 0 && !context.commitDiff) {
+    console.warn(
+      `[LLM] No code context available — README will be limited to repository metadata`,
+    );
+    liveUpdate(sharedLogId, `No code context available — README will be limited`);
+  }
+
   if (validation.estimatedTokens > 8000) {
+    console.log(`[LLM] Optimizing large context`);
+    liveUpdate(sharedLogId, `Optimizing large context`);
     context = optimizeContext(context, 8000);
   }
 
   let prompt = buildFUllReadmePrompt(context);
 
+  console.log(`[LLM] Generating README with AI`);
+  liveUpdate(sharedLogId, `Generating README with AI`);
   const readme = await provider.generate(prompt);
 
+  console.log(`[LLM] Validating generated README`);
+  liveUpdate(sharedLogId, `Validating generated README`);
   const validatedReadme = validateGeneratedReadme(readme);
+
+  console.log(
+    `[LLM] ✓ Full README generated (${validatedReadme.length} chars)`,
+  );
+  liveUpdate(sharedLogId, `README generated successfully`);
 
   return validatedReadme;
 }

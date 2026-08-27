@@ -16,6 +16,7 @@ import {
   shouldIncludeFile,
   truncateContent,
 } from "../services/github.service.js";
+import { selectImportantFiles } from "./scan.filters.js";
 import UserLogModel from "../schema/userLog.schema.js";
 import { liveUpdate } from "../services/convex.service.js";
 import { cleanReadmeWithAI } from "../services/readmeCleanup.service.js";
@@ -173,14 +174,25 @@ const aihandler = async (data) => {
     console.log(`[AI Handler] Fetching repository structure`);
     liveUpdate(sharedLogId, `Fetching repository structure`);
     let repoStructure = "";
+    let repoTree = null;
     try {
-      const treeData = await getRepoTree(
+      repoTree = await getRepoTree(
         accessToken,
         repoOwner,
         repoName,
         defaultBranch,
       );
-      repoStructure = formatRepoTree(treeData.tree, 3);
+      repoStructure = formatRepoTree(repoTree.tree, 3);
+
+      if (repoTree.truncated) {
+        console.warn(
+          `[AI Handler] Repository tree truncated by GitHub — scan may be partial`,
+        );
+        liveUpdate(
+          sharedLogId,
+          `Repository tree truncated by GitHub — scan may be partial`,
+        );
+      }
     } catch (error) {
       console.warn(`[AI Handler] Could not fetch repo tree: ${error.message}`);
       repoStructure = "Repository structure not available";
@@ -236,6 +248,7 @@ const aihandler = async (data) => {
         repoOwner,
         repoName,
         defaultBranch,
+        repoTree,
         repo_limits.maxFilesFullScan,
         repo_limits.maxLinesPerFile,
       );
@@ -268,6 +281,7 @@ const aihandler = async (data) => {
       existingReadme,
       existingReadmeSha,
       changedFilesContent,
+      fullCodebase,
       commitData,
       sharedLogId,
     });
@@ -356,11 +370,15 @@ async function fetchFilesFromTree(
   owner,
   repo,
   branch,
+  treeData,
   limit = 25,
   linesPerFile = 200,
 ) {
-  const treeData = await getRepoTree(accessToken, owner, repo, branch);
-  const filePaths = getImportantFiles(treeData.tree).slice(0, limit);
+  if (!treeData || !Array.isArray(treeData.tree) || treeData.tree.length === 0) {
+    return [];
+  }
+
+  const filePaths = selectImportantFiles(treeData.tree, limit);
   const results = [];
 
   for (const filePath of filePaths) {
@@ -433,75 +451,6 @@ async function fetchChangedFiles(
     }
   }
   return results;
-}
-
-function getImportantFiles(tree) {
-  const priorities = {
-    // dependency/config files — tell us the most about the project
-    "package.json": 1,
-    "package-lock.json": 1,
-    "requirements.txt": 1,
-    "setup.py": 1,
-    "Cargo.toml": 1,
-    "go.mod": 1,
-    "pom.xml": 1,
-    "build.gradle": 1,
-    "composer.json": 1,
-
-    // entry points
-    "index.js": 2,
-    "index.ts": 2,
-    "main.js": 2,
-    "main.ts": 2,
-    "main.py": 2,
-    "app.js": 2,
-    "app.ts": 2,
-    "server.js": 2,
-    "server.ts": 2,
-
-    // runtime config
-    ".env.example": 3,
-    "config.js": 3,
-    "config.json": 3,
-
-    // docs
-    "CHANGELOG.md": 4,
-    "CONTRIBUTING.md": 4,
-  };
-
-  const importantDirPatterns = [
-    /^src\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^lib\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^app\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^api\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^routes\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^controllers\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^models\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^services\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^utils\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^components\/.*\.(js|ts|jsx|tsx)$/,
-    /^pages\/.*\.(js|ts|jsx|tsx)$/,
-  ];
-
-  const categorized = tree
-    .filter((item) => item.type === "blob")
-    .map((item) => {
-      const filename = item.path.split("/").pop();
-      const priority = priorities[filename] || 999;
-      const matchesPattern = importantDirPatterns.some((pattern) =>
-        pattern.test(item.path),
-      );
-      return { path: item.path, priority, matchesPattern };
-    })
-    .filter((item) => item.priority < 999 || item.matchesPattern)
-    .sort((a, b) => {
-      if (a.priority !== b.priority) return a.priority - b.priority;
-      if (a.matchesPattern && !b.matchesPattern) return -1;
-      if (!a.matchesPattern && b.matchesPattern) return 1;
-      return 0;
-    });
-
-  return categorized.map((item) => item.path);
 }
 
 export const cleanUpQueue = new Queue("cleanup-queue", { connection });
