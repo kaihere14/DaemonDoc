@@ -3,7 +3,8 @@ import { ThinkingOrb } from "@/components/ui/thinking-orb";
 
 /* Sonner's own loading spinner, replaced by the searching orb, whose sphere
    reads as a round icon in sonner's square icon box, run fast enough that the
-   scan stays legible at 16px.
+   scan stays legible at 16px. It takes the same blue as the cleanup button that
+   opened it, rather than inheriting the toast's text colour.
    Sonner drops a custom `icon` on a `loading` toast (it only ever draws its own
    spinner there), so these go out as default toasts held open by an infinite
    duration instead, and the orb sized to sonner's 16px icon box. */
@@ -16,7 +17,7 @@ const cleanupToastOptions = {
       showLabel={false}
       tone="ghost"
       size="sm"
-      className="h-auto p-0 text-current [--orb-size:1rem]"
+      className="h-auto p-0 text-blue-600 [--orb-size:1rem]"
     />
   ),
 };
