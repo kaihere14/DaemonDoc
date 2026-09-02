@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, X, Loader2 } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { usePostHog } from "@posthog/react";
+import { ThinkingOrb } from "@/components/ui/thinking-orb";
 
 // Same three-part shape for every state, so the card doesn't jump as the
 // status changes — only the mark, the colour and the copy swap.
@@ -94,7 +95,13 @@ const OauthVerify = () => {
           className={`rounded-panel mx-auto mb-6 flex h-16 w-16 items-center justify-center border ${view.tone}`}
         >
           {status === "verifying" && (
-            <Loader2 size={28} className="animate-spin" />
+            <ThinkingOrb
+              preset="searching"
+              showLabel={false}
+              tone="ghost"
+              size="sm"
+              className="h-auto p-0 text-current [--orb-size:1.75rem]"
+            />
           )}
           {status === "success" && <Check size={30} strokeWidth={2.5} />}
           {status === "error" && <X size={30} strokeWidth={2.5} />}

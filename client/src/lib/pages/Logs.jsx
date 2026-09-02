@@ -5,7 +5,6 @@ import {
   XCircle,
   GitBranch,
   RefreshCw,
-  Loader2,
   History,
   SkipForward,
   ChevronDown,
@@ -17,6 +16,7 @@ import { api, ENDPOINTS } from "../api";
 import { usePostHog } from "@posthog/react";
 import { WalkthroughLogsBanner } from "@/components/repos/WalkthroughOverlay";
 import { convexApi } from "../convexApi";
+import { ThinkingOrb } from "@/components/ui/thinking-orb";
 import { APP_ORIGIN } from "../urls";
 
 const STATUS_CONFIG = {
@@ -44,7 +44,15 @@ const STATUS_CONFIG = {
     bg: "bg-sky-50",
     border: "border-sky-100",
     glow: "shadow-[0_0_12px_-2px_rgba(14,165,233,0.2)]",
-    icon: <Loader2 size={14} className="animate-spin" />,
+    icon: (
+      <ThinkingOrb
+        preset="working"
+        showLabel={false}
+        tone="ghost"
+        size="sm"
+        className="h-auto p-0 text-current [--orb-size:0.875rem]"
+      />
+    ),
     panelTone: "bg-sky-50 border-sky-100 text-sky-600 group-hover:bg-white",
   },
   skipped: {
@@ -205,11 +213,17 @@ const Logs = () => {
                 }}
                 className="rounded-action bg-primary flex w-full cursor-pointer items-center justify-center gap-2.5 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-colors hover:bg-blue-800 active:scale-[0.97] sm:w-auto sm:px-6"
               >
-                <RefreshCw
-                  size={16}
-                  strokeWidth={2.5}
-                  className={refreshing ? "animate-spin" : ""}
-                />
+                {refreshing ? (
+                  <ThinkingOrb
+                    preset="working"
+                    showLabel={false}
+                    tone="ghost"
+                    size="sm"
+                    className="h-auto p-0 text-current [--orb-size:1rem]"
+                  />
+                ) : (
+                  <RefreshCw size={16} strokeWidth={2.5} />
+                )}
                 Refresh Feed
               </button>
             </div>
@@ -286,10 +300,11 @@ const Logs = () => {
             <div className="divide-y divide-slate-100">
               {loading && logs.length === 0 ? (
                 <div className="flex flex-col items-center gap-4 py-24">
-                  <Loader2 className="animate-spin text-blue-500" size={40} />
-                  <p className="font-mono text-xs font-black tracking-[0.24em] text-slate-400 uppercase">
-                    Loading Logs
-                  </p>
+                  <ThinkingOrb
+                    preset="searching"
+                    label="Loading logs"
+                    size="lg"
+                  />
                 </div>
               ) : error ? (
                 <div className="px-4 py-14 text-center sm:px-6 sm:py-16">
@@ -435,10 +450,13 @@ const LogMessages = ({ logId }) => {
 
   if (messages === undefined) {
     return (
-      <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-        <Loader2 className="animate-spin" size={14} />
-        Loading detail messages
-      </div>
+      <ThinkingOrb
+        preset="thinking"
+        label="Loading detail messages"
+        tone="ghost"
+        size="sm"
+        className="px-0 font-semibold text-slate-400"
+      />
     );
   }
 

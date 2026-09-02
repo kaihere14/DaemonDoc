@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { ThinkingOrb } from "@/components/ui/thinking-orb";
 import {
   Github,
   ArrowLeft,
@@ -172,7 +173,13 @@ const ReplayBtn = ({ onClick, running, idleLabel = "Run again" }) => (
   >
     {running ? (
       <>
-        <div className="h-3 w-3 animate-spin rounded-full border-2 border-slate-300 border-t-slate-600" />
+        <ThinkingOrb
+          preset="working"
+          showLabel={false}
+          tone="ghost"
+          size="sm"
+          className="h-auto p-0 text-current [--orb-size:0.75rem]"
+        />
         Running...
       </>
     ) : (
@@ -331,7 +338,7 @@ const Login = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="border-t-primary h-10 w-10 animate-spin rounded-full border-4 border-slate-100" />
+        <ThinkingOrb preset="searching" label="Loading" size="lg" />
       </div>
     );
   }
@@ -427,7 +434,13 @@ const Login = () => {
                       {s.label}
                     </span>
                     {active && (
-                      <div className="ml-auto h-3 w-3 animate-spin rounded-full border-2 border-slate-200 border-t-slate-500" />
+                      <ThinkingOrb
+                        preset="working"
+                        showLabel={false}
+                        tone="ghost"
+                        size="sm"
+                        className="ml-auto h-auto p-0 text-slate-500 [--orb-size:0.75rem]"
+                      />
                     )}
                     {reached && !active && (
                       <div
@@ -593,7 +606,13 @@ const Login = () => {
                     </span>
                     <span className="text-xs text-slate-400">{f.size}</span>
                     {active && (
-                      <div className="h-3 w-3 animate-spin rounded-full border-2 border-slate-200 border-t-slate-500" />
+                      <ThinkingOrb
+                        preset="working"
+                        showLabel={false}
+                        tone="ghost"
+                        size="sm"
+                        className="h-auto p-0 text-slate-500 [--orb-size:0.75rem]"
+                      />
                     )}
                     {fetched && (
                       <CheckCheck
@@ -705,7 +724,13 @@ const Login = () => {
                       {f.path}
                     </span>
                     {active && !skipped && (
-                      <div className="h-3 w-3 animate-spin rounded-full border-2 border-slate-200 border-t-slate-500" />
+                      <ThinkingOrb
+                        preset="working"
+                        showLabel={false}
+                        tone="ghost"
+                        size="sm"
+                        className="h-auto p-0 text-slate-500 [--orb-size:0.75rem]"
+                      />
                     )}
                     {revealed && !skipped && (
                       <span
