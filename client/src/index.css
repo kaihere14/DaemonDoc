@@ -43,6 +43,22 @@
     0 1px 2px rgba(15, 23, 42, 0.05), 0 20px 50px -32px rgba(15, 23, 42, 0.34);
   --shadow-overlay:
     0 2px 6px rgba(15, 23, 42, 0.06), 0 24px 70px -36px rgba(15, 23, 42, 0.55);
+
+  /* ── B6 registry tokens ────────────────────────────────────────────────
+     `components/ui/thinking-orb` ships from ui.armandev.space and reads these
+     directly (`text-(length:--text-small)`, `ease-b6`, `shadow-b6-xs`) so the
+     item stays standalone. Without them the pill loses its type step and
+     border shadow, so they live here rather than inside the component. */
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+  --text-caption--letter-spacing: 0.005em;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.25rem;
+  --text-small--letter-spacing: -0.006em;
+  --text-body: 1rem;
+  --text-body--line-height: 1.5rem;
+  --ease-b6: cubic-bezier(0.32, 0.72, 0, 1);
+  --shadow-b6-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
 }
 
 /* Premium typography and smooth rendering */

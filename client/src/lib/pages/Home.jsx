@@ -13,6 +13,7 @@ import {
 } from "@/components/repos/WalkthroughOverlay";
 import CleanupFeatureSpotlight from "@/components/repos/CleanupFeatureSpotlight";
 import { APP_ORIGIN } from "../urls";
+import { ThinkingOrb } from "@/components/ui/thinking-orb";
 
 const FILTER_TABS = [
   { key: "all", label: "All Repositories" },
@@ -199,10 +200,17 @@ const Home = () => {
                     disabled={loading}
                     className="rounded-action bg-primary sm:rounded-action flex w-full items-center justify-center gap-2 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/20 transition-all hover:bg-blue-800 disabled:opacity-50 sm:w-auto sm:px-5"
                   >
-                    <RefreshCw
-                      size={16}
-                      className={loading ? "animate-spin" : ""}
-                    />
+                    {loading ? (
+                      <ThinkingOrb
+                        preset="working"
+                        showLabel={false}
+                        tone="ghost"
+                        size="sm"
+                        className="h-auto p-0 text-current [--orb-size:1rem]"
+                      />
+                    ) : (
+                      <RefreshCw size={16} />
+                    )}
                     Refresh list
                   </motion.button>
                 </div>

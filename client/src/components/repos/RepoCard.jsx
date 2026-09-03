@@ -4,16 +4,15 @@ import {
   GitBranch,
   Lock,
   Unlock,
-  Loader2,
   ExternalLink,
   BrushCleaning,
-  Loader,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useQuery } from "convex/react";
 import { api, ENDPOINTS } from "@/lib/api";
 import { convexApi } from "@/lib/convexApi";
 import { usePostHog } from "@posthog/react";
+import { ThinkingOrb } from "@/components/ui/thinking-orb";
 
 // The worker's terminal messages, matched so the toast can settle instead of
 // guessing on a timer. Kept in sync with cleanupHandler in git.worker.js.
@@ -267,7 +266,13 @@ const RepoCard = ({
                   </motion.span>
                 ))}
               {loading ? (
-                <Loader2 size={20} className="animate-spin text-slate-400" />
+                <ThinkingOrb
+                  preset="working"
+                  showLabel={false}
+                  tone="ghost"
+                  size="sm"
+                  className="h-auto p-0 text-slate-400 [--orb-size:1.25rem]"
+                />
               ) : repo.canActivate === false && !isActive ? (
                 <button
                   type="button"
@@ -368,7 +373,13 @@ const RepoCard = ({
               {!isCleaningUp ? (
                 <BrushCleaning size={16} className="text-blue-600" />
               ) : (
-                <Loader size={16} className="animate-spin text-blue-600" />
+                <ThinkingOrb
+                  preset="working"
+                  showLabel={false}
+                  tone="ghost"
+                  size="sm"
+                  className="h-auto p-0 text-blue-600 [--orb-size:1rem]"
+                />
               )}
             </button>
           </div>

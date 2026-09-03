@@ -3,7 +3,6 @@ import {
   BarChart3,
   AlertCircle,
   RefreshCw,
-  Loader2,
   Activity,
   CheckCircle2,
   XCircle,
@@ -12,6 +11,7 @@ import {
 import { motion } from "framer-motion";
 import CountUpNumber from "./CountUpNumber";
 import { fadeUpVariant, formatAnalyticsTimestamp } from "./adminUtils";
+import { ThinkingOrb } from "@/components/ui/thinking-orb";
 
 const STATUS_CONFIG = {
   success: {
@@ -36,7 +36,15 @@ const STATUS_CONFIG = {
     bg: "bg-sky-50",
     border: "border-sky-100",
     glow: "shadow-[0_0_12px_-2px_rgba(14,165,233,0.2)]",
-    icon: <Loader2 size={14} className="animate-spin" />,
+    icon: (
+      <ThinkingOrb
+        preset="working"
+        showLabel={false}
+        tone="ghost"
+        size="sm"
+        className="h-auto p-0 text-current [--orb-size:0.875rem]"
+      />
+    ),
   },
   skipped: {
     label: "Skipped",
@@ -86,10 +94,17 @@ const AdminAnalyticsSection = ({
           onClick={onRefresh}
           className="inline-flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold tracking-[0.2em] text-slate-500 uppercase transition-all hover:border-blue-200 hover:text-blue-600"
         >
-          <RefreshCw
-            size={14}
-            className={isAnalyticsRefreshing ? "animate-spin" : ""}
-          />
+          {isAnalyticsRefreshing ? (
+            <ThinkingOrb
+              preset="working"
+              showLabel={false}
+              tone="ghost"
+              size="sm"
+              className="h-auto p-0 text-current [--orb-size:0.875rem]"
+            />
+          ) : (
+            <RefreshCw size={14} />
+          )}
           Refresh
         </button>
       </div>
@@ -128,15 +143,10 @@ const AdminAnalyticsSection = ({
 
         {isAnalyticsLoading ? (
           <div className="rounded-panel flex min-h-[320px] flex-1 flex-col items-center justify-center gap-4 border border-dashed border-slate-200 bg-slate-50/70 px-6 py-10 text-center">
-            <Loader2 size={28} className="animate-spin text-blue-600" />
-            <div>
-              <p className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
-                Loading Analytics
-              </p>
-              <p className="mt-2 text-sm text-slate-500">
-                Aggregating repository activity and admin metrics.
-              </p>
-            </div>
+            <ThinkingOrb preset="searching" label="Loading analytics" />
+            <p className="text-sm text-slate-500">
+              Aggregating repository activity and admin metrics.
+            </p>
           </div>
         ) : analyticsError ? (
           <div className="rounded-panel flex min-h-[320px] flex-1 flex-col justify-between border border-rose-100 bg-rose-50/60 p-5">

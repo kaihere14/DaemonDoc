@@ -2,6 +2,7 @@ import React from "react";
 import { Send, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDialog } from "../../hooks/useDialog";
+import { ThinkingOrb } from "@/components/ui/thinking-orb";
 
 const ConfirmBroadcastModal = ({
   isOpen,
@@ -61,7 +62,13 @@ const ConfirmBroadcastModal = ({
                 className="rounded-tile flex w-full cursor-pointer items-center justify-center gap-2 bg-slate-900 px-6 py-4 font-bold text-white shadow-xl shadow-slate-200 transition-colors hover:bg-black active:scale-[0.98] disabled:opacity-60"
               >
                 {isLoading ? (
-                  <div className="h-5 w-5 animate-spin rounded-full border-4 border-white border-t-transparent" />
+                  <ThinkingOrb
+                    preset="working"
+                    showLabel={false}
+                    tone="ghost"
+                    size="sm"
+                    className="h-auto p-0 text-current [--orb-size:1.25rem]"
+                  />
                 ) : (
                   <>
                     <Send size={20} />
