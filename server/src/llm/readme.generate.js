@@ -1,5 +1,5 @@
 import { liveUpdate } from "../services/convex.service.js";
-import { buildFUllReadmePrompt } from "./prompts/full.generate.prompt.js";
+import { buildFullReadmePrompt } from "./prompts/full.generate.prompt.js";
 
 // Exported so the patch pipeline renders commit diffs identically to full mode.
 export function formatCommitDiff(commitData) {
@@ -296,7 +296,7 @@ export async function generateReadme({
     context = optimizeContext(context, 8000);
   }
 
-  let prompt = buildFUllReadmePrompt(context);
+  let prompt = buildFullReadmePrompt(context);
 
   console.log(`[LLM] Generating README with AI`);
   liveUpdate(sharedLogId, `Generating README with AI`);

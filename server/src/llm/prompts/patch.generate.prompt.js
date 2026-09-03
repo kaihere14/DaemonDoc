@@ -16,12 +16,18 @@ export function buildPatchReadmePrompt(context) {
           .join("\n")
       : "(none)";
 
+  const forbidden =
+    context.forbiddenSections.length > 0
+      ? context.forbiddenSections.join(", ")
+      : "(none)";
+
   return `
-You are an expert technical writer and software engineer maintaining an existing README.md.
+You are a technical writer maintaining an existing README.md. A commit just
+landed in the repository. Decide which README sections that commit made
+inaccurate, incomplete, or outdated, and rewrite ONLY those sections.
 
-A commit landed in the repository. Your job is to decide which README sections that commit made inaccurate or incomplete, and to rewrite ONLY those sections.
-
-You are NOT regenerating the README. Every section you do not return is preserved untouched by the server.
+You are NOT regenerating the README. Any section you do not return is kept
+exactly as it is. Returning fewer sections is better than returning more.
 
 ## Repository
 
@@ -49,24 +55,31 @@ ${sectionList}
 
 ## Rules
 
-- Return a section ONLY if the commit above genuinely made it inaccurate, incomplete, or outdated.
-- If nothing in the README is affected by this commit, return an empty "updates" array.
-- Use ONLY the exact section names listed above. Never invent, rename, split, merge, or delete a section.
-- Never return these protected sections: ${context.forbiddenSections.join(", ")}.
+- Return a section ONLY if the commit above genuinely made it wrong, incomplete,
+  or outdated. If nothing is affected, return an empty "updates" array.
+- Use ONLY the exact section names listed above. Never invent, rename, split,
+  merge, or delete a section.
+- Never return these protected sections: ${forbidden}.
 - Return at most ${context.maxSections} sections. Prefer the most affected ones.
-- Each "content" value must be the COMPLETE replacement markdown for that section, starting with its heading line reproduced exactly as given above.
-- Do not speculate about features, commands, dependencies, or configuration that are not visible in the provided context.
-- Preserve wording, tone, formatting, and details of the existing section that are still accurate. Change only what the commit invalidated.
-- Do not mention the commit, this instruction, or that you are an AI.
+- Each "content" value is the COMPLETE replacement Markdown for that section. It
+  MUST begin with that section's "Heading line to reproduce verbatim" exactly as
+  given above — same text and same heading level (number of leading \`#\`).
+- Change only what the commit invalidated. Preserve the wording, tone, structure,
+  and detail of the rest of the section.
+- Base every change on the provided commit, changed files, and repository
+  structure. Do not add features, commands, dependencies, or configuration that
+  are not visible in that context.
+- Do not mention the commit, these instructions, or that you are an AI.
 
 ## Output
 
-Return ONLY valid JSON in this exact shape. No markdown fences, no commentary:
+Return ONLY a valid JSON object in exactly this shape — no code fences, no
+commentary. Escape every newline inside "content" as \\n:
 
 {
   "updates": [
     { "section": "Installation", "content": "## Installation\\n\\nUpdated content..." }
   ]
 }
-`;
+`.trim();
 }

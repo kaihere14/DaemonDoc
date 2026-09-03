@@ -3,6 +3,7 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { aiCall } from "../ai.sdk.js";
 import { buildDetectPrompt } from "../prompts/detect.prompt.js";
 import { extractJson } from "../utils/response.js";
+import { buildCleanupPrompt } from "../prompts/cleanup.prompt.js";
 
 // Keys are tried in slot order. Unset or blank slots are dropped, so a
 // half-filled .env still works instead of burning an attempt on nothing.
@@ -57,9 +58,10 @@ function describe(error) {
 export class GeminiProvider {
   // detectionModel/generationModel are Gemini model ids. The provider binds
   // them to a key itself, because the key is what rotates — not the model.
-  constructor({ detectionModel, generationModel }) {
+  constructor({ detectionModel, generationModel, cleanupModel }) {
     this.detectionModel = detectionModel;
     this.generationModel = generationModel;
+    this.cleanupModel = cleanupModel;
 
     // One AI SDK client per usable key, built once and reused for every call.
     this.clients = loadGeminiKeys().map((apiKey) =>
@@ -120,6 +122,13 @@ export class GeminiProvider {
   async generate(prompt) {
     return this.#call(this.generationModel, {
       prompt,
+      temperature: 0,
+    });
+  }
+
+  async cleanup(existingReadme) {
+    return this.#call(this.cleanupModel, {
+      prompt: buildCleanupPrompt(existingReadme),
       temperature: 0,
     });
   }
