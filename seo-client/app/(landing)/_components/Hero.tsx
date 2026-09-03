@@ -10,6 +10,7 @@ import {
 import { Play, ArrowRight, Lock, Sparkles, ChevronRight, FileText, RefreshCw } from "lucide-react";
 import Image from "next/image";
 import { SECTION_X } from "@/app/(landing)/_lib/section";
+import { CandyLink } from "@/components/ui/candy-button";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daemondoc.online";
 
@@ -53,19 +54,15 @@ const TECH_LOGOS = [
   },
 ];
 
-/** The two things DaemonDoc can do with a repo, mirrored as prompt-card modes. */
+/** The two things DaemonDoc does with a repo, shown as labels on the mock. */
 const MODES = [
   { id: "generate", label: "Generate", Icon: FileText },
   { id: "sync", label: "Keep in sync", Icon: RefreshCw },
 ] as const;
 
-type Mode = (typeof MODES)[number]["id"];
-
 export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [repo, setRepo] = useState("");
-  const [mode, setMode] = useState<Mode>("generate");
   const reduceMotion = useReducedMotion();
 
   // The photo starts edge-to-edge and pulls into a rounded, inset panel as the
@@ -114,15 +111,6 @@ export default function Hero() {
     }
   };
 
-  // The repo never reaches an API from here — the landing page hands the input
-  // to the app's login, which owns GitHub OAuth and the actual run.
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const params = new URLSearchParams({ mode });
-    if (repo.trim()) params.set("repo", repo.trim());
-    window.location.href = `${APP_URL}/login?${params.toString()}`;
-  };
-
   return (
     <main id="hero">
       {/* ── Full-bleed photo panel ─────────────────────────────────────────── */}
@@ -149,72 +137,63 @@ export default function Hero() {
           {/* Eyebrow pill */}
           <a
             href="#engine"
-            className="inline-flex items-center gap-3 rounded-full border border-white/25 bg-white/15 py-2 pr-3 pl-4 text-sm font-medium text-white backdrop-blur-md transition-colors hover:bg-white/25"
+            className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/25 bg-white/15 py-2 pr-2.5 pl-3 text-xs font-medium text-white backdrop-blur-md transition-colors hover:bg-white/25 sm:gap-3 sm:pr-3 sm:pl-4 sm:text-sm"
           >
             <Sparkles size={15} className="shrink-0 text-sky-200" />
-            <span className="h-4 w-px bg-white/30" />
-            Synced on every push — no manual edits
+            <span className="h-4 w-px shrink-0 bg-white/30" />
+            <span className="truncate">
+              Synced on every push
+              <span className="hidden sm:inline"> — no manual edits</span>
+            </span>
             <ChevronRight size={15} className="shrink-0 opacity-70" />
           </a>
 
           {/* Headline. Reference proportions: ~64px desktop, regular weight —
               the display face carries the line, no bold and no ornament. */}
-          <h1 className="font-display mx-auto mt-12 max-w-3xl text-[2rem] leading-[1.14] font-normal tracking-[-0.022em] text-white [text-shadow:0_1px_2px_rgba(3,17,48,0.7),0_3px_18px_rgba(3,17,48,0.55)] sm:text-5xl lg:text-[4rem]">
+          <h1 className="font-display mx-auto mt-10 max-w-3xl text-[1.75rem] leading-[1.16] sm:mt-12 font-normal tracking-[-0.022em] text-white [text-shadow:0_1px_2px_rgba(3,17,48,0.7),0_3px_18px_rgba(3,17,48,0.55)] sm:text-5xl lg:text-[4rem]">
             From git push to current docs in seconds.
           </h1>
 
-          {/* Prompt card. Two shells: a pale outer frame that separates the card
-              from the photo, and a near-solid dark panel that keeps the input
-              legible instead of showing the meadow through it. */}
+          {/* Prompt card. A still of the product, not a form — there is nothing
+              to submit from the marketing site, so the only live control is the
+              link into the app. The mock is inert and out of the tab order. */}
           <div className="mx-auto mt-14 w-full max-w-2xl rounded-[22px] bg-white/25 p-1 shadow-[var(--shadow-overlay)] ring-1 ring-white/40 backdrop-blur-md">
-            <form
-              onSubmit={handleSubmit}
-              className="rounded-[18px] bg-slate-950/90 p-4 text-left"
-            >
-              <label htmlFor="hero-repo" className="sr-only">
-                GitHub repository URL
-              </label>
-              <input
-                id="hero-repo"
-                type="text"
-                inputMode="url"
-                autoComplete="off"
-                spellCheck={false}
-                value={repo}
-                onChange={(e) => setRepo(e.target.value)}
-                placeholder="github.com/your-org/your-repo"
-                className="w-full bg-transparent px-2 pt-2 pb-12 font-mono text-base text-white placeholder:text-slate-500 focus:outline-none sm:text-lg"
-              />
+            <div className="rounded-[18px] bg-slate-950/90 p-4 text-left select-none">
+              <p
+                aria-hidden="true"
+                className="px-2 pt-2 pb-10 font-mono text-sm text-slate-500 sm:pb-12 sm:text-lg"
+              >
+                github.com/your-org/your-repo
+                <span className="ml-0.5 inline-block h-[1.1em] w-[2px] translate-y-[0.18em] bg-slate-500/80 align-baseline" />
+              </p>
 
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-1 rounded-full bg-white/[0.06] p-1">
-                  {MODES.map(({ id, label, Icon }) => (
-                    <button
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div
+                  aria-hidden="true"
+                  className="flex items-center justify-center gap-1 rounded-full bg-white/[0.06] p-1"
+                >
+                  {MODES.map(({ id, label, Icon }, i) => (
+                    <span
                       key={id}
-                      type="button"
-                      onClick={() => setMode(id)}
-                      aria-pressed={mode === id}
-                      className={`flex cursor-pointer items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium whitespace-nowrap transition-colors sm:px-4 ${
-                        mode === id
-                          ? "bg-white/12 text-white"
-                          : "text-slate-400 hover:text-slate-200"
+                      className={`flex flex-1 items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-medium whitespace-nowrap sm:flex-none sm:px-4 ${
+                        i === 0 ? "bg-white/12 text-white" : "text-slate-400"
                       }`}
                     >
                       <Icon size={15} className="hidden shrink-0 sm:block" />
                       {label}
-                    </button>
+                    </span>
                   ))}
                 </div>
 
-                <button
-                  type="submit"
-                  className="bg-primary hover:bg-secondary flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#54A1FD] px-5 py-2.5 font-semibold text-white shadow-[inset_0px_1px_8px_-4px_#FFFFFF] transition-colors active:scale-[0.97]"
+                <CandyLink
+                  href={`${APP_URL}/login`}
+                  className="w-full gap-2 px-5 py-2.5 text-base sm:w-auto"
                 >
-                  {mode === "generate" ? "Generate" : "Connect"}
+                  Connect repo
                   <Sparkles size={16} className="shrink-0" />
-                </button>
+                </CandyLink>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </motion.section>
