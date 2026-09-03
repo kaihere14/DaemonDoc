@@ -19,7 +19,6 @@ import {
 import { selectImportantFiles } from "./scan.filters.js";
 import UserLogModel from "../schema/userLog.schema.js";
 import { liveUpdate } from "../services/convex.service.js";
-import { cleanReadmeWithAI } from "../services/readmeCleanup.service.js";
 import { LlmService } from "../llm/llm.service.js";
 
 export const connection = new IORedis({
