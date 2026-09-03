@@ -119,10 +119,13 @@ export class GeminiProvider {
   }
 
   // Main model — free-form README generation, no JSON parsing here.
+  // maxOutputTokens set explicitly: a README fits well under 16K, and the SDK
+  // default is too low to trust for a full-length document.
   async generate(prompt) {
     return this.#call(this.generationModel, {
       prompt,
       temperature: 0,
+      maxOutputTokens: 16000,
     });
   }
 
@@ -130,6 +133,7 @@ export class GeminiProvider {
     return this.#call(this.cleanupModel, {
       prompt: buildCleanupPrompt(existingReadme),
       temperature: 0,
+      maxOutputTokens: 16000,
     });
   }
 }

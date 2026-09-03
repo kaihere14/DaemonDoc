@@ -13,8 +13,8 @@ import { extractJson } from "./utils/response.js";
 
 // Patch mode ships far less context than full mode: only the current README,
 // the commit diff, and the files that commit touched.
-const MAX_CONTEXT_TOKENS = 8000;
-const MAX_PATCH_SECTIONS = 10;
+const MAX_CONTEXT_TOKENS = 60000;
+const MAX_PATCH_SECTIONS = 20;
 
 function estimateContextSize(context) {
   return JSON.stringify(context).length;

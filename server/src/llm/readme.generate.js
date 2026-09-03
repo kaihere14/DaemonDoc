@@ -141,7 +141,7 @@ export function validateContext(context) {
   const size = estimateContextSize(context);
   const estimatedTokens = Math.ceil(size / 4);
 
-  if (estimatedTokens > 10000) {
+  if (estimatedTokens > 200000) {
     warnings.push(
       `Context is large (${estimatedTokens} tokens) - will be optimized`,
     );
@@ -156,7 +156,7 @@ export function validateContext(context) {
   };
 }
 
-export function optimizeContext(context, maxTokens = 8000) {
+export function optimizeContext(context, maxTokens = 180000) {
   const maxChars = maxTokens * 4;
 
   if (estimateContextSize(context) <= maxChars) {
@@ -169,18 +169,18 @@ export function optimizeContext(context, maxTokens = 8000) {
   if (optimized.fullCodebase && optimized.fullCodebase.length > 0) {
     optimized.fullCodebase = optimized.fullCodebase.map((file) => ({
       ...file,
-      content: truncateText(file.content, 80),
+      content: truncateText(file.content, 400),
     }));
     if (fits()) return optimized;
 
-    if (optimized.fullCodebase.length > 15) {
-      optimized.fullCodebase = optimized.fullCodebase.slice(0, 15);
+    if (optimized.fullCodebase.length > 80) {
+      optimized.fullCodebase = optimized.fullCodebase.slice(0, 80);
       if (fits()) return optimized;
     }
 
     optimized.fullCodebase = optimized.fullCodebase.map((file) => ({
       ...file,
-      content: truncateText(file.content, 50),
+      content: truncateText(file.content, 200),
     }));
     if (fits()) return optimized;
   }
@@ -290,10 +290,10 @@ export async function generateReadme({
     );
   }
 
-  if (validation.estimatedTokens > 8000) {
+  if (validation.estimatedTokens > 180000) {
     console.log(`[LLM] Optimizing large context`);
     liveUpdate(sharedLogId, `Optimizing large context`);
-    context = optimizeContext(context, 8000);
+    context = optimizeContext(context, 180000);
   }
 
   let prompt = buildFullReadmePrompt(context);
