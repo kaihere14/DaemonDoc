@@ -1,73 +1,86 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Play, ArrowRight, Lock } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import { Play, ArrowRight, Lock, Sparkles, ChevronRight, FileText, RefreshCw } from "lucide-react";
 import Image from "next/image";
-import { CandyLink } from "@/components/ui/candy-button";
 import { SECTION_X } from "@/app/(landing)/_lib/section";
-import GradientWaves from "@/components/GradientWaves"
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daemondoc.online";
 
-const FLOATING_ICONS = [
+/** Languages the analyzer reads — shown as a static strip under the prompt card. */
+const TECH_LOGOS = [
   {
     id: "java",
+    label: "Java",
     bg: "#ffffff",
     logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg",
-    pos: "top-20 left-4",
-    rotate: "-rotate-6",
-    anim: "animate-float-slow",
   },
   {
     id: "cpp",
+    label: "C++",
     bg: "#00599c",
     logo: "https://cdn.simpleicons.org/cplusplus/ffffff",
-    pos: "top-60 left-24",
-    rotate: "rotate-12",
-    anim: "animate-float-slow-delayed",
   },
   {
     id: "go",
+    label: "Go",
     bg: "#00acd7",
     logo: "https://cdn.simpleicons.org/go/ffffff",
-    pos: "top-96 left-10",
-    rotate: "-rotate-3",
-    anim: "animate-float-slow",
   },
   {
     id: "js",
+    label: "JavaScript",
     bg: "#ffffff",
     logo: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg",
-    pos: "top-24 right-12",
-    rotate: "rotate-6",
-    anim: "animate-float-slow-delayed",
   },
   {
     id: "ts",
+    label: "TypeScript",
     bg: "#3178c6",
     logo: "https://cdn.simpleicons.org/typescript/ffffff",
-    pos: "top-64 right-32",
-    rotate: "-rotate-12",
-    anim: "animate-float-slow",
   },
   {
     id: "react",
+    label: "React",
     bg: "#20232a",
     logo: "https://cdn.simpleicons.org/react/61dafb",
-    pos: "top-96 right-10",
-    rotate: "rotate-3",
-    anim: "animate-float-slow-delayed",
   },
 ];
 
+/** The two things DaemonDoc can do with a repo, mirrored as prompt-card modes. */
+const MODES = [
+  { id: "generate", label: "Generate", Icon: FileText },
+  { id: "sync", label: "Keep in sync", Icon: RefreshCw },
+] as const;
 
+type Mode = (typeof MODES)[number]["id"];
 
 export default function Hero() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [repo, setRepo] = useState("");
+  const [mode, setMode] = useState<Mode>("generate");
   const reduceMotion = useReducedMotion();
-  
+
+  // The photo starts edge-to-edge and pulls into a rounded, inset panel as the
+  // page scrolls — the same move the reference makes.
+  const { scrollY } = useScroll();
+  const radius = useTransform(scrollY, [0, 260], [0, 32]);
+  const inset = useTransform(scrollY, [0, 260], [0, 14]);
+  const frameStyle = reduceMotion
+    ? undefined
+    : {
+        borderBottomLeftRadius: radius,
+        borderBottomRightRadius: radius,
+        marginLeft: inset,
+        marginRight: inset,
+      };
 
   const handleMouseEnter = () => {
     if (videoRef.current) {
@@ -101,107 +114,114 @@ export default function Hero() {
     }
   };
 
+  // The repo never reaches an API from here — the landing page hands the input
+  // to the app's login, which owns GitHub OAuth and the actual run.
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams({ mode });
+    if (repo.trim()) params.set("repo", repo.trim());
+    window.location.href = `${APP_URL}/login?${params.toString()}`;
+  };
+
   return (
-    <main
-      className="relative overflow-hidden pt-32 pb-14 lg:pt-44 lg:pb-20"
-      id="hero"
-    >
-      {/* SVG Grid Background */}
-      <div className="pointer-events-none absolute inset-0 z-0 ">
-        <GradientWaves horizonColor="#209BFF" opacity={1} detail="high" height={15}/>
-      </div>
+    <main id="hero">
+      {/* ── Full-bleed photo panel ─────────────────────────────────────────── */}
+      <motion.section
+        style={frameStyle}
+        className="relative isolate flex min-h-[100svh] flex-col justify-center overflow-hidden pt-40 pb-40 lg:pt-48 lg:pb-52"
+      >
+        <Image
+          src="/background4.png"
+          alt=""
+          aria-hidden="true"
+          fill
+          priority
+          sizes="100vw"
+          className="-z-20 object-cover object-center [filter:saturate(1.45)_contrast(1.14)_brightness(1.06)]"
+        />
 
-      <div className="pointer-events-none absolute inset-0 z-0 bg-linear-to-b from-transparent via-[#EAF4FF]/30 to-white" />
+        {/* Scrims. Kept light so the photo stays saturated — the headline earns
+            its contrast from a tight text-shadow instead of a heavy overlay. */}
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(70%_45%_at_50%_30%,rgba(3,17,48,0.30)_0%,rgba(3,17,48,0.10)_55%,transparent_80%)]" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-48 bg-linear-to-b from-slate-950/32 via-slate-950/8 to-transparent" />
 
-      <div className={`relative z-10 text-center ${SECTION_X}`}>
-        {/* Floating tech icon chips */}
-        {FLOATING_ICONS.map((icon) => (
-          <div
-            key={icon.id}
-            className={`absolute hidden lg:block ${icon.pos} ${icon.anim}`}
+        <div className={`relative text-center ${SECTION_X}`}>
+          {/* Eyebrow pill */}
+          <a
+            href="#engine"
+            className="inline-flex items-center gap-3 rounded-full border border-white/25 bg-white/15 py-2 pr-3 pl-4 text-sm font-medium text-white backdrop-blur-md transition-colors hover:bg-white/25"
           >
-            <div
-              className={`flex h-9 w-9 items-center justify-center rounded-lg shadow-lg shadow-slate-200/40 ${icon.rotate}`}
-              style={{ background: icon.bg }}
-            >
-              {/* Purely decorative: the language set is conveyed by the copy, so
-                  these stay out of the accessibility tree. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={icon.logo}
-                alt=""
-                aria-hidden="true"
-                width={20}
-                height={20}
-                className="h-5 w-5"
-              />
-            </div>
-          </div>
-        ))}
+            <Sparkles size={15} className="shrink-0 text-sky-200" />
+            <span className="h-4 w-px bg-white/30" />
+            Synced on every push — no manual edits
+            <ChevronRight size={15} className="shrink-0 opacity-70" />
+          </a>
 
-        {/* Headline + CTAs */}
-        <div className="mx-auto max-w-4xl space-y-8">
-          <h1 className="font-display overflow-visible text-4xl leading-[1.06] font-bold tracking-[-0.038em] text-slate-900 sm:text-5xl md:text-6xl lg:text-7xl">
-            Where your code turns into{" "}
-            <span className="text-primary relative mx-1 inline-block transform-[perspective(800px)_rotateY(15deg)_rotateX(5deg)] rounded-t-lg border border-[#D6EAFF] bg-[#EAF4FF]/50 px-2 leading-tight font-extrabold whitespace-nowrap shadow-sm drop-shadow-2xl text-shadow-md sm:mr-0 sm:ml-5">
-              documentation
-              <svg
-                className="text-primary/40 absolute -bottom-2 left-0 h-3 w-full"
-                viewBox="0 0 200 10"
-                preserveAspectRatio="none"
-              >
-                <motion.path
-                  d="M0 5 Q 50 1 100 5 T 200 5"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  fill="none"
-                  strokeLinecap="round"
-                  initial={
-                    reduceMotion
-                      ? { pathLength: 1, opacity: 1 }
-                      : { pathLength: 0, opacity: 0 }
-                  }
-                  animate={{ pathLength: 1, opacity: 1 }}
-                  transition={
-                    reduceMotion
-                      ? { duration: 0 }
-                      : { duration: 1.5, delay: 0.5, ease: "easeOut" }
-                  }
-                />
-              </svg>
-            </span>{" "}
-            with a click
+          {/* Headline. Reference proportions: ~64px desktop, regular weight —
+              the display face carries the line, no bold and no ornament. */}
+          <h1 className="font-display mx-auto mt-12 max-w-3xl text-[2rem] leading-[1.14] font-normal tracking-[-0.022em] text-white [text-shadow:0_1px_2px_rgba(3,17,48,0.7),0_3px_18px_rgba(3,17,48,0.55)] sm:text-5xl lg:text-[4rem]">
+            From git push to current docs in seconds.
           </h1>
 
-          <p className="mx-auto max-w-2xl text-lg leading-relaxed font-light tracking-[-0.012em] text-slate-600 sm:text-xl md:text-2xl">
-            Connect once. We handle the rest. Your README updates automatically
-            with every git push.
-          </p>
-
-          <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
-            <CandyLink
-              href={`${APP_URL}/login`}
-              className="w-full gap-2 sm:w-auto"
+          {/* Prompt card. Two shells: a pale outer frame that separates the card
+              from the photo, and a near-solid dark panel that keeps the input
+              legible instead of showing the meadow through it. */}
+          <div className="mx-auto mt-14 w-full max-w-2xl rounded-[22px] bg-white/25 p-1 shadow-[var(--shadow-overlay)] ring-1 ring-white/40 backdrop-blur-md">
+            <form
+              onSubmit={handleSubmit}
+              className="rounded-[18px] bg-slate-950/90 p-4 text-left"
             >
-              Try Now
-              <ArrowRight size={18} />
-            </CandyLink>
+              <label htmlFor="hero-repo" className="sr-only">
+                GitHub repository URL
+              </label>
+              <input
+                id="hero-repo"
+                type="text"
+                inputMode="url"
+                autoComplete="off"
+                spellCheck={false}
+                value={repo}
+                onChange={(e) => setRepo(e.target.value)}
+                placeholder="github.com/your-org/your-repo"
+                className="w-full bg-transparent px-2 pt-2 pb-12 font-mono text-base text-white placeholder:text-slate-500 focus:outline-none sm:text-lg"
+              />
 
-            <a
-              href="#features"
-              className="flex items-center justify-center gap-1 rounded-xl px-9 py-3 font-medium text-slate-600 transition-all duration-300 border-2 border-dashed border-transparent hover:border-white ease-in-out  active:scale-[0.98]"
-            >
-              View Capabilities
-              <ArrowRight size={16} />
-            </a>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-1 rounded-full bg-white/[0.06] p-1">
+                  {MODES.map(({ id, label, Icon }) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={() => setMode(id)}
+                      aria-pressed={mode === id}
+                      className={`flex cursor-pointer items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium whitespace-nowrap transition-colors sm:px-4 ${
+                        mode === id
+                          ? "bg-white/12 text-white"
+                          : "text-slate-400 hover:text-slate-200"
+                      }`}
+                    >
+                      <Icon size={15} className="hidden shrink-0 sm:block" />
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="submit"
+                  className="bg-primary hover:bg-secondary flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#54A1FD] px-5 py-2.5 font-semibold text-white shadow-[inset_0px_1px_8px_-4px_#FFFFFF] transition-colors active:scale-[0.97]"
+                >
+                  {mode === "generate" ? "Generate" : "Connect"}
+                  <Sparkles size={16} className="shrink-0" />
+                </button>
+              </div>
+            </form>
           </div>
         </div>
+      </motion.section>
 
-        {/* 3-step flow */}
-        
-
-        {/* README Preview Card */}
-        <div className="relative mx-auto mt-16 max-w-5xl">
+      {/* ── Demo, in its own band below the photo ─────────────────────────── */}
+      <section className={`relative pt-20 pb-14 lg:pt-28 lg:pb-20 ${SECTION_X}`}>
+        <div className="relative mx-auto max-w-5xl">
           <div className="animate-pulse-slow absolute -inset-1 top-0 right-0 left-0 rounded-2xl bg-linear-to-r from-[#209BFF] to-[#54A1FD] opacity-20 blur" />
 
           <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl">
@@ -257,10 +277,48 @@ export default function Hero() {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Bottom blend gradient */}
-      <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-0 h-40 w-full bg-linear-to-t from-white to-transparent" />
+        <p className="mx-auto mt-12 max-w-2xl text-center text-lg leading-relaxed font-light tracking-[-0.012em] text-slate-600">
+          DaemonDoc reads your repository, writes the README, and patches only
+          the sections your code actually changed.
+        </p>
+
+        {/* Language strip */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <span className="text-sm font-medium text-slate-500">
+            Reads the whole repo:
+          </span>
+          {TECH_LOGOS.map((tech) => (
+            <div
+              key={tech.id}
+              title={tech.label}
+              className="flex h-9 w-9 items-center justify-center rounded-lg shadow-[var(--shadow-card)]"
+              style={{ background: tech.bg }}
+            >
+              {/* Decorative: the copy already names the capability. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={tech.logo}
+                alt=""
+                aria-hidden="true"
+                width={20}
+                height={20}
+                className="h-5 w-5"
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+          <a
+            href="#features"
+            className="hover:text-primary flex items-center justify-center gap-1 rounded-xl px-6 py-3 font-medium text-slate-600 transition-colors"
+          >
+            View capabilities
+            <ArrowRight size={16} />
+          </a>
+        </div>
+      </section>
     </main>
   );
 }
