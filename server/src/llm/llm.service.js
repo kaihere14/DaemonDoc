@@ -11,10 +11,12 @@ export class LlmService {
   // Model ids only — GeminiProvider binds them to whichever API key is live.
   detectionModel = "gemini-3.5-flash-lite";
   generationModel = "gemini-3.6-flash";
+  cleanupModel = "gemini-3.6-flash";
 
   geminiProvider = new GeminiProvider({
     detectionModel: this.detectionModel,
     generationModel: this.generationModel,
+    cleanupModel: this.cleanupModel,
   });
 
   async generate({
@@ -88,5 +90,9 @@ export class LlmService {
     }
 
     return this.geminiProvider.detect(existingReadme);
+  }
+
+  async cleanup(existingReadme) {
+    return this.geminiProvider.cleanup(existingReadme);
   }
 }

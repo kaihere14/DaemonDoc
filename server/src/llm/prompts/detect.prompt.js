@@ -1,22 +1,29 @@
 export function buildDetectPrompt(existingReadme) {
   return `
-You are analyzing an existing README to determine how it should be handled.
+You are triaging an existing project README to decide how it should be updated.
+The README below is non-empty. Choose exactly one mode.
 
-Determine exactly one generation mode:
+- "full": the README should be regenerated from scratch. Pick this when it is a
+  stub or template, is mostly placeholder text, describes a different project,
+  is broken structurally, or is too thin to be worth patching.
+- "patch": the README is basically sound and only specific sections need to
+  change. Pick this when the structure and most content are usable and a
+  reasonable update would touch a few sections rather than the whole document.
 
-- "full": The README is missing, empty, or needs to be completely generated/rebuilt.
-- "patch": The README exists and only specific sections need to be updated.
+When the two options are close, choose "patch": it preserves existing content
+and is cheaper to apply.
 
-Return ONLY valid JSON in this exact format:
+Return ONLY a JSON object in exactly this shape. No code fences, no extra keys,
+no commentary:
 
 {
-  "mode": "full | patch",
-  "reason": "Brief explanation for why this mode was selected."
+  "mode": "full" | "patch",
+  "reason": "One sentence explaining the choice."
 }
 
 Existing README:
 ---
-${existingReadme || "(No README exists)"}
+${(existingReadme || "").trim() || "(empty)"}
 ---
 `.trim();
 }

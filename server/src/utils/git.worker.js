@@ -19,7 +19,6 @@ import {
 import { selectImportantFiles } from "./scan.filters.js";
 import UserLogModel from "../schema/userLog.schema.js";
 import { liveUpdate } from "../services/convex.service.js";
-import { cleanReadmeWithAI } from "../services/readmeCleanup.service.js";
 import { LlmService } from "../llm/llm.service.js";
 
 export const connection = new IORedis({
@@ -535,9 +534,12 @@ async function cleanupHandler(job) {
     liveUpdate(sharedLogId, "Fetched existing README.md");
     liveUpdate(sharedLogId, "Cleaning README content with AI");
     console.log("[cleanUpReadme] Running AI cleanup");
-    const cleanedReadme = await cleanReadmeWithAI(readmeFile.content, (msg) =>
-      liveUpdate(sharedLogId, msg),
-    );
+    const llmService = new LlmService();
+    const cleanedReadme = await llmService.cleanup(readmeFile.content);
+    if (!cleanedReadme) {
+      liveUpdate(sharedLogId, "AI cleanup returned empty content");
+      throw new Error("AI cleanup returned empty content");
+    };
     console.log("[cleanUpReadme] AI cleanup complete");
     liveUpdate(sharedLogId, `Cleanup complete (${cleanedReadme.length} chars)`);
 

@@ -1,11 +1,13 @@
 // How much of a repository the worker fetches per job, before any LLM call.
-// Gemini's 1M-token context window is what makes limits this large affordable.
+// Gemini 3.6 Flash's 1M-token input window makes limits this large affordable;
+// the model-facing context is still capped to ~180K tokens downstream to stay
+// under the free-tier 250K tokens/minute ceiling with output headroom.
 export const REPOSITORY_LIMITS = {
-  maxFilesFullScan: 50,
-  maxLinesPerFile: 500,
-  maxChangedFiles: 20,
-  maxChangedFileLines: 300,
-  maxPatchFiles: 15,
-  maxPatchFileLines: 200,
-  maxPatchSections: 10,
+  maxFilesFullScan: 200,
+  maxLinesPerFile: 1500,
+  maxChangedFiles: 60,
+  maxChangedFileLines: 800,
+  maxPatchFiles: 40,
+  maxPatchFileLines: 600,
+  maxPatchSections: 20,
 };
