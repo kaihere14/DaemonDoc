@@ -2,7 +2,7 @@ import User from "../schema/user.schema.js";
 import { decrypt } from "./oauthcontroller.js";
 import ActiveRepo from "../schema/activeRepo.js";
 import crypto from "node:crypto";
-import { readmeQueue } from "../utils/git.worker.js";
+import { cleanUpQueue, readmeQueue } from "../utils/git.worker.js";
 import UserLogModel from "../schema/userLog.schema.js";
 import {
   GITHUB_API_BASE,
@@ -10,41 +10,27 @@ import {
   githubPost,
   githubDelete,
 } from "../utils/githubApiClient.js";
-import { RedisConnection } from "bullmq";
 import { redis } from "../utils/redis.js";
-import { commitFile, getFileContent } from "../services/github.service.js";
-import { cleanReadmeWithAI } from "../services/readmeCleanup.service.js";
-import { makeFunctionReference } from "convex/server";
-import convexClient from "../services/convex.service.js";
-
-const logsCreate = makeFunctionReference("logs:createLog");
-const logsUpdate = makeFunctionReference("logs:updateLog");
-const logsAddMessage = makeFunctionReference("logs:addLogMessage");
-
-function liveUpdate(sharedLogId, message) {
-  if (!sharedLogId) return;
-  convexClient
-    .mutation(logsAddMessage, { logId: sharedLogId, message })
-    .catch((err) =>
-      console.warn(
-        "[cleanUpReadme] Convex log message failed (non-fatal):",
-        err.message,
-      ),
-    );
-}
+import { liveUpdate } from "../services/convex.service.js";
 
 export function verifyGithubSignature(req) {
+  if (!Buffer.isBuffer(req.body)) return false;
   const signature = req.headers["x-hub-signature-256"];
+
   if (!signature) return false;
 
   const hmac = crypto.createHmac("sha256", process.env.GITHUB_WEBHOOK_SECRET);
 
-  const payload =
-    typeof req.body === "string" ? req.body : JSON.stringify(req.body);
+  const digest = "sha256=" + hmac.update(req.body).digest("hex");
 
-  const digest = "sha256=" + hmac.update(payload).digest("hex");
+  const signatureBuffer = Buffer.from(signature, "utf8");
+  const digestBuffer = Buffer.from(digest, "utf8");
 
-  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(digest));
+  if (signatureBuffer.length !== digestBuffer.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(signatureBuffer, digestBuffer);
 }
 
 export const getGithubRepos = async (req, res) => {
@@ -109,12 +95,9 @@ export const addRepoActivity = async (req, res) => {
     const existedRepo = await ActiveRepo.findOne({
       userId,
       repoId,
-      active: true,
     });
-    if (existedRepo) {
-      return res
-        .status(400)
-        .json({ message: "Repository activity already exists" });
+    if (existedRepo && existedRepo.active == true) {
+      return res.status(400).json({ message: "Repository is already active" });
     }
 
     const accessToken = decrypt(user.githubAccessToken);
@@ -167,29 +150,33 @@ export const addRepoActivity = async (req, res) => {
           .json({ message: "Error creating webhook", error: error.message });
       }
     }
+    let activeRepo;
+    if (existedRepo != null) {
+      activeRepo = await ActiveRepo.updateOne(
+        { _id: existedRepo._id },
+        {
+          repoName,
+          repoFullName,
+          repoOwner,
+          defaultBranch,
+          webhookId,
+          active: true,
+        },
+      );
+    } else {
+      activeRepo = new ActiveRepo({
+        userId,
+        repoId,
+        repoName,
+        repoFullName,
+        repoOwner,
+        defaultBranch,
+        webhookId,
+        active: true,
+      });
 
-    const activeRepo = new ActiveRepo({
-      userId,
-      repoId,
-      repoName,
-      repoFullName,
-      repoOwner,
-      defaultBranch,
-      webhookId,
-      active: true,
-    });
+      await activeRepo.save();
 
-    await activeRepo.save();
-    await redis.del("admin_analytics");
-
-    // On first-ever activation, immediately trigger README generation
-    // so users don't have to make a commit themselves to see it work.
-    const hasBeenActivatedBefore = await ActiveRepo.findOne({
-      userId,
-      repoId,
-      active: false,
-    });
-    if (!hasBeenActivatedBefore) {
       try {
         const refRes = await githubGet(
           `${GITHUB_API_BASE}/repos/${repoOwner}/${repoName}/git/ref/heads/${defaultBranch}`,
@@ -214,12 +201,14 @@ export const addRepoActivity = async (req, res) => {
           "Failed to trigger initial README generation:",
           err.message,
         );
-        // Non-fatal: repo is still activated, pipeline just won't auto-start
       }
     }
 
+    await redis.del("admin_analytics");
+
     res.status(200).json({ message: "Repository activity added successfully" });
   } catch (error) {
+    console.error("Error adding repository activity:", error);
     res
       .status(500)
       .json({ message: "Error adding repository activity", error });
@@ -256,12 +245,15 @@ export const deactivateRepoActivity = async (req, res) => {
       console.error("Error deleting webhook:", error.message);
     }
 
-    //insted of turning the toggle of we are just removing the complete document from the db as there was a issue with the toggle where if the user deactivates and activates again then the document was created twice and it was creating an issue for the users so we are just removing the document from the db and when the user activates again then we will create a new document in the db and a new webhook in the github
-
-    const response = await ActiveRepo.deleteOne({ _id: activeRepo._id });
+    const response = await ActiveRepo.updateOne(
+      { _id: activeRepo._id },
+      { active: false },
+    );
+    if (response.matchedCount === 0) {
+      return res.status(404).json({ message: "Active repository not found" });
+    }
     await redis.del("admin_analytics");
 
-    console.log(response);
     res
       .status(200)
       .json({ message: "Repository activity deactivated successfully" });
@@ -284,9 +276,7 @@ export const githubWebhookHandler = async (req, res) => {
       return res.status(200).send("Event ignored");
     }
 
-    const payload =
-      typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-
+    const payload = JSON.parse(req.body.toString("utf8"));
     const repoId = payload.repository.id;
     const commitSha = payload.after;
     const commitMessage = payload.head_commit?.message || "";
@@ -597,8 +587,9 @@ export const fetchAdminUsers = async (req, res) => {
 };
 
 export const cleanUpReadme = async (req, res) => {
-  let userLog = null;
-  let sharedLogId = null;
+  // Minted here, not in the worker, so the 202 can hand the client a log id to
+  // subscribe to and so a retry reuses the same log row.
+  const sharedLogId = crypto.randomUUID();
 
   try {
     console.log("[cleanUpReadme] Started");
@@ -610,10 +601,10 @@ export const cleanUpReadme = async (req, res) => {
     }
 
     const userId = req.userId;
-    const activeRepo = await ActiveRepo.findOne({ repoId, userId });
+    const activeRepo = await ActiveRepo.findOne({ repoId, userId, active: true });
     if (!activeRepo) {
-      console.log("[cleanUpReadme] Active repository not found");
-      return res.status(404).json({ message: "Active repository not found" });
+      console.log("[cleanUpReadme] Please activate the repository first");
+      return res.status(404).json({ message: "Please activate the repository first" });
     }
 
     console.log(
@@ -627,145 +618,37 @@ export const cleanUpReadme = async (req, res) => {
       return res.status(404).json({ message: "GitHub access token not found" });
     }
 
-    const accessToken = decrypt(user.githubAccessToken);
-
-    console.log("[cleanUpReadme] Fetching README.md");
-    const readmeFile = await getFileContent(
-      accessToken,
-      activeRepo.repoOwner,
-      activeRepo.repoName,
-      "README.md",
-      activeRepo.defaultBranch,
-    );
-    if (!readmeFile?.content?.trim()) {
-      console.log("[cleanUpReadme] README.md not found");
-      return res
-        .status(404)
-        .json({ message: "README.md not found in repository" });
-    }
-
-    console.log("[cleanUpReadme] README fetched");
-    sharedLogId = crypto.randomUUID();
-    userLog = await UserLogModel.create({
-      logId: sharedLogId,
-      userId,
-      repoName: activeRepo.repoName,
-      repoOwner: activeRepo.repoOwner,
-      action: "README_CLEANUP_STARTED",
-      status: "ongoing",
-    });
-    await redis.del("admin_analytics");
-
-    try {
-      await convexClient.mutation(logsCreate, {
-        logId: sharedLogId,
+    await cleanUpQueue.add(
+      "cleanup-queue",
+      {
         userId,
         repoName: activeRepo.repoName,
-        action: "README_CLEANUP_STARTED",
-        status: "ongoing",
-      });
-    } catch (err) {
-      console.warn(
-        "[cleanUpReadme] Convex log create failed (non-fatal):",
-        err.message,
-      );
-    }
-
-    liveUpdate(
-      sharedLogId,
-      `Starting README cleanup for ${activeRepo.repoOwner}/${activeRepo.repoName}`,
-    );
-    console.log("[cleanUpReadme] Running AI cleanup");
-    liveUpdate(sharedLogId, "Fetched existing README.md");
-    liveUpdate(sharedLogId, "Cleaning README content with AI");
-    const cleanedReadme = await cleanReadmeWithAI(readmeFile.content, (msg) =>
-      liveUpdate(sharedLogId, msg),
-    );
-    console.log("[cleanUpReadme] AI cleanup complete");
-    liveUpdate(sharedLogId, `Cleanup complete (${cleanedReadme.length} chars)`);
-
-    console.log("[cleanUpReadme] Committing README");
-    liveUpdate(sharedLogId, "Committing cleaned README to GitHub");
-    const commitResult = await commitFile(
-      accessToken,
-      activeRepo.repoOwner,
-      activeRepo.repoName,
-      "README.md",
-      cleanedReadme,
-      "chore: cleanup README [skip ci]",
-      activeRepo.defaultBranch,
-      readmeFile.sha,
-    );
-
-    console.log("[cleanUpReadme] README committed:", commitResult.commit.sha);
-    liveUpdate(
-      sharedLogId,
-      `✓ README committed: ${commitResult.commit.sha.slice(0, 7)}`,
-    );
-    await UserLogModel.findByIdAndUpdate(
-      userLog._id,
-      {
-        action: "README_CLEANUP_SUCCESS",
-        status: "success",
-        commitId: commitResult.commit.sha,
+        repoOwner: activeRepo.repoOwner,
+        defaultBranch: activeRepo.defaultBranch,
+        // Ciphertext only — the job payload sits in Redis for the lifetime of
+        // the job, so the worker does the decrypting.
+        encryptedAccessToken: {
+          iv: user.githubAccessToken.iv,
+          content: user.githubAccessToken.content,
+          tag: user.githubAccessToken.tag,
+        },
+        sharedLogId,
       },
       {
-        new: true,
-        runValidators: true,
+        attempts: 3,
+        backoff: { type: "exponential", delay: 5000 },
       },
     );
-    await redis.del("admin_analytics");
 
-    convexClient
-      .mutation(logsUpdate, { logId: sharedLogId, status: "success" })
-      .catch((err) =>
-        console.warn(
-          "[cleanUpReadme] Convex log update failed (non-fatal):",
-          err.message,
-        ),
-      );
-
-    return res.status(200).json({
-      message: "Readme cleaned up successfully",
-      commitSha: commitResult.commit.sha,
+    return res.status(202).json({
+      message: "Readme cleanup initiated",
+      logId: sharedLogId,
     });
   } catch (error) {
     console.error("[cleanUpReadme] Failed:", error.message);
     liveUpdate(sharedLogId, `✗ Failed: ${error.message}`);
-
-    if (userLog) {
-      try {
-        await UserLogModel.findByIdAndUpdate(
-          userLog._id,
-          {
-            action: "README_CLEANUP_FAILED",
-            status: "failed",
-          },
-          {
-            new: true,
-            runValidators: true,
-          },
-        );
-        await redis.del("admin_analytics");
-      } catch (logError) {
-        console.error(
-          "[cleanUpReadme] Failed to update Mongo log:",
-          logError.message,
-        );
-      }
-    }
-
-    if (sharedLogId) {
-      convexClient
-        .mutation(logsUpdate, { logId: sharedLogId, status: "failed" })
-        .catch((err) =>
-          console.warn(
-            "[cleanUpReadme] Convex log failure update failed (non-fatal):",
-            err.message,
-          ),
-        );
-    }
-
-    return res.status(500).json({ message: "Error cleaning up readme" });
+    return res
+      .status(500)
+      .json({ message: "Error cleaning up readme", logId: sharedLogId });
   }
 };

@@ -1,7 +1,6 @@
 interface:
   display_name: "Convex Create Component"
-  short_description:
-    "Design and build reusable Convex components with clear boundaries."
+  short_description: "Design and build reusable Convex components with clear boundaries."
   icon_small: "./assets/icon.svg"
   icon_large: "./assets/icon.svg"
   brand_color: "#14B8A6"

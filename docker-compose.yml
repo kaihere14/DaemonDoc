@@ -1,0 +1,60 @@
+services:
+  mongo:
+    image: mongo:8
+    container_name: daemondoc-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - daemondoc-mongo-data:/data/db
+
+  redis:
+    image: redis:7-alpine
+    container_name: daemondoc-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - daemondoc-redis-data:/data
+
+  mongo-seed:
+    image: mongo:8
+    container_name: daemondoc-mongo-seed
+    depends_on:
+      - mongo
+    restart: "no"
+    command: >
+      mongosh mongodb://mongo:27017/daemondoc --eval '
+      db = db.getSiblingDB("daemondoc");
+
+      const githubId = "319204766";
+
+      if (!db.users.findOne({ githubId: githubId })) {
+        db.users.insertOne({
+          githubId: "319204766",
+          githubUsername: "mirenox14",
+          email: "armanthakur200814@gmail.com",
+          autoReadmeEnabled: true,
+          avatarUrl: "https://avatars.githubusercontent.com/u/319204766?v=4",
+          emailNotificationsEnabled: true,
+          admin: false,
+          githubAccessToken: {
+            iv: "e4675bc687f840287fd9bbac",
+            content: "47963e689832dae04d0029c955f379c07dff6ca6c73bb7a5173f5016fb048b14e7b8ab8eba2cc8c6",
+            tag: "59b06067c272aa365149e2056071d1c8"
+          },
+          createdAt: ISODate("2026-08-20T20:50:53.009Z"),
+          updatedAt: ISODate("2026-08-20T20:50:53.009Z")
+        });
+
+        print("Seeded DaemonDoc user");
+      } else {
+        print("DaemonDoc user already exists — skipping seed");
+      }
+      '
+
+volumes:
+  daemondoc-mongo-data:
+    name: daemondoc-mongo-data
+  daemondoc-redis-data:
+    name: daemondoc-redis-data

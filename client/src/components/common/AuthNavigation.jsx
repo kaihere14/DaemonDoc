@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { User, LogOut, Home, Activity, Menu, X, Shield } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/auth-context";
 import { usePostHog } from "@posthog/react";
 
 import { MARKETING_URL } from "@/lib/urls";

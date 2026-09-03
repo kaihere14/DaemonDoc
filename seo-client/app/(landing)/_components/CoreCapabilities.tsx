@@ -49,8 +49,8 @@ export default function CoreCapabilities() {
             Core Capabilities
           </h2>
           <p className="text-lg font-light tracking-[-0.012em] text-slate-600">
-            Everything you need to maintain perfect documentation without lifting
-            a finger.
+            Everything you need to maintain perfect documentation without
+            lifting a finger.
           </p>
         </div>
 

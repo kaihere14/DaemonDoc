@@ -59,7 +59,6 @@ function Slot({ children, ref, ...props }: SlotProps) {
       isAlreadyMotion
         ? (children.type as React.ComponentType)
         : motion.create(children.type as string),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isAlreadyMotion, children.type],
   );
 

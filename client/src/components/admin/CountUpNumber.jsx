@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import React from "react";
 
 const CountUpNumber = ({ value, suffix = "", duration = 1100 }) => {

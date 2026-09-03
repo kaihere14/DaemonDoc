@@ -102,7 +102,7 @@ const getGithubPrimaryEmail = async (accessToken) => {
     const first = emails[0];
 
     return primaryVerified?.email || verified?.email || first?.email || null;
-  } catch (error) {
+  } catch {
     // Some accounts may not expose email even with scope; continue without blocking login.
     return null;
   }

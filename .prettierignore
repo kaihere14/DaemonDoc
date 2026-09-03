@@ -1,0 +1,12 @@
+**/node_modules
+**/dist
+**/dist-ssr
+**/build
+**/.next
+**/pnpm-lock.yaml
+**/package-lock.json
+**/bun.lock
+convex-server/convex/_generated
+*.log
+.env
+.env.*

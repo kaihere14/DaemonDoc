@@ -31,3 +31,4 @@ dist-ssr
 .claude
 CLAUDE.md
 .env-share
+LLM_FLOW.md

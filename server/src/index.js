@@ -4,9 +4,9 @@ import "dotenv/config";
 import authRoutes from "./routes/auth.routes.js";
 import githubRoutes from "./routes/github.routes.js";
 import emailRoutes from "./routes/email.routes.js";
-import convexRoutes from "./routes/convex.routes.js";
 import { connectDB } from "./db/connectDB.js";
 import { recoverInterruptedCleanupLogs } from "./services/logRecovery.service.js";
+import { githubWebhookHandler } from "./controllers/github.controller.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,12 +23,17 @@ app.use(
   }),
 );
 
+app.use(
+  "/api/github/webhookhandler",
+  express.raw({ type: "application/json" }),
+  githubWebhookHandler,
+);
+
 app.use(express.json());
 
 app.use("/auth", authRoutes);
 app.use("/api/github", githubRoutes);
 app.use("/api/email", emailRoutes);
-app.use("/api/convex", convexRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello from the server!");
@@ -44,6 +49,7 @@ app.get("/health", (req, res) => {
   });
 });
 
+// eslint-disable-next-line no-unused-vars -- 4-arg signature required for Express to treat this as error middleware
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err.message);
   res.status(500).json({ message: "Internal server error" });

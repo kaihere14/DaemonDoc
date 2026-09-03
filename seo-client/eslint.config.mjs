@@ -13,6 +13,21 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    // Pre-existing effect-timing patterns in the vendored animate-ui components,
+    // predating the react-hooks/set-state-in-effect, react-hooks/refs, and
+    // react-hooks/static-components rules. Not refactoring behavior here —
+    // just acknowledging these as known exceptions.
+    files: [
+      "app/(landing)/_animate-ui/icons/icon.tsx",
+      "app/(landing)/_animate-ui/primitives/animate/slot.tsx",
+    ],
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/refs": "off",
+      "react-hooks/static-components": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

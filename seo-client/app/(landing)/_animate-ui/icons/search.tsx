@@ -35,7 +35,13 @@ const animations = {
   },
 };
 
-function IconComponent({ size, ...props }: { size?: number; [key: string]: unknown }) {
+function IconComponent({
+  size,
+  ...props
+}: {
+  size?: number;
+  [key: string]: unknown;
+}) {
   const { controls } = useAnimateIconContext();
   const variants = getVariants(animations);
 
@@ -55,8 +61,20 @@ function IconComponent({ size, ...props }: { size?: number; [key: string]: unkno
       animate={controls}
       {...props}
     >
-      <motion.path d="m21 21-4.34-4.34" variants={variants.path as never} initial="initial" animate={controls} />
-      <motion.circle cx={11} cy={11} r={8} variants={variants.circle as never} initial="initial" animate={controls} />
+      <motion.path
+        d="m21 21-4.34-4.34"
+        variants={variants.path as never}
+        initial="initial"
+        animate={controls}
+      />
+      <motion.circle
+        cx={11}
+        cy={11}
+        r={8}
+        variants={variants.circle as never}
+        initial="initial"
+        animate={controls}
+      />
     </motion.svg>
   );
 }

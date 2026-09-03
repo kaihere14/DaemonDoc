@@ -1,17 +1,11 @@
 import IORedis from "ioredis";
 import { Queue } from "bullmq";
-import { Worker } from "bullmq";
+import { UnrecoverableError, Worker } from "bullmq";
 import { redis } from "./redis.js";
 import User from "../schema/user.schema.js";
 import ActiveRepo from "../schema/activeRepo.js";
 import { decrypt } from "./crypto.js";
-import {
-  generateReadme,
-  generateReadmePatch,
-  determineGenerationMode,
-} from "../services/groq.service.js";
-import { getActiveLimits } from "../services/gemini.service.js";
-import { parseReadmeSections, hashSections } from "./readme.parser.js";
+import { REPOSITORY_LIMITS } from "./repo.limits.js";
 import {
   getCommit,
   getRepoTree,
@@ -22,30 +16,10 @@ import {
   shouldIncludeFile,
   truncateContent,
 } from "../services/github.service.js";
-import {
-  buildReadmeContext,
-  optimizeContext,
-  validateContext,
-} from "./prompt.builder.js";
+import { selectImportantFiles } from "./scan.filters.js";
 import UserLogModel from "../schema/userLog.schema.js";
-import { makeFunctionReference } from "convex/server";
-import convexClient from "../services/convex.service.js";
-
-const logsCreate = makeFunctionReference("logs:createLog");
-const logsUpdate = makeFunctionReference("logs:updateLog");
-const logsAddMessage = makeFunctionReference("logs:addLogMessage");
-
-function liveUpdate(sharedLogId, message) {
-  if (!sharedLogId) return;
-  convexClient
-    .mutation(logsAddMessage, { logId: sharedLogId, message })
-    .catch((err) =>
-      console.warn(
-        "[Worker] Convex log message failed (non-fatal):",
-        err.message,
-      ),
-    );
-}
+import { liveUpdate } from "../services/convex.service.js";
+import { LlmService } from "../llm/llm.service.js";
 
 export const connection = new IORedis({
   host: process.env.REDIS_HOST || "localhost",
@@ -113,20 +87,6 @@ new Worker(
     job.data.sharedLogId = sharedLogId;
     console.log("Updated job data with logId:", job.data.logId);
 
-    convexClient
-      .mutation(logsCreate, {
-        logId: sharedLogId,
-        userId: job.data.userId,
-        repoName: job.data.repoName,
-        action: "README_GENERATION_STARTED",
-        status: "ongoing",
-      })
-      .catch((err) =>
-        console.warn(
-          "[Worker] Convex log create failed (non-fatal):",
-          err.message,
-        ),
-      );
     await aihandler(job.data);
   },
   {
@@ -137,13 +97,7 @@ new Worker(
 );
 
 // Errors here are swallowed so a logging failure never kills a generation job
-async function updateLogStatus(
-  logId,
-  action,
-  status,
-  commitId = null,
-  sharedLogId = null,
-) {
+async function updateLogStatus(logId, action, status, commitId = null) {
   try {
     const update = {
       action,
@@ -168,17 +122,6 @@ async function updateLogStatus(
   } catch (err) {
     console.error("[AI Handler] Failed to update log:", err.message);
   }
-
-  if (sharedLogId) {
-    convexClient
-      .mutation(logsUpdate, { logId: sharedLogId, status })
-      .catch((err) =>
-        console.warn(
-          "[Worker] Convex log status update failed (non-fatal):",
-          err.message,
-        ),
-      );
-  }
 }
 
 const aihandler = async (data) => {
@@ -193,8 +136,7 @@ const aihandler = async (data) => {
     sharedLogId,
   } = data;
 
-  // Resolve fetch limits up front — Gemini gets larger budgets than Groq
-  const limits = getActiveLimits();
+  const repo_limits = REPOSITORY_LIMITS;
 
   console.log(
     `[AI Handler] Starting README generation for ${repoFullName} at commit ${commitSha}`,
@@ -231,14 +173,25 @@ const aihandler = async (data) => {
     console.log(`[AI Handler] Fetching repository structure`);
     liveUpdate(sharedLogId, `Fetching repository structure`);
     let repoStructure = "";
+    let repoTree = null;
     try {
-      const treeData = await getRepoTree(
+      repoTree = await getRepoTree(
         accessToken,
         repoOwner,
         repoName,
         defaultBranch,
       );
-      repoStructure = formatRepoTree(treeData.tree, 3);
+      repoStructure = formatRepoTree(repoTree.tree, 3);
+
+      if (repoTree.truncated) {
+        console.warn(
+          `[AI Handler] Repository tree truncated by GitHub — scan may be partial`,
+        );
+        liveUpdate(
+          sharedLogId,
+          `Repository tree truncated by GitHub — scan may be partial`,
+        );
+      }
     } catch (error) {
       console.warn(`[AI Handler] Could not fetch repo tree: ${error.message}`);
       repoStructure = "Repository structure not available";
@@ -287,128 +240,89 @@ const aihandler = async (data) => {
       sharedLogId,
     );
 
-    const { mode, reason } = determineGenerationMode(existingReadme);
-    console.log(`[AI Handler] Generation mode: ${mode} — ${reason}`);
-    liveUpdate(sharedLogId, `Mode: ${mode} — ${reason}`);
-
-    if (mode === "full") {
-      console.log(`[AI Handler] FULL mode — scanning entire repository`);
-      liveUpdate(sharedLogId, `Scanning entire repository for important files`);
-
-      let fullCodebase = [];
-      try {
-        fullCodebase = await fetchFilesFromTree(
-          accessToken,
-          repoOwner,
-          repoName,
-          defaultBranch,
-          limits.maxFilesFullScan,
-          limits.maxLinesPerFile,
-        );
-        console.log(
-          `[AI Handler] Scanned ${fullCodebase.length} important files from repository`,
-        );
-        liveUpdate(
-          sharedLogId,
-          `Scanned ${fullCodebase.length} important files`,
-        );
-      } catch (error) {
-        console.error(
-          `[AI Handler] Error scanning repository: ${error.message}`,
-        );
-      }
-
-      const fullCodebasePathSet = new Set(fullCodebase.map((f) => f.path));
-      const changedFilesContent = await fetchChangedFiles(
+    let fullCodebase = [];
+    try {
+      fullCodebase = await fetchFilesFromTree(
         accessToken,
         repoOwner,
         repoName,
         defaultBranch,
-        commitData.files,
-        limits.maxChangedFiles,
-        limits.maxChangedFileLines,
-        fullCodebasePathSet,
+        repoTree,
+        repo_limits.maxFilesFullScan,
+        repo_limits.maxLinesPerFile,
       );
-
-      let context = buildReadmeContext({
-        repoName,
-        repoOwner,
-        repoStructure,
-        existingReadme,
-        commitData,
-        changedFilesContent,
-        fullCodebase,
-      });
-
-      const validation = validateContext(context);
-      console.log(`[AI Handler] Context validation:`, validation);
-
-      if (!validation.valid)
-        throw new Error(`Invalid context: ${validation.errors.join(", ")}`);
-
-      if (validation.warnings.length > 0) {
-        console.warn(`[AI Handler] Context warnings:`, validation.warnings);
-        liveUpdate(
-          sharedLogId,
-          `Context: ${validation.estimatedTokens} tokens — optimizing`,
-        );
-      }
-
-      if (validation.estimatedTokens > limits.contextOptimizeAt) {
-        console.log(
-          `[AI Handler] Optimizing context (${validation.estimatedTokens} tokens > ${limits.contextOptimizeAt} limit)`,
-        );
-        context = optimizeContext(context, limits.contextOptimizeAt);
-      }
-
-      console.log(`[AI Handler] Generating README (Gemini → Groq fallback)`);
-      const generatedReadme = await generateReadme(context, (msg) =>
-        liveUpdate(sharedLogId, msg),
-      );
-
-      if (!generatedReadme || generatedReadme.trim().length === 0) {
-        throw new Error("AI returned empty README");
-      }
-
       console.log(
-        `[AI Handler] Generated README (${generatedReadme.length} characters)`,
+        `[AI Handler] Scanned ${fullCodebase.length} important files from repository`,
+      );
+      liveUpdate(sharedLogId, `Scanned ${fullCodebase.length} important files`);
+    } catch (error) {
+      console.error(`[AI Handler] Error scanning repository: ${error.message}`);
+    }
+
+    const fullCodebasePathSet = new Set(fullCodebase.map((f) => f.path));
+    const changedFilesContent = await fetchChangedFiles(
+      accessToken,
+      repoOwner,
+      repoName,
+      defaultBranch,
+      commitData.files,
+      repo_limits.maxChangedFiles,
+      repo_limits.maxChangedFileLines,
+      fullCodebasePathSet,
+    );
+
+    let llm = new LlmService();
+
+    const result = await llm.generate({
+      repoName,
+      repoOwner,
+      repoStructure,
+      existingReadme,
+      existingReadmeSha,
+      changedFilesContent,
+      fullCodebase,
+      commitData,
+      sharedLogId,
+    });
+
+    // Nothing worth documenting changed — this is a normal outcome, not a
+    // failure, so settle the log as skipped and commit nothing.
+    if (result.skipped) {
+      console.log(
+        `[AI Handler] No README update needed for ${repoFullName} — ${result.reason}`,
       );
       liveUpdate(
         sharedLogId,
-        `Generated README (${generatedReadme.length} chars) — committing to repo`,
+        `No major section update — skipping README commit`,
+      );
+      await updateLogStatus(
+        data.logId,
+        "README_GENERATION_SKIPPED",
+        "skipped",
+        null,
+        sharedLogId,
       );
 
-      const commitResult = await commitFile(
+      return { skipped: true, reason: result.reason };
+    }
+
+    const readme = result.readme;
+
+    let commitResult;
+
+    try {
+      commitResult = await commitFile(
         accessToken,
         repoOwner,
         repoName,
         readmeFileName,
-        generatedReadme,
+        readme,
         "chore: auto-update README [skip ci]",
         defaultBranch,
         existingReadmeSha,
       );
 
-      console.log(
-        `[AI Handler] README committed successfully: ${commitResult.commit.sha}`,
-      );
-      liveUpdate(
-        sharedLogId,
-        `✓ README committed: ${commitResult.commit.sha.slice(0, 7)}`,
-      );
-
-      // Store section hashes so the next push can use patch mode instead of full regen
-      const { sections: newSections } = parseReadmeSections(generatedReadme);
-      const newHashes = hashSections(newSections);
-
-      activeRepo.sectionHashes = newHashes;
-      activeRepo.markModified("sectionHashes");
-      activeRepo.lastSectionHashesUpdatedAt = new Date();
-      activeRepo.lastReadmeGeneratedAt = new Date();
-      activeRepo.readmeGenerationCount =
-        (activeRepo.readmeGenerationCount || 0) + 1;
-      activeRepo.lastReadmeSha = commitResult.commit.sha;
-      await activeRepo.save();
+      liveUpdate(sharedLogId, `Readme commited successfully `);
 
       await updateLogStatus(
         data.logId,
@@ -418,124 +332,19 @@ const aihandler = async (data) => {
         sharedLogId,
       );
 
-      console.log(
-        `[AI Handler] ✓ Full README generation completed for ${repoFullName}`,
-      );
-      return {
-        success: true,
-        commitSha: commitResult.commit.sha,
-        readmeLength: generatedReadme.length,
-      };
-    } else {
-      console.log(`[AI Handler] PATCH mode — surgical section update`);
-      liveUpdate(sharedLogId, `Fetching changed files from commit`);
-
-      const { sections: originalSections, orderedKeys } =
-        parseReadmeSections(existingReadme);
-      const originalHashes = hashSections(originalSections);
-
-      const changedFilesContent = await fetchChangedFiles(
-        accessToken,
-        repoOwner,
-        repoName,
-        defaultBranch,
-        commitData.files,
-        limits.maxPatchFiles,
-        limits.maxPatchFileLines,
-      );
-      console.log(
-        `[AI Handler] Fetched ${changedFilesContent.length} changed files`,
-      );
-      liveUpdate(
-        sharedLogId,
-        `Fetched ${changedFilesContent.length} changed file(s)`,
-      );
-
-      const { commitDiff } = buildReadmeContext({
-        repoName,
-        repoOwner,
-        repoStructure: "",
-        existingReadme: null,
-        commitData,
-        changedFilesContent: [],
-      });
-
-      const patchResult = await generateReadmePatch({
-        repoName,
-        repoOwner,
-        repoStructure,
-        commitDiff,
-        changedFiles: changedFilesContent,
-        originalSections,
-        orderedKeys,
-        originalHashes,
-        onProgress: (msg) => liveUpdate(sharedLogId, msg),
-      });
-
-      if (!patchResult) {
-        console.log(
-          `[AI Handler] Patch generation returned null — skipping commit`,
-        );
-        liveUpdate(
-          sharedLogId,
-          `No sections needed updating — skipping commit`,
-        );
-        await updateLogStatus(
-          data.logId,
-          "README_GENERATION_SKIPPED",
-          "skipped",
-          null,
-          sharedLogId,
-        );
-        return { skipped: true };
-      }
-
-      const { finalReadme, newHashes } = patchResult;
-
-      const commitResult = await commitFile(
-        accessToken,
-        repoOwner,
-        repoName,
-        readmeFileName,
-        finalReadme,
-        "chore: auto-update README [skip ci]",
-        defaultBranch,
-        existingReadmeSha,
-      );
-
-      console.log(
-        `[AI Handler] README patch committed successfully: ${commitResult.commit.sha}`,
-      );
-      liveUpdate(
-        sharedLogId,
-        `✓ README committed: ${commitResult.commit.sha.slice(0, 7)}`,
-      );
-
-      activeRepo.sectionHashes = newHashes;
-      activeRepo.markModified("sectionHashes");
-      activeRepo.lastSectionHashesUpdatedAt = new Date();
-      activeRepo.lastReadmeGeneratedAt = new Date();
-      activeRepo.readmeGenerationCount =
-        (activeRepo.readmeGenerationCount || 0) + 1;
-      activeRepo.lastReadmeSha = commitResult.commit.sha;
-      await activeRepo.save();
+      console.log("Readme is commited successfully");
+    } catch {
+      liveUpdate(sharedLogId, `Readme failed to commit `);
 
       await updateLogStatus(
         data.logId,
-        "README_GENERATION_SUCCESS",
-        "success",
-        commitResult.commit.sha,
+        "README_GENERATION_FAILED",
+        "failed",
+        null,
         sharedLogId,
       );
 
-      console.log(
-        `[AI Handler] ✓ Patch README generation completed for ${repoFullName}`,
-      );
-      return {
-        success: true,
-        commitSha: commitResult.commit.sha,
-        mode: "patch",
-      };
+      console.log("Readme failed to commit");
     }
   } catch (error) {
     console.error(
@@ -560,11 +369,19 @@ async function fetchFilesFromTree(
   owner,
   repo,
   branch,
+  treeData,
   limit = 25,
   linesPerFile = 200,
 ) {
-  const treeData = await getRepoTree(accessToken, owner, repo, branch);
-  const filePaths = getImportantFiles(treeData.tree).slice(0, limit);
+  if (
+    !treeData ||
+    !Array.isArray(treeData.tree) ||
+    treeData.tree.length === 0
+  ) {
+    return [];
+  }
+
+  const filePaths = selectImportantFiles(treeData.tree, limit);
   const results = [];
 
   for (const filePath of filePaths) {
@@ -639,71 +456,155 @@ async function fetchChangedFiles(
   return results;
 }
 
-function getImportantFiles(tree) {
-  const priorities = {
-    // dependency/config files — tell us the most about the project
-    "package.json": 1,
-    "package-lock.json": 1,
-    "requirements.txt": 1,
-    "setup.py": 1,
-    "Cargo.toml": 1,
-    "go.mod": 1,
-    "pom.xml": 1,
-    "build.gradle": 1,
-    "composer.json": 1,
+export const cleanUpQueue = new Queue("cleanup-queue", { connection });
 
-    // entry points
-    "index.js": 2,
-    "index.ts": 2,
-    "main.js": 2,
-    "main.ts": 2,
-    "main.py": 2,
-    "app.js": 2,
-    "app.ts": 2,
-    "server.js": 2,
-    "server.ts": 2,
+new Worker("cleanup-queue", cleanupHandler, {
+  connection,
+  removeOnComplete: { count: 100 },
+  removeOnFail: { count: 50 },
+});
 
-    // runtime config
-    ".env.example": 3,
-    "config.js": 3,
-    "config.json": 3,
+// A retry reuses the sharedLogId minted by the controller, so upsert the row
+// instead of creating one — a stalled job re-run would otherwise leave a
+// second Mongo row for the same cleanup, and logRecovery would mark the
+// orphan failed while the retry is still running.
+async function startCleanupLog({ sharedLogId, userId, repoName, repoOwner }) {
+  const userLog = await UserLogModel.findOneAndUpdate(
+    { logId: sharedLogId },
+    {
+      logId: sharedLogId,
+      userId,
+      repoName,
+      repoOwner,
+      action: "README_CLEANUP_STARTED",
+      status: "ongoing",
+    },
+    {
+      new: true,
+      upsert: true,
+      setDefaultsOnInsert: true,
+      runValidators: true,
+    },
+  );
+  await redis.del("admin_analytics");
+  return userLog;
+}
 
-    // docs
-    "CHANGELOG.md": 4,
-    "CONTRIBUTING.md": 4,
-  };
+async function cleanupHandler(job) {
+  const {
+    userId,
+    repoName,
+    repoOwner,
+    defaultBranch,
+    encryptedAccessToken,
+    sharedLogId,
+  } = job.data;
 
-  const importantDirPatterns = [
-    /^src\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^lib\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^app\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^api\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^routes\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^controllers\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^models\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^services\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^utils\/.*\.(js|ts|jsx|tsx|py|java|go|rs)$/,
-    /^components\/.*\.(js|ts|jsx|tsx)$/,
-    /^pages\/.*\.(js|ts|jsx|tsx)$/,
-  ];
+  const userLog = await startCleanupLog({
+    sharedLogId,
+    userId,
+    repoName,
+    repoOwner,
+  });
 
-  const categorized = tree
-    .filter((item) => item.type === "blob")
-    .map((item) => {
-      const filename = item.path.split("/").pop();
-      const priority = priorities[filename] || 999;
-      const matchesPattern = importantDirPatterns.some((pattern) =>
-        pattern.test(item.path),
+  try {
+    const accessToken = decrypt(encryptedAccessToken);
+
+    liveUpdate(
+      sharedLogId,
+      `Starting README cleanup for ${repoOwner}/${repoName}`,
+    );
+    console.log("[cleanUpReadme] Fetching README.md");
+    const readmeFile = await getFileContent(
+      accessToken,
+      repoOwner,
+      repoName,
+      "README.md",
+      defaultBranch,
+    );
+
+    if (!readmeFile?.content?.trim()) {
+      console.log("[cleanUpReadme] README.md not found");
+      // Retrying cannot conjure a README — fail the job outright rather than
+      // burning every attempt plus its backoff on a job that cannot succeed.
+      throw new UnrecoverableError("README.md not found in repository");
+    }
+
+    console.log("[cleanUpReadme] README fetched");
+    liveUpdate(sharedLogId, "Fetched existing README.md");
+    liveUpdate(sharedLogId, "Cleaning README content with AI");
+    console.log("[cleanUpReadme] Running AI cleanup");
+    const llmService = new LlmService();
+    const cleanedReadme = await llmService.cleanup(readmeFile.content);
+    if (!cleanedReadme) {
+      liveUpdate(sharedLogId, "AI cleanup returned empty content");
+      throw new Error("AI cleanup returned empty content");
+    };
+    console.log("[cleanUpReadme] AI cleanup complete");
+    liveUpdate(sharedLogId, `Cleanup complete (${cleanedReadme.length} chars)`);
+
+    console.log("[cleanUpReadme] Committing README");
+    liveUpdate(sharedLogId, "Committing cleaned README to GitHub");
+    const commitResult = await commitFile(
+      accessToken,
+      repoOwner,
+      repoName,
+      "README.md",
+      cleanedReadme,
+      "chore: cleanup README [skip ci]",
+      defaultBranch,
+      readmeFile.sha,
+    );
+
+    console.log("[cleanUpReadme] README committed:", commitResult.commit.sha);
+    liveUpdate(
+      sharedLogId,
+      `✓ README committed: ${commitResult.commit.sha.slice(0, 7)}`,
+    );
+    await UserLogModel.findByIdAndUpdate(
+      userLog._id,
+      {
+        action: "README_CLEANUP_SUCCESS",
+        status: "success",
+        commitId: commitResult.commit.sha,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+    await redis.del("admin_analytics");
+  } catch (error) {
+    console.error("[cleanUpReadme] Failed:", error.message);
+
+    // Only settle the log as failed once no attempt is left, so a transient
+    // failure does not flash "failed" in the UI before the retry reopens it.
+    const attemptsAllowed = job.opts.attempts ?? 1;
+    const attemptsUsed = job.attemptsStarted ?? job.attemptsMade + 1;
+    const isLastAttempt =
+      error instanceof UnrecoverableError || attemptsUsed >= attemptsAllowed;
+
+    if (isLastAttempt) {
+      liveUpdate(sharedLogId, `✗ README cleanup failed: ${error.message}`);
+      await UserLogModel.findByIdAndUpdate(
+        userLog._id,
+        {
+          action: "README_CLEANUP_FAILED",
+          status: "failed",
+        },
+        {
+          new: true,
+          runValidators: true,
+        },
       );
-      return { path: item.path, priority, matchesPattern };
-    })
-    .filter((item) => item.priority < 999 || item.matchesPattern)
-    .sort((a, b) => {
-      if (a.priority !== b.priority) return a.priority - b.priority;
-      if (a.matchesPattern && !b.matchesPattern) return -1;
-      if (!a.matchesPattern && b.matchesPattern) return 1;
-      return 0;
-    });
+      await redis.del("admin_analytics");
+    } else {
+      liveUpdate(
+        sharedLogId,
+        `Attempt ${attemptsUsed}/${attemptsAllowed} failed (${error.message}) — retrying`,
+      );
+    }
 
-  return categorized.map((item) => item.path);
+    throw error;
+  }
 }

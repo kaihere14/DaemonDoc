@@ -4,6 +4,7 @@ import {
   githubPut,
 } from "../utils/githubApiClient.js";
 import { getLanguageFromExtension } from "../utils/langMap.js";
+import { IGNORED_DIR_PATTERNS } from "../utils/scan.filters.js";
 
 /**
  * Get commit diff between two commits
@@ -183,21 +184,8 @@ export async function commitFile(
  * @returns {string} Formatted tree structure
  */
 export function formatRepoTree(tree, maxDepth = 3) {
-  const ignorePatterns = [
-    /^node_modules\//,
-    /^\.git\//,
-    /^dist\//,
-    /^build\//,
-    /^coverage\//,
-    /^\.next\//,
-    /^\.cache\//,
-    /^__pycache__\//,
-    /^venv\//,
-    /^\.venv\//,
-  ];
-
   const filteredTree = tree.filter((item) => {
-    return !ignorePatterns.some((pattern) => pattern.test(item.path));
+    return !IGNORED_DIR_PATTERNS.some((pattern) => pattern.test(item.path));
   });
 
   const structure = {};
@@ -220,7 +208,7 @@ export function formatRepoTree(tree, maxDepth = 3) {
     });
   });
 
-  function formatNode(node, prefix = "", isLast = true) {
+  function formatNode(node, prefix = "") {
     let result = "";
     const entries = Object.entries(node);
 
@@ -233,7 +221,7 @@ export function formatRepoTree(tree, maxDepth = 3) {
 
       if (value !== null) {
         const newPrefix = prefix + (isLastEntry ? "    " : "│   ");
-        result += formatNode(value, newPrefix, isLastEntry);
+        result += formatNode(value, newPrefix);
       }
     });
 

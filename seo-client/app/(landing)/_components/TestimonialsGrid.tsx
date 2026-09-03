@@ -15,7 +15,9 @@ interface TestimonialsGridProps {
   testimonials: Testimonial[];
 }
 
-export default function TestimonialsGrid({ testimonials }: TestimonialsGridProps) {
+export default function TestimonialsGrid({
+  testimonials,
+}: TestimonialsGridProps) {
   const [activeIndex, setActiveIndex] = useState(-1);
 
   return (
@@ -26,7 +28,7 @@ export default function TestimonialsGrid({ testimonials }: TestimonialsGridProps
           onMouseEnter={() => setActiveIndex(index)}
           onMouseLeave={() => setActiveIndex(-1)}
           className={cn(
-            "relative flex min-h-75 justify-end flex-col items-start rounded-lg p-10",
+            "relative flex min-h-75 flex-col items-start justify-end rounded-lg p-10",
             activeIndex === index ? "blur-none" : "blur-xs",
             activeIndex === -1
               ? "blur-none"

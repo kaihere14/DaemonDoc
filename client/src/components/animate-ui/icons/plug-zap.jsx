@@ -2,11 +2,11 @@
 import * as React from "react";
 import { motion } from "motion/react";
 
+import { IconWrapper } from "@/components/animate-ui/icons/icon";
 import {
   getVariants,
   useAnimateIconContext,
-  IconWrapper,
-} from "@/components/animate-ui/icons/icon";
+} from "@/components/animate-ui/icons/icon-context";
 
 const animations = {
   default: {
@@ -87,4 +87,4 @@ function PlugZap(props) {
   return <IconWrapper icon={IconComponent} {...props} />;
 }
 
-export { animations, PlugZap, PlugZap as PlugZapIcon };
+export { PlugZap, PlugZap as PlugZapIcon };

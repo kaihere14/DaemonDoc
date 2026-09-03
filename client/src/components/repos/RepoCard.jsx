@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   GitBranch,
@@ -8,13 +8,42 @@ import {
   BrushCleaning,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useQuery } from "convex/react";
 import { api, ENDPOINTS } from "@/lib/api";
-import {
-  startCleanupProgressToast,
-  completeCleanupProgressToast,
-} from "@/lib/cleanupProgressToast";
+import { convexApi } from "@/lib/convexApi";
 import { usePostHog } from "@posthog/react";
 import { ThinkingOrb } from "@/components/ui/thinking-orb";
+
+// The worker's terminal messages, matched so the toast can settle instead of
+// guessing on a timer. Kept in sync with cleanupHandler in git.worker.js.
+const CLEANUP_SUCCESS_PREFIX = "✓ README committed";
+const CLEANUP_FAILURE_PREFIX = "✗ README cleanup failed";
+const CLEANUP_TOAST_DURATION_MS = 5000;
+
+const cleanupToastId = (logId) => `cleanup-progress-${logId}`;
+
+// liveUpdate fires Convex mutations without awaiting them, so the terminal
+// message is not guaranteed to be the newest — scan instead of trusting the
+// tail. Returns null while there is nothing to show yet.
+const readCleanupOutcome = (messages) => {
+  if (!messages?.length) return null;
+
+  for (let i = messages.length - 1; i >= 0; i -= 1) {
+    const { message } = messages[i];
+    if (message.startsWith(CLEANUP_SUCCESS_PREFIX)) {
+      return { settled: true, succeeded: true, message };
+    }
+    if (message.startsWith(CLEANUP_FAILURE_PREFIX)) {
+      return { settled: true, succeeded: false, message };
+    }
+  }
+
+  return {
+    settled: false,
+    succeeded: false,
+    message: messages[messages.length - 1].message,
+  };
+};
 
 const RepoCard = ({
   repo,
@@ -29,7 +58,23 @@ const RepoCard = ({
   const posthog = usePostHog();
   const [isActive, setIsActive] = useState(repo.activated);
   const [loading, setLoading] = useState(false);
-  const [isCleaningUp, setIsCleaningUp] = useState(false);
+  const [isEnqueueingCleanup, setIsEnqueueingCleanup] = useState(false);
+  const [cleanupLogId, setCleanupLogId] = useState(null);
+  const settledCleanupRef = useRef(null);
+  const cleanupMessages = useQuery(
+    convexApi.logs.getLogMessages,
+    cleanupLogId ? { logId: cleanupLogId } : "skip",
+  );
+
+  // Progress is derived from the worker's log stream rather than mirrored into
+  // state, so the button stays spinning until the job actually reports back.
+  const cleanupOutcome = useMemo(
+    () => readCleanupOutcome(cleanupMessages),
+    [cleanupMessages],
+  );
+  const isCleaningUp =
+    isEnqueueingCleanup || (Boolean(cleanupLogId) && !cleanupOutcome?.settled);
+
   const ownerLabel =
     repo.owner || repo.full_name?.split("/")?.[0] || "Repository";
   const branchLabel = repo.default_branch || "main";
@@ -76,31 +121,90 @@ const RepoCard = ({
     }
   };
 
-  const handleCleanUp = async (e) => {
-    e.stopPropagation();
-    if (isCleaningUp) return;
+  // Cleanup runs on a queue, so the request only enqueues it. The toast is
+  // driven by the worker's own log messages, keyed by the logId in the 202.
+  useEffect(() => {
+    if (!cleanupLogId || !cleanupOutcome) return;
 
-    setIsCleaningUp(true);
-    const progress = startCleanupProgressToast();
+    const toastId = cleanupToastId(cleanupLogId);
 
-    try {
-      await api.post(ENDPOINTS.CLEAN_UP_README, { repoId: repo.id });
-      completeCleanupProgressToast(progress, {
-        success: true,
-        message: "Your README is now clean and tidy",
+    if (!cleanupOutcome.settled) {
+      toast.loading(cleanupOutcome.message, { id: toastId });
+      return;
+    }
+
+    // Terminal messages never change again, but a remount would replay them.
+    if (settledCleanupRef.current === cleanupLogId) return;
+    settledCleanupRef.current = cleanupLogId;
+
+    // A loading toast has no duration, and sonner keeps whatever the toast was
+    // created with when an update reuses the id — pass one so it can close.
+    if (cleanupOutcome.succeeded) {
+      toast.success("Your README is now clean and tidy", {
+        id: toastId,
+        duration: CLEANUP_TOAST_DURATION_MS,
       });
       posthog?.capture("readme_cleanup_completed", {
         repo_name: repo.name,
         repo_full_name: repo.full_name,
       });
-    } catch (error) {
-      completeCleanupProgressToast(progress, {
-        success: false,
-        message:
-          error.response?.data?.message || "Failed to clean up your README",
+      return;
+    }
+
+    const reason = cleanupOutcome.message
+      .slice(CLEANUP_FAILURE_PREFIX.length)
+      .replace(/^:\s*/, "");
+    toast.error(reason || "Failed to clean up your README", {
+      id: toastId,
+      duration: CLEANUP_TOAST_DURATION_MS,
+    });
+    posthog?.capture("readme_cleanup_failed", {
+      repo_name: repo.name,
+      repo_full_name: repo.full_name,
+    });
+  }, [cleanupLogId, cleanupOutcome, posthog, repo.name, repo.full_name]);
+
+  // A loading toast never auto-dismisses, so one left without an updater hangs
+  // on screen forever. Drop it if this card stops watching the job — unmounted,
+  // or superseded by a newer cleanup — unless it already settled.
+  useEffect(() => {
+    if (!cleanupLogId) return undefined;
+
+    return () => {
+      if (settledCleanupRef.current !== cleanupLogId) {
+        toast.dismiss(cleanupToastId(cleanupLogId));
+      }
+    };
+  }, [cleanupLogId]);
+
+  const handleCleanUp = async (e) => {
+    e.stopPropagation();
+    if (isCleaningUp) return;
+
+    setIsEnqueueingCleanup(true);
+
+    try {
+      const res = await api.post(ENDPOINTS.CLEAN_UP_README, {
+        repoId: repo.id,
       });
+      if (res.status !== 202 || !res.data?.logId) {
+        throw new Error("Cleanup could not be queued");
+      }
+
+      posthog?.capture("readme_cleanup_started", {
+        repo_name: repo.name,
+        repo_full_name: repo.full_name,
+      });
+      toast.loading("Queued README cleanup", {
+        id: cleanupToastId(res.data.logId),
+      });
+      setCleanupLogId(res.data.logId);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to clean up your README",
+      );
     } finally {
-      setIsCleaningUp(false);
+      setIsEnqueueingCleanup(false);
     }
   };
 

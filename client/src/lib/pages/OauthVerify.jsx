@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check, X } from "lucide-react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/auth-context";
 import { usePostHog } from "@posthog/react";
 import { ThinkingOrb } from "@/components/ui/thinking-orb";
 

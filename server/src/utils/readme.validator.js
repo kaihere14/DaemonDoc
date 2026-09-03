@@ -26,12 +26,7 @@ const HALLUCINATION_PHRASES = [
  * @param {string[]}               params.affectedKeys     - Keys the model was asked to patch
  * @returns {{ decision: "commit"|"retry"|"skip", reason: string, details: any }}
  */
-export function validatePatches({
-  originalSections,
-  originalHashes,
-  patches,
-  affectedKeys,
-}) {
+export function validatePatches({ originalSections, patches }) {
   if (!patches || typeof patches !== "object" || Array.isArray(patches)) {
     return {
       decision: "retry",
