@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     networks:
-      - daemondoc-network
+      - daemondoc-api-network
 
   caddy:
     image: caddy:latest
@@ -15,7 +15,7 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
     networks:
-      - daemondoc-network 
+      - daemondoc-api-network
        
 networks:
   daemondoc-network:
