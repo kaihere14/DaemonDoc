@@ -1,0 +1,22 @@
+name: daemondoc-api-server
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - daemondoc-network
+
+  caddy:
+    image: caddy:latest
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    networks:
+      - daemondoc-network 
+       
+networks:
+    damondoc-network:
+      external: true

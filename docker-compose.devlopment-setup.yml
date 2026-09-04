@@ -3,6 +3,8 @@ services:
     image: mongo:8
     container_name: daemondoc-mongo
     restart: unless-stopped
+    networks:
+      - daemondoc-network
     ports:
       - "27017:27017"
     volumes:
@@ -12,6 +14,8 @@ services:
     image: redis:7-alpine
     container_name: daemondoc-redis
     restart: unless-stopped
+    networks:
+      - daemondoc-network
     ports:
       - "6379:6379"
     volumes:
@@ -20,6 +24,8 @@ services:
   mongo-seed:
     image: mongo:8
     container_name: daemondoc-mongo-seed
+    networks:
+      - daemondoc-network
     depends_on:
       - mongo
     restart: "no"
@@ -58,3 +64,7 @@ volumes:
     name: daemondoc-mongo-data
   daemondoc-redis-data:
     name: daemondoc-redis-data
+networks:
+  daemondoc-network:
+    name: daemondoc-network
+    driver: bridge

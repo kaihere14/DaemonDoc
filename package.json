@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"pnpm run dev:client\" \"pnpm run dev:seo\" \"pnpm run dev:server\"",
+    "dev": "concurrently \"npm run dev:client\"  \"npm run dev:server\"",
     "prepare": "husky",
     "install:all": "pnpm install",
     "dev:client": "pnpm --filter client dev",
