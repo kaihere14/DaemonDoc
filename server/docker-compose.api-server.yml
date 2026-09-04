@@ -1,5 +1,17 @@
 name: daemondoc-api-server
 services:
+  redis:
+    image: redis:7-alpine
+    container_name: daemondoc-redis
+    restart: unless-stopped
+    networks:
+      - daemondoc-api-network
+    ports:
+      - "6379:6379"
+    volumes:
+      - daemondoc-redis-data:/data
+
+ 
   api:
     build:
       context: .
@@ -23,3 +35,7 @@ networks:
   daemondoc-api-network:
     name: daemondoc-api-network
     driver: bridge
+
+volumes:
+  daemondoc-redis-data:
+    name: daemondoc-redis-data
