@@ -18,5 +18,6 @@ services:
       - daemondoc-network 
        
 networks:
-    damondoc-network:
-      external: true
+  daemondoc-network:
+    name: daemondoc-api-network
+    driver: bridge
