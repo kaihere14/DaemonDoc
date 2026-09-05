@@ -27,6 +27,8 @@ services:
       - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
     networks:
       - daemondoc-api-network
 
@@ -38,3 +40,7 @@ networks:
 volumes:
   daemondoc-redis-data:
     name: daemondoc-redis-data
+  caddy_data:
+    name: caddy_data
+  caddy_config:
+    name: caddy_config
