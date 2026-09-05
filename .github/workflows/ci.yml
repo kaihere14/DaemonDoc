@@ -2,75 +2,45 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main, develop]
+    branches: [main]
+  workflow_dispatch:
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-env:
-  NODE_VERSION: "24"
-  PNPM_VERSION: "10.20.0"
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
-  format:
-    name: Format
+  deploy:
+    name: Deploy API server to EC2
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
         with:
-          version: ${{ env.PNPM_VERSION }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm format:check
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_PORT || 22 }}
+          command_timeout: 20m
+          script: |
+            set -euo pipefail
 
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
+            APP_DIR="${{ vars.EC2_APP_DIR || '$HOME/DaemonDoc' }}"
+            COMPOSE_FILE="docker-compose.api-server.yml"
 
-  typecheck:
-    name: Typecheck
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
+            cd "$APP_DIR"
+            cd server
 
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
+            echo "==> Stopping current stack"
+            docker compose -f "$COMPOSE_FILE" down
+
+            echo "==> Pulling latest code"
+            cd "$APP_DIR"
+            git pull --ff-only origin main
+
+            echo "==> Rebuilding and starting stack"
+            cd server
+            docker compose -f "$COMPOSE_FILE" up -d --build
+
+            echo "==> Status"
+            docker compose -f "$COMPOSE_FILE" ps
