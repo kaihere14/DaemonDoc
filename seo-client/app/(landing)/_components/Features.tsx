@@ -6,7 +6,7 @@ import Steps from "./Steps";
 export default function Features() {
   return (
     <>
-      <Steps/>
+      <Steps />
       <CoreCapabilities />
       <Testimonials />
       <EngineSection />

@@ -539,7 +539,7 @@ async function cleanupHandler(job) {
     if (!cleanedReadme) {
       liveUpdate(sharedLogId, "AI cleanup returned empty content");
       throw new Error("AI cleanup returned empty content");
-    };
+    }
     console.log("[cleanUpReadme] AI cleanup complete");
     liveUpdate(sharedLogId, `Cleanup complete (${cleanedReadme.length} chars)`);
 

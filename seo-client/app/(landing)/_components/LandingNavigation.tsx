@@ -64,7 +64,7 @@ export default function LandingNavigation() {
       <MobileNav
         className={
           onPhoto
-            ? "[&>div:first-child_img]:brightness-0 [&>div:first-child_img]:invert [&>div:first-child_button]:text-white"
+            ? "[&>div:first-child_button]:text-white [&>div:first-child_img]:brightness-0 [&>div:first-child_img]:invert"
             : undefined
         }
       >

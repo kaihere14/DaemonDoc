@@ -601,10 +601,16 @@ export const cleanUpReadme = async (req, res) => {
     }
 
     const userId = req.userId;
-    const activeRepo = await ActiveRepo.findOne({ repoId, userId, active: true });
+    const activeRepo = await ActiveRepo.findOne({
+      repoId,
+      userId,
+      active: true,
+    });
     if (!activeRepo) {
       console.log("[cleanUpReadme] Please activate the repository first");
-      return res.status(404).json({ message: "Please activate the repository first" });
+      return res
+        .status(404)
+        .json({ message: "Please activate the repository first" });
     }
 
     console.log(

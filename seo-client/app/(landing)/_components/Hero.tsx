@@ -7,12 +7,21 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import { Play, ArrowRight, Lock, Sparkles, ChevronRight, FileText, RefreshCw } from "lucide-react";
+import {
+  Play,
+  ArrowRight,
+  Lock,
+  Sparkles,
+  ChevronRight,
+  FileText,
+  RefreshCw,
+} from "lucide-react";
 import Image from "next/image";
 import { SECTION_X } from "@/app/(landing)/_lib/section";
 import { CandyLink } from "@/components/ui/candy-button";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daemondoc.online";
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daemondoc.online";
 
 /** Languages the analyzer reads — shown as a static strip under the prompt card. */
 const TECH_LOGOS = [
@@ -150,7 +159,7 @@ export default function Hero() {
 
           {/* Headline. Reference proportions: ~64px desktop, regular weight —
               the display face carries the line, no bold and no ornament. */}
-          <h1 className="font-display mx-auto mt-10 max-w-3xl text-[1.75rem] leading-[1.16] sm:mt-12 font-normal tracking-[-0.022em] text-white [text-shadow:0_1px_2px_rgba(3,17,48,0.7),0_3px_18px_rgba(3,17,48,0.55)] sm:text-5xl lg:text-[4rem]">
+          <h1 className="font-display mx-auto mt-10 max-w-3xl text-[1.75rem] leading-[1.16] font-normal tracking-[-0.022em] text-white [text-shadow:0_1px_2px_rgba(3,17,48,0.7),0_3px_18px_rgba(3,17,48,0.55)] sm:mt-12 sm:text-5xl lg:text-[4rem]">
             From git push to current docs in seconds.
           </h1>
 
@@ -199,7 +208,9 @@ export default function Hero() {
       </motion.section>
 
       {/* ── Demo, in its own band below the photo ─────────────────────────── */}
-      <section className={`relative pt-20 pb-14 lg:pt-28 lg:pb-20 ${SECTION_X}`}>
+      <section
+        className={`relative pt-20 pb-14 lg:pt-28 lg:pb-20 ${SECTION_X}`}
+      >
         <div className="relative mx-auto max-w-5xl">
           <div className="animate-pulse-slow absolute -inset-1 top-0 right-0 left-0 rounded-2xl bg-linear-to-r from-[#209BFF] to-[#54A1FD] opacity-20 blur" />
 
@@ -250,7 +261,11 @@ export default function Hero() {
                 className={`pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/10 transition-opacity duration-300 ${isPlaying ? "opacity-0" : "opacity-100"}`}
               >
                 <div className="flex h-16 w-16 items-center justify-center rounded-full border border-white/20 bg-white/20 shadow-lg backdrop-blur-md">
-                  <Play size={28} className="ml-1 text-white" fill="currentColor" />
+                  <Play
+                    size={28}
+                    className="ml-1 text-white"
+                    fill="currentColor"
+                  />
                 </div>
               </div>
             </div>
