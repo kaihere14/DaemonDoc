@@ -1,4 +1,4 @@
-api.daemondoc.online {
+api2.daemondoc.online {
     handle {
         reverse_proxy api:3000 {
             header_up Host {host}
