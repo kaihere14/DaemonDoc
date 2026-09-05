@@ -17,6 +17,7 @@ import { usePostHog } from "@posthog/react";
 import { WalkthroughLogsBanner } from "@/components/repos/WalkthroughOverlay";
 import { convexApi } from "../convexApi";
 import { ThinkingOrb } from "@/components/ui/thinking-orb";
+import LogRowSkeleton from "@/components/common/LogRowSkeleton";
 import { APP_ORIGIN } from "../urls";
 
 const STATUS_CONFIG = {
@@ -66,6 +67,10 @@ const STATUS_CONFIG = {
       "bg-amber-50 border-amber-100 text-amber-600 group-hover:bg-white",
   },
 };
+
+/* Enough rows to keep the feed taller than the viewport while loading, so the
+   page scrolls from the first paint instead of gaining a scrollbar mid-load. */
+const LOG_SKELETON_COUNT = 6;
 
 const logRowVariants = {
   initial: { opacity: 0, y: 10 },
@@ -299,12 +304,16 @@ const Logs = () => {
             </div>
             <div className="divide-y divide-slate-100">
               {loading && logs.length === 0 ? (
-                <div className="flex flex-col items-center gap-4 py-24">
-                  <ThinkingOrb
-                    preset="searching"
-                    label="Loading logs"
-                    size="lg"
-                  />
+                <div
+                  className="divide-y divide-slate-100"
+                  aria-busy="true"
+                  aria-label="Loading logs"
+                >
+                  {Array.from({ length: LOG_SKELETON_COUNT }).map(
+                    (_, index) => (
+                      <LogRowSkeleton key={index} />
+                    ),
+                  )}
                 </div>
               ) : error ? (
                 <div className="px-4 py-14 text-center sm:px-6 sm:py-16">

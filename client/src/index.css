@@ -69,6 +69,10 @@
 
 html {
   overflow-x: hidden;
+  /* The custom scrollbar below is a classic one: it takes 10px of layout width.
+     Reserving the gutter on every page stops centred content from jumping
+     sideways the moment a short page grows past the viewport. */
+  scrollbar-gutter: stable;
 }
 
 body {
