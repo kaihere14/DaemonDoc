@@ -25,11 +25,16 @@ jobs:
           script: |
             set -euo pipefail
 
-            APP_DIR="${{ vars.EC2_APP_DIR || '$HOME/DaemonDoc' }}"
+            APP_DIR="${{ vars.EC2_APP_DIR || '$HOME/daemondoc' }}"
             COMPOSE_FILE="docker-compose.api-server.yml"
 
-            cd "$APP_DIR"
-            cd server
+            if [ ! -d "$APP_DIR/.git" ]; then
+              echo "ERROR: no git repo at $APP_DIR"
+              echo "Set repo variable EC2_APP_DIR to the real path, or clone the repo there."
+              exit 1
+            fi
+
+            cd "$APP_DIR/server"
 
             echo "==> Stopping current stack"
             docker compose -f "$COMPOSE_FILE" down
