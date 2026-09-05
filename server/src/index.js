@@ -36,7 +36,7 @@ app.use("/api/github", githubRoutes);
 app.use("/api/email", emailRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Hello from the server!");
+  res.send("Server is up and running ! ");
 });
 
 app.get("/health", (req, res) => {
