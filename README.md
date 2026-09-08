@@ -1,3 +1,4 @@
+
 # DaemonDoc
 
 DaemonDoc is an AI-powered documentation platform that automatically generates, updates, and cleans up GitHub `README.md` files. By integrating with GitHub webhooks, BullMQ queues, and Gemini LLM provider chains, DaemonDoc analyzes commit diffs and repository code structure to keep project documentation continuously synchronized with codebase changes.
@@ -8,11 +9,10 @@ DaemonDoc is an AI-powered documentation platform that automatically generates, 
 - **Smart Generation & Patching**: Detects whether a full README generation or section-level patch is needed, updating only changed documentation sections while preserving existing content.
 - **AST & Section Parsing**: Uses SHA-256 section hashing and deterministic section re-anchoring to prevent hallucinated headings or structure loss.
 - **Automated README Cleanup**: AI-assisted cleanup pipeline to reformat, restructure, and remove clutter or template boilerplate from existing README files.
-- **Resilient LLM Provider Infrastructure**: Implements Gemini models (`gemini-3.5-flash-lite` and `gemini-3.6-flash`) with multi-API key rotation and fallback logic.
+- **Resilient LLM Provider Infrastructure**: Implements Gemini models (`gemini-3.5-flash-lite` and `gemini-3.6-flash`) with multi-API key rotation and Sarvam fallback logic.
 - **Real-Time Live Streaming Logs**: Powered by Convex to stream job progress logs directly to the user dashboard.
 - **Asynchronous Queue Architecture**: Built with BullMQ and Redis to execute non-blocking, queued background jobs for generation, cleanup, and email broadcasts.
 - **Admin Control Center**: Built-in system analytics, user management, and broadcast update email functionality using Resend templates.
-
 ## Requirements
 
 - **Node.js**: `>=20`
