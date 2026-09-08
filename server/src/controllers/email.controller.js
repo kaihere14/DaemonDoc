@@ -3,6 +3,7 @@ import {
   getFeatureUpdateRecipientsList,
   getEmailQueueStats,
 } from "../services/email.queue.js";
+import { emailLog as log } from "../utils/logger.js";
 
 export const sendFeatureUpdateEmail = async (req, res) => {
   const { subject, content, recipientUserIds } = req.body;
@@ -44,7 +45,9 @@ export const sendFeatureUpdateEmail = async (req, res) => {
       ...result,
     });
   } catch (error) {
-    console.error("Error sending email:", error);
+    log.error("Failed to queue feature update broadcast", {
+      detail: error.message,
+    });
     res.status(500).json({ message: "Failed to send email" });
   }
 };
@@ -54,7 +57,9 @@ export const getFeatureUpdateRecipients = async (_req, res) => {
     const audience = await getFeatureUpdateRecipientsList();
     return res.status(200).json(audience);
   } catch (error) {
-    console.error("Error getting recipients:", error);
+    log.error("Failed to list broadcast recipients", {
+      detail: error.message,
+    });
     return res.status(500).json({ message: "Failed to get recipients" });
   }
 };
@@ -64,7 +69,7 @@ export const getEmailQueueStatus = async (_req, res) => {
     const stats = await getEmailQueueStats();
     return res.status(200).json(stats);
   } catch (error) {
-    console.error("Error getting queue stats:", error);
+    log.error("Failed to read email queue stats", { detail: error.message });
     return res.status(500).json({ message: "Failed to get queue stats" });
   }
 };

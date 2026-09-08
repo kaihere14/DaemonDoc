@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../schema/user.schema.js";
+import { authLog as log } from "../utils/logger.js";
 
 export const authenticate = (req, res, next) => {
   try {
@@ -44,7 +45,10 @@ export const requireAdmin = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error("Admin auth error:", error);
+    log.error("Admin authorisation check failed", {
+      userId: req.userId,
+      detail: error.message,
+    });
     return res.status(500).json({ message: "Internal server error" });
   }
 };

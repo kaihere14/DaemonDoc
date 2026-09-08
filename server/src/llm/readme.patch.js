@@ -1,4 +1,7 @@
 import { liveUpdate } from "../services/convex.service.js";
+import { aiLog } from "../utils/logger.js";
+
+const log = aiLog.child({ pipeline: "patch" });
 import {
   parseReadmeSections,
   mergePatchedSections,
@@ -194,7 +197,7 @@ export function parsePatchResponse(response, { sections, editableKeys }) {
     // An entry with no content is the model saying "nothing to change here".
     // Treat it as a no-op section instead of failing the whole run.
     if (typeof content !== "string" || !content.trim()) {
-      console.log(`[Patch] Skipping empty update for section "${section}"`);
+      log.debug("Skipping empty section update", { section });
       continue;
     }
 
@@ -290,7 +293,9 @@ export async function patchReadme({
     throw new Error("PATCH mode requires an existing README");
   }
 
-  console.log(`[Patch] Analyzing README changes`);
+  log.info("Analysing README against commit", {
+    repo: `${repoOwner}/${repoName}`,
+  });
   liveUpdate(sharedLogId, "Comparing the commit against the current README");
 
   const { context, sections, orderedKeys, editableKeys } = buildPatchContext({
@@ -309,7 +314,7 @@ export async function patchReadme({
   }
 
   if (validation.warnings.length > 0) {
-    console.warn("[Patch] Context warnings:", validation.warnings);
+    log.warn("Context warnings", { warnings: validation.warnings });
   }
 
   let patchContext = context;
@@ -318,7 +323,7 @@ export async function patchReadme({
     patchContext = optimizePatchContext(context, MAX_CONTEXT_TOKENS);
   }
 
-  console.log(`[Patch] ${editableKeys.length} patchable section(s)`);
+  log.info("Patchable sections identified", { sections: editableKeys.length });
   liveUpdate(sharedLogId, "Identifying the affected README sections");
 
   const prompt = buildPatchReadmePrompt(patchContext);
@@ -327,18 +332,18 @@ export async function patchReadme({
 
   let response;
   try {
-    console.log(
-      `[Patch] Generating section updates with ${provider.getName()}`,
-    );
+    log.info("Generating section updates", { provider: provider.getName() });
     response = await provider.generate(prompt);
   } catch (error) {
     // Same contract as full mode: the primary provider throws only once every
     // one of its keys is spent, so a throw here is the signal to switch.
     if (!fallBackProvider) throw error;
 
-    console.warn(
-      `[Patch] ${provider.getName()} generation failed (${error.message}) — falling back to ${fallBackProvider.getName()}`,
-    );
+    log.warn("Generation failed — falling back", {
+      provider: provider.getName(),
+      fallback: fallBackProvider.getName(),
+      detail: error.message,
+    });
     liveUpdate(sharedLogId, "Primary model unavailable — switching to backup");
     response = await fallBackProvider.generate(prompt);
   }
@@ -351,7 +356,7 @@ export async function patchReadme({
   // An empty patch is a valid outcome: the commit did not change anything the
   // README documents. Skip the run instead of failing it.
   if (patchedKeys.length === 0) {
-    console.log(`[Patch] No sections needed updating — skipping`);
+    log.info("No sections needed updating — skipping commit");
     liveUpdate(
       sharedLogId,
       "No changes needed — the README is already current",
@@ -372,7 +377,7 @@ export async function patchReadme({
     throw new Error(`Patch rejected: ${patchValidation.reason}`);
   }
 
-  console.log(`[Patch] Applying sections: ${patchedKeys.join(", ")}`);
+  log.info("Applying section updates", { sections: patchedKeys.join(", ") });
   liveUpdate(
     sharedLogId,
     `Applying updates to ${patchedKeys.length} section(s)`,
@@ -381,9 +386,10 @@ export async function patchReadme({
   const finalReadme = mergePatchedSections(sections, orderedKeys, patches);
   const validatedReadme = validatePatchedReadme(finalReadme, orderedKeys);
 
-  console.log(
-    `[Patch] ✓ Patched [${patchedKeys.join(", ")}] (${validatedReadme.length} chars)`,
-  );
+  log.info("README patched", {
+    sections: patchedKeys.join(", "),
+    chars: validatedReadme.length,
+  });
   liveUpdate(sharedLogId, "README updated");
 
   return { skipped: false, readme: validatedReadme };

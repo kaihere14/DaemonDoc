@@ -29,7 +29,8 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.2",
     "resend": "^6.9.4",
-    "sarvamai": "1.1.8-alpha.5"
+    "sarvamai": "1.1.8-alpha.5",
+    "winston": "^3.19.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

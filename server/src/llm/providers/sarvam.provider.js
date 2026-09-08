@@ -3,6 +3,9 @@ import { SarvamAIClient } from "sarvamai";
 import { buildDetectPrompt } from "../prompts/detect.prompt.js";
 import { buildCleanupPrompt } from "../prompts/cleanup.prompt.js";
 import { extractJson } from "../utils/response.js";
+import { providerLog } from "../../utils/logger.js";
+
+const log = providerLog("Sarvam");
 
 // Sarvam ships no AI SDK adapter, so this provider talks to the vendor client
 // directly. It exposes the same surface as GeminiProvider (getName/detect/
@@ -55,9 +58,10 @@ export class SarvamProvider {
         messages: [{ role: "user", content: prompt }],
       });
     } catch (error) {
-      console.error(
-        `[Sarvam] ${label} failed on ${MODEL} (${describe(error)})`,
-      );
+      log.error(`${label} call failed`, {
+        model: MODEL,
+        detail: describe(error),
+      });
       throw error;
     }
 
@@ -67,9 +71,10 @@ export class SarvamProvider {
       throw new Error(`Sarvam returned an empty ${label} response`);
     }
 
-    console.log(
-      `[Sarvam] ${label} completed on ${MODEL} in ${Date.now() - startedAt}ms`,
-    );
+    log.info(`${label} call completed`, {
+      model: MODEL,
+      durationMs: Date.now() - startedAt,
+    });
 
     return content;
   }

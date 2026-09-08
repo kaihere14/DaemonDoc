@@ -12,6 +12,7 @@ import {
 } from "../utils/githubApiClient.js";
 import { redis } from "../utils/redis.js";
 import { liveUpdate } from "../services/convex.service.js";
+import { githubLog, serverLog, queueLog } from "../utils/logger.js";
 
 export function verifyGithubSignature(req) {
   if (!Buffer.isBuffer(req.body)) return false;
@@ -71,7 +72,10 @@ export const getGithubRepos = async (req, res) => {
 
     res.status(200).json({ reposData });
   } catch (error) {
-    console.log(error);
+    githubLog.error("Failed to list user repositories", {
+      userId: req.userId,
+      detail: error.message,
+    });
     res
       .status(500)
       .json({ message: "Error fetching GitHub repositories", error });
@@ -197,10 +201,10 @@ export const addRepoActivity = async (req, res) => {
         activeRepo.lastProcessedSha = headSha;
         await activeRepo.save();
       } catch (err) {
-        console.error(
-          "Failed to trigger initial README generation:",
-          err.message,
-        );
+        queueLog.error("Failed to queue initial README generation", {
+          repo: repoFullName,
+          detail: err.message,
+        });
       }
     }
 
@@ -208,7 +212,10 @@ export const addRepoActivity = async (req, res) => {
 
     res.status(200).json({ message: "Repository activity added successfully" });
   } catch (error) {
-    console.error("Error adding repository activity:", error);
+    githubLog.error("Failed to activate repository", {
+      userId: req.userId,
+      detail: error.message,
+    });
     res
       .status(500)
       .json({ message: "Error adding repository activity", error });
@@ -242,7 +249,11 @@ export const deactivateRepoActivity = async (req, res) => {
         accessToken,
       );
     } catch (error) {
-      console.error("Error deleting webhook:", error.message);
+      githubLog.warn("Failed to delete webhook — deactivating anyway", {
+        repo: `${activeRepo.repoOwner}/${activeRepo.repoName}`,
+        webhookId: activeRepo.webhookId,
+        detail: error.message,
+      });
     }
 
     const response = await ActiveRepo.updateOne(
@@ -294,9 +305,11 @@ export const githubWebhookHandler = async (req, res) => {
 
     // Only process README generation on default branch
     if (branchName !== activeRepo.defaultBranch) {
-      console.log(
-        `Ignoring push to non-default branch: ${branchName} (default: ${activeRepo.defaultBranch})`,
-      );
+      githubLog.info("Push ignored — not the default branch", {
+        repo: activeRepo.repoFullName,
+        branch: branchName,
+        defaultBranch: activeRepo.defaultBranch,
+      });
       return res.status(200).send("Non-default branch ignored");
     }
 
@@ -304,7 +317,10 @@ export const githubWebhookHandler = async (req, res) => {
       commitMessage.includes("[skip ci]") ||
       commitMessage.includes("auto-update README")
     ) {
-      console.log(`Ignoring bot commit: ${commitSha}`);
+      githubLog.info("Push ignored — bot commit", {
+        repo: activeRepo.repoFullName,
+        commit: commitSha,
+      });
       return res.status(200).send("Bot commit ignored");
     }
 
@@ -312,9 +328,10 @@ export const githubWebhookHandler = async (req, res) => {
       return res.status(200).send("Already processed");
     }
 
-    console.log(
-      `Received push event for repo ${activeRepo.repoFullName} at commit ${commitSha}`,
-    );
+    githubLog.info("Push event accepted", {
+      repo: activeRepo.repoFullName,
+      commit: commitSha,
+    });
 
     readmeQueue.add("generate-readme", {
       userId: activeRepo.userId,
@@ -331,7 +348,7 @@ export const githubWebhookHandler = async (req, res) => {
 
     return res.status(200).send("Webhook processed");
   } catch (err) {
-    console.error(err);
+    githubLog.error("Webhook handling failed", { detail: err.message });
     return res.status(500).send("Webhook error");
   }
 };
@@ -354,7 +371,7 @@ export const fetchAdminAnalytics = async (_req, res) => {
   try {
     const cachedAnalytics = await redis.get("admin_analytics");
     if (cachedAnalytics) {
-      console.log("[cache] Serving admin analytics from Redis cache");
+      serverLog.debug("Serving admin analytics from cache");
       return res.status(200).json(JSON.parse(cachedAnalytics));
     }
 
@@ -506,10 +523,7 @@ export const fetchAdminAnalytics = async (_req, res) => {
         recentLogs: threeLatestLogs,
       }),
     );
-    console.log(
-      "[cache] Admin analytics saved to Redis cache with ID:",
-      saveCache,
-    );
+    serverLog.debug("Admin analytics cached", { result: saveCache });
 
     return res.status(200).json({
       overview: {
@@ -527,7 +541,9 @@ export const fetchAdminAnalytics = async (_req, res) => {
       recentLogs: threeLatestLogs,
     });
   } catch (error) {
-    console.error("Error fetching admin analytics:", error);
+    serverLog.error("Failed to fetch admin analytics", {
+      detail: error.message,
+    });
     return res.status(500).json({ message: "Error fetching admin analytics" });
   }
 };
@@ -581,7 +597,7 @@ export const fetchAdminUsers = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching admin users:", error);
+    serverLog.error("Failed to fetch admin users", { detail: error.message });
     return res.status(500).json({ message: "Error fetching admin users" });
   }
 };
@@ -592,11 +608,11 @@ export const cleanUpReadme = async (req, res) => {
   const sharedLogId = crypto.randomUUID();
 
   try {
-    console.log("[cleanUpReadme] Started");
-
     const { repoId } = req.body;
     if (!repoId) {
-      console.log("[cleanUpReadme] Missing repoId");
+      serverLog.warn("Cleanup request rejected — repoId missing", {
+        userId: req.userId,
+      });
       return res.status(400).json({ message: "repoId is required" });
     }
 
@@ -607,20 +623,25 @@ export const cleanUpReadme = async (req, res) => {
       active: true,
     });
     if (!activeRepo) {
-      console.log("[cleanUpReadme] Please activate the repository first");
+      serverLog.warn("Cleanup request rejected — repository not active", {
+        userId,
+        repoId,
+      });
       return res
         .status(404)
         .json({ message: "Please activate the repository first" });
     }
 
-    console.log(
-      "[cleanUpReadme] Active repository found:",
-      `${activeRepo.repoOwner}/${activeRepo.repoName}`,
-    );
+    serverLog.info("Cleanup requested", {
+      repo: `${activeRepo.repoOwner}/${activeRepo.repoName}`,
+      logId: sharedLogId,
+    });
 
     const user = await User.findById(userId);
     if (!user?.githubAccessToken) {
-      console.log("[cleanUpReadme] GitHub access token not found");
+      serverLog.warn("Cleanup request rejected — no GitHub access token", {
+        userId,
+      });
       return res.status(404).json({ message: "GitHub access token not found" });
     }
 
@@ -651,7 +672,10 @@ export const cleanUpReadme = async (req, res) => {
       logId: sharedLogId,
     });
   } catch (error) {
-    console.error("[cleanUpReadme] Failed:", error.message);
+    serverLog.error("Cleanup request failed", {
+      logId: sharedLogId,
+      detail: error.message,
+    });
     liveUpdate(sharedLogId, `✗ Failed: ${error.message}`);
     return res
       .status(500)

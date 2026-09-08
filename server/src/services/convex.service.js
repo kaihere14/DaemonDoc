@@ -1,10 +1,9 @@
 import { ConvexHttpClient } from "convex/browser";
 import { makeFunctionReference } from "convex/server";
+import { convexLog as log } from "../utils/logger.js";
 
 if (!process.env.CONVEX_URL) {
-  console.warn(
-    "[convex.service] CONVEX_URL is not set — Convex queries will fail.",
-  );
+  log.warn("CONVEX_URL is not set — live updates will fail");
 }
 
 const client = new ConvexHttpClient(process.env.CONVEX_URL);
@@ -15,10 +14,10 @@ export function liveUpdate(sharedLogId, message) {
   client
     .mutation(logsAddMessage, { logId: sharedLogId, message })
     .catch((err) =>
-      console.warn(
-        "[cleanUpReadme] Convex log message failed (non-fatal):",
-        err.message,
-      ),
+      log.warn("Live update failed (non-fatal)", {
+        logId: sharedLogId,
+        detail: err.message,
+      }),
     );
 }
 

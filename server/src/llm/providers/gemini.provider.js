@@ -4,6 +4,9 @@ import { aiCall } from "../ai.sdk.js";
 import { buildDetectPrompt } from "../prompts/detect.prompt.js";
 import { extractJson } from "../utils/response.js";
 import { buildCleanupPrompt } from "../prompts/cleanup.prompt.js";
+import { providerLog } from "../../utils/logger.js";
+
+const log = providerLog("Gemini");
 
 // Keys are tried in slot order. Unset or blank slots are dropped, so a
 // half-filled .env still works instead of burning an attempt on nothing.
@@ -99,9 +102,11 @@ export class GeminiProvider {
         if (!isRotatable(error)) throw error;
 
         lastError = error;
-        console.warn(
-          `[Gemini] key ${index + 1}/${this.clients.length} failed on ${modelId} (${describe(error)}) — trying next key`,
-        );
+        log.warn("API key failed — trying next key", {
+          key: `${index + 1}/${this.clients.length}`,
+          model: modelId,
+          detail: describe(error),
+        });
       }
     }
 

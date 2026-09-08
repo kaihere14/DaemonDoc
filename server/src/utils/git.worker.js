@@ -19,6 +19,10 @@ import {
 import { selectImportantFiles } from "./scan.filters.js";
 import UserLogModel from "../schema/userLog.schema.js";
 import { liveUpdate } from "../services/convex.service.js";
+import { githubLog, queueLog, redisLog, workerLog } from "./logger.js";
+
+const generationLog = workerLog.child({ job: "readme-generation" });
+const cleanupLog = workerLog.child({ job: "readme-cleanup" });
 import { LlmService } from "../llm/llm.service.js";
 
 export const connection = new IORedis({
@@ -32,13 +36,13 @@ export const connection = new IORedis({
   keepAlive: 30000,
   retryStrategy: (times) => {
     const delay = Math.min(times * 1000, 10000);
-    console.log(`Retrying Redis connection in ${delay}ms (attempt ${times})`);
+    redisLog.warn("Retrying connection", { attempt: times, delayMs: delay });
     return delay;
   },
   reconnectOnError: (err) => {
     const targetErrors = ["READONLY", "ECONNRESET", "ETIMEDOUT"];
     if (targetErrors.some((e) => err.message.includes(e))) {
-      console.log("Reconnecting due to:", err.message);
+      redisLog.warn("Reconnecting after error", { detail: err.message });
       return true;
     }
     return false;
@@ -48,23 +52,22 @@ export const connection = new IORedis({
 });
 
 connection.on("error", (err) =>
-  console.error("Redis connection error:", err.message),
+  redisLog.error("Connection error", { detail: err.message }),
 );
-connection.on("connect", () => console.log("Redis connected successfully"));
-connection.on("ready", () => console.log("Redis ready to accept commands"));
+connection.on("connect", () => redisLog.info("Connected"));
+connection.on("ready", () => redisLog.info("Ready to accept commands"));
 connection.on("close", () =>
-  console.warn("Redis connection closed. Will attempt to reconnect..."),
+  redisLog.warn("Connection closed — will attempt to reconnect"),
 );
 connection.on("reconnecting", (timeToReconnect) =>
-  console.log(`Reconnecting to Redis in ${timeToReconnect}ms...`),
+  redisLog.info("Reconnecting", { delayMs: timeToReconnect }),
 );
-connection.on("end", () => console.error("Redis connection ended permanently"));
+connection.on("end", () => redisLog.error("Connection ended permanently"));
 
 connection.connect().catch((err) => {
-  console.error("Failed to connect to Redis:", err.message);
-  console.log(
-    "Redis is optional. Server will continue without queue functionality.",
-  );
+  redisLog.error("Initial connection failed — queues disabled", {
+    detail: err.message,
+  });
 });
 
 export const readmeQueue = new Queue("readme-generation", { connection });
@@ -72,7 +75,11 @@ export const readmeQueue = new Queue("readme-generation", { connection });
 new Worker(
   "readme-generation",
   async (job) => {
-    console.log("Processing job:", job.data);
+    queueLog.info("README generation job received", {
+      jobId: job.id,
+      repo: job.data.repoFullName,
+      commit: job.data.commitSha,
+    });
     const sharedLogId = crypto.randomUUID();
     const userLog = await UserLogModel.create({
       logId: sharedLogId,
@@ -85,7 +92,11 @@ new Worker(
     await redis.del("admin_analytics");
     job.data.logId = userLog._id.toString();
     job.data.sharedLogId = sharedLogId;
-    console.log("Updated job data with logId:", job.data.logId);
+    queueLog.debug("Job bound to log row", {
+      jobId: job.id,
+      logId: job.data.logId,
+      sharedLogId,
+    });
 
     await aihandler(job.data);
   },
@@ -114,13 +125,18 @@ async function updateLogStatus(logId, action, status, commitId = null) {
     });
 
     if (log) {
-      console.log(
-        `[AI Handler] Log ${logId} saved as action=${log.action} status=${log.status}`,
-      );
+      generationLog.debug("Log row updated", {
+        logId,
+        action: log.action,
+        status: log.status,
+      });
       await redis.del("admin_analytics");
     }
   } catch (err) {
-    console.error("[AI Handler] Failed to update log:", err.message);
+    generationLog.error("Failed to update log row", {
+      logId,
+      detail: err.message,
+    });
   }
 }
 
@@ -138,9 +154,10 @@ const aihandler = async (data) => {
 
   const repo_limits = REPOSITORY_LIMITS;
 
-  console.log(
-    `[AI Handler] Starting README generation for ${repoFullName} at commit ${commitSha}`,
-  );
+  generationLog.info("Starting README generation", {
+    repo: repoFullName,
+    commit: commitSha,
+  });
   liveUpdate(
     sharedLogId,
     `Starting README generation for ${repoFullName} at commit ${commitSha.slice(0, 7)}`,
@@ -161,7 +178,10 @@ const aihandler = async (data) => {
     });
     if (!activeRepo) throw new Error("Active repository not found");
 
-    console.log(`[AI Handler] Fetching commit details for ${commitSha}`);
+    githubLog.info("Fetching commit details", {
+      repo: repoFullName,
+      commit: commitSha,
+    });
     liveUpdate(sharedLogId, `Fetching commit details`);
     const commitData = await getCommit(
       accessToken,
@@ -170,7 +190,7 @@ const aihandler = async (data) => {
       commitSha,
     );
 
-    console.log(`[AI Handler] Fetching repository structure`);
+    githubLog.info("Fetching repository tree", { repo: repoFullName });
     liveUpdate(sharedLogId, `Fetching repository structure`);
     let repoStructure = "";
     let repoTree = null;
@@ -184,20 +204,23 @@ const aihandler = async (data) => {
       repoStructure = formatRepoTree(repoTree.tree, 3);
 
       if (repoTree.truncated) {
-        console.warn(
-          `[AI Handler] Repository tree truncated by GitHub — scan may be partial`,
-        );
+        githubLog.warn("Repository tree truncated by GitHub — partial scan", {
+          repo: repoFullName,
+        });
         liveUpdate(
           sharedLogId,
           `Repository tree truncated by GitHub — scan may be partial`,
         );
       }
     } catch (error) {
-      console.warn(`[AI Handler] Could not fetch repo tree: ${error.message}`);
+      githubLog.warn("Could not fetch repository tree", {
+        repo: repoFullName,
+        detail: error.message,
+      });
       repoStructure = "Repository structure not available";
     }
 
-    console.log(`[AI Handler] Checking for existing README`);
+    githubLog.info("Checking for existing README", { repo: repoFullName });
     liveUpdate(sharedLogId, `Checking for existing README`);
     const readmeFileName = process.env.README_FILE_NAME || "README.md";
     let existingReadme = null;
@@ -214,18 +237,20 @@ const aihandler = async (data) => {
       if (readmeData) {
         existingReadme = readmeData.content;
         existingReadmeSha = readmeData.sha;
-        console.log(
-          `[AI Handler] Found existing README (${readmeData.size} bytes)`,
-        );
+        githubLog.info("Existing README found", {
+          repo: repoFullName,
+          bytes: readmeData.size,
+        });
         liveUpdate(
           sharedLogId,
           `Found existing README (${readmeData.size} bytes)`,
         );
       }
     } catch (error) {
-      console.log(
-        `[AI Handler] No existing README found or error fetching: ${error.message}`,
-      );
+      githubLog.info("No existing README — generating from scratch", {
+        repo: repoFullName,
+        detail: error.message,
+      });
       liveUpdate(
         sharedLogId,
         `No existing README found — will generate from scratch`,
@@ -251,12 +276,16 @@ const aihandler = async (data) => {
         repo_limits.maxFilesFullScan,
         repo_limits.maxLinesPerFile,
       );
-      console.log(
-        `[AI Handler] Scanned ${fullCodebase.length} important files from repository`,
-      );
+      githubLog.info("Repository scan complete", {
+        repo: repoFullName,
+        files: fullCodebase.length,
+      });
       liveUpdate(sharedLogId, `Scanned ${fullCodebase.length} important files`);
     } catch (error) {
-      console.error(`[AI Handler] Error scanning repository: ${error.message}`);
+      githubLog.error("Repository scan failed", {
+        repo: repoFullName,
+        detail: error.message,
+      });
     }
 
     const fullCodebasePathSet = new Set(fullCodebase.map((f) => f.path));
@@ -288,9 +317,10 @@ const aihandler = async (data) => {
     // Nothing worth documenting changed — this is a normal outcome, not a
     // failure, so settle the log as skipped and commit nothing.
     if (result.skipped) {
-      console.log(
-        `[AI Handler] No README update needed for ${repoFullName} — ${result.reason}`,
-      );
+      generationLog.info("No README update needed", {
+        repo: repoFullName,
+        reason: result.reason,
+      });
       liveUpdate(
         sharedLogId,
         `No major section update — skipping README commit`,
@@ -332,7 +362,10 @@ const aihandler = async (data) => {
         sharedLogId,
       );
 
-      console.log("Readme is commited successfully");
+      githubLog.info("README committed", {
+        repo: repoFullName,
+        commit: commitResult.commit.sha,
+      });
     } catch {
       liveUpdate(sharedLogId, `Readme failed to commit `);
 
@@ -344,14 +377,15 @@ const aihandler = async (data) => {
         sharedLogId,
       );
 
-      console.log("Readme failed to commit");
+      githubLog.error("README commit failed", { repo: repoFullName });
     }
   } catch (error) {
-    console.error(
-      `[AI Handler] ✗ Error generating README for ${repoFullName}:`,
-      error.message,
-    );
-    console.error(error.stack);
+    generationLog.error("README generation failed", {
+      repo: repoFullName,
+      commit: commitSha,
+      detail: error.message,
+      stack: error.stack,
+    });
     liveUpdate(sharedLogId, `✗ Failed: ${error.message}`);
     await updateLogStatus(
       data.logId,
@@ -401,9 +435,11 @@ async function fetchFilesFromTree(
         });
       }
     } catch (err) {
-      console.warn(
-        `[AI Handler] Could not fetch file ${filePath}: ${err.message}`,
-      );
+      githubLog.warn("Could not fetch file", {
+        repo: `${owner}/${repo}`,
+        path: filePath,
+        detail: err.message,
+      });
     }
   }
   return results;
@@ -448,9 +484,11 @@ async function fetchChangedFiles(
         });
       }
     } catch (err) {
-      console.warn(
-        `[AI Handler] Could not fetch changed file ${file.filename}: ${err.message}`,
-      );
+      githubLog.warn("Could not fetch changed file", {
+        repo: `${owner}/${repo}`,
+        path: file.filename,
+        detail: err.message,
+      });
     }
   }
   return results;
@@ -514,7 +552,9 @@ async function cleanupHandler(job) {
       sharedLogId,
       `Starting README cleanup for ${repoOwner}/${repoName}`,
     );
-    console.log("[cleanUpReadme] Fetching README.md");
+    githubLog.info("Fetching README for cleanup", {
+      repo: `${repoOwner}/${repoName}`,
+    });
     const readmeFile = await getFileContent(
       accessToken,
       repoOwner,
@@ -524,16 +564,23 @@ async function cleanupHandler(job) {
     );
 
     if (!readmeFile?.content?.trim()) {
-      console.log("[cleanUpReadme] README.md not found");
+      githubLog.warn("README not found — cleanup cannot run", {
+        repo: `${repoOwner}/${repoName}`,
+      });
       // Retrying cannot conjure a README — fail the job outright rather than
       // burning every attempt plus its backoff on a job that cannot succeed.
       throw new UnrecoverableError("README.md not found in repository");
     }
 
-    console.log("[cleanUpReadme] README fetched");
+    githubLog.info("README fetched", {
+      repo: `${repoOwner}/${repoName}`,
+      bytes: readmeFile.content.length,
+    });
     liveUpdate(sharedLogId, "Fetched existing README.md");
     liveUpdate(sharedLogId, "Rewriting the README");
-    console.log("[cleanUpReadme] Running AI cleanup");
+    cleanupLog.info("Running README cleanup", {
+      repo: `${repoOwner}/${repoName}`,
+    });
     const llmService = new LlmService();
     const cleanedReadme = await llmService.cleanup(
       readmeFile.content,
@@ -543,13 +590,15 @@ async function cleanupHandler(job) {
       liveUpdate(sharedLogId, "The model returned an empty README");
       throw new Error("Cleanup returned empty content");
     }
-    console.log("[cleanUpReadme] AI cleanup complete");
+    cleanupLog.info("Cleanup complete", { chars: cleanedReadme.length });
     liveUpdate(
       sharedLogId,
       `Cleanup complete — ${cleanedReadme.length.toLocaleString()} characters`,
     );
 
-    console.log("[cleanUpReadme] Committing README");
+    githubLog.info("Committing cleaned README", {
+      repo: `${repoOwner}/${repoName}`,
+    });
     liveUpdate(sharedLogId, "Committing cleaned README to GitHub");
     const commitResult = await commitFile(
       accessToken,
@@ -562,7 +611,10 @@ async function cleanupHandler(job) {
       readmeFile.sha,
     );
 
-    console.log("[cleanUpReadme] README committed:", commitResult.commit.sha);
+    githubLog.info("Cleaned README committed", {
+      repo: `${repoOwner}/${repoName}`,
+      commit: commitResult.commit.sha,
+    });
     liveUpdate(
       sharedLogId,
       `✓ README committed: ${commitResult.commit.sha.slice(0, 7)}`,
@@ -581,7 +633,10 @@ async function cleanupHandler(job) {
     );
     await redis.del("admin_analytics");
   } catch (error) {
-    console.error("[cleanUpReadme] Failed:", error.message);
+    cleanupLog.error("README cleanup failed", {
+      repo: `${repoOwner}/${repoName}`,
+      detail: error.message,
+    });
 
     // Only settle the log as failed once no attempt is left, so a transient
     // failure does not flash "failed" in the UI before the retry reopens it.
