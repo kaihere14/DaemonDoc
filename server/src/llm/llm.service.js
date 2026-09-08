@@ -1,4 +1,5 @@
 import { liveUpdate } from "../services/convex.service.js";
+import { aiLog as log } from "../utils/logger.js";
 import { GeminiProvider } from "./providers/gemini.provider.js";
 import { SarvamProvider } from "./providers/sarvam.provider.js";
 import { detectReadme, generateReadme } from "./readme.generate.js";
@@ -41,7 +42,7 @@ export class LlmService {
       sharedLogId,
     });
 
-    console.log(`[LLM] Generation mode: ${mode} — ${reason}`);
+    log.info("Generation mode selected", { mode, reason });
     liveUpdate(
       sharedLogId,
       `Update strategy: ${mode === "patch" ? "targeted update" : "full rewrite"} — ${reason}`,
@@ -49,7 +50,7 @@ export class LlmService {
 
     //full generation pipeline setup
     if (mode === "full") {
-      console.log(`[LLM] FULL mode — scanning entire repository`);
+      log.info("Full mode — scanning entire repository");
       liveUpdate(sharedLogId, "Reading the full repository");
 
       const readme = await generateReadme({
@@ -71,7 +72,7 @@ export class LlmService {
 
     //patch pipeline setup
     if (mode === "patch") {
-      console.log(`[LLM] PATCH mode — scanning modified files only`);
+      log.info("Patch mode — scanning modified files only");
       liveUpdate(sharedLogId, "Reading the changed files");
 
       return await patchReadme({
@@ -97,14 +98,14 @@ export class LlmService {
   // the same primary/fallback handling instead of inheriting it from above.
   async cleanup(existingReadme, sharedLogId) {
     try {
-      console.log(
-        `[LLM] Cleaning README with ${this.geminiProvider.getName()}`,
-      );
+      log.info("Cleaning README", { provider: this.geminiProvider.getName() });
       return await this.geminiProvider.cleanup(existingReadme);
     } catch (error) {
-      console.warn(
-        `[LLM] ${this.geminiProvider.getName()} cleanup failed (${error.message}) — falling back to ${this.sarvamProvider.getName()}`,
-      );
+      log.warn("Cleanup failed — falling back", {
+        provider: this.geminiProvider.getName(),
+        fallback: this.sarvamProvider.getName(),
+        detail: error.message,
+      });
       liveUpdate(
         sharedLogId,
         "Primary model unavailable — switching to backup",

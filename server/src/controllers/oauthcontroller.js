@@ -6,6 +6,7 @@ import UserLogModel from "../schema/userLog.schema.js";
 import { encrypt, decrypt } from "../utils/crypto.js";
 import { GITHUB_API_BASE, githubDelete } from "../utils/githubApiClient.js";
 import { redis } from "../utils/redis.js";
+import { authLog as log } from "../utils/logger.js";
 
 export { encrypt, decrypt };
 
@@ -58,14 +59,14 @@ export const githubCallBack = async (req, res) => {
       const result = await createOAuthUser(userInfo, accessToken, primaryEmail);
       user = result.user;
     } catch (error) {
-      console.error("Error creating OAuth user:", error);
+      log.error("OAuth user creation failed", { detail: error.message });
       return res
         .status(500)
         .json({ message: "Error creating OAuth user", error: error.message });
     }
 
     if (!user || !user._id) {
-      console.error("User creation failed: user object is invalid");
+      log.error("OAuth user creation returned an invalid user object");
       return res
         .status(500)
         .json({ message: "Failed to create or retrieve user" });
@@ -125,7 +126,9 @@ export const createOAuthUser = async (
     await user.save();
     await redis.del("admin_analytics");
   } else {
-    console.log("User already exists. Updating access token.");
+    log.info("Existing user signed in — refreshing access token", {
+      userId: user._id,
+    });
     user.githubAccessToken = encrypt(access_token);
     if (profile.email || primaryEmail) {
       user.email = profile.email || primaryEmail;
@@ -145,7 +148,7 @@ export const verifyUser = async (req, res) => {
     }
     return res.status(200).json({ user });
   } catch (error) {
-    console.error("Verify user error:", error);
+    log.error("User verification failed", { detail: error.message });
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -172,10 +175,10 @@ export const deleteAccount = async (req, res) => {
         );
       } catch (webhookError) {
         if (webhookError.response?.status !== 404) {
-          console.warn(
-            `Failed to delete webhook for ${repo.repoName}:`,
-            webhookError.message,
-          );
+          log.warn("Failed to delete webhook during account deletion", {
+            repo: `${repo.repoOwner}/${repo.repoName}`,
+            detail: webhookError.message,
+          });
         }
       }
     }
@@ -185,7 +188,10 @@ export const deleteAccount = async (req, res) => {
     await redis.del("admin_analytics");
     return res.status(200).json({ message: "Account deleted successfully" });
   } catch (error) {
-    console.error("Delete account error:", error);
+    log.error("Account deletion failed", {
+      userId,
+      detail: error.message,
+    });
     return res.status(500).json({ message: "Internal server error" });
   }
 };

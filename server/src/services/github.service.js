@@ -5,6 +5,7 @@ import {
 } from "../utils/githubApiClient.js";
 import { getLanguageFromExtension } from "../utils/langMap.js";
 import { IGNORED_DIR_PATTERNS } from "../utils/scan.filters.js";
+import { githubLog as log } from "../utils/logger.js";
 
 /**
  * Get commit diff between two commits
@@ -32,7 +33,12 @@ export async function getCommitDiff(
       totalCommits: response.data.total_commits || 0,
     };
   } catch (error) {
-    console.error("Error fetching commit diff:", error.message);
+    log.error("Failed to fetch commit diff", {
+      repo: `${owner}/${repo}`,
+      baseSha,
+      headSha,
+      detail: error.message,
+    });
     throw new Error(`Failed to fetch commit diff: ${error.message}`);
   }
 }
@@ -58,7 +64,11 @@ export async function getCommit(accessToken, owner, repo, sha) {
       stats: response.data.stats,
     };
   } catch (error) {
-    console.error("Error fetching commit:", error.message);
+    log.error("Failed to fetch commit", {
+      repo: `${owner}/${repo}`,
+      sha,
+      detail: error.message,
+    });
     throw new Error(`Failed to fetch commit: ${error.message}`);
   }
 }
@@ -86,7 +96,10 @@ export async function getRepoTree(accessToken, owner, repo, branch) {
       truncated: treeResponse.data.truncated || false,
     };
   } catch (error) {
-    console.error("Error fetching repo tree:", error.message);
+    log.error("Failed to fetch repository tree", {
+      repo: `${owner}/${repo}`,
+      detail: error.message,
+    });
     throw new Error(`Failed to fetch repo tree: ${error.message}`);
   }
 }
@@ -120,7 +133,11 @@ export async function getFileContent(accessToken, owner, repo, path, branch) {
     if (error.response && error.response.status === 404) {
       return null; // File doesn't exist
     }
-    console.error(`Error fetching file content (${path}):`, error.message);
+    log.error("Failed to fetch file content", {
+      repo: `${owner}/${repo}`,
+      path,
+      detail: error.message,
+    });
     throw new Error(`Failed to fetch file content: ${error.message}`);
   }
 }
@@ -169,10 +186,13 @@ export async function commitFile(
       commit: response.data.commit,
     };
   } catch (error) {
-    console.error(`Error committing file (${path}):`, error.message);
-    if (error.response) {
-      console.error("Response data:", error.response.data);
-    }
+    log.error("Failed to commit file", {
+      repo: `${owner}/${repo}`,
+      path,
+      branch,
+      detail: error.message,
+      response: error.response?.data,
+    });
     throw new Error(`Failed to commit file: ${error.message}`);
   }
 }

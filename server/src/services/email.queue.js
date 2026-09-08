@@ -2,12 +2,13 @@ import { Queue, Worker } from "bullmq";
 import User from "../schema/user.schema.js";
 import { sendEmail } from "./email.service.js";
 import { redisConnection } from "../utils/redis.js";
+import { emailLog as log } from "../utils/logger.js";
 
 const MAX_CONCURRENCY = 2;
 const EMAIL_QUEUE_NAME = "email-broadcast";
 
 redisConnection.on("error", (err) => {
-  console.error("Email queue Redis error:", err.message);
+  log.error("Email queue Redis error", { detail: err.message });
 });
 
 export const emailQueue = new Queue(EMAIL_QUEUE_NAME, {
