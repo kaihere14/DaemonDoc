@@ -47,6 +47,9 @@ importers:
       resend:
         specifier: ^6.9.4
         version: 6.12.3
+      sarvamai:
+        specifier: 1.1.8-alpha.5
+        version: 1.1.8-alpha.5
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.1
@@ -1152,6 +1155,10 @@ packages:
 
   safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
+
+  sarvamai@1.1.8-alpha.5:
+    resolution: {integrity: sha512-qmx0pfJmwyugWbGvaUhM/Sw9ZRecCmN57Q+n0tPAxO0N/hwIED/DioUQAcvk4NQke7kxepTzu5FSSgJOifMeIg==}
+    engines: {node: '>=18.0.0'}
 
   semver@7.8.0:
     resolution: {integrity: sha512-AcM7dV/5ul4EekoQ29Agm5vri8JNqRyj39o0qpX6vDF2GZrtutZl5RwgD1XnZjiTAfncsJhMI48QQH3sN87YNA==}
@@ -2337,6 +2344,13 @@ snapshots:
   safe-buffer@5.2.1: {}
 
   safer-buffer@2.1.2: {}
+
+  sarvamai@1.1.8-alpha.5:
+    dependencies:
+      ws: 8.18.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   semver@7.8.0: {}
 

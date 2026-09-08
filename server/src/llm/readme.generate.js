@@ -228,6 +228,46 @@ function validateGeneratedReadme(readme) {
   return content;
 }
 
+export async function detectReadme({
+  existingReadme,
+  provider,
+  fallBackProvider,
+  sharedLogId,
+}) {
+  if (!existingReadme || !existingReadme.trim()) {
+    return {
+      mode: "full",
+      reason: "No existing README — generating from scratch",
+    };
+  }
+
+  let result;
+
+  try {
+    console.log(`[LLM] Detecting update mode with ${provider.getName()}`);
+    liveUpdate(sharedLogId, "Analysing the existing README");
+    result = await provider.detect(existingReadme);
+  } catch (error) {
+    console.warn(
+      `[LLM] ${provider.getName()} detection failed (${error.message}) — falling back to ${fallBackProvider.getName()}`,
+    );
+    liveUpdate(sharedLogId, "Primary model unavailable — switching to backup");
+    result = await fallBackProvider.detect(existingReadme);
+  }
+
+  if (!result) {
+    console.error(
+      `[LLM] Detection returned no usable result from any provider`,
+    );
+    result = {
+      mode: "failed",
+      reason: "Unable to analyse the existing README",
+    };
+  }
+
+  return result;
+}
+
 export async function generateReadme({
   repoName,
   repoOwner,
@@ -239,9 +279,10 @@ export async function generateReadme({
   fullCodebase,
   sharedLogId,
   provider,
+  fallBackProvider,
 }) {
   console.log(`[LLM] Building full generation context`);
-  liveUpdate(sharedLogId, `Building full generation context`);
+  liveUpdate(sharedLogId, "Preparing the repository context");
 
   let context = buildReadmeContext({
     repoName,
@@ -270,7 +311,7 @@ export async function generateReadme({
   );
   liveUpdate(
     sharedLogId,
-    `Context ready — ${fileCount} codebase file(s) (~${validation.estimatedTokens} tokens)`,
+    `Context ready — ${fileCount} file(s), roughly ${validation.estimatedTokens.toLocaleString()} tokens`,
   );
 
   // Nothing but the repo name reached the model — the scan found no readable
@@ -286,30 +327,41 @@ export async function generateReadme({
     );
     liveUpdate(
       sharedLogId,
-      `No code context available — README will be limited`,
+      "No readable code found — the README will cover repository metadata only",
     );
   }
 
   if (validation.estimatedTokens > 180000) {
     console.log(`[LLM] Optimizing large context`);
-    liveUpdate(sharedLogId, `Optimizing large context`);
+    liveUpdate(sharedLogId, "Trimming the context to fit the model window");
     context = optimizeContext(context, 180000);
   }
 
   let prompt = buildFullReadmePrompt(context);
 
-  console.log(`[LLM] Generating README with AI`);
-  liveUpdate(sharedLogId, `Generating README with AI`);
-  const readme = await provider.generate(prompt);
+  let readme;
+  try {
+    console.log(`[LLM] Generating README with ${provider.getName()}`);
+    liveUpdate(sharedLogId, "Writing the README");
+    readme = await provider.generate(prompt);
+  } catch (error) {
+    console.warn(
+      `[LLM] ${provider.getName()} generation failed (${error.message}) — falling back to ${fallBackProvider.getName()}`,
+    );
+    liveUpdate(sharedLogId, "Primary model unavailable — switching to backup");
+    readme = await fallBackProvider.generate(prompt);
+  }
+
+  if (!readme) throw new Error("No README returned by any provider");
 
   console.log(`[LLM] Validating generated README`);
-  liveUpdate(sharedLogId, `Validating generated README`);
+  liveUpdate(sharedLogId, "Reviewing the generated README");
   const validatedReadme = validateGeneratedReadme(readme);
 
   console.log(
     `[LLM] ✓ Full README generated (${validatedReadme.length} chars)`,
   );
-  liveUpdate(sharedLogId, `README generated successfully`);
+  liveUpdate(sharedLogId, "README ready");
 
   return validatedReadme;
 }

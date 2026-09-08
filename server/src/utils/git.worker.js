@@ -532,16 +532,22 @@ async function cleanupHandler(job) {
 
     console.log("[cleanUpReadme] README fetched");
     liveUpdate(sharedLogId, "Fetched existing README.md");
-    liveUpdate(sharedLogId, "Cleaning README content with AI");
+    liveUpdate(sharedLogId, "Rewriting the README");
     console.log("[cleanUpReadme] Running AI cleanup");
     const llmService = new LlmService();
-    const cleanedReadme = await llmService.cleanup(readmeFile.content);
+    const cleanedReadme = await llmService.cleanup(
+      readmeFile.content,
+      sharedLogId,
+    );
     if (!cleanedReadme) {
-      liveUpdate(sharedLogId, "AI cleanup returned empty content");
-      throw new Error("AI cleanup returned empty content");
+      liveUpdate(sharedLogId, "The model returned an empty README");
+      throw new Error("Cleanup returned empty content");
     }
     console.log("[cleanUpReadme] AI cleanup complete");
-    liveUpdate(sharedLogId, `Cleanup complete (${cleanedReadme.length} chars)`);
+    liveUpdate(
+      sharedLogId,
+      `Cleanup complete — ${cleanedReadme.length.toLocaleString()} characters`,
+    );
 
     console.log("[cleanUpReadme] Committing README");
     liveUpdate(sharedLogId, "Committing cleaned README to GitHub");

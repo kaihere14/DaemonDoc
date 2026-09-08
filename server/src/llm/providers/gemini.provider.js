@@ -59,6 +59,7 @@ export class GeminiProvider {
   // detectionModel/generationModel are Gemini model ids. The provider binds
   // them to a key itself, because the key is what rotates — not the model.
   constructor({ detectionModel, generationModel, cleanupModel }) {
+    this.name = "Gemini";
     this.detectionModel = detectionModel;
     this.generationModel = generationModel;
     this.cleanupModel = cleanupModel;
@@ -67,6 +68,9 @@ export class GeminiProvider {
     this.clients = loadGeminiKeys().map((apiKey) =>
       createGoogleGenerativeAI({ apiKey }),
     );
+  }
+  getName() {
+    return this.name;
   }
 
   // keys -> try key -> failure -> next key -> success.

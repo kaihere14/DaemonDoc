@@ -284,13 +284,14 @@ export async function patchReadme({
   changedFilesContent,
   sharedLogId,
   provider,
+  fallBackProvider,
 }) {
   if (!existingReadme || !existingReadme.trim()) {
     throw new Error("PATCH mode requires an existing README");
   }
 
   console.log(`[Patch] Analyzing README changes`);
-  liveUpdate(sharedLogId, `PATCH mode — analyzing README changes`);
+  liveUpdate(sharedLogId, "Comparing the commit against the current README");
 
   const { context, sections, orderedKeys, editableKeys } = buildPatchContext({
     repoName,
@@ -318,12 +319,31 @@ export async function patchReadme({
   }
 
   console.log(`[Patch] ${editableKeys.length} patchable section(s)`);
-  liveUpdate(sharedLogId, `Identifying affected README sections`);
+  liveUpdate(sharedLogId, "Identifying the affected README sections");
 
   const prompt = buildPatchReadmePrompt(patchContext);
-  const response = await provider.generate(prompt);
 
-  liveUpdate(sharedLogId, `Generating section updates`);
+  liveUpdate(sharedLogId, "Rewriting the affected sections");
+
+  let response;
+  try {
+    console.log(
+      `[Patch] Generating section updates with ${provider.getName()}`,
+    );
+    response = await provider.generate(prompt);
+  } catch (error) {
+    // Same contract as full mode: the primary provider throws only once every
+    // one of its keys is spent, so a throw here is the signal to switch.
+    if (!fallBackProvider) throw error;
+
+    console.warn(
+      `[Patch] ${provider.getName()} generation failed (${error.message}) — falling back to ${fallBackProvider.getName()}`,
+    );
+    liveUpdate(sharedLogId, "Primary model unavailable — switching to backup");
+    response = await fallBackProvider.generate(prompt);
+  }
+
+  if (!response) throw new Error("No section updates returned by any provider");
 
   const patches = parsePatchResponse(response, { sections, editableKeys });
   const patchedKeys = Object.keys(patches);
@@ -332,7 +352,10 @@ export async function patchReadme({
   // README documents. Skip the run instead of failing it.
   if (patchedKeys.length === 0) {
     console.log(`[Patch] No sections needed updating — skipping`);
-    liveUpdate(sharedLogId, `No major section update — README already current`);
+    liveUpdate(
+      sharedLogId,
+      "No changes needed — the README is already current",
+    );
 
     return {
       skipped: true,
@@ -350,7 +373,10 @@ export async function patchReadme({
   }
 
   console.log(`[Patch] Applying sections: ${patchedKeys.join(", ")}`);
-  liveUpdate(sharedLogId, `Applying README patch`);
+  liveUpdate(
+    sharedLogId,
+    `Applying updates to ${patchedKeys.length} section(s)`,
+  );
 
   const finalReadme = mergePatchedSections(sections, orderedKeys, patches);
   const validatedReadme = validatePatchedReadme(finalReadme, orderedKeys);
@@ -358,7 +384,7 @@ export async function patchReadme({
   console.log(
     `[Patch] ✓ Patched [${patchedKeys.join(", ")}] (${validatedReadme.length} chars)`,
   );
-  liveUpdate(sharedLogId, `README patch generated successfully`);
+  liveUpdate(sharedLogId, "README updated");
 
   return { skipped: false, readme: validatedReadme };
 }

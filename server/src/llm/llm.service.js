@@ -1,6 +1,7 @@
 import { liveUpdate } from "../services/convex.service.js";
 import { GeminiProvider } from "./providers/gemini.provider.js";
-import { generateReadme } from "./readme.generate.js";
+import { SarvamProvider } from "./providers/sarvam.provider.js";
+import { detectReadme, generateReadme } from "./readme.generate.js";
 import { patchReadme } from "./readme.patch.js";
 
 export class LlmService {
@@ -19,6 +20,8 @@ export class LlmService {
     cleanupModel: this.cleanupModel,
   });
 
+  sarvamProvider = new SarvamProvider();
+
   async generate({
     repoName,
     repoOwner,
@@ -31,15 +34,23 @@ export class LlmService {
     sharedLogId,
   }) {
     // 1. Detection logic uses the small LLM to determine the mode of operation (full or patch).
-    const { mode, reason } = await this.detect(existingReadme);
+    const { mode, reason } = await detectReadme({
+      existingReadme,
+      provider: this.geminiProvider,
+      fallBackProvider: this.sarvamProvider,
+      sharedLogId,
+    });
 
     console.log(`[LLM] Generation mode: ${mode} — ${reason}`);
-    liveUpdate(sharedLogId, `Mode: ${mode} — ${reason}`);
+    liveUpdate(
+      sharedLogId,
+      `Update strategy: ${mode === "patch" ? "targeted update" : "full rewrite"} — ${reason}`,
+    );
 
     //full generation pipeline setup
     if (mode === "full") {
       console.log(`[LLM] FULL mode — scanning entire repository`);
-      liveUpdate(sharedLogId, `FULL mode — scanning entire repository`);
+      liveUpdate(sharedLogId, "Reading the full repository");
 
       const readme = await generateReadme({
         repoName,
@@ -52,6 +63,7 @@ export class LlmService {
         commitData,
         sharedLogId,
         provider: this.geminiProvider,
+        fallBackProvider: this.sarvamProvider,
       });
 
       return { skipped: false, readme };
@@ -60,7 +72,7 @@ export class LlmService {
     //patch pipeline setup
     if (mode === "patch") {
       console.log(`[LLM] PATCH mode — scanning modified files only`);
-      liveUpdate(sharedLogId, `PATCH mode — scanning modified files only`);
+      liveUpdate(sharedLogId, "Reading the changed files");
 
       return await patchReadme({
         repoName,
@@ -71,6 +83,7 @@ export class LlmService {
         commitData,
         sharedLogId,
         provider: this.geminiProvider,
+        fallBackProvider: this.sarvamProvider,
       });
     }
 
@@ -79,20 +92,25 @@ export class LlmService {
 
   // Detection function uses the small LLM to determine
   // the mode of operation (full or patch).
-  async detect(existingReadme) {
-    // No README to analyze — full is the only possible outcome, so skip the
-    // detection model call entirely instead of paying a round trip to learn it.
-    if (!existingReadme || !existingReadme.trim()) {
-      return {
-        mode: "full",
-        reason: "No existing README — generating from scratch",
-      };
+
+  // Cleanup runs outside the generate() pipeline (its own queue), so it owns
+  // the same primary/fallback handling instead of inheriting it from above.
+  async cleanup(existingReadme, sharedLogId) {
+    try {
+      console.log(
+        `[LLM] Cleaning README with ${this.geminiProvider.getName()}`,
+      );
+      return await this.geminiProvider.cleanup(existingReadme);
+    } catch (error) {
+      console.warn(
+        `[LLM] ${this.geminiProvider.getName()} cleanup failed (${error.message}) — falling back to ${this.sarvamProvider.getName()}`,
+      );
+      liveUpdate(
+        sharedLogId,
+        "Primary model unavailable — switching to backup",
+      );
+
+      return this.sarvamProvider.cleanup(existingReadme);
     }
-
-    return this.geminiProvider.detect(existingReadme);
-  }
-
-  async cleanup(existingReadme) {
-    return this.geminiProvider.cleanup(existingReadme);
   }
 }
