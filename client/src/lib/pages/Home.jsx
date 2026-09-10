@@ -259,7 +259,7 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
-              className="rounded-panel shadow-raised sm:rounded-panel-lg mb-8 flex flex-col gap-4 border border-slate-200 bg-white/75 p-3 backdrop-blur-sm sm:flex-row sm:items-center sm:p-4"
+              className="rounded-panel shadow-raised sm:rounded-panel-lg relative z-20 mb-8 flex flex-col gap-4 border border-slate-200 bg-white/75 p-3 backdrop-blur-sm sm:flex-row sm:items-center sm:p-4"
             >
               {/* Filter Tabs */}
               <div className="rounded-tile flex items-center gap-2 overflow-x-auto border border-slate-200 bg-slate-50/80 p-1.5">
