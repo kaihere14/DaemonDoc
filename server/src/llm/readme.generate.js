@@ -208,9 +208,84 @@ export function optimizeContext(context, maxTokens = 180000) {
 
   if (optimized.commitDiff) {
     optimized.commitDiff = truncateText(optimized.commitDiff, 50);
+    if (fits()) return optimized;
   }
 
+  // Last-resort trims for a very tight budget (a low-context provider such as
+  // Sarvam). The Gemini path never reaches here — its budget is far larger
+  // than the steps above ever need. Shrink the source listing hard, keeping
+  // some real code for small repos; only a genuinely huge repo ends up with
+  // metadata alone.
+  for (const [count, lines] of [
+    [25, 150],
+    [12, 80],
+    [6, 40],
+  ]) {
+    if (optimized.fullCodebase.length > 0) {
+      optimized.fullCodebase = optimized.fullCodebase
+        .slice(0, count)
+        .map((file) => ({ ...file, content: truncateText(file.content, lines) }));
+      if (fits()) return optimized;
+    }
+  }
+
+  optimized.fullCodebase = [];
+  if (fits()) return optimized;
+
+  optimized.changedFiles = [];
+  if (fits()) return optimized;
+
+  optimized.repoStructure = truncateText(optimized.repoStructure, 40);
+  optimized.existingReadme = truncateText(optimized.existingReadme, 40);
+  optimized.commitDiff = truncateText(optimized.commitDiff, 20);
+
   return optimized;
+}
+
+// Marker prefix on live-update messages that report a context trim. The client
+// renders these with a "low context" badge instead of as plain log text.
+export const LOW_CONTEXT_MARKER = "[low-context] ";
+
+// Builds the prompt for one provider, trimming the shared context down to that
+// provider's token budget first when it does not already fit. A high-context
+// provider (Gemini) gets the context untouched; a low-context one (Sarvam)
+// gets a trimmed copy. The other provider's prompt is unaffected — each call
+// re-derives its own from the same source context.
+export function buildProviderPrompt({
+  provider,
+  context,
+  buildPrompt,
+  optimize,
+  sharedLogId,
+  logger,
+}) {
+  const limit = provider.getContextTokenLimit?.() ?? Infinity;
+  const fullPrompt = buildPrompt(context);
+  const estimatedTokens = Math.ceil(fullPrompt.length / 4);
+
+  if (estimatedTokens <= limit) {
+    return { prompt: fullPrompt, trimmed: false };
+  }
+
+  // optimize() budgets the JSON context only; the prompt template adds a fixed
+  // scaffold on top, so aim the context trim a little below the real limit.
+  const SCAFFOLD_TOKENS = 2500;
+  const contextTarget = Math.max(limit - SCAFFOLD_TOKENS, 1000);
+  const trimmedContext = optimize(context, contextTarget);
+  const prompt = buildPrompt(trimmedContext);
+
+  logger?.info?.("Trimmed context for low-context provider", {
+    provider: provider.getName(),
+    fromTokens: estimatedTokens,
+    limit,
+    toTokens: Math.ceil(prompt.length / 4),
+  });
+  liveUpdate(
+    sharedLogId,
+    `${LOW_CONTEXT_MARKER}Trimmed the repository context to fit ${provider.getName()}'s smaller context window`,
+  );
+
+  return { prompt, trimmed: true };
 }
 
 function validateGeneratedReadme(readme) {
@@ -344,21 +419,42 @@ export async function generateReadme({
     context = optimizeContext(context, 180000);
   }
 
-  let prompt = buildFullReadmePrompt(context);
+  // Each provider gets its own prompt: a low-context provider (Sarvam) is
+  // handed a context trimmed to its window, while the fallback keeps the full
+  // context. buildProviderPrompt is a no-op for a provider that already fits.
+  const primary = buildProviderPrompt({
+    provider,
+    context,
+    buildPrompt: buildFullReadmePrompt,
+    optimize: optimizeContext,
+    sharedLogId,
+    logger: log,
+  });
 
   let readme;
   try {
     log.info("Generating README", { provider: provider.getName() });
     liveUpdate(sharedLogId, "Writing the README");
-    readme = await provider.generate(prompt);
+    readme = await provider.generate(primary.prompt);
   } catch (error) {
+    if (!fallBackProvider) throw error;
+
     log.warn("Generation failed — falling back", {
       provider: provider.getName(),
       fallback: fallBackProvider.getName(),
       detail: error.message,
     });
     liveUpdate(sharedLogId, "Primary model unavailable — switching to backup");
-    readme = await fallBackProvider.generate(prompt);
+
+    const fallback = buildProviderPrompt({
+      provider: fallBackProvider,
+      context,
+      buildPrompt: buildFullReadmePrompt,
+      optimize: optimizeContext,
+      sharedLogId,
+      logger: log,
+    });
+    readme = await fallBackProvider.generate(fallback.prompt);
   }
 
   if (!readme) throw new Error("No README returned by any provider");

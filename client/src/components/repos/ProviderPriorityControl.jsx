@@ -8,6 +8,18 @@ import { ThinkingOrb } from "@/components/ui/thinking-orb";
 
 const DEFAULT_PRIORITY = ["gemini", "sarvam"];
 
+// Providers with a small context window. When one of these runs, the pipeline
+// trims the repository context to fit before calling it; a larger-window
+// fallback below it still receives the full context.
+const LOW_CONTEXT_PROVIDERS = new Set(["sarvam"]);
+
+const LowContextBadge = () => (
+  <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-1.5 py-0.5 text-[9px] font-black tracking-wider text-amber-700 uppercase">
+    <Layers size={9} strokeWidth={2.75} />
+    Low context
+  </span>
+);
+
 // Spring morph borrowed from the @beui/combobox popover, so the open/close
 // motion here matches that component.
 const POPOVER_MORPH = { type: "spring", duration: 0.5, bounce: 0.22 };
@@ -148,7 +160,7 @@ const ProviderPriorityControl = () => {
             exit={{ opacity: 0, y: -6, scale: 0.97 }}
             transition={POPOVER_MORPH}
             style={{ transformOrigin: "top" }}
-            className="rounded-panel shadow-overlay absolute right-0 left-0 z-50 mt-2 w-auto border border-slate-200 bg-white p-4 sm:left-auto sm:w-72"
+            className="rounded-panel shadow-overlay absolute right-0 left-0 z-50 mt-2 w-auto border border-slate-200 bg-white p-4 sm:left-auto sm:w-80 md:w-96"
           >
             <p className="mb-1 font-mono text-[10px] font-black tracking-[0.22em] text-slate-400 uppercase">
               AI Provider Priority
@@ -157,6 +169,17 @@ const ProviderPriorityControl = () => {
               Drag to rank — top is primary, the ones below are fallbacks in
               order.
             </p>
+
+            {order.some((id) => LOW_CONTEXT_PROVIDERS.has(id)) && (
+              <p className="mb-3 flex items-start gap-1.5 rounded-lg border border-amber-100 bg-amber-50/70 px-2.5 py-2 text-[11px] leading-snug text-amber-700">
+                <Layers size={13} className="mt-px shrink-0" strokeWidth={2.5} />
+                <span>
+                  <span className="font-bold uppercase">Low context</span> — small
+                  window, context trimmed to fit. A larger fallback below still
+                  gets it all.
+                </span>
+              </p>
+            )}
 
             <Reorder.Group
               axis="y"
@@ -183,9 +206,12 @@ const ProviderPriorityControl = () => {
                     />
                     <ProviderLogo provider={provider} />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-slate-800">
-                        {provider.name}
-                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="truncate text-sm font-semibold text-slate-800">
+                          {provider.name}
+                        </p>
+                        {LOW_CONTEXT_PROVIDERS.has(id) && <LowContextBadge />}
+                      </div>
                       <p className="truncate text-[11px] text-slate-400">
                         {index === 0 ? "Primary" : `Fallback ${index}`}
                       </p>

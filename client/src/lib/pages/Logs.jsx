@@ -8,6 +8,7 @@ import {
   History,
   SkipForward,
   ChevronDown,
+  Layers,
 } from "lucide-react";
 import { useQuery } from "convex/react";
 import SEO from "@/components/common/SEO";
@@ -480,18 +481,41 @@ const LogMessages = ({ logId }) => {
   return (
     <div className="space-y-3 border-l-2 border-slate-100 pl-4">
       {messages.map((message) => (
-        <div key={message._id} className="relative">
-          <span className="absolute top-1.5 -left-[1.35rem] h-2 w-2 rounded-full border-2 border-white bg-blue-500" />
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-            <p className="min-w-0 font-mono text-xs leading-relaxed text-slate-600">
-              {message.message}
-            </p>
-            <span className="shrink-0 text-[10px] font-semibold text-slate-400">
-              {formatMessageTimestamp(message.createdAt)}
-            </span>
-          </div>
-        </div>
+        <LogMessageRow key={message._id} message={message} />
       ))}
+    </div>
+  );
+};
+
+/* Server tags context-trim notices with this prefix (see LOW_CONTEXT_MARKER in
+   the API). Render them with a badge instead of as raw log text. */
+const LOW_CONTEXT_MARKER = "[low-context] ";
+
+const LowContextBadge = () => (
+  <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[9px] font-black tracking-wider text-amber-700 uppercase">
+    <Layers size={10} strokeWidth={2.75} />
+    Low context
+  </span>
+);
+
+const LogMessageRow = ({ message }) => {
+  const isLowContext = message.message.startsWith(LOW_CONTEXT_MARKER);
+  const text = isLowContext
+    ? message.message.slice(LOW_CONTEXT_MARKER.length)
+    : message.message;
+
+  return (
+    <div className="relative">
+      <span className="absolute top-1.5 -left-[1.35rem] h-2 w-2 rounded-full border-2 border-white bg-blue-500" />
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <p className="flex min-w-0 flex-wrap items-center gap-2 font-mono text-xs leading-relaxed text-slate-600">
+          {isLowContext && <LowContextBadge />}
+          <span className="min-w-0">{text}</span>
+        </p>
+        <span className="shrink-0 text-[10px] font-semibold text-slate-400">
+          {formatMessageTimestamp(message.createdAt)}
+        </span>
+      </div>
     </div>
   );
 };

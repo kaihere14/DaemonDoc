@@ -76,6 +76,14 @@ export class GeminiProvider {
     return this.name;
   }
 
+  // Gemini's window is very large (hundreds of thousands of tokens). The
+  // generation pipelines already trim context to their own budgets
+  // (180K full / 60K patch), so this only has to sit above those to signal
+  // "no extra trimming needed" — the fallback provider keeps the full context.
+  getContextTokenLimit() {
+    return 1_000_000;
+  }
+
   // keys -> try key -> failure -> next key -> success.
   // Once every key is exhausted this throws, which is the signal a fallback
   // provider would hang off of in the orchestration layer above.

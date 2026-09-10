@@ -12,6 +12,32 @@ const log = providerLog("Sarvam");
 // generate) so the orchestration layer can swap one for the other blindly.
 const MODEL = "sarvam-105b-conversations";
 
+// Sarvam's context window is 32K tokens for prompt + completion combined —
+// far tighter than Gemini. Reserve headroom for the generated README and let
+// the rest go to the prompt. The generation pipeline reads getContextTokenLimit()
+// and trims the repository context down to this budget before calling Sarvam;
+// the Gemini fallback keeps the full, untrimmed context.
+const CONTEXT_WINDOW_TOKENS = 32_000;
+const COMPLETION_RESERVE_TOKENS = 8_000;
+const PROMPT_TOKEN_BUDGET = CONTEXT_WINDOW_TOKENS - COMPLETION_RESERVE_TOKENS;
+
+// Rough chars-per-token, matching the estimate the pipelines use elsewhere.
+const MAX_PROMPT_CHARS = PROMPT_TOKEN_BUDGET * 4;
+
+// detect/cleanup embed the existing README at the very end of the prompt,
+// followed only by a closing marker, so clamping the README text is a safe
+// way to keep those single-shot calls inside the window.
+function clampReadme(existingReadme) {
+  const text = (existingReadme || "").trim();
+  if (text.length <= MAX_PROMPT_CHARS) return text;
+
+  log.warn("Existing README exceeds Sarvam window — clamping", {
+    chars: text.length,
+    limit: MAX_PROMPT_CHARS,
+  });
+  return `${text.slice(0, MAX_PROMPT_CHARS)}\n\n... (truncated to fit Sarvam's context window)`;
+}
+
 // The vendor client throws several error shapes (HTTP error, network error,
 // SDK validation error), and none of them alone reads as a usable log line.
 function describe(error) {
@@ -38,6 +64,12 @@ export class SarvamProvider {
 
   getName() {
     return this.name;
+  }
+
+  // Prompt-token budget the generation pipeline trims the context to before
+  // handing a prompt to this provider.
+  getContextTokenLimit() {
+    return PROMPT_TOKEN_BUDGET;
   }
 
   // Single entry point for every call, so key checks, logging and empty
@@ -86,13 +118,13 @@ export class SarvamProvider {
   async detect(existingReadme) {
     const content = await this.#call(
       "detection",
-      buildDetectPrompt(existingReadme),
+      buildDetectPrompt(clampReadme(existingReadme)),
     );
 
     return extractJson(content);
   }
 
   async cleanup(existingReadme) {
-    return this.#call("cleanup", buildCleanupPrompt(existingReadme));
+    return this.#call("cleanup", buildCleanupPrompt(clampReadme(existingReadme)));
   }
 }

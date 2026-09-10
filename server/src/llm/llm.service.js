@@ -41,7 +41,7 @@ export class LlmService {
     const { mode, reason } = await detectReadme({
       existingReadme,
       provider: providers[0],
-      fallback: providers[1],
+      fallBackProvider: providers[1],
       sharedLogId,
     });
 
@@ -67,7 +67,7 @@ export class LlmService {
         commitData,
         sharedLogId,
         provider: providers[0],
-        fallback: providers[1],
+        fallBackProvider: providers[1],
       });
 
       return { skipped: false, readme };
@@ -87,7 +87,7 @@ export class LlmService {
         commitData,
         sharedLogId,
         provider: providers[0],
-        fallback: providers[1],
+        fallBackProvider: providers[1],
       });
     }
 

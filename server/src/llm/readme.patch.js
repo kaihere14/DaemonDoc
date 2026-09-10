@@ -10,7 +10,11 @@ import {
   FORBIDDEN_SECTIONS,
   validatePatches,
 } from "../utils/readme.validator.js";
-import { formatCommitDiff, truncateText } from "./readme.generate.js";
+import {
+  formatCommitDiff,
+  truncateText,
+  buildProviderPrompt,
+} from "./readme.generate.js";
 import { buildPatchReadmePrompt } from "./prompts/patch.generate.prompt.js";
 import { extractJson } from "./utils/response.js";
 
@@ -149,7 +153,19 @@ export function optimizePatchContext(context, maxTokens = MAX_CONTEXT_TOKENS) {
 
   if (optimized.commitDiff) {
     optimized.commitDiff = truncateText(optimized.commitDiff, 50);
+    if (fits()) return optimized;
   }
+
+  // Last-resort trims for a very tight budget (a low-context provider such as
+  // Sarvam). The normal Gemini patch budget never reaches here.
+  optimized.changedFiles = [];
+  if (fits()) return optimized;
+
+  optimized.repoStructure = truncateText(optimized.repoStructure, 30);
+  optimized.sections = optimized.sections.map((section) => ({
+    ...section,
+    content: truncateText(section.content, 40),
+  }));
 
   return optimized;
 }
@@ -326,14 +342,24 @@ export async function patchReadme({
   log.info("Patchable sections identified", { sections: editableKeys.length });
   liveUpdate(sharedLogId, "Identifying the affected README sections");
 
-  const prompt = buildPatchReadmePrompt(patchContext);
-
   liveUpdate(sharedLogId, "Rewriting the affected sections");
+
+  // Trim the context to the primary provider's window if it does not already
+  // fit; a low-context provider (Sarvam) gets the trimmed prompt, the fallback
+  // keeps the full patch context.
+  const primary = buildProviderPrompt({
+    provider,
+    context: patchContext,
+    buildPrompt: buildPatchReadmePrompt,
+    optimize: optimizePatchContext,
+    sharedLogId,
+    logger: log,
+  });
 
   let response;
   try {
     log.info("Generating section updates", { provider: provider.getName() });
-    response = await provider.generate(prompt);
+    response = await provider.generate(primary.prompt);
   } catch (error) {
     // Same contract as full mode: the primary provider throws only once every
     // one of its keys is spent, so a throw here is the signal to switch.
@@ -345,7 +371,16 @@ export async function patchReadme({
       detail: error.message,
     });
     liveUpdate(sharedLogId, "Primary model unavailable — switching to backup");
-    response = await fallBackProvider.generate(prompt);
+
+    const fallback = buildProviderPrompt({
+      provider: fallBackProvider,
+      context: patchContext,
+      buildPrompt: buildPatchReadmePrompt,
+      optimize: optimizePatchContext,
+      sharedLogId,
+      logger: log,
+    });
+    response = await fallBackProvider.generate(fallback.prompt);
   }
 
   if (!response) throw new Error("No section updates returned by any provider");
