@@ -6,12 +6,16 @@ import {
   Zap,
   Settings,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
   Clock,
+  Cpu,
   TrendingUp,
   AlertTriangle,
   Check,
 } from "lucide-react";
 import SEO from "@/components/common/SEO";
+import { useAuth } from "../../context/auth-context";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { useRepos } from "../../hooks/useRepos";
 import { api, ENDPOINTS } from "../api";
@@ -20,14 +24,65 @@ import { usePostHog } from "@posthog/react";
 import { ThinkingOrb } from "@/components/ui/thinking-orb";
 import { useDialog } from "../../hooks/useDialog";
 
+const PROVIDER_LABELS = {
+  gemini: "Gemini",
+  sarvam: "Sarvam",
+};
+const DEFAULT_PROVIDER_PRIORITY = ["gemini", "sarvam"];
+
 const Profile = () => {
   const posthog = usePostHog();
   const { user, isLoading } = useRequireAuth();
+  const { setUser } = useAuth();
   const { repos, loading: statsLoading } = useRepos(user);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const persistedPriority = user?.llmProviderPriority?.length
+    ? user.llmProviderPriority
+    : DEFAULT_PROVIDER_PRIORITY;
+  const [providerOrder, setProviderOrder] = useState(persistedPriority);
+  const [priorityBaseline, setPriorityBaseline] = useState(persistedPriority);
+  const [isSavingPriority, setIsSavingPriority] = useState(false);
+
+  // Reset the local editable order whenever the persisted value changes (first
+  // load, or a save elsewhere) — the render-time adjustment React recommends
+  // over an effect that only mirrors props into state.
+  if (JSON.stringify(persistedPriority) !== JSON.stringify(priorityBaseline)) {
+    setPriorityBaseline(persistedPriority);
+    setProviderOrder(persistedPriority);
+  }
+
+  const priorityDirty =
+    JSON.stringify(providerOrder) !== JSON.stringify(persistedPriority);
+
+  const moveProvider = (index, direction) => {
+    const target = index + direction;
+    if (target < 0 || target >= providerOrder.length) return;
+    const next = [...providerOrder];
+    [next[index], next[target]] = [next[target], next[index]];
+    setProviderOrder(next);
+  };
+
+  const savePriority = async () => {
+    setIsSavingPriority(true);
+    try {
+      const { data } = await api.patch(ENDPOINTS.LLM_PROVIDER_PRIORITY, {
+        llmProviderPriority: providerOrder,
+      });
+      setUser(data.user);
+      setProviderOrder(data.llmProviderPriority);
+      toast.success("LLM provider priority updated");
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Could not update provider priority. Please try again.",
+      );
+    } finally {
+      setIsSavingPriority(false);
+    }
+  };
 
   const closeDeleteModal = useCallback(() => {
     setShowDeleteModal(false);
@@ -338,6 +393,96 @@ const Profile = () => {
               </div>
             </motion.div>
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            className="rounded-panel shadow-raised sm:rounded-panel-lg mb-8 border border-slate-200 bg-white/90 p-5 backdrop-blur-sm sm:p-6"
+          >
+            <div className="mb-5 flex items-center gap-2">
+              <div className="h-1 w-6 rounded-full bg-blue-600" />
+              <span className="font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase">
+                LLM Provider Priority
+              </span>
+            </div>
+
+            <p className="mb-4 text-xs text-slate-500">
+              README generation tries these providers in order — the first is
+              primary, the rest are fallbacks.
+            </p>
+
+            <ol className="space-y-3">
+              {providerOrder.map((provider, index) => (
+                <li
+                  key={provider}
+                  className="rounded-tile flex items-center justify-between gap-4 border border-slate-200 bg-slate-50/80 p-4"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="rounded-xl bg-slate-900 p-2 text-white">
+                      <Cpu size={16} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-slate-800">
+                        {PROVIDER_LABELS[provider] || provider}
+                      </p>
+                      <p className="truncate text-[11px] text-slate-400">
+                        {index === 0 ? "Primary" : `Fallback ${index}`}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => moveProvider(index, -1)}
+                      disabled={index === 0}
+                      aria-label={`Move ${PROVIDER_LABELS[provider] || provider} up`}
+                      className="rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <ChevronUp size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moveProvider(index, 1)}
+                      disabled={index === providerOrder.length - 1}
+                      aria-label={`Move ${PROVIDER_LABELS[provider] || provider} down`}
+                      className="rounded-lg border border-slate-200 bg-white p-1.5 text-slate-500 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <ChevronDown size={16} />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ol>
+
+            <div className="mt-5 flex justify-end">
+              <button
+                type="button"
+                onClick={savePriority}
+                disabled={!priorityDirty || isSavingPriority}
+                className={`rounded-control flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold transition-colors ${
+                  priorityDirty && !isSavingPriority
+                    ? "cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
+                    : "cursor-not-allowed bg-slate-100 text-slate-400"
+                }`}
+              >
+                {isSavingPriority ? (
+                  <>
+                    <ThinkingOrb
+                      preset="working"
+                      showLabel={false}
+                      tone="ghost"
+                      size="sm"
+                      className="h-auto p-0 text-current [--orb-size:1.25rem]"
+                    />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  "Save priority"
+                )}
+              </button>
+            </div>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 10 }}

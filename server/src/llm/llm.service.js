@@ -1,9 +1,10 @@
 import { liveUpdate } from "../services/convex.service.js";
-import { aiLog as log } from "../utils/logger.js";
+import { aiLog as log, providerLog } from "../utils/logger.js";
+import { detectReadme, generateReadme } from "./readme.generate.js";
 import { GeminiProvider } from "./providers/gemini.provider.js";
 import { SarvamProvider } from "./providers/sarvam.provider.js";
-import { detectReadme, generateReadme } from "./readme.generate.js";
 import { patchReadme } from "./readme.patch.js";
+import { createProvidersInstances } from "./utils/object-creator.js";
 
 export class LlmService {
   // Main abstraction layer called at the start of the LLM workflow.
@@ -11,17 +12,6 @@ export class LlmService {
   // and the final generated result is returned to the caller.
 
   // Model ids only — GeminiProvider binds them to whichever API key is live.
-  detectionModel = "gemini-3.5-flash-lite";
-  generationModel = "gemini-3.6-flash";
-  cleanupModel = "gemini-3.6-flash";
-
-  geminiProvider = new GeminiProvider({
-    detectionModel: this.detectionModel,
-    generationModel: this.generationModel,
-    cleanupModel: this.cleanupModel,
-  });
-
-  sarvamProvider = new SarvamProvider();
 
   async generate({
     repoName,
@@ -33,12 +23,25 @@ export class LlmService {
     fullCodebase,
     commitData,
     sharedLogId,
+    providersPriority,
   }) {
+    let providers = await createProvidersInstances(
+      providersPriority,
+      GeminiProvider,
+      SarvamProvider,
+    );
+
+    log.info("Resolved LLM provider priority", {
+      priority: providersPriority ?? ["gemini", "sarvam"],
+      primary: providers[0].getName(),
+      fallback: providers[1]?.getName(),
+    });
+
     // 1. Detection logic uses the small LLM to determine the mode of operation (full or patch).
     const { mode, reason } = await detectReadme({
       existingReadme,
-      provider: this.geminiProvider,
-      fallBackProvider: this.sarvamProvider,
+      provider: providers[0],
+      fallback: providers[1],
       sharedLogId,
     });
 
@@ -63,8 +66,8 @@ export class LlmService {
         fullCodebase,
         commitData,
         sharedLogId,
-        provider: this.geminiProvider,
-        fallBackProvider: this.sarvamProvider,
+        provider: providers[0],
+        fallback: providers[1],
       });
 
       return { skipped: false, readme };
@@ -83,8 +86,8 @@ export class LlmService {
         changedFilesContent,
         commitData,
         sharedLogId,
-        provider: this.geminiProvider,
-        fallBackProvider: this.sarvamProvider,
+        provider: providers[0],
+        fallback: providers[1],
       });
     }
 
@@ -96,14 +99,30 @@ export class LlmService {
 
   // Cleanup runs outside the generate() pipeline (its own queue), so it owns
   // the same primary/fallback handling instead of inheriting it from above.
-  async cleanup(existingReadme, sharedLogId) {
+  async cleanup(existingReadme, sharedLogId, providersPriority) {
+    let providers;
     try {
-      log.info("Cleaning README", { provider: this.geminiProvider.getName() });
-      return await this.geminiProvider.cleanup(existingReadme);
+      providers = await createProvidersInstances(
+        providersPriority,
+        GeminiProvider,
+        SarvamProvider,
+      );
+      log.info("Resolved LLM provider priority", {
+        priority: providersPriority ?? ["gemini", "sarvam"],
+        primary: providers[0].getName(),
+        fallback: providers[1]?.getName(),
+      });
+
+      providerLog(providers[0].getName()).info("Cleaning README");
+      return await providers[0].cleanup(existingReadme);
     } catch (error) {
+      // A failure inside createProvidersInstances leaves `providers` unset, so
+      // guard before reaching for the fallback.
+      if (!providers?.[1]) throw error;
+
       log.warn("Cleanup failed — falling back", {
-        provider: this.geminiProvider.getName(),
-        fallback: this.sarvamProvider.getName(),
+        provider: providers[0].getName(),
+        fallback: providers[1].getName(),
         detail: error.message,
       });
       liveUpdate(
@@ -111,7 +130,7 @@ export class LlmService {
         "Primary model unavailable — switching to backup",
       );
 
-      return this.sarvamProvider.cleanup(existingReadme);
+      return await providers[1].cleanup(existingReadme);
     }
   }
 }

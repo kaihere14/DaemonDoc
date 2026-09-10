@@ -660,6 +660,7 @@ export const cleanUpReadme = async (req, res) => {
           tag: user.githubAccessToken.tag,
         },
         sharedLogId,
+        providerPriority: user.llmProviderPriority,
       },
       {
         attempts: 3,
