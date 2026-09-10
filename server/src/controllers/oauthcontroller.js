@@ -1,6 +1,7 @@
 import axios from "axios";
 import jwt from "jsonwebtoken";
-import User from "../schema/user.schema.js";
+import User, { SUPPORTED_LLM_PROVIDERS } from "../schema/user.schema.js";
+import Provider from "../schema/provider.schema.js";
 import ActiveRepo from "../schema/activeRepo.js";
 import UserLogModel from "../schema/userLog.schema.js";
 import { encrypt, decrypt } from "../utils/crypto.js";
@@ -145,6 +146,78 @@ export const verifyUser = async (req, res) => {
     return res.status(200).json({ user });
   } catch (error) {
     log.error("User verification failed", { detail: error.message });
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getProviders = async (_req, res) => {
+  try {
+    const providers = await Provider.find()
+      .sort({ order: 1 })
+      .select("-__v -createdAt -updatedAt")
+      .lean();
+    return res.status(200).json({ providers });
+  } catch (error) {
+    log.error("Failed to fetch LLM providers", { detail: error.message });
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const updateLlmProviderPriority = async (req, res) => {
+  const userId = req.userId;
+  const { llmProviderPriority } = req.body;
+
+  if (!Array.isArray(llmProviderPriority)) {
+    return res
+      .status(400)
+      .json({ message: "llmProviderPriority must be an array" });
+  }
+
+  const unsupported = llmProviderPriority.filter(
+    (provider) => !SUPPORTED_LLM_PROVIDERS.includes(provider),
+  );
+  if (unsupported.length > 0) {
+    return res
+      .status(400)
+      .json({ message: `Unsupported provider(s): ${unsupported.join(", ")}` });
+  }
+
+  const hasDuplicates =
+    new Set(llmProviderPriority).size !== llmProviderPriority.length;
+  if (hasDuplicates) {
+    return res
+      .status(400)
+      .json({ message: "llmProviderPriority contains duplicate providers" });
+  }
+
+  if (llmProviderPriority.length !== SUPPORTED_LLM_PROVIDERS.length) {
+    return res.status(400).json({
+      message: `llmProviderPriority must include all providers: ${SUPPORTED_LLM_PROVIDERS.join(
+        ", ",
+      )}`,
+    });
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { llmProviderPriority },
+      { new: true, runValidators: true },
+    ).select("-__v -githubAccessToken");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      user,
+      llmProviderPriority: user.llmProviderPriority,
+    });
+  } catch (error) {
+    log.error("Failed to update LLM provider priority", {
+      userId,
+      detail: error.message,
+    });
     return res.status(500).json({ message: "Internal server error" });
   }
 };

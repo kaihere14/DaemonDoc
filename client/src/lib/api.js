@@ -17,6 +17,8 @@ api.interceptors.request.use((config) => {
 export const ENDPOINTS = {
   AUTH_VERIFY: "/auth/verify",
   AUTH_DELETE: "/auth/delete",
+  LLM_PROVIDERS: "/auth/providers",
+  LLM_PROVIDER_PRIORITY: "/auth/llm-provider-priority",
   REPOS: "/api/github/getGithubRepos",
   ADD_REPO: "/api/github/addRepoActivity",
   DEACTIVATE_REPO: "/api/github/deactivateRepoActivity",

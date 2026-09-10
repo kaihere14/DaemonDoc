@@ -169,6 +169,8 @@ const aihandler = async (data) => {
       throw new Error("GitHub access token not found for user");
     }
 
+    const providersPriority = user.llmProviderPriority || ["gemini", "sarvam"];
+
     const accessToken = decrypt(user.githubAccessToken);
 
     const activeRepo = await ActiveRepo.findOne({
@@ -312,6 +314,7 @@ const aihandler = async (data) => {
       fullCodebase,
       commitData,
       sharedLogId,
+      providersPriority,
     });
 
     // Nothing worth documenting changed — this is a normal outcome, not a
@@ -536,6 +539,7 @@ async function cleanupHandler(job) {
     defaultBranch,
     encryptedAccessToken,
     sharedLogId,
+    providerPriority,
   } = job.data;
 
   const userLog = await startCleanupLog({
@@ -585,6 +589,7 @@ async function cleanupHandler(job) {
     const cleanedReadme = await llmService.cleanup(
       readmeFile.content,
       sharedLogId,
+      providerPriority,
     );
     if (!cleanedReadme) {
       liveUpdate(sharedLogId, "The model returned an empty README");

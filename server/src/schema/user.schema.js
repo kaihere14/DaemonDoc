@@ -1,5 +1,9 @@
 import { Schema, model } from "mongoose";
 
+// Every LLM provider the generation pipeline knows how to instantiate. A user's
+// llmProviderPriority is always a full ordering of exactly these values.
+export const SUPPORTED_LLM_PROVIDERS = ["gemini", "sarvam"];
+
 const userSchema = new Schema(
   {
     githubId: { type: String, unique: true, sparse: true },
@@ -13,6 +17,15 @@ const userSchema = new Schema(
       iv: { type: String, required: true },
       content: { type: String, required: true },
       tag: { type: String, required: true },
+    },
+    llmProviderPriority: {
+      type: [
+        {
+          type: String,
+          enum: SUPPORTED_LLM_PROVIDERS,
+        },
+      ],
+      default: () => [...SUPPORTED_LLM_PROVIDERS],
     },
   },
   { timestamps: true },
