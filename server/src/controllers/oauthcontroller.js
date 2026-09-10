@@ -1,6 +1,7 @@
 import axios from "axios";
 import jwt from "jsonwebtoken";
 import User, { SUPPORTED_LLM_PROVIDERS } from "../schema/user.schema.js";
+import Provider from "../schema/provider.schema.js";
 import ActiveRepo from "../schema/activeRepo.js";
 import UserLogModel from "../schema/userLog.schema.js";
 import { encrypt, decrypt } from "../utils/crypto.js";
@@ -145,6 +146,19 @@ export const verifyUser = async (req, res) => {
     return res.status(200).json({ user });
   } catch (error) {
     log.error("User verification failed", { detail: error.message });
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getProviders = async (_req, res) => {
+  try {
+    const providers = await Provider.find()
+      .sort({ order: 1 })
+      .select("-__v -createdAt -updatedAt")
+      .lean();
+    return res.status(200).json({ providers });
+  } catch (error) {
+    log.error("Failed to fetch LLM providers", { detail: error.message });
     return res.status(500).json({ message: "Internal server error" });
   }
 };

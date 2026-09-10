@@ -12,6 +12,7 @@ import {
   WalkthroughModal,
 } from "@/components/repos/WalkthroughOverlay";
 import CleanupFeatureSpotlight from "@/components/repos/CleanupFeatureSpotlight";
+import ProviderPriorityControl from "@/components/repos/ProviderPriorityControl";
 import { APP_ORIGIN } from "../urls";
 import { ThinkingOrb } from "@/components/ui/thinking-orb";
 
@@ -311,6 +312,9 @@ const Home = () => {
                   </button>
                 )}
               </div>
+
+              {/* AI provider priority */}
+              <ProviderPriorityControl />
             </motion.div>
 
             {/* Walkthrough: step 0 guide banner */}
