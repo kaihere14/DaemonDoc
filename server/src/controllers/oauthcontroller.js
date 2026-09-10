@@ -114,27 +114,23 @@ export const createOAuthUser = async (
   access_token,
   primaryEmail = null,
 ) => {
-  let user = await User.findOne({ githubUsername: profile.login });
+  let user = await User.findOne({ githubId: profile.id });
+
   if (!user) {
     user = new User({
       githubId: profile.id,
-      githubUsername: profile.login,
-      email: profile.email || primaryEmail,
-      avatarUrl: profile.avatar_url,
-      githubAccessToken: encrypt(access_token),
     });
-    await user.save();
-    await redis.del("admin_analytics");
-  } else {
-    log.info("Existing user signed in — refreshing access token", {
-      userId: user._id,
-    });
-    user.githubAccessToken = encrypt(access_token);
-    if (profile.email || primaryEmail) {
-      user.email = profile.email || primaryEmail;
-    }
-    await user.save();
   }
+
+  user.githubUsername = profile.login;
+  user.avatarUrl = profile.avatar_url;
+  user.githubAccessToken = encrypt(access_token);
+
+  if (profile.email || primaryEmail) {
+    user.email = profile.email || primaryEmail;
+  }
+
+  await user.save();
 
   return { user };
 };
