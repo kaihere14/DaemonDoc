@@ -106,7 +106,7 @@ export function SortableDropdownAvatar({
 
 const sortableDropdownTriggerVariants = cva(
   [
-    "relative inline-flex w-full shrink-0 items-center gap-2 rounded-md border font-medium",
+    "relative inline-flex w-full shrink-0 items-center gap-2 rounded-control border font-medium",
     "transition-colors duration-150 ease-b6",
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
     "disabled:pointer-events-none disabled:opacity-50",
@@ -138,7 +138,7 @@ const sortableDropdownTriggerVariants = cva(
  * `absolute` against.
  */
 const sortableDropdownContentClass =
-  "fixed z-50 w-72 rounded-lg border border-border bg-popover p-4 text-popover-foreground shadow-b6-lg sm:w-80 md:w-96";
+  "fixed z-50 w-72 rounded-panel border border-border bg-popover p-4 text-popover-foreground shadow-b6-lg sm:w-80 md:w-96";
 
 const applyButtonVariants = cva(
   [
@@ -168,10 +168,10 @@ const applyButtonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        sm: `h-8 rounded-sm px-3 ${TYPE.small}`,
-        md: `h-10 rounded-md px-4 ${TYPE.body}`,
-        lg: `h-12 rounded-md px-6 ${TYPE.body}`,
-        icon: "size-10 rounded-md p-0",
+        sm: `h-8 rounded-action px-3 ${TYPE.small}`,
+        md: `h-10 rounded-action px-4 ${TYPE.body}`,
+        lg: `h-12 rounded-action px-6 ${TYPE.body}`,
+        icon: "size-10 rounded-action p-0",
       },
       block: {
         true: "w-full",
@@ -578,7 +578,7 @@ export const SortableDropdown = React.forwardRef(function SortableDropdown(
                 {note && (
                   <div
                     className={cn(
-                      "mb-3 rounded-md border border-border bg-muted/60 px-2.5 py-2 text-muted-foreground",
+                      "mb-3 rounded-tile border border-border bg-muted/60 px-2.5 py-2 text-muted-foreground",
                       TYPE.small,
                     )}
                   >
@@ -605,7 +605,7 @@ export const SortableDropdown = React.forwardRef(function SortableDropdown(
                         key={id}
                         value={id}
                         data-slot="sortable-dropdown-item"
-                        className="flex cursor-grab items-center gap-3 rounded-md border border-border bg-muted/60 p-2.5 active:cursor-grabbing"
+                        className="flex cursor-grab items-center gap-3 rounded-tile border border-border bg-muted/60 p-2.5 active:cursor-grabbing"
                         variants={listItemVariants}
                         whileDrag={{ scale: 1.02, boxShadow: "var(--shadow-b6-lg)" }}
                         transition={ITEM_DRAG_TRANSITION}

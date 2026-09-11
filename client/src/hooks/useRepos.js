@@ -5,9 +5,10 @@ export function useRepos(user) {
   const [repos, setRepos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const userId = user?._id;
 
   const fetchRepos = useCallback(async () => {
-    if (!user) return;
+    if (!userId) return;
     setLoading(true);
     setError(null);
     try {
@@ -18,7 +19,7 @@ export function useRepos(user) {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [userId]);
 
   useEffect(() => {
     fetchRepos();
