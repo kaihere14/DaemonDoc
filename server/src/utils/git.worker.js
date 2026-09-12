@@ -1,7 +1,6 @@
-import IORedis from "ioredis";
 import { Queue } from "bullmq";
 import { UnrecoverableError, Worker } from "bullmq";
-import { redis } from "./redis.js";
+import { redis, readmeConnection as connection } from "./redis.js";
 import User from "../schema/user.schema.js";
 import ActiveRepo from "../schema/activeRepo.js";
 import { decrypt } from "./crypto.js";
@@ -19,56 +18,11 @@ import {
 import { selectImportantFiles } from "./scan.filters.js";
 import UserLogModel from "../schema/userLog.schema.js";
 import { liveUpdate } from "../services/convex.service.js";
-import { githubLog, queueLog, redisLog, workerLog } from "./logger.js";
+import { githubLog, queueLog, workerLog } from "./logger.js";
 
 const generationLog = workerLog.child({ job: "readme-generation" });
 const cleanupLog = workerLog.child({ job: "readme-cleanup" });
 import { LlmService } from "../llm/llm.service.js";
-
-export const connection = new IORedis({
-  host: process.env.REDIS_HOST || "localhost",
-  port: process.env.REDIS_PORT || 6379,
-  password: process.env.REDIS_PASSWORD,
-  username: "default",
-  maxRetriesPerRequest: null,
-  enableReadyCheck: true,
-  enableOfflineQueue: true,
-  keepAlive: 30000,
-  retryStrategy: (times) => {
-    const delay = Math.min(times * 1000, 10000);
-    redisLog.warn("Retrying connection", { attempt: times, delayMs: delay });
-    return delay;
-  },
-  reconnectOnError: (err) => {
-    const targetErrors = ["READONLY", "ECONNRESET", "ETIMEDOUT"];
-    if (targetErrors.some((e) => err.message.includes(e))) {
-      redisLog.warn("Reconnecting after error", { detail: err.message });
-      return true;
-    }
-    return false;
-  },
-  connectTimeout: 10000,
-  lazyConnect: true,
-});
-
-connection.on("error", (err) =>
-  redisLog.error("Connection error", { detail: err.message }),
-);
-connection.on("connect", () => redisLog.info("Connected"));
-connection.on("ready", () => redisLog.info("Ready to accept commands"));
-connection.on("close", () =>
-  redisLog.warn("Connection closed — will attempt to reconnect"),
-);
-connection.on("reconnecting", (timeToReconnect) =>
-  redisLog.info("Reconnecting", { delayMs: timeToReconnect }),
-);
-connection.on("end", () => redisLog.error("Connection ended permanently"));
-
-connection.connect().catch((err) => {
-  redisLog.error("Initial connection failed — queues disabled", {
-    detail: err.message,
-  });
-});
 
 export const readmeQueue = new Queue("readme-generation", { connection });
 
