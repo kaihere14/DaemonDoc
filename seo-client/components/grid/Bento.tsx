@@ -11,14 +11,14 @@ const Grid = () => {
           One webhook. Docs that write themselves.
         </div>
         <div className="max-w-2xl">
-          Every feature below runs off the same GitHub push webhook
-          provider fallback, smart generation modes, and live job logs all
-          stay in sync automatically.
+          Every feature below runs off the same GitHub push webhook provider
+          fallback, smart generation modes, and live job logs all stay in sync
+          automatically.
         </div>
       </div>
 
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid min-w-full grid-cols-1 gap-4 divide-neutral-200 rounded-2xl mb-4 sm:gap-0 sm:divide-x sm:divide-y sm:border sm:border-neutral-200 lg:grid-cols-2">
+        <div className="mb-4 grid min-w-full grid-cols-1 gap-4 divide-neutral-200 rounded-2xl sm:gap-0 sm:divide-x sm:divide-y sm:border sm:border-neutral-200 lg:grid-cols-2">
           <ModelCard />
           <ChatCard />
           <IngestCard />

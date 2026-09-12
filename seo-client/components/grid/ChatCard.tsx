@@ -4,7 +4,12 @@ import {
   SkipForward,
   SquareMousePointer,
 } from "lucide-react";
-import { Card, CardDescription, CardHeading, CardIllustrations } from "./shared";
+import {
+  Card,
+  CardDescription,
+  CardHeading,
+  CardIllustrations,
+} from "./shared";
 
 const STATUS_STYLES = {
   success: {

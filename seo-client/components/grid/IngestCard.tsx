@@ -17,9 +17,8 @@ const IngestCard = () => {
         One Webhook, Smart Generation
       </CardHeading>
       <CardDescription>
-        A push webhook decides the mode full rewrite, targeted section
-        patch, or a background cleanup pass all run through the same
-        BullMQ pipeline.
+        A push webhook decides the mode full rewrite, targeted section patch, or
+        a background cleanup pass all run through the same BullMQ pipeline.
       </CardDescription>
       <CardIllustrations>
         <div className="flex flex-col gap-3 px-1 py-6 sm:hidden">

@@ -1,6 +1,11 @@
 import { BrainIcon, FolderIcon } from "lucide-react";
 import Image from "next/image";
-import { Card, CardDescription, CardHeading, CardIllustrations } from "./shared";
+import {
+  Card,
+  CardDescription,
+  CardHeading,
+  CardIllustrations,
+} from "./shared";
 
 const ModelCard = () => {
   return (
@@ -10,9 +15,9 @@ const ModelCard = () => {
         Provider Priority & Fallback
       </CardHeading>
       <CardDescription>
-        Gemini runs first with automatic key rotation across multiple API
-        keys. If it's rate-limited or down, Sarvam AI steps in so your
-        README run never stalls.
+        Gemini runs first with automatic key rotation across multiple API keys.
+        If it&apos;s rate-limited or down, Sarvam AI steps in so your README run
+        never stalls.
       </CardDescription>
       <CardIllustrations>
         <div className="main-card relative mx-auto mt-16 h-70 max-w-lg">
