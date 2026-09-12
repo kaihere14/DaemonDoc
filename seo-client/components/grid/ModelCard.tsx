@@ -4,7 +4,7 @@ import { Card, CardDescription, CardHeading, CardIllustrations } from "./shared"
 
 const ModelCard = () => {
   return (
-    <Card className="h-110 w-full overflow-hidden p-4">
+    <Card className="h-110 w-full overflow-hidden rounded-2xl border border-neutral-200 p-5 sm:rounded-none sm:border-0 sm:p-4">
       <CardHeading>
         <BrainIcon className="size-4" />
         Provider Priority & Fallback

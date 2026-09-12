@@ -11,7 +11,7 @@ import {
 
 const IngestCard = () => {
   return (
-    <Card className="h-110 w-full overflow-hidden p-4 lg:col-span-2">
+    <Card className="h-auto w-full overflow-hidden rounded-2xl border border-neutral-200 p-5 sm:h-110 sm:rounded-none sm:border-0 sm:p-4 lg:col-span-2">
       <CardHeading>
         <GitBranch className="size-4" />
         One Webhook, Smart Generation
@@ -22,7 +22,22 @@ const IngestCard = () => {
         BullMQ pipeline.
       </CardDescription>
       <CardIllustrations>
-        <div className="relative mx-auto mr-50 h-full max-w-2xl sm:scale-120">
+        <div className="flex flex-col gap-3 px-1 py-6 sm:hidden">
+          <div className="flex items-center gap-3 rounded-lg border border-neutral-200 bg-white p-3 shadow-sm">
+            <FileText size={16} className="text-blue-500" />
+            <span className="text-sm">Full Rewrite</span>
+          </div>
+          <div className="flex items-center gap-3 rounded-lg border border-neutral-200 bg-white p-3 shadow-sm">
+            <GitPullRequest size={16} className="text-purple-500" />
+            <span className="text-sm">Section Patch</span>
+          </div>
+          <div className="flex items-center gap-3 rounded-lg border border-neutral-200 bg-white p-3 shadow-sm">
+            <Network size={16} className="text-orange-500" />
+            <span className="text-sm">Cleanup Worker</span>
+          </div>
+        </div>
+
+        <div className="relative mx-auto mr-50 hidden h-full max-w-2xl sm:block sm:scale-120">
           <LineSvg className="top-25 left-50" color="#3b82f6" />
           <StraightLine className="top-39 left-50" />
           <LineSvg className="top-45 left-50 rotate-x-180" color="#a855f7" />

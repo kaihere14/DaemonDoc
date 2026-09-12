@@ -5,12 +5,12 @@ import IngestCard from "./IngestCard";
 const Grid = () => {
   return (
     <div className="flex flex-col gap-20">
-      <div className="flex flex-col items-center gap-5">
+      <div className="flex flex-col items-center gap-5 px-4 text-center">
         <div className="text-blue-600">Platform</div>
-        <div className="text-4xl font-medium tracking-tighter">
+        <div className="text-2xl font-medium tracking-tighter sm:text-3xl md:text-4xl">
           One webhook. Docs that write themselves.
         </div>
-        <div className="max-w-2xl text-center">
+        <div className="max-w-2xl">
           Every feature below runs off the same GitHub push webhook
           provider fallback, smart generation modes, and live job logs all
           stay in sync automatically.
@@ -18,7 +18,7 @@ const Grid = () => {
       </div>
 
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid min-w-full grid-cols-1 divide-x divide-y divide-neutral-200 border border-neutral-200 rounded-2xl mb-4 lg:grid-cols-2">
+        <div className="grid min-w-full grid-cols-1 gap-4 divide-neutral-200 rounded-2xl mb-4 sm:gap-0 sm:divide-x sm:divide-y sm:border sm:border-neutral-200 lg:grid-cols-2">
           <ModelCard />
           <ChatCard />
           <IngestCard />

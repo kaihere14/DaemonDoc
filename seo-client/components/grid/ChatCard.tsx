@@ -59,7 +59,7 @@ const runs = [
 
 const ChatCard = () => {
   return (
-    <Card className="h-110 w-full overflow-hidden p-4">
+    <Card className="h-110 w-full overflow-hidden rounded-2xl border border-neutral-200 p-5 sm:rounded-none sm:border-0 sm:p-4">
       <CardHeading>
         <SquareMousePointer className="size-4" />
         Watch Every Push, Live

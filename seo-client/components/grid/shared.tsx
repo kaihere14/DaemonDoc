@@ -24,7 +24,7 @@ export const CardDescription = ({
   children: React.ReactNode;
 }) => {
   return (
-    <div className="text-md font-md flex items-center gap-2 pt-2 text-neutral-500">
+    <div className="text-md font-md flex items-center gap-2 pt-3 text-neutral-500 sm:pt-2">
       {children}
     </div>
   );
@@ -36,7 +36,7 @@ export const CardIllustrations = ({
   children: React.ReactNode;
 }) => {
   return (
-    <div className="mx-auto min-h-[73%] w-[calc(100%-10px)] pt-3">
+    <div className="mx-auto min-h-[73%] w-[calc(100%-10px)] pt-5 sm:pt-3">
       {children}
     </div>
   );
