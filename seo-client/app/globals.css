@@ -150,6 +150,33 @@ html {
   animation: float-slow-anim 12s ease-in-out 6s infinite;
 }
 
+@keyframes line-pulse-travel-corner {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -390;
+  }
+}
+
+@keyframes line-pulse-travel-straight {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -359;
+  }
+}
+
+@keyframes border-ring-pulse {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -192.6;
+  }
+}
+
 .animate-pulse-slow {
   animation: pulse-slow-anim 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
