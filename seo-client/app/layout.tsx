@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
+import { Providers } from "./providers";
 import "./globals.css";
 
 // Body/UI font — self-hosted from public/, same setup as daemondoc-v2
@@ -38,8 +39,10 @@ export default function RootLayout({
       className={`${interDisplay.variable} ${spaceGrotesk.variable} h-full`}
     >
       <body className="flex min-h-full flex-col bg-white font-sans text-slate-900 antialiased">
-        {children}
-        <Analytics />
+        <Providers>
+          {children}
+          <Analytics />
+        </Providers>
       </body>
     </html>
   );
