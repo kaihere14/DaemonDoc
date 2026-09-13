@@ -10,9 +10,11 @@ import {
   TrendingUp,
   AlertTriangle,
   Check,
+  Mail,
 } from "lucide-react";
 import SEO from "@/components/common/SEO";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
+import { useAuth } from "../../context/auth-context";
 import { useRepos } from "../../hooks/useRepos";
 import { api, ENDPOINTS } from "../api";
 import { APP_ORIGIN, MARKETING_URL } from "../urls";
@@ -23,11 +25,37 @@ import { useDialog } from "../../hooks/useDialog";
 const Profile = () => {
   const posthog = usePostHog();
   const { user, isLoading } = useRequireAuth();
+  const { setUser } = useAuth();
   const { repos, loading: statsLoading } = useRepos(user);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [isUpdatingNotifications, setIsUpdatingNotifications] = useState(false);
+
+  const handleToggleEmailNotifications = async () => {
+    if (isUpdatingNotifications) return;
+    const nextValue = !(user.emailNotificationsEnabled ?? true);
+    setIsUpdatingNotifications(true);
+    try {
+      const { data } = await api.patch(ENDPOINTS.EMAIL_NOTIFICATIONS, {
+        emailNotificationsEnabled: nextValue,
+      });
+      setUser(data.user);
+      toast.success(
+        nextValue
+          ? "Email notifications enabled"
+          : "Email notifications disabled",
+      );
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Could not update notification preference. Please try again.",
+      );
+    } finally {
+      setIsUpdatingNotifications(false);
+    }
+  };
 
   const closeDeleteModal = useCallback(() => {
     setShowDeleteModal(false);
@@ -334,6 +362,42 @@ const Profile = () => {
                       {user.autoReadmeEnabled ? "Enabled" : "Disabled"}
                     </p>
                   </div>
+                </div>
+
+                <div className="rounded-tile flex items-center justify-between gap-4 border border-slate-200 bg-white p-4 sm:col-span-2">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="rounded-xl bg-slate-100 p-2 text-slate-500">
+                      <Mail size={16} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-slate-800">
+                        Email Notifications
+                      </p>
+                      <p className="truncate text-[11px] text-slate-400">
+                        README generation success &amp; failure emails
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={user.emailNotificationsEnabled ?? true}
+                    onClick={handleToggleEmailNotifications}
+                    disabled={isUpdatingNotifications}
+                    className={`relative h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
+                      (user.emailNotificationsEnabled ?? true)
+                        ? "bg-blue-600"
+                        : "bg-slate-200"
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                        (user.emailNotificationsEnabled ?? true)
+                          ? "translate-x-5"
+                          : "translate-x-0"
+                      }`}
+                    />
+                  </button>
                 </div>
               </div>
             </motion.div>

@@ -2,6 +2,8 @@ import { Queue, Worker } from "bullmq";
 import User from "../schema/user.schema.js";
 import { sendEmail } from "./email.service.js";
 import { emailConnection } from "../utils/redis.js";
+import { sendFailureEmail, sendSuccessEmail } from "../email/email.js";
+import { emailLog } from "../utils/logger.js";
 
 const MAX_CONCURRENCY = 2;
 const EMAIL_QUEUE_NAME = "email-broadcast";
@@ -13,8 +15,41 @@ export const emailQueue = new Queue(EMAIL_QUEUE_NAME, {
 new Worker(
   EMAIL_QUEUE_NAME,
   async (job) => {
-    const { subject, content, to } = job.data;
-    await sendEmail(subject, content, to);
+    let jobData = job.data;
+    switch (job.name) {
+      case "send-feature-update":
+        await sendEmail(jobData.subject, jobData.content, jobData.to);
+        emailLog.info("Feature update email sent", { to: jobData.to });
+        break;
+      case "send-readme-success":
+        await sendSuccessEmail(
+          jobData.to,
+          jobData.repoOwner,
+          jobData.repoName,
+          jobData.mode,
+          jobData.commitSha,
+          jobData.repoUrl,
+        );
+        emailLog.info("Readme success email sent", {
+          to: jobData.to,
+          repo: `${jobData.repoOwner}/${jobData.repoName}`,
+        });
+        break;
+      case "send-readme-failure":
+        await sendFailureEmail(
+          jobData.to,
+          jobData.repoOwner,
+          jobData.repoName,
+          jobData.mode,
+          jobData.errorMessage,
+          jobData.repoUrl,
+        );
+        emailLog.info("Readme failure email sent", {
+          to: jobData.to,
+          repo: `${jobData.repoOwner}/${jobData.repoName}`,
+        });
+        break;
+    }
   },
   {
     connection: emailConnection,

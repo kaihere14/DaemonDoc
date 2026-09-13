@@ -43,7 +43,7 @@ services:
           autoReadmeEnabled: true,
           avatarUrl: "https://avatars.githubusercontent.com/u/319204766?v=4",
           emailNotificationsEnabled: true,
-          admin: false,
+          admin: true,
           githubAccessToken: {
             iv: "e4675bc687f840287fd9bbac",
             content: "47963e689832dae04d0029c955f379c07dff6ca6c73bb7a5173f5016fb048b14e7b8ab8eba2cc8c6",
@@ -55,7 +55,8 @@ services:
 
         print("Seeded DaemonDoc user");
       } else {
-        print("DaemonDoc user already exists — skipping seed");
+        db.users.updateOne({ githubId: githubId }, { $set: { admin: true, updatedAt: new Date() } });
+        print("DaemonDoc user already exists — admin flag ensured");
       }
       '
 

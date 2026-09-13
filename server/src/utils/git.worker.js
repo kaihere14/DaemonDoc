@@ -19,6 +19,7 @@ import { selectImportantFiles } from "./scan.filters.js";
 import UserLogModel from "../schema/userLog.schema.js";
 import { liveUpdate } from "../services/convex.service.js";
 import { githubLog, queueLog, workerLog } from "./logger.js";
+import { emailQueue } from "../services/email.queue.js";
 
 const generationLog = workerLog.child({ job: "readme-generation" });
 const cleanupLog = workerLog.child({ job: "readme-cleanup" });
@@ -117,8 +118,10 @@ const aihandler = async (data) => {
     `Starting README generation for ${repoFullName} at commit ${commitSha.slice(0, 7)}`,
   );
 
+  let user;
+
   try {
-    const user = await User.findById(userId);
+    user = await User.findById(userId);
     if (!user || !user.githubAccessToken) {
       throw new Error("GitHub access token not found for user");
     }
@@ -294,6 +297,7 @@ const aihandler = async (data) => {
     }
 
     const readme = result.readme;
+    const repoUrl = `https://github.com/${repoOwner}/${repoName}`;
 
     let commitResult;
 
@@ -323,7 +327,18 @@ const aihandler = async (data) => {
         repo: repoFullName,
         commit: commitResult.commit.sha,
       });
-    } catch {
+
+      if (user.email && user.emailNotificationsEnabled !== false) {
+        await emailQueue.add("send-readme-success", {
+          to: user.email,
+          repoOwner,
+          repoName,
+          mode: result.mode,
+          commitSha: commitResult.commit.sha,
+          repoUrl,
+        });
+      }
+    } catch (commitError) {
       liveUpdate(sharedLogId, `Readme failed to commit `);
 
       await updateLogStatus(
@@ -335,6 +350,17 @@ const aihandler = async (data) => {
       );
 
       githubLog.error("README commit failed", { repo: repoFullName });
+
+      if (user.email && user.emailNotificationsEnabled !== false) {
+        await emailQueue.add("send-readme-failure", {
+          to: user.email,
+          repoOwner,
+          repoName,
+          mode: result.mode,
+          errorMessage: commitError.message,
+          repoUrl,
+        });
+      }
     }
   } catch (error) {
     generationLog.error("README generation failed", {
@@ -351,6 +377,18 @@ const aihandler = async (data) => {
       null,
       sharedLogId,
     );
+
+    if (user?.email && user.emailNotificationsEnabled !== false) {
+      await emailQueue.add("send-readme-failure", {
+        to: user.email,
+        repoOwner,
+        repoName,
+        mode: null,
+        errorMessage: error.message,
+        repoUrl: `https://github.com/${repoOwner}/${repoName}`,
+      });
+    }
+
     throw error;
   }
 };

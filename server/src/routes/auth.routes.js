@@ -7,6 +7,7 @@ import {
   getProviders,
   githubAuthRedirect,
   githubCallBack,
+  updateEmailNotifications,
   updateLlmProviderPriority,
   verifyUser,
 } from "../controllers/oauthcontroller.js";
@@ -17,6 +18,7 @@ router.get("/github/callback", githubCallBack);
 router.post("/verify", authenticate, verifyUser);
 router.get("/providers", authenticate, getProviders);
 router.patch("/llm-provider-priority", authenticate, updateLlmProviderPriority);
+router.patch("/email-notifications", authenticate, updateEmailNotifications);
 router.delete("/delete", authenticate, deleteAccount);
 
 export default router;
