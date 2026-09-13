@@ -222,6 +222,40 @@ export const updateLlmProviderPriority = async (req, res) => {
   }
 };
 
+export const updateEmailNotifications = async (req, res) => {
+  const userId = req.userId;
+  const { emailNotificationsEnabled } = req.body;
+
+  if (typeof emailNotificationsEnabled !== "boolean") {
+    return res
+      .status(400)
+      .json({ message: "emailNotificationsEnabled must be a boolean" });
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { emailNotificationsEnabled },
+      { new: true, runValidators: true },
+    ).select("-__v -githubAccessToken");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      user,
+      emailNotificationsEnabled: user.emailNotificationsEnabled,
+    });
+  } catch (error) {
+    log.error("Failed to update email notification preference", {
+      userId,
+      detail: error.message,
+    });
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const logout = async (req, res) => {
   res.status(200).json({ message: "Logged out successfully" });
 };

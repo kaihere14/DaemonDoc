@@ -70,7 +70,7 @@ export class LlmService {
         fallBackProvider: providers[1],
       });
 
-      return { skipped: false, readme };
+      return { skipped: false, readme, mode };
     }
 
     //patch pipeline setup
@@ -78,7 +78,7 @@ export class LlmService {
       log.info("Patch mode — scanning modified files only");
       liveUpdate(sharedLogId, "Reading the changed files");
 
-      return await patchReadme({
+      const patchResult = await patchReadme({
         repoName,
         repoOwner,
         repoStructure,
@@ -89,6 +89,8 @@ export class LlmService {
         provider: providers[0],
         fallBackProvider: providers[1],
       });
+
+      return { ...patchResult, mode };
     }
 
     throw new Error(`Unknown generation mode: ${mode}`);

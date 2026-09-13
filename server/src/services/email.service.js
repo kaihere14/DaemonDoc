@@ -1,9 +1,7 @@
-import { Resend } from "resend";
+import { resend } from "../email/email.js";
 import { buildFallbackHtml } from "../email/template.fallback.js";
 import { renderFeatureAnnouncementTemplate } from "../email/template.renderer.js";
 import { isValidEmailHtml } from "../email/template.validation.js";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const getEmailTemplate = async (data) => {
   const rendered = renderFeatureAnnouncementTemplate(data);
@@ -27,7 +25,7 @@ export const sendEmail = async (
   const html = await getEmailTemplate(content);
 
   const response = await resend.emails.send({
-    from: "DaemonDoc<no-reply@armandev.space>",
+    from: "DaemonDoc<no-reply@daemondoc.online>",
     to,
     subject,
     html,
