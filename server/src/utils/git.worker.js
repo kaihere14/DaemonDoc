@@ -560,12 +560,28 @@ async function cleanupHandler(job) {
     );
 
     if (!readmeFile?.content?.trim()) {
-      githubLog.warn("README not found — cleanup cannot run", {
+      githubLog.warn("README not found — nothing to clean up", {
         repo: `${repoOwner}/${repoName}`,
       });
-      // Retrying cannot conjure a README — fail the job outright rather than
-      // burning every attempt plus its backoff on a job that cannot succeed.
-      throw new UnrecoverableError("README.md not found in repository");
+      // No README is a normal outcome, not a failure — settle as skipped
+      // rather than failing (and retrying) a job that cannot succeed.
+      liveUpdate(
+        sharedLogId,
+        "Skipped — no README.md content found to clean up",
+      );
+      await UserLogModel.findByIdAndUpdate(
+        userLog._id,
+        {
+          action: "README_CLEANUP_SKIPPED",
+          status: "skipped",
+        },
+        {
+          new: true,
+          runValidators: true,
+        },
+      );
+      await redis.del("admin_analytics");
+      return { skipped: true, reason: "README.md not found in repository" };
     }
 
     githubLog.info("README fetched", {

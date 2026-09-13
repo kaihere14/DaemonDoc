@@ -41,6 +41,7 @@ const UserLogSchema = new Schema(
         "README_CLEANUP_STARTED",
         "README_CLEANUP_SUCCESS",
         "README_CLEANUP_FAILED",
+        "README_CLEANUP_SKIPPED",
         "GITHUB_REPO_CONNECTED",
         "GITHUB_AUTH_FAILED",
         "README_COMMIT_PUSHED",
