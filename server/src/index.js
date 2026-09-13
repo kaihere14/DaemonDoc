@@ -6,6 +6,8 @@ import githubRoutes from "./routes/github.routes.js";
 import emailRoutes from "./routes/email.routes.js";
 import { connectDB } from "./db/connectDB.js";
 import { recoverInterruptedCleanupLogs } from "./services/logRecovery.service.js";
+import { enqueueStaleLogSweep } from "./services/staleLog.queue.js";
+import { startCronJobs } from "./services/cron.service.js";
 import { githubWebhookHandler } from "./controllers/github.controller.js";
 import { serverLog, requestLogger } from "./utils/logger.js";
 
@@ -52,6 +54,18 @@ app.get("/health", (req, res) => {
   });
 });
 
+app.get("/cleanup", async (req, res, next) => {
+  try {
+    const jobId = await enqueueStaleLogSweep();
+    res.status(200).json({
+      message: "Stale README generation sweep added to the queue",
+      jobId,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // eslint-disable-next-line no-unused-vars -- 4-arg signature required for Express to treat this as error middleware
 app.use((err, req, res, next) => {
   serverLog.error("Unhandled request error", {
@@ -83,6 +97,7 @@ connectDB()
             port: PORT,
             env: process.env.NODE_ENV || "development",
           });
+          startCronJobs();
         });
       });
   })

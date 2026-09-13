@@ -44,6 +44,9 @@ importers:
       mongoose:
         specifier: ^9.1.2
         version: 9.6.2
+      node-cron:
+        specifier: ^4.6.0
+        version: 4.6.0
       resend:
         specifier: ^6.9.4
         version: 6.12.3
@@ -1077,6 +1080,10 @@ packages:
 
   node-abort-controller@3.1.1:
     resolution: {integrity: sha512-AGK2yQKIjRuqnc6VkX2Xj5d+QW8xZ87pa1UK6yA6ouUyuxfHuMP6umE5QK7UmTeOAymo+Zx1Fxiuw9rVx8taHQ==}
+
+  node-cron@4.6.0:
+    resolution: {integrity: sha512-Si/bzYiKRHOB8/a99T2+SDGN582ONDMSTlJr5oCkT6GtnqPjZ2s10eoQRYkW9ZHwjVxONL+W8Fb+qR0AHMQsdg==}
+    engines: {node: '>=20'}
 
   node-gyp-build-optional-packages@5.2.2:
     resolution: {integrity: sha512-s+w+rBWnpTMwSFbaE0UXsRlg7hU4FjekKU4eyAih5T8nJuNZT1nNsskXpxmeqSK9UzkBl6UgRlnKc8hz8IEqOw==}
@@ -2367,6 +2374,8 @@ snapshots:
   negotiator@1.0.0: {}
 
   node-abort-controller@3.1.1: {}
+
+  node-cron@4.6.0: {}
 
   node-gyp-build-optional-packages@5.2.2:
     dependencies:
