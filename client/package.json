@@ -20,7 +20,7 @@
     "clsx": "^2.1.1",
     "convex": "^1.37.0",
     "framer-motion": "^12.25.0",
-    "lucide-react": "^0.562.0",
+    "lucide-react": "^1.45.0",
     "motion": "^12.38.0",
     "posthog-js": "^1.365.3",
     "react": "^19.2.0",
