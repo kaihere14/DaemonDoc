@@ -73,7 +73,9 @@ const ProviderPriorityControl = () => {
       return {
         id,
         label: provider.name,
-        icon: <SortableDropdownAvatar src={provider.logo} alt={provider.name} />,
+        icon: (
+          <SortableDropdownAvatar src={provider.logo} alt={provider.name} />
+        ),
         badge: LOW_CONTEXT_PROVIDERS.has(id) ? <LowContextBadge /> : null,
       };
     });
@@ -102,7 +104,9 @@ const ProviderPriorityControl = () => {
       items={items}
       order={order}
       onOrderChange={setOrder}
-      triggerIcon={<Layers size={16} className="shrink-0 text-muted-foreground" />}
+      triggerIcon={
+        <Layers size={16} className="text-muted-foreground shrink-0" />
+      }
       label="AI Priority"
       eyebrow="AI Provider Priority"
       description="Drag to rank — top is primary, the ones below are fallbacks in order."
@@ -112,8 +116,8 @@ const ProviderPriorityControl = () => {
             <Layers size={13} className="mt-px shrink-0" strokeWidth={2.5} />
             <span>
               <span className="font-bold uppercase">Low context</span> — small
-              window, context trimmed to fit. A larger fallback below still
-              gets it all.
+              window, context trimmed to fit. A larger fallback below still gets
+              it all.
             </span>
           </span>
         ) : undefined

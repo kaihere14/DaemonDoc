@@ -125,6 +125,9 @@ export class SarvamProvider {
   }
 
   async cleanup(existingReadme) {
-    return this.#call("cleanup", buildCleanupPrompt(clampReadme(existingReadme)));
+    return this.#call(
+      "cleanup",
+      buildCleanupPrompt(clampReadme(existingReadme)),
+    );
   }
 }

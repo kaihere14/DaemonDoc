@@ -4,12 +4,12 @@ DaemonDoc is an AI-powered documentation engine that automatically generates, up
 
 ## Features
 
-* **Webhook-Driven Automation**: Automatically queues README updates on GitHub `push` events to default repository branches.
-* **Smart Generation Modes**: Evaluates repository state to choose between full README rewrites and targeted section patches.
-* **README Cleanup**: Asynchronously restructures, deduplicates, and tidies cluttered documentation via BullMQ background workers.
-* **AI Provider Priority & Fallback**: Configurable provider prioritization supporting Google Gemini (with key rotation) and Sarvam AI.
-* **Real-time Log Streaming**: Streams live background job progress and status messages to the client using Convex.
-* **Dashboard & Admin Tools**: Includes repository activation controls, system analytics, user management, and email broadcast tools using Resend.
+- **Webhook-Driven Automation**: Automatically queues README updates on GitHub `push` events to default repository branches.
+- **Smart Generation Modes**: Evaluates repository state to choose between full README rewrites and targeted section patches.
+- **README Cleanup**: Asynchronously restructures, deduplicates, and tidies cluttered documentation via BullMQ background workers.
+- **AI Provider Priority & Fallback**: Configurable provider prioritization supporting Google Gemini (with key rotation) and Sarvam AI.
+- **Real-time Log Streaming**: Streams live background job progress and status messages to the client using Convex.
+- **Dashboard & Admin Tools**: Includes repository activation controls, system analytics, user management, and email broadcast tools using Resend.
 
 ## Repository Structure
 
@@ -23,11 +23,11 @@ DaemonDoc is an AI-powered documentation engine that automatically generates, up
 
 ## Requirements
 
-* **Node.js**: `>=20`
-* **Package Manager**: `pnpm` (`10.20.0`)
-* **Databases & Services**:
-  * MongoDB
-  * Redis
+- **Node.js**: `>=20`
+- **Package Manager**: `pnpm` (`10.20.0`)
+- **Databases & Services**:
+  - MongoDB
+  - Redis
 
 ## Installation
 
@@ -150,35 +150,35 @@ docker compose -f docker-compose.devlopment-setup.yml up -d
 
 ### Authentication (`/auth`)
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/auth/github` | Redirects to GitHub OAuth authorization |
-| `GET` | `/auth/github/callback` | Handles GitHub OAuth callback |
-| `POST` | `/auth/verify` | Validates JWT token and returns user details |
-| `GET` | `/auth/providers` | Retrieves supported LLM provider metadata |
-| `PATCH` | `/auth/llm-provider-priority` | Updates LLM provider priority order for the user |
-| `DELETE` | `/auth/delete` | Deletes user account, webhooks, and associated logs |
+| Method   | Endpoint                      | Description                                         |
+| :------- | :---------------------------- | :-------------------------------------------------- |
+| `GET`    | `/auth/github`                | Redirects to GitHub OAuth authorization             |
+| `GET`    | `/auth/github/callback`       | Handles GitHub OAuth callback                       |
+| `POST`   | `/auth/verify`                | Validates JWT token and returns user details        |
+| `GET`    | `/auth/providers`             | Retrieves supported LLM provider metadata           |
+| `PATCH`  | `/auth/llm-provider-priority` | Updates LLM provider priority order for the user    |
+| `DELETE` | `/auth/delete`                | Deletes user account, webhooks, and associated logs |
 
 ### GitHub & Repository Automation (`/api/github`)
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/github/getGithubRepos` | Fetches accessible GitHub repositories for the user |
-| `POST` | `/api/github/addRepoActivity` | Activates repo monitoring and creates a GitHub webhook |
-| `POST` | `/api/github/deactivateRepoActivity` | Deactivates repo monitoring and removes webhook |
-| `POST` | `/api/github/webhookhandler` | Raw body handler for incoming GitHub push webhooks |
-| `GET` | `/api/github/fetchUserLogs` | Retrieves recent log history for the authenticated user |
-| `POST` | `/api/github/cleanUpReadme` | Enqueues a background job to clean up and reformat a README |
-| `GET` | `/api/github/admin/analytics` | Returns system overview and run analytics (Admin required) |
-| `GET` | `/api/github/admin/users` | Fetches paginated user list (Admin required) |
+| Method | Endpoint                             | Description                                                 |
+| :----- | :----------------------------------- | :---------------------------------------------------------- |
+| `GET`  | `/api/github/getGithubRepos`         | Fetches accessible GitHub repositories for the user         |
+| `POST` | `/api/github/addRepoActivity`        | Activates repo monitoring and creates a GitHub webhook      |
+| `POST` | `/api/github/deactivateRepoActivity` | Deactivates repo monitoring and removes webhook             |
+| `POST` | `/api/github/webhookhandler`         | Raw body handler for incoming GitHub push webhooks          |
+| `GET`  | `/api/github/fetchUserLogs`          | Retrieves recent log history for the authenticated user     |
+| `POST` | `/api/github/cleanUpReadme`          | Enqueues a background job to clean up and reformat a README |
+| `GET`  | `/api/github/admin/analytics`        | Returns system overview and run analytics (Admin required)  |
+| `GET`  | `/api/github/admin/users`            | Fetches paginated user list (Admin required)                |
 
 ### Email Broadcast (`/api/email`)
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/email/recipients` | Returns eligible broadcast recipients list (Admin required) |
-| `POST` | `/api/email/send` | Queues feature update broadcast email jobs (Admin required) |
-| `GET` | `/api/email/queue-status` | Fetches current email queue metrics (Admin required) |
+| Method | Endpoint                  | Description                                                 |
+| :----- | :------------------------ | :---------------------------------------------------------- |
+| `GET`  | `/api/email/recipients`   | Returns eligible broadcast recipients list (Admin required) |
+| `POST` | `/api/email/send`         | Queues feature update broadcast email jobs (Admin required) |
+| `GET`  | `/api/email/queue-status` | Fetches current email queue metrics (Admin required)        |
 
 ## License
 

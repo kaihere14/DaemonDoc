@@ -10,10 +10,7 @@ export const createProvidersInstances = (
   SarvamProvider,
 ) => {
   if (!providerPriority) {
-    return [
-      new GeminiProvider(geminiConfig),
-      new SarvamProvider(),
-    ];
+    return [new GeminiProvider(geminiConfig), new SarvamProvider()];
   }
 
   return providerPriority.map((provider) => {

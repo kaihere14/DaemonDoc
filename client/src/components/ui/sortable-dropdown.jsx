@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { cva } from "class-variance-authority";
@@ -10,7 +10,14 @@ import {
   useMotionValue,
   useReducedMotion,
 } from "motion/react";
-import { Check, ChevronDown, ChevronUp, GripVertical, Loader2, X } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  ChevronUp,
+  GripVertical,
+  Loader2,
+  X,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -53,21 +60,20 @@ const TYPE = {
     "text-(length:--text-caption) leading-(--text-caption--line-height) tracking-(--text-caption--letter-spacing) font-(weight:--text-caption--font-weight)",
 
   small: "text-(length:--text-small) leading-(--text-small--line-height)",
-  body: "text-(length:--text-body) leading-(--text-body--line-height)"
+  body: "text-(length:--text-body) leading-(--text-body--line-height)",
 };
 
 const POPOVER_SPRING = { type: "spring", duration: 0.5, bounce: 0.22 };
 const ITEM_DRAG_TRANSITION = { type: "spring", duration: 0.4, bounce: 0.2 };
 /** Settle for each row's own entrance, separate from the spring it reorders under while dragging. */
-const ITEM_ENTRANCE_TRANSITION = { type: "spring", duration: 0.45, bounce: 0.15 };
+const ITEM_ENTRANCE_TRANSITION = {
+  type: "spring",
+  duration: 0.45,
+  bounce: 0.15,
+};
 
 /** Small round mark for an item: an image with a lettered fallback, used in the trigger stack and each row. */
-export function SortableDropdownAvatar({
-  src,
-  alt,
-  className,
-  ...props
-}) {
+export function SortableDropdownAvatar({ src, alt, className, ...props }) {
   const [broken, setBroken] = React.useState(false);
 
   if (!src || broken) {
@@ -75,7 +81,7 @@ export function SortableDropdownAvatar({
       <span
         data-slot="sortable-dropdown-avatar"
         className={cn(
-          "flex size-6 shrink-0 items-center justify-center rounded-full bg-foreground font-bold text-background",
+          "bg-foreground text-background flex size-6 shrink-0 items-center justify-center rounded-full font-bold",
           TYPE.caption,
           className,
         )}
@@ -92,7 +98,7 @@ export function SortableDropdownAvatar({
       src={src}
       alt={alt}
       className={cn(
-        "size-6 shrink-0 rounded-full border border-border bg-background object-contain",
+        "border-border bg-background size-6 shrink-0 rounded-full border object-contain",
         className,
       )}
       onError={() => setBroken(true)}
@@ -115,7 +121,8 @@ const sortableDropdownTriggerVariants = cva(
   {
     variants: {
       variant: {
-        outline: "border-border bg-background text-foreground shadow-b6-xs hover:bg-muted",
+        outline:
+          "border-border bg-background text-foreground shadow-b6-xs hover:bg-muted",
         ghost: "border-transparent bg-muted/60 text-foreground hover:bg-muted",
       },
       size: {
@@ -210,7 +217,7 @@ function SortableDropdownApplyButton({
   errorLabel,
   variant,
   size,
-  block
+  block,
 }) {
   const reducedMotion = useReducedMotion();
   const shakeX = useMotionValue(0);
@@ -242,7 +249,9 @@ function SortableDropdownApplyButton({
           ? errorLabel
           : idleLabel;
 
-  const contentTransition = reducedMotion ? { duration: 0 } : APPLY_CONTENT_TRANSITION;
+  const contentTransition = reducedMotion
+    ? { duration: 0 }
+    : APPLY_CONTENT_TRANSITION;
   const staggered = !reducedMotion;
 
   // The icon and each character of the label are separate items under one
@@ -252,13 +261,26 @@ function SortableDropdownApplyButton({
     initial: {},
     animate: { transition: { staggerChildren: staggered ? 0.02 : 0 } },
     exit: {
-      transition: { staggerChildren: staggered ? 0.01 : 0, staggerDirection: -1 },
+      transition: {
+        staggerChildren: staggered ? 0.01 : 0,
+        staggerDirection: -1,
+      },
     },
   };
   const contentItem = {
     initial: { opacity: 0, scale: 0.95, filter: "blur(4px)" },
-    animate: { opacity: 1, scale: 1, filter: "blur(0px)", transition: contentTransition },
-    exit: { opacity: 0, scale: 0.95, filter: "blur(4px)", transition: contentTransition },
+    animate: {
+      opacity: 1,
+      scale: 1,
+      filter: "blur(0px)",
+      transition: contentTransition,
+    },
+    exit: {
+      opacity: 0,
+      scale: 0.95,
+      filter: "blur(4px)",
+      transition: contentTransition,
+    },
   };
 
   return (
@@ -271,7 +293,10 @@ function SortableDropdownApplyButton({
       style={{ x: shakeX }}
       className={cn(applyButtonVariants({ variant, size, block }))}
     >
-      <motion.span layout="size" className="inline-flex justify-center overflow-hidden">
+      <motion.span
+        layout="size"
+        className="inline-flex justify-center overflow-hidden"
+      >
         <AnimatePresence mode="wait" initial={false}>
           <motion.span
             key={status}
@@ -282,7 +307,10 @@ function SortableDropdownApplyButton({
             className="inline-flex items-center gap-2"
           >
             {icon && (
-              <motion.span variants={contentItem} className="inline-flex items-center">
+              <motion.span
+                variants={contentItem}
+                className="inline-flex items-center"
+              >
                 {icon}
               </motion.span>
             )}
@@ -363,7 +391,10 @@ export const SortableDropdown = React.forwardRef(function SortableDropdown(
     for (const item of items) map.set(item.id, item);
     return map;
   }, [items]);
-  const fallbackOrder = React.useMemo(() => items.map((item) => item.id), [items]);
+  const fallbackOrder = React.useMemo(
+    () => items.map((item) => item.id),
+    [items],
+  );
 
   const [uncontrolledOrder, setUncontrolledOrder] = React.useState(
     defaultOrder ?? fallbackOrder,
@@ -396,7 +427,8 @@ export const SortableDropdown = React.forwardRef(function SortableDropdown(
     if (open) setBaselineOrder(currentOrder);
   }
 
-  const isDirty = JSON.stringify(currentOrder) !== JSON.stringify(baselineOrder);
+  const isDirty =
+    JSON.stringify(currentOrder) !== JSON.stringify(baselineOrder);
 
   React.useEffect(() => {
     if (!open) return;
@@ -451,19 +483,24 @@ export const SortableDropdown = React.forwardRef(function SortableDropdown(
     setOrder(next);
   };
 
-  const [internalApplyStatus, setInternalApplyStatus] =
-    React.useState("idle");
+  const [internalApplyStatus, setInternalApplyStatus] = React.useState("idle");
   const isApplyControlled = applyStatus !== undefined;
-  const currentApplyStatus = isApplyControlled ? applyStatus : internalApplyStatus;
+  const currentApplyStatus = isApplyControlled
+    ? applyStatus
+    : internalApplyStatus;
 
   // Auto-reset out of `success` / `error` back to `idle`. Only owned here
   // when the status is uncontrolled; a caller driving `applyStatus` decides
   // its own timing.
   React.useEffect(() => {
     if (isApplyControlled) return;
-    if (internalApplyStatus !== "success" && internalApplyStatus !== "error") return;
+    if (internalApplyStatus !== "success" && internalApplyStatus !== "error")
+      return;
     if (applyResetDelay <= 0) return;
-    const timer = setTimeout(() => setInternalApplyStatus("idle"), applyResetDelay);
+    const timer = setTimeout(
+      () => setInternalApplyStatus("idle"),
+      applyResetDelay,
+    );
     return () => clearTimeout(timer);
   }, [internalApplyStatus, applyResetDelay, isApplyControlled]);
 
@@ -484,8 +521,12 @@ export const SortableDropdown = React.forwardRef(function SortableDropdown(
   };
 
   const prefersReducedMotion = useReducedMotion();
-  const hidden = prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.97 };
-  const shown = prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 };
+  const hidden = prefersReducedMotion
+    ? { opacity: 0 }
+    : { opacity: 0, y: -6, scale: 0.97 };
+  const shown = prefersReducedMotion
+    ? { opacity: 1 }
+    : { opacity: 1, y: 0, scale: 1 };
 
   // Rows cascade in top to bottom on open instead of appearing all at once:
   // the list is one staggered container, each row one of its children.
@@ -502,7 +543,9 @@ export const SortableDropdown = React.forwardRef(function SortableDropdown(
     visible: {
       opacity: 1,
       y: 0,
-      transition: prefersReducedMotion ? { duration: 0 } : ITEM_ENTRANCE_TRANSITION,
+      transition: prefersReducedMotion
+        ? { duration: 0 }
+        : ITEM_ENTRANCE_TRANSITION,
     },
   };
 
@@ -528,7 +571,7 @@ export const SortableDropdown = React.forwardRef(function SortableDropdown(
           {currentOrder.map((id) => (
             <span
               key={id}
-              className="rounded-full border border-background bg-background shadow-b6-xs"
+              className="border-background bg-background shadow-b6-xs rounded-full border"
             >
               {itemsById.get(id)?.icon}
             </span>
@@ -538,7 +581,7 @@ export const SortableDropdown = React.forwardRef(function SortableDropdown(
           aria-hidden
           size={16}
           className={cn(
-            "shrink-0 text-muted-foreground transition-transform",
+            "text-muted-foreground shrink-0 transition-transform",
             open && "rotate-180",
           )}
         />
@@ -563,7 +606,7 @@ export const SortableDropdown = React.forwardRef(function SortableDropdown(
                 {(eyebrow ?? label) && (
                   <p
                     className={cn(
-                      "mb-1 font-mono font-black text-muted-foreground uppercase",
+                      "text-muted-foreground mb-1 font-mono font-black uppercase",
                       TYPE.caption,
                     )}
                   >
@@ -571,14 +614,14 @@ export const SortableDropdown = React.forwardRef(function SortableDropdown(
                   </p>
                 )}
                 {description && (
-                  <p className={cn("mb-3 text-muted-foreground", TYPE.small)}>
+                  <p className={cn("text-muted-foreground mb-3", TYPE.small)}>
                     {description}
                   </p>
                 )}
                 {note && (
                   <div
                     className={cn(
-                      "mb-3 rounded-tile border border-border bg-muted/60 px-2.5 py-2 text-muted-foreground",
+                      "rounded-tile border-border bg-muted/60 text-muted-foreground mb-3 border px-2.5 py-2",
                       TYPE.small,
                     )}
                   >
@@ -605,22 +648,25 @@ export const SortableDropdown = React.forwardRef(function SortableDropdown(
                         key={id}
                         value={id}
                         data-slot="sortable-dropdown-item"
-                        className="flex cursor-grab items-center gap-3 rounded-tile border border-border bg-muted/60 p-2.5 active:cursor-grabbing"
+                        className="rounded-tile border-border bg-muted/60 flex cursor-grab items-center gap-3 border p-2.5 active:cursor-grabbing"
                         variants={listItemVariants}
-                        whileDrag={{ scale: 1.02, boxShadow: "var(--shadow-b6-lg)" }}
+                        whileDrag={{
+                          scale: 1.02,
+                          boxShadow: "var(--shadow-b6-lg)",
+                        }}
                         transition={ITEM_DRAG_TRANSITION}
                       >
                         <GripVertical
                           aria-hidden
                           size={16}
-                          className="shrink-0 text-muted-foreground/60"
+                          className="text-muted-foreground/60 shrink-0"
                         />
                         {item.icon}
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
                             <p
                               className={cn(
-                                "truncate font-semibold text-foreground",
+                                "text-foreground truncate font-semibold",
                                 TYPE.small,
                               )}
                             >
@@ -628,7 +674,12 @@ export const SortableDropdown = React.forwardRef(function SortableDropdown(
                             </p>
                             {item.badge}
                           </div>
-                          <p className={cn("truncate text-muted-foreground", TYPE.caption)}>
+                          <p
+                            className={cn(
+                              "text-muted-foreground truncate",
+                              TYPE.caption,
+                            )}
+                          >
                             {item.description ??
                               (index === 0 ? "Primary" : `Fallback ${index}`)}
                           </p>
@@ -639,7 +690,7 @@ export const SortableDropdown = React.forwardRef(function SortableDropdown(
                             aria-label={`Move ${item.label} up`}
                             disabled={index === 0}
                             onClick={() => moveBy(index, -1)}
-                            className="rounded-xs p-0.5 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-30"
+                            className="text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-ring rounded-xs p-0.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 disabled:pointer-events-none disabled:opacity-30"
                           >
                             <ChevronUp aria-hidden size={14} />
                           </button>
@@ -648,7 +699,7 @@ export const SortableDropdown = React.forwardRef(function SortableDropdown(
                             aria-label={`Move ${item.label} down`}
                             disabled={index === currentOrder.length - 1}
                             onClick={() => moveBy(index, 1)}
-                            className="rounded-xs p-0.5 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-30"
+                            className="text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:outline-ring rounded-xs p-0.5 transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 disabled:pointer-events-none disabled:opacity-30"
                           >
                             <ChevronDown aria-hidden size={14} />
                           </button>

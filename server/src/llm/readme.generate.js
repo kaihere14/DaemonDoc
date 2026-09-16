@@ -224,7 +224,10 @@ export function optimizeContext(context, maxTokens = 180000) {
     if (optimized.fullCodebase.length > 0) {
       optimized.fullCodebase = optimized.fullCodebase
         .slice(0, count)
-        .map((file) => ({ ...file, content: truncateText(file.content, lines) }));
+        .map((file) => ({
+          ...file,
+          content: truncateText(file.content, lines),
+        }));
       if (fits()) return optimized;
     }
   }
