@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
-    "typecheck": "tsc -p convex --noEmit",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "typecheck": "tsc -p convex --noEmit"
   },
   "keywords": [],
   "author": "",

@@ -1,0 +1,5 @@
+echo "Typechecking..." && pnpm typecheck || { echo "Push blocked. Fix the above, or skip with: git push --no-verify"; exit 1; }
+echo "Linting..." && pnpm lint || { echo "Push blocked. Fix the above, or skip with: git push --no-verify"; exit 1; }
+echo "Checking formatting..." && pnpm format:check || { echo "Push blocked. Fix the above, or skip with: git push --no-verify"; exit 1; }
+echo "Running tests..." && pnpm test || { echo "Push blocked. Fix the above, or skip with: git push --no-verify"; exit 1; }
+echo "Building..." && pnpm build || { echo "Push blocked. Fix the above, or skip with: git push --no-verify"; exit 1; }
