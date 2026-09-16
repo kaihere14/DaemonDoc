@@ -1,0 +1,54 @@
+version: 2
+
+updates:
+  # pnpm workspace (root + client, server, seo-client, convex-server packages)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 15
+    groups:
+      patch-updates:
+        update-types:
+          - "patch"
+      minor-updates:
+        update-types:
+          - "minor"
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "fix"
+      prefix-development: "chore"
+      include: "scope"
+
+  # GitHub Actions used in workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    groups:
+      github-actions:
+        update-types:
+          - "patch"
+          - "minor"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+  # Dockerfile base image for the server
+  - package-ecosystem: "docker"
+    directory: "/server"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
