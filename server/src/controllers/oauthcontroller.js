@@ -1,6 +1,9 @@
 import axios from "axios";
 import jwt from "jsonwebtoken";
-import User, { SUPPORTED_LLM_PROVIDERS } from "../schema/user.schema.js";
+import User, {
+  SUPPORTED_COMMIT_TYPES,
+  SUPPORTED_LLM_PROVIDERS,
+} from "../schema/user.schema.js";
 import Provider from "../schema/provider.schema.js";
 import ActiveRepo from "../schema/activeRepo.js";
 import UserLogModel from "../schema/userLog.schema.js";
@@ -292,6 +295,41 @@ export const deleteAccount = async (req, res) => {
     return res.status(200).json({ message: "Account deleted successfully" });
   } catch (error) {
     log.error("Account deletion failed", {
+      userId,
+      detail: error.message,
+    });
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const updatePreferredCommitType = async (req, res) => {
+  const userId = req.userId;
+  const { preferredCommitType } = req.body;
+
+  if (!SUPPORTED_COMMIT_TYPES.includes(preferredCommitType)) {
+    return res.status(400).json({
+      message: `preferredCommitType must be one of: ${SUPPORTED_COMMIT_TYPES.join(
+        ", ",
+      )}`,
+    });
+  }
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { preferredCommitType },
+      { new: true, runValidators: true },
+    ).select("preferredCommitType");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res
+      .status(200)
+      .json({ preferredCommitType: user.preferredCommitType });
+  } catch (error) {
+    log.error("Failed to update preferred commit type", {
       userId,
       detail: error.message,
     });

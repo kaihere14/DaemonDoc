@@ -661,6 +661,7 @@ export const cleanUpReadme = async (req, res) => {
         },
         sharedLogId,
         providerPriority: user.llmProviderPriority,
+        preferredCommitType: user.preferredCommitType,
       },
       {
         attempts: 3,
