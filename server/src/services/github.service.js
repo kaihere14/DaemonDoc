@@ -1,6 +1,7 @@
 import {
   GITHUB_API_BASE,
   githubGet,
+  githubPost,
   githubPut,
 } from "../utils/githubApiClient.js";
 import { getLanguageFromExtension } from "../utils/langMap.js";
@@ -194,6 +195,79 @@ export async function commitFile(
       response: error.response?.data,
     });
     throw new Error(`Failed to commit file: ${error.message}`);
+  }
+}
+
+/**
+ * Commit a file to a new branch and raise a pull request against the base branch
+ * @param {string} accessToken - GitHub access token
+ * @param {string} owner - Repository owner
+ * @param {string} repo - Repository name
+ * @param {string} path - File path
+ * @param {string} content - File content
+ * @param {string} message - Commit message (also used as PR title)
+ * @param {string} baseBranch - Branch the PR targets
+ * @param {string} sha - Current file SHA (for updates, optional for new files)
+ * @param {string} headBranch - Branch to create for the PR (optional)
+ * @returns {Promise<Object>} Commit and pull request response
+ */
+export async function raisePr(
+  accessToken,
+  owner,
+  repo,
+  path,
+  content,
+  message,
+  baseBranch,
+  sha = null,
+  headBranch = `daemondoc/readme-${Date.now()}`,
+) {
+  try {
+    const baseRefUrl = `${GITHUB_API_BASE}/repos/${owner}/${repo}/git/ref/heads/${baseBranch}`;
+    const baseRef = await githubGet(baseRefUrl, accessToken);
+
+    await githubPost(
+      `${GITHUB_API_BASE}/repos/${owner}/${repo}/git/refs`,
+      { ref: `refs/heads/${headBranch}`, sha: baseRef.data.object.sha },
+      accessToken,
+    );
+
+    const commitResult = await commitFile(
+      accessToken,
+      owner,
+      repo,
+      path,
+      content,
+      message,
+      headBranch,
+      sha,
+    );
+
+    const prResponse = await githubPost(
+      `${GITHUB_API_BASE}/repos/${owner}/${repo}/pulls`,
+      { title: message, head: headBranch, base: baseBranch },
+      accessToken,
+    );
+
+    return {
+      content: commitResult.content,
+      commit: commitResult.commit,
+      pullRequest: {
+        number: prResponse.data.number,
+        url: prResponse.data.html_url,
+        headBranch,
+      },
+    };
+  } catch (error) {
+    log.error("Failed to raise pull request", {
+      repo: `${owner}/${repo}`,
+      path,
+      baseBranch,
+      headBranch,
+      detail: error.message,
+      response: error.response?.data,
+    });
+    throw new Error(`Failed to raise pull request: ${error.message}`);
   }
 }
 

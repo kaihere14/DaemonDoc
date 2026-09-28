@@ -14,6 +14,7 @@ import {
   getFileLanguage,
   shouldIncludeFile,
   truncateContent,
+  raisePr,
 } from "../services/github.service.js";
 import { selectImportantFiles } from "./scan.filters.js";
 import UserLogModel from "../schema/userLog.schema.js";
@@ -125,6 +126,8 @@ const aihandler = async (data) => {
     if (!user || !user.githubAccessToken) {
       throw new Error("GitHub access token not found for user");
     }
+
+    const preferredCommitType = user.preferredCommitType;
 
     const providersPriority = user.llmProviderPriority || ["gemini", "sarvam"];
 
@@ -302,18 +305,36 @@ const aihandler = async (data) => {
     let commitResult;
 
     try {
-      commitResult = await commitFile(
-        accessToken,
-        repoOwner,
-        repoName,
-        readmeFileName,
-        readme,
-        "chore: auto-update README [skip ci]",
-        defaultBranch,
-        existingReadmeSha,
-      );
+      if (preferredCommitType === "pull-request") {
+        commitResult = await raisePr(
+          accessToken,
+          repoOwner,
+          repoName,
+          readmeFileName,
+          readme,
+          "chore: auto-update README [skip ci]",
+          defaultBranch,
+          existingReadmeSha,
+        );
 
-      liveUpdate(sharedLogId, `Readme commited successfully `);
+        liveUpdate(
+          sharedLogId,
+          `Pull request raised: ${commitResult.pullRequest.url}`,
+        );
+      } else {
+        commitResult = await commitFile(
+          accessToken,
+          repoOwner,
+          repoName,
+          readmeFileName,
+          readme,
+          "chore: auto-update README [skip ci]",
+          defaultBranch,
+          existingReadmeSha,
+        );
+
+        liveUpdate(sharedLogId, `Readme commited successfully `);
+      }
 
       await updateLogStatus(
         data.logId,
@@ -532,6 +553,7 @@ async function cleanupHandler(job) {
     encryptedAccessToken,
     sharedLogId,
     providerPriority,
+    preferredCommitType,
   } = job.data;
 
   const userLog = await startCleanupLog({
@@ -613,25 +635,49 @@ async function cleanupHandler(job) {
       repo: `${repoOwner}/${repoName}`,
     });
     liveUpdate(sharedLogId, "Committing cleaned README to GitHub");
-    const commitResult = await commitFile(
-      accessToken,
-      repoOwner,
-      repoName,
-      "README.md",
-      cleanedReadme,
-      "chore: cleanup README [skip ci]",
-      defaultBranch,
-      readmeFile.sha,
-    );
+    let commitResult;
+    if (preferredCommitType === "pull-request") {
+      commitResult = await raisePr(
+        accessToken,
+        repoOwner,
+        repoName,
+        "README.md",
+        cleanedReadme,
+        "chore: cleanup README [skip ci]",
+        defaultBranch,
+        readmeFile.sha,
+      );
 
-    githubLog.info("Cleaned README committed", {
-      repo: `${repoOwner}/${repoName}`,
-      commit: commitResult.commit.sha,
-    });
-    liveUpdate(
-      sharedLogId,
-      `✓ README committed: ${commitResult.commit.sha.slice(0, 7)}`,
-    );
+      githubLog.info("Cleaned README pull request raised", {
+        repo: `${repoOwner}/${repoName}`,
+        commit: commitResult.commit.sha,
+        pullRequest: commitResult.pullRequest.url,
+      });
+      liveUpdate(
+        sharedLogId,
+        `✓ Pull request raised: ${commitResult.pullRequest.url}`,
+      );
+    } else {
+      commitResult = await commitFile(
+        accessToken,
+        repoOwner,
+        repoName,
+        "README.md",
+        cleanedReadme,
+        "chore: cleanup README [skip ci]",
+        defaultBranch,
+        readmeFile.sha,
+      );
+
+      githubLog.info("Cleaned README committed", {
+        repo: `${repoOwner}/${repoName}`,
+        commit: commitResult.commit.sha,
+      });
+      liveUpdate(
+        sharedLogId,
+        `✓ README committed: ${commitResult.commit.sha.slice(0, 7)}`,
+      );
+    }
     await UserLogModel.findByIdAndUpdate(
       userLog._id,
       {

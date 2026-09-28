@@ -1,0 +1,50 @@
+name: daemondoc-local
+services:
+  mongo:
+    image: mongo:8
+    container_name: daemondoc-mongo
+    restart: unless-stopped
+    networks:
+      - daemondoc-local-network
+    ports:
+      - "27017:27017"
+    volumes:
+      - daemondoc-mongo-data:/data/db
+
+  redis:
+    image: redis:7-alpine
+    container_name: daemondoc-redis
+    restart: unless-stopped
+    networks:
+      - daemondoc-local-network
+    ports:
+      - "6379:6379"
+    volumes:
+      - daemondoc-redis-data:/data
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: daemondoc-api
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - daemondoc-local-network
+    ports:
+      - "3000:3000"
+
+networks:
+  daemondoc-local-network:
+    name: daemondoc-local-network
+    driver: bridge
+
+volumes:
+  daemondoc-mongo-data:
+    name: daemondoc-mongo-data
+  daemondoc-redis-data:
+    name: daemondoc-redis-data

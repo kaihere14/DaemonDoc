@@ -4,10 +4,9 @@ services:
     image: redis:7-alpine
     container_name: daemondoc-redis
     restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
     networks:
       - daemondoc-api-network
-    ports:
-      - "6379:6379"
     volumes:
       - daemondoc-redis-data:/data
 
@@ -15,13 +14,22 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    restart: unless-stopped
     env_file:
       - .env
+    environment:
+      NODE_ENV: production
+      REDIS_HOST: redis
+    depends_on:
+      - redis
     networks:
       - daemondoc-api-network
 
   caddy:
-    image: caddy:latest
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - api
     ports:
       - "80:80"
       - "443:443"

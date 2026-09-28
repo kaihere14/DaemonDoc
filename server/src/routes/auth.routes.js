@@ -9,6 +9,7 @@ import {
   githubCallBack,
   updateEmailNotifications,
   updateLlmProviderPriority,
+  updatePreferredCommitType,
   verifyUser,
 } from "../controllers/oauthcontroller.js";
 import { authenticate } from "../middlewares/auth.middleware.js";
@@ -19,6 +20,7 @@ router.post("/verify", authenticate, verifyUser);
 router.get("/providers", authenticate, getProviders);
 router.patch("/llm-provider-priority", authenticate, updateLlmProviderPriority);
 router.patch("/email-notifications", authenticate, updateEmailNotifications);
+router.patch("/commit-type", authenticate, updatePreferredCommitType);
 router.delete("/delete", authenticate, deleteAccount);
 
 export default router;

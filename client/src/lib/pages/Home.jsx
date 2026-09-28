@@ -13,6 +13,7 @@ import {
 } from "@/components/repos/WalkthroughOverlay";
 import CleanupFeatureSpotlight from "@/components/repos/CleanupFeatureSpotlight";
 import ProviderPriorityControl from "@/components/repos/ProviderPriorityControl";
+import CommitTypeToggle from "@/components/repos/CommitTypeToggle";
 import { APP_ORIGIN } from "../urls";
 import { ThinkingOrb } from "@/components/ui/thinking-orb";
 
@@ -312,6 +313,9 @@ const Home = () => {
                   </button>
                 )}
               </div>
+
+              {/* README commit type */}
+              <CommitTypeToggle />
 
               {/* AI provider priority */}
               <ProviderPriorityControl />
