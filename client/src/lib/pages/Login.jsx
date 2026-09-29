@@ -121,15 +121,18 @@ const Login = () => {
           <a
             href={MARKETING_URL}
             aria-label="DaemonDoc home"
-            className="rounded-md"
+            className="flex items-center gap-1.5 rounded-md"
           >
             <img
-              src="/DaemonLogo-nav.png"
-              alt="DaemonDoc"
-              width={406}
-              height={120}
+              src="/mascot-bust.png"
+              alt=""
+              width={216}
+              height={256}
               className="h-6 w-auto"
             />
+            <span className="font-display text-base font-semibold tracking-tight text-slate-900">
+              DaemonDoc
+            </span>
           </a>
           <a
             href={MARKETING_URL}
@@ -146,6 +149,13 @@ const Login = () => {
           {/* ── The action. Dominant in the first viewport, because signing in
               is the reader's whole job here. ───────────────────────────────── */}
           <section className="min-w-0 lg:col-span-5">
+            <img
+              src="/mascot-full.png"
+              alt=""
+              width={364}
+              height={480}
+              className="mb-5 h-24 w-auto"
+            />
             <h1 className={TYPE.title}>Sign in to DaemonDoc</h1>
             <p className={`${TYPE.lede} mt-3 max-w-[58ch]`}>
               DaemonDoc reads your repository on every push and writes the

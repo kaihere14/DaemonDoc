@@ -212,13 +212,13 @@ export const PulseBorderIcon = ({ className }: { className?: string }) => {
           }}
         />
       </svg>
-      <div className="absolute inset-px flex items-center justify-center rounded-[2px] bg-neutral-100">
+      <div className="absolute inset-px flex items-center justify-center rounded-[2px] bg-white">
         <Image
-          src="/daemon-icon.webp"
-          width={183}
-          height={240}
+          src="/mascot-full.png"
+          width={364}
+          height={480}
           alt="DaemonDoc"
-          className="h-7 w-auto pl-1"
+          className="h-9 w-auto"
         />
       </div>
     </div>

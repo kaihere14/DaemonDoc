@@ -27,7 +27,8 @@ export default function LandingNavigation() {
   const closeMobile = useCallback(() => setMobileOpen(false), []);
 
   // The bar floats over the hero photo until it picks up its own white surface,
-  // so above the fold the dark logo and slate links have to flip to white.
+  // so above the fold the wordmark and slate links have to flip to white. The
+  // mascot keeps its own colors.
   // Same 100px threshold the Navbar uses to swap in that surface.
   const { scrollY } = useScroll();
   const [onPhoto, setOnPhoto] = useState(true);
@@ -36,7 +37,7 @@ export default function LandingNavigation() {
     setOnPhoto((prev) => (prev === next ? prev : next));
   });
 
-  const invertedLogo = "[&_img]:brightness-0 [&_img]:invert";
+  const invertedLogo = "[&_.wordmark]:text-white";
 
   return (
     <Navbar className="fixed inset-x-0 top-0 z-50">
@@ -64,7 +65,7 @@ export default function LandingNavigation() {
       <MobileNav
         className={
           onPhoto
-            ? "[&>div:first-child_button]:text-white [&>div:first-child_img]:brightness-0 [&>div:first-child_img]:invert"
+            ? "[&>div:first-child_.wordmark]:text-white [&>div:first-child_button]:text-white"
             : undefined
         }
       >

@@ -58,17 +58,18 @@ const AuthNavigation = () => {
         <a
           href={MARKETING_URL}
           aria-label="DaemonDoc home"
-          className="flex shrink-0 cursor-pointer items-center rounded-lg"
+          className="flex shrink-0 cursor-pointer items-center gap-2 rounded-lg"
         >
-          {/* The cropped 406x120 asset — DaemonLogo.png is a mostly-transparent
-              1536x1024 canvas, which is what the scale-120 hack compensated for. */}
           <img
-            src="/DaemonLogo-nav.png"
-            alt="DaemonDoc"
-            width={406}
-            height={120}
+            src="/mascot-bust.png"
+            alt=""
+            width={216}
+            height={256}
             className="h-8 w-auto sm:h-9"
           />
+          <span className="font-display text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">
+            DaemonDoc
+          </span>
         </a>
 
         {/* Navigation & User Menu */}

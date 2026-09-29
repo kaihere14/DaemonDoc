@@ -22,16 +22,20 @@ export default function Footer() {
       <div className={SECTION_X}>
         <div className="grid grid-cols-1 gap-12 pb-14 md:grid-cols-12 lg:gap-16">
           <div className="flex flex-col gap-4 md:col-span-8">
-            {/* The cropped nav asset, not DaemonLogo.png — that one is a
-                1536x1024 canvas that is mostly transparent padding, which is
-                what forced the negative offsets and scale hacks here. */}
-            <Image
-              src="/DaemonLogo-nav.png"
-              alt="DaemonDoc"
-              width={406}
-              height={120}
-              className="h-10 w-auto self-start"
-            />
+            {/* The footer has room for the full standing mascot; the navbars
+                use the cropped bust. */}
+            <div className="flex items-end gap-3 self-start">
+              <Image
+                src="/mascot-full.png"
+                alt=""
+                width={364}
+                height={480}
+                className="h-16 w-auto"
+              />
+              <span className="font-display pb-1 text-2xl font-semibold tracking-tight text-slate-900">
+                DaemonDoc
+              </span>
+            </div>
             <p className="max-w-xs text-sm leading-relaxed font-light text-slate-600">
               The automation layer for your codebase documentation.
             </p>

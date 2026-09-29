@@ -262,16 +262,19 @@ export const NavbarLogo = () => {
     <a
       href="#"
       aria-label="DaemonDoc home"
-      className="relative z-20 mr-4 flex shrink-0 transform-gpu items-center rounded-lg px-2 py-1 text-sm font-normal text-black"
+      className="relative z-20 mr-4 flex shrink-0 transform-gpu items-center gap-2 rounded-lg px-2 py-1 text-sm font-normal text-black"
     >
       <Image
-        src="/DaemonLogo-nav.png"
-        alt="DaemonDoc"
-        width={406}
-        height={120}
+        src="/mascot-bust.png"
+        alt=""
+        width={216}
+        height={256}
         priority
         className="h-8 w-auto md:h-9"
       />
+      <span className="wordmark font-display text-lg font-semibold tracking-tight text-slate-900 transition-colors md:text-xl">
+        DaemonDoc
+      </span>
     </a>
   );
 };
