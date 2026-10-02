@@ -3,3 +3,12 @@ packages:
   - "server"
   - "convex-server"
   - "seo-client"
+
+allowBuilds:
+  core-js: false
+  esbuild: false
+  msgpackr-extract: false
+  msw: false
+  protobufjs: false
+  sharp: false
+  unrs-resolver: false

@@ -160,7 +160,25 @@ export default function Hero() {
           {/* Headline. Reference proportions: ~64px desktop, regular weight —
               the display face carries the line, no bold and no ornament. */}
           <h1 className="font-display mx-auto mt-10 max-w-3xl text-[1.75rem] leading-[1.16] font-normal tracking-[-0.022em] text-white [text-shadow:0_1px_2px_rgba(3,17,48,0.7),0_3px_18px_rgba(3,17,48,0.55)] sm:mt-12 sm:text-5xl lg:text-[4rem]">
-            From git push to current docs in seconds.
+            From git push{" "}
+            {/* Sized in em so the mascot tracks the headline at every breakpoint.
+                The wrapper clips its bottom and right edges — the mascot slides
+                in from that corner, and its overshoot can still clear the top
+                and left. */}
+            <span
+              aria-hidden="true"
+              className="inline-block -translate-y-[0.06em] align-middle [clip-path:inset(-50%_0_0_-50%)]"
+            >
+              <Image
+                src="/mascot-bust.png"
+                alt=""
+                width={216}
+                height={256}
+                priority
+                className="animate-mascot-peek block h-[1em] w-auto drop-shadow-[0_3px_10px_rgba(3,17,48,0.5)]"
+              />
+            </span>{" "}
+            to current docs in seconds.
           </h1>
 
           {/* Prompt card. A still of the product, not a form — there is nothing

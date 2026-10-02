@@ -1,5 +1,0 @@
-allowBuilds:
-  core-js: false
-  esbuild: false
-  msw: false
-  protobufjs: false
