@@ -1,0 +1,54 @@
+<!doctype html>
+<!-- Reference layouts. Copy into c1.html ... c6.html, replace copy, images and background-position.
+     Landscape "text left / panel right" (c1, c3, c4). See the commented blocks for other layouts. -->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="card.css" />
+  </head>
+  <body>
+    <div class="art" style="background-position: 30% 40%"></div>
+    <div class="shade"></div>
+    <div class="scrim"></div>
+    <div class="mark"><img src="logo.png" />Product</div>
+    <div class="site">product.com</div>
+
+    <div style="position: absolute; left: 72px; top: 190px; width: 620px">
+      <h1>One sentence about what the user gets.</h1>
+      <p class="sub">One plain line on how it happens.</p>
+    </div>
+
+    <!-- Outcome mock (bleeds off the bottom; add lines until the panel is full) -->
+    <div
+      class="panel"
+      style="left: 760px; top: 170px; width: 780px; height: 760px"
+    >
+      <div class="gh">
+        <div class="head">
+          <div class="av"><img src="logo.png" /></div>
+          <div>
+            <div class="t1">docs: update Installation section</div>
+            <div class="t2">
+              product-bot committed 4 seconds after your push
+            </div>
+          </div>
+          <div class="ok">In sync</div>
+        </div>
+        <div class="file">
+          <span>README.md</span><span><b>+2</b>&nbsp;&nbsp;<s>−1</s></span>
+        </div>
+        <pre><div class="hunk">@@ -38,6 +38,7 @@ ## Installation</div><div class="del">- npm install</div><div class="add">+ pnpm install</div><div class="add">+ pnpm dev</div></pre>
+      </div>
+    </div>
+
+    <!-- Fully visible screenshot panel (features):
+  <div class="panel round" style="left:700px;top:300px;width:840px"><img src="section.png"></div> -->
+
+    <!-- Text top / wide panel below (steps, testimonials):
+  <div style="position:absolute;left:72px;top:170px;width:1000px"><h1>Headline on one or two lines.</h1></div>
+  <div class="panel" style="left:72px;right:72px;top:540px;height:400px;padding:44px 40px"><img src="steps.png"></div> -->
+
+    <!-- Portrait: <body data-size="1080x1350" class="vertical">; square: data-size="1080x1080"; story: data-size="1080x1920" class="vertical".
+     Vertical layout:, text at top:170px, panel left:72px;right:72px;top:640px -->
+  </body>
+</html>
