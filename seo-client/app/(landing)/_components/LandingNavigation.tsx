@@ -17,12 +17,22 @@ import { CandyLink } from "@/components/ui/candy-button";
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daemondoc.online";
 
+// Root-relative so the links also work from the inner pages. Listed in the
+// order the sections appear on the home page.
 const NAV_LINKS = [
-  { name: "Solutions", link: "#features" },
-  { name: "Features", link: "#engine" },
+  { name: "How it works", link: "/#how-it-works" },
+  { name: "Testimonials", link: "/#testimonials" },
+  { name: "Features", link: "/#features" },
 ];
 
-export default function LandingNavigation() {
+interface LandingNavigationProps {
+  /** False on pages without the hero photo, where white text would vanish. */
+  overPhoto?: boolean;
+}
+
+export default function LandingNavigation({
+  overPhoto = true,
+}: LandingNavigationProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeMobile = useCallback(() => setMobileOpen(false), []);
 
@@ -31,9 +41,9 @@ export default function LandingNavigation() {
   // mascot keeps its own colors.
   // Same 100px threshold the Navbar uses to swap in that surface.
   const { scrollY } = useScroll();
-  const [onPhoto, setOnPhoto] = useState(true);
+  const [onPhoto, setOnPhoto] = useState(overPhoto);
   useMotionValueEvent(scrollY, "change", (latest) => {
-    const next = latest <= 100;
+    const next = overPhoto && latest <= 100;
     setOnPhoto((prev) => (prev === next ? prev : next));
   });
 

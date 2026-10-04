@@ -70,6 +70,8 @@ h4 {
 
 html {
   overflow-x: hidden;
+  /* Anchor jumps land below the fixed navbar instead of under it. */
+  scroll-padding-top: 6rem;
 }
 
 * {

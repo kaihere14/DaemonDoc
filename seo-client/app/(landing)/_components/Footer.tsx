@@ -1,18 +1,37 @@
 import Image from "next/image";
+import Link from "next/link";
 import { SECTION_X } from "@/app/(landing)/_lib/section";
 
-const PRODUCT_LINKS = [
-  { label: "Solutions", href: "#features" },
-  { label: "Product Engine", href: "#engine" },
-];
+const PRODUCT_LINKS = [{ label: "Solutions", href: "/solutions" }];
 
 const LEGAL_LINKS = [
-  { label: "Privacy Policy", href: "#" },
-  { label: "Terms of Service", href: "#" },
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Terms of Service", href: "/terms" },
 ];
 
 const FOOTER_LINK =
   "hover:text-primary rounded text-sm text-slate-600 transition-colors";
+
+export function UsefulShelfBadge() {
+  return (
+    <a
+      href="https://usefulshelf.co/?utm_source=daemondoc.online&amp;utm_medium=referral&amp;utm_campaign=badge&amp;utm_content=lime"
+      target="_blank"
+      rel="noopener"
+    >
+      {/* Plain <img> on purpose: next/image would proxy the src, and
+          UsefulShelf verifies the badge by its original URL. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="https://usefulshelf.co/badge/usefulshelf.svg?theme=lime"
+        alt="Featured on UsefulShelf"
+        width={248}
+        height={66}
+        className="h-8 w-auto"
+      />
+    </a>
+  );
+}
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -39,6 +58,9 @@ export default function Footer() {
             <p className="max-w-xs text-sm leading-relaxed font-light text-slate-600">
               The automation layer for your codebase documentation.
             </p>
+            <div className="self-start">
+              <UsefulShelfBadge />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-8 md:col-span-4">
@@ -49,9 +71,9 @@ export default function Footer() {
               <ul className="space-y-4">
                 {PRODUCT_LINKS.map((link) => (
                   <li key={link.label}>
-                    <a href={link.href} className={FOOTER_LINK}>
+                    <Link href={link.href} className={FOOTER_LINK}>
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -63,9 +85,9 @@ export default function Footer() {
               <ul className="space-y-4">
                 {LEGAL_LINKS.map((link) => (
                   <li key={link.label}>
-                    <a href={link.href} className={FOOTER_LINK}>
+                    <Link href={link.href} className={FOOTER_LINK}>
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>

@@ -1,6 +1,7 @@
 "use client";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import {
   motion,
@@ -259,8 +260,8 @@ export const MobileNavToggle = ({
 
 export const NavbarLogo = () => {
   return (
-    <a
-      href="#"
+    <Link
+      href="/"
       aria-label="DaemonDoc home"
       className="relative z-20 mr-4 flex shrink-0 transform-gpu items-center gap-2 rounded-lg px-2 py-1 text-sm font-normal text-black"
     >
@@ -275,7 +276,7 @@ export const NavbarLogo = () => {
       <span className="wordmark font-display text-lg font-semibold tracking-tight text-slate-900 transition-colors md:text-xl">
         DaemonDoc
       </span>
-    </a>
+    </Link>
   );
 };
 

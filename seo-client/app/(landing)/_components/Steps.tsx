@@ -28,7 +28,11 @@ const STEPS = [
 
 const Steps: FC = () => {
   return (
-    <section aria-labelledby="hero-steps" className="mx-auto mt-16 max-w-4xl">
+    <section
+      id="how-it-works"
+      aria-labelledby="hero-steps"
+      className="mx-auto mt-16 max-w-4xl"
+    >
       <h2 id="hero-steps" className="sr-only">
         How DaemonDoc works
       </h2>
