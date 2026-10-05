@@ -16,8 +16,8 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "@ai-sdk/google": "^4.0.50",
-    "ai": "^7.0.77",
+    "@ai-sdk/google": "^4.0.87",
+    "ai": "^7.0.127",
     "axios": "^1.13.2",
     "bullmq": "^5.66.4",
     "convex": "^1.37.0",
@@ -30,7 +30,7 @@
     "mongoose": "^9.1.2",
     "node-cron": "^4.6.0",
     "resend": "^6.9.4",
-    "sarvamai": "1.1.8-alpha.5",
+    "sarvamai": "1.1.10",
     "winston": "^3.19.0"
   },
   "devDependencies": {
@@ -38,6 +38,6 @@
     "eslint": "^9.39.1",
     "globals": "^17.12.0",
     "nodemon": "^3.1.11",
-    "vitest": "^5.0.1"
+    "vitest": "^5.0.3"
   }
 }
