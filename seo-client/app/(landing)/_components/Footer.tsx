@@ -12,12 +12,18 @@ const LEGAL_LINKS = [
 const FOOTER_LINK =
   "hover:text-primary rounded text-sm text-slate-600 transition-colors";
 
+// Directory badges stay visible (directories verify them), just small and
+// muted so they don't compete with the footer content.
+const DIRECTORY_BADGE =
+  "rounded opacity-60 transition-opacity hover:opacity-100";
+
 export function UsefulShelfBadge() {
   return (
     <a
       href="https://usefulshelf.co/?utm_source=daemondoc.online&amp;utm_medium=referral&amp;utm_campaign=badge&amp;utm_content=lime"
       target="_blank"
       rel="noopener"
+      className={DIRECTORY_BADGE}
     >
       {/* Plain <img> on purpose: next/image would proxy the src, and
           UsefulShelf verifies the badge by its original URL. */}
@@ -27,7 +33,29 @@ export function UsefulShelfBadge() {
         alt="Featured on UsefulShelf"
         width={248}
         height={66}
-        className="h-8 w-auto"
+        className="h-6 w-auto"
+      />
+    </a>
+  );
+}
+
+export function WebsiteShowBadge() {
+  return (
+    <a
+      href="https://www.website.show"
+      title="Featured on website.show"
+      target="_blank"
+      rel="noopener"
+      className={DIRECTORY_BADGE}
+    >
+      {/* Plain <img> for the same reason as the UsefulShelf badge. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="https://www.website.show/badge/websiteshow-badge-light-b1.svg"
+        alt="Featured on website.show"
+        width={216}
+        height={64}
+        className="h-6 w-auto"
       />
     </a>
   );
@@ -58,8 +86,9 @@ export default function Footer() {
             <p className="max-w-xs text-sm leading-relaxed font-light text-slate-600">
               The automation layer for your codebase documentation.
             </p>
-            <div className="self-start">
+            <div className="flex flex-wrap items-center gap-3 self-start">
               <UsefulShelfBadge />
+              <WebsiteShowBadge />
             </div>
           </div>
 
