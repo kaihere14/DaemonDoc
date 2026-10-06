@@ -1,0 +1,296 @@
+/* Social image card system. Set --canvas to the dominant colour of the brand art and
+   --shadow to a dark tint of it. Put the art file next to the cards as art.png. */
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap");
+
+:root {
+  --canvas: #1b2fb8; /* dominant colour sampled from the brand art */
+  --shadow:
+    10, 21, 80; /* RGB of a deep tint of --canvas, used in shades and shadows */
+  --paper: #fff;
+  --mist: rgba(255, 255, 255, 0.78);
+}
+* {
+  margin: 0;
+  box-sizing: border-box;
+}
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  font-family: "Geist", sans-serif;
+  color: #fff;
+  background: var(--canvas);
+}
+
+/* Brand art canvas: vary background-position per card */
+.art {
+  position: absolute;
+  inset: 0;
+  background: url(../../../seo-client/public/background4.png) no-repeat;
+  background-size: cover;
+}
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(var(--shadow), 0.45) 0%,
+    rgba(var(--shadow), 0) 45%
+  );
+}
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--shadow), 0.55) 0%,
+    rgba(var(--shadow), 0) 48%
+  );
+}
+
+/* Brand mark + domain */
+.mark {
+  position: absolute;
+  top: 48px;
+  left: 72px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: -0.2px;
+}
+.mark img {
+  height: 36px;
+}
+.site {
+  position: absolute;
+  top: 56px;
+  right: 72px;
+  font-size: 18px;
+  color: var(--mist);
+  font-weight: 500;
+}
+
+/* Type */
+h1 {
+  font-family: "Instrument Serif", serif;
+  font-weight: 400;
+  font-size: 84px;
+  line-height: 0.98;
+  letter-spacing: -1.2px;
+  text-shadow: 0 2px 30px rgba(var(--shadow), 0.35);
+}
+body.vertical h1 {
+  font-size: 104px;
+}
+.sub {
+  font-size: 22px;
+  line-height: 1.45;
+  color: var(--mist);
+  margin-top: 22px;
+  max-width: 30ch;
+}
+body.vertical .sub {
+  font-size: 26px;
+}
+
+/* Product panels: hug content. .round = fully visible; default = bleeds off the bottom edge */
+.panel {
+  position: absolute;
+  background: var(--paper);
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+  box-shadow:
+    0 -1px 0 rgba(255, 255, 255, 0.6),
+    0 30px 80px rgba(var(--shadow), 0.55),
+    0 8px 24px rgba(var(--shadow), 0.35);
+}
+.panel.round {
+  border-radius: 16px;
+}
+.panel img {
+  display: block;
+  width: 100%;
+}
+
+/* GitHub-style commit/diff panel for the "outcome" card */
+.gh {
+  color: #1f2328;
+}
+.gh .head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 22px 26px;
+  border-bottom: 1px solid #d1d9e0;
+}
+.gh .av {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #e8eeff;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.gh .av img {
+  height: 34px;
+  margin-top: 6px;
+}
+.gh .t1 {
+  font-size: 19px;
+  font-weight: 600;
+}
+.gh .t2 {
+  font-size: 15px;
+  color: #59636e;
+  margin-top: 3px;
+}
+.gh .ok {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a7f37;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.gh .ok::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #1a7f37;
+}
+.gh .file {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 26px;
+  background: #f6f8fa;
+  border-bottom: 1px solid #d1d9e0;
+  font:
+    500 15px "Geist Mono",
+    monospace;
+}
+.gh .file b {
+  font-weight: 500;
+  color: #1a7f37;
+}
+.gh .file s {
+  text-decoration: none;
+  color: #d1242f;
+}
+.gh pre {
+  font:
+    400 15.5px/1.75 "Geist Mono",
+    monospace;
+  margin: 0;
+}
+.gh pre div {
+  padding: 0 26px;
+  white-space: pre;
+}
+.gh .hunk {
+  background: #ddf4ff;
+  color: #59636e;
+}
+.gh .add {
+  background: #dafbe1;
+}
+.gh .del {
+  background: #ffebe9;
+}
+
+/* README additions */
+:root {
+  --canvas: #05329f;
+  --shadow: 8, 22, 92;
+}
+.gh pre div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gh .ok {
+  color: #1a7f37;
+}
+.bare .panel {
+  box-shadow:
+    0 40px 90px rgba(var(--shadow), 0.55),
+    0 10px 28px rgba(var(--shadow), 0.35);
+}
+
+/* Schematic README panels for the update-mode cards */
+.md {
+  color: #1f2328;
+}
+.md .file {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 32px;
+  background: #f6f8fa;
+  border-bottom: 1px solid #d1d9e0;
+  font:
+    500 26px "Geist Mono",
+    monospace;
+}
+.md .file span:last-child {
+  font:
+    500 24px "Geist",
+    sans-serif;
+  color: #59636e;
+}
+.md .row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 32px;
+  height: 52px;
+}
+.md .row .g {
+  width: 22px;
+  font:
+    500 26px "Geist Mono",
+    monospace;
+  color: #8c959f;
+}
+.md .row h4 {
+  font:
+    600 28px "Geist Mono",
+    monospace;
+  letter-spacing: -0.4px;
+}
+.md .row i {
+  display: block;
+  height: 14px;
+  border-radius: 7px;
+  background: #d8dee4;
+}
+.md .add {
+  background: #dafbe1;
+}
+.md .add .g {
+  color: #1a7f37;
+}
+.md .add i {
+  background: #8fd8a3;
+}
+.md .del {
+  background: #ffebe9;
+}
+.md .del .g {
+  color: #d1242f;
+}
+.md .del i {
+  background: #f5a8a8;
+}
+.md .del h4 {
+  color: #a40e26;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+.md .gap {
+  height: 18px;
+}
