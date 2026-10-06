@@ -3,6 +3,7 @@ import PageEntrance from "./(landing)/_components/PageEntrance";
 import LandingNavigation from "./(landing)/_components/LandingNavigation";
 import Hero from "./(landing)/_components/Hero";
 import Features from "./(landing)/_components/Features";
+import Faq from "./(landing)/_components/Faq";
 import Footer from "./(landing)/_components/Footer";
 
 export const metadata: Metadata = {
@@ -103,6 +104,7 @@ export default function Home() {
         <LandingNavigation />
         <Hero />
         <Features />
+        <Faq />
         <Footer />
       </PageEntrance>
     </>

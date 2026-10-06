@@ -4,7 +4,7 @@ import IngestCard from "./IngestCard";
 
 const Grid = () => {
   return (
-    <section id="features" className="flex flex-col gap-20">
+    <section id="features" className="flex flex-col gap-20 pb-14 lg:pb-20">
       <div className="flex flex-col items-center gap-5 px-4 text-center">
         <div className="text-blue-600">Platform</div>
         <div className="text-2xl font-medium tracking-tighter sm:text-3xl md:text-4xl">

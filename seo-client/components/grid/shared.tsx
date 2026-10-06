@@ -214,7 +214,7 @@ export const PulseBorderIcon = ({ className }: { className?: string }) => {
       </svg>
       <div className="absolute inset-px flex items-center justify-center rounded-[2px] bg-white">
         <Image
-          src="/mascot-full.png"
+          src="/mascot-bust.png"
           width={364}
           height={480}
           alt="DaemonDoc"
