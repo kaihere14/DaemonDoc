@@ -15,6 +15,7 @@ import {
   ChevronRight,
   FileText,
   RefreshCw,
+  GitPullRequest,
 } from "lucide-react";
 import Image from "next/image";
 import { SECTION_X } from "@/app/(landing)/_lib/section";
@@ -65,8 +66,8 @@ const TECH_LOGOS = [
 
 /** The two things DaemonDoc does with a repo, shown as labels on the mock. */
 const MODES = [
-  { id: "generate", label: "Generate", Icon: FileText },
-  { id: "sync", label: "Keep in sync", Icon: RefreshCw },
+  { id: "direct", label: "Direct", Icon: FileText },
+  { id: "pr", label: "Pull Request", Icon: GitPullRequest },
 ] as const;
 
 export default function Hero() {
