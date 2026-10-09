@@ -1,46 +1,33 @@
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { GitCommitHorizontal, GitPullRequest } from "lucide-react";
-import { api, ENDPOINTS } from "@/lib/api";
-import { useAuth } from "../../context/auth-context";
+import { useCommitType } from "../../hooks/useCommitType";
+import { useOnboarding } from "../../context/onboarding-context";
 
 const COMMIT_TYPES = [
   { key: "direct", label: "Direct", icon: GitCommitHorizontal },
   { key: "pull-request", label: "Pull Request", icon: GitPullRequest },
 ];
 
-// Last saved value per user, so the toggle stays correct when it remounts.
-// The auth user is left untouched on purpose: replacing it with setUser
-// re-renders every auth consumer, including the whole repo grid.
-const savedCommitTypes = new Map();
-
 const CommitTypeToggle = () => {
-  const { user } = useAuth();
-  const [commitType, setCommitType] = useState(
-    savedCommitTypes.get(user?._id) || user?.preferredCommitType || "direct",
-  );
+  const { commitType, saveCommitType } = useCommitType();
+  const onboarding = useOnboarding();
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSelect = async (nextType) => {
     if (isSaving || nextType === commitType) return;
 
-    const previousType = commitType;
-    setCommitType(nextType);
     setIsSaving(true);
 
     try {
-      const { data } = await api.patch(ENDPOINTS.COMMIT_TYPE, {
-        preferredCommitType: nextType,
-      });
-      setCommitType(data.preferredCommitType);
-      savedCommitTypes.set(user?._id, data.preferredCommitType);
+      const savedType = await saveCommitType(nextType);
       toast.success(
-        data.preferredCommitType === "pull-request"
+        savedType === "pull-request"
           ? "README updates will be raised as pull requests"
           : "README updates will be committed directly",
       );
+      onboarding?.refresh();
     } catch (error) {
-      setCommitType(previousType);
       toast.error(
         error.response?.data?.message ||
           "Could not update commit type. Please try again.",

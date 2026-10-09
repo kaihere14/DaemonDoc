@@ -7,10 +7,7 @@ import SEO from "@/components/common/SEO";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { useRepos } from "../../hooks/useRepos";
 import { usePostHog } from "@posthog/react";
-import {
-  WalkthroughBanner,
-  WalkthroughModal,
-} from "@/components/repos/WalkthroughOverlay";
+import { useOnboarding } from "../../context/onboarding-context";
 import CleanupFeatureSpotlight from "@/components/repos/CleanupFeatureSpotlight";
 import ProviderPriorityControl from "@/components/repos/ProviderPriorityControl";
 import CommitTypeToggle from "@/components/repos/CommitTypeToggle";
@@ -36,7 +33,6 @@ const paginationPageBtnClass = (active) =>
       : "border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100"
   }`;
 
-const WT_KEY = (username) => `dd_wt_v1_${username}`;
 const CLEANUP_INTRO_KEY = (username) => `dd_cleanup_intro_v1_${username}`;
 
 const Home = () => {
@@ -48,34 +44,21 @@ const Home = () => {
   const [reposPage, setReposPage] = useState(1);
 
   const [, forceUpdate] = useState(0);
-  const wtStep = user?.githubUsername
-    ? (localStorage.getItem(WT_KEY(user.githubUsername)) ?? "step0")
-    : null;
-
-  const advanceWalkthrough = useCallback(
-    (to) => {
-      if (!user?.githubUsername) return;
-      localStorage.setItem(WT_KEY(user.githubUsername), to);
-      forceUpdate((n) => n + 1);
-    },
-    [user],
-  );
-
-  const handleRepoActivated = useCallback(() => {
-    if (wtStep === "step0") advanceWalkthrough("step1");
-  }, [wtStep, advanceWalkthrough]);
+  const { enrolled: inOnboarding, refresh: refreshOnboarding } =
+    useOnboarding();
 
   const cleanupIntroDismissed = user?.githubUsername
     ? localStorage.getItem(CLEANUP_INTRO_KEY(user.githubUsername)) === "done"
     : true;
 
+  // New accounts meet Cleanup in the onboarding checklist instead, so the
+  // announcement is only for people who used DaemonDoc before it existed.
   const showCleanupIntro =
     Boolean(user?.githubUsername) &&
     !loading &&
     repos.length > 0 &&
     !cleanupIntroDismissed &&
-    wtStep !== "step0" &&
-    wtStep !== "step1";
+    !inOnboarding;
 
   const dismissCleanupIntro = useCallback(() => {
     if (!user?.githubUsername) return;
@@ -150,11 +133,6 @@ const Home = () => {
         description="Manage AI-powered README updates for your GitHub repositories. View, enable, and configure automatic documentation generation."
         ogUrl={`${APP_ORIGIN}/home`}
         canonical={`${APP_ORIGIN}/home`}
-      />
-      <WalkthroughModal
-        open={wtStep === "step1"}
-        onGoToLogs={() => advanceWalkthrough("step2")}
-        onSkip={() => advanceWalkthrough("done")}
       />
       <CleanupFeatureSpotlight
         open={showCleanupIntro}
@@ -321,11 +299,6 @@ const Home = () => {
               <ProviderPriorityControl />
             </motion.div>
 
-            {/* Walkthrough: step 0 guide banner */}
-            {wtStep === "step0" && !loading && repos.length > 0 && (
-              <WalkthroughBanner onSkip={() => advanceWalkthrough("done")} />
-            )}
-
             {/* Content */}
             {loading ? (
               <div
@@ -380,10 +353,7 @@ const Home = () => {
                         showToggle={true}
                         onToggle={() => handleSilentToggle(repo.id)}
                         onActivate={
-                          wtStep === "step0" ? handleRepoActivated : undefined
-                        }
-                        isWalkthroughTarget={
-                          wtStep === "step0" && index === 0 && !repo.activated
+                          inOnboarding ? refreshOnboarding : undefined
                         }
                       />
                     </motion.div>

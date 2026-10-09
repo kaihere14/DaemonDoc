@@ -123,6 +123,7 @@ export const createOAuthUser = async (
   if (!user) {
     user = new User({
       githubId: profile.id,
+      onboarding: { startedAt: new Date() },
     });
   }
 
@@ -315,9 +316,14 @@ export const updatePreferredCommitType = async (req, res) => {
   }
 
   try {
+    // Picking a commit type, even the default one, is the deliberate choice
+    // the onboarding checklist waits for.
     const user = await User.findByIdAndUpdate(
       userId,
-      { preferredCommitType },
+      {
+        preferredCommitType,
+        "onboarding.commitTypeConfirmedAt": new Date(),
+      },
       { new: true, runValidators: true },
     ).select("preferredCommitType");
 

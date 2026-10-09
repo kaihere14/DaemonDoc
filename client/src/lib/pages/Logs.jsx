@@ -15,7 +15,6 @@ import SEO from "@/components/common/SEO";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { api, ENDPOINTS } from "../api";
 import { usePostHog } from "@posthog/react";
-import { WalkthroughLogsBanner } from "@/components/repos/WalkthroughOverlay";
 import { convexApi } from "../convexApi";
 import { ThinkingOrb } from "@/components/ui/thinking-orb";
 import LogRowSkeleton from "@/components/common/LogRowSkeleton";
@@ -103,27 +102,13 @@ const StatusBadge = ({ status }) => {
 };
 
 const Logs = () => {
-  const { user } = useRequireAuth();
+  useRequireAuth();
   const posthog = usePostHog();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [expandedLogId, setExpandedLogId] = useState(null);
-
-  const wtKey = user?.githubUsername ? `dd_wt_v1_${user.githubUsername}` : null;
-  const [wtBannerDismissed, setWtBannerDismissed] = useState(false);
-  const showWtBanner =
-    !wtBannerDismissed &&
-    wtKey !== null &&
-    localStorage.getItem(wtKey) === "step2";
-
-  const handleWtDismiss = () => {
-    if (wtKey) {
-      localStorage.setItem(wtKey, "done");
-    }
-    setWtBannerDismissed(true);
-  };
 
   const fetchLogs = useCallback(async (isRefresh = false) => {
     if (isRefresh) setRefreshing(true);
@@ -234,11 +219,6 @@ const Logs = () => {
               </button>
             </div>
           </div>
-
-          {/* Walkthrough: step 2 info banner */}
-          {showWtBanner && (
-            <WalkthroughLogsBanner onDismiss={handleWtDismiss} />
-          )}
 
           {/* Stats Bar */}
           <div className="mb-8 grid grid-cols-2 gap-3 sm:mb-10 sm:gap-4 md:grid-cols-5">
@@ -353,9 +333,6 @@ const Logs = () => {
                       animate="animate"
                       exit="exit"
                     >
-                      {showWtBanner && index === 0 && (
-                        <div className="pointer-events-none absolute inset-0 z-10 border-2 border-dashed border-sky-400" />
-                      )}
                       <LogItem
                         log={log}
                         expandedLogId={expandedLogId}

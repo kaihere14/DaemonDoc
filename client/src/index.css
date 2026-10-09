@@ -59,6 +59,23 @@
   --text-body--line-height: 1.5rem;
   --ease-b6: cubic-bezier(0.32, 0.72, 0, 1);
   --shadow-b6-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+
+  /* ── Motion ────────────────────────────────────────────────────────────
+     The built-in curves are too soft to feel intentional. `ease-out-strong`
+     is for anything entering or responding to a press; `ease-swap` is the
+     cross-fade curve for state swaps. */
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-swap: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Doku's idle bob while a README is being written. CSS rather than JS so
+     it stays smooth while the page is busy loading. */
+  --animate-doku-bob: doku-bob 1.6s ease-in-out infinite;
+
+  @keyframes doku-bob {
+    50% {
+      transform: translateY(-3px);
+    }
+  }
 }
 
 /* Premium typography and smooth rendering */
