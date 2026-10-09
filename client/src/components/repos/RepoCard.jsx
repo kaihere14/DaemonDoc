@@ -50,7 +50,6 @@ const RepoCard = ({
   showToggle = true,
   onToggle,
   onActivate,
-  isWalkthroughTarget = false,
   isPreview = false,
   highlightCleanupButton = false,
 }) => {
@@ -208,11 +207,9 @@ const RepoCard = ({
     }
   };
 
-  const cardClassName = `group relative flex h-full flex-col overflow-hidden rounded-panel bg-white/90 p-4 backdrop-blur-xl transition-[box-shadow,border-color] duration-200 sm:rounded-panel-lg sm:p-6 ${
-    isWalkthroughTarget && !isActive
-      ? "border-2 border-dashed border-blue-400 shadow-[0_8px_30px_-18px_rgba(29,78,216,0.35)]"
-      : "border border-slate-200/80 shadow-card hover:border-blue-200 hover:shadow-raised"
-  }${isPreview ? " pointer-events-none" : ""}`;
+  const cardClassName = `group relative flex h-full flex-col overflow-hidden rounded-panel border border-slate-200/80 bg-white/90 p-4 shadow-card backdrop-blur-xl transition-[box-shadow,border-color] duration-200 hover:border-blue-200 hover:shadow-raised sm:rounded-panel-lg sm:p-6${
+    isPreview ? " pointer-events-none" : ""
+  }`;
 
   const cardContent = (
     <>
@@ -245,26 +242,6 @@ const RepoCard = ({
               className="flex shrink-0 items-center gap-2 self-start"
               onClick={(e) => e.stopPropagation()}
             >
-              {isWalkthroughTarget &&
-                !isActive &&
-                !loading &&
-                (reduceMotion ? (
-                  <span className="text-xs font-bold text-blue-500 select-none">
-                    Enable →
-                  </span>
-                ) : (
-                  <motion.span
-                    animate={{ x: [0, 3, 0] }}
-                    transition={{
-                      repeat: Infinity,
-                      duration: 1.0,
-                      ease: "easeInOut",
-                    }}
-                    className="text-xs font-bold text-blue-500 select-none"
-                  >
-                    Enable →
-                  </motion.span>
-                ))}
               {loading ? (
                 <ThinkingOrb
                   preset="working"
