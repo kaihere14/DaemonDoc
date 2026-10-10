@@ -18,6 +18,8 @@ import { usePostHog } from "@posthog/react";
 import { convexApi } from "../convexApi";
 import { ThinkingOrb } from "@/components/ui/thinking-orb";
 import LogRowSkeleton from "@/components/common/LogRowSkeleton";
+import DokuState from "@/components/doku/DokuState";
+import { logsEmptyState, logsErrorState } from "@/components/doku/dokuStates";
 import { APP_ORIGIN } from "../urls";
 
 const STATUS_CONFIG = {
@@ -297,29 +299,17 @@ const Logs = () => {
                   )}
                 </div>
               ) : error ? (
-                <div className="px-4 py-14 text-center sm:px-6 sm:py-16">
-                  <XCircle size={42} className="mx-auto mb-4 text-rose-500" />
-                  <h3 className="mb-2 text-lg font-black tracking-tight text-slate-900 uppercase">
-                    Failed to load logs
-                  </h3>
-                  <p className="mb-6 text-sm text-slate-500">{error}</p>
-                  <button
-                    onClick={() => fetchLogs(true)}
-                    className="bg-primary cursor-pointer rounded-full px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-800"
-                  >
-                    Retry
-                  </button>
+                <div className="px-4 py-14 sm:px-6 sm:py-16">
+                  <DokuState
+                    {...logsErrorState({
+                      error,
+                      onRetry: () => fetchLogs(true),
+                    })}
+                  />
                 </div>
               ) : logs.length === 0 ? (
-                <div className="px-4 py-16 text-center sm:px-6 sm:py-20">
-                  <History size={46} className="mx-auto mb-4 text-blue-300" />
-                  <h3 className="mb-2 text-lg font-black tracking-tight text-slate-900 uppercase">
-                    No activity yet
-                  </h3>
-                  <p className="text-sm text-slate-500">
-                    Once README jobs start running, this feed will show the
-                    latest activity here.
-                  </p>
+                <div className="px-4 py-16 sm:px-6 sm:py-20">
+                  <DokuState {...logsEmptyState()} />
                 </div>
               ) : (
                 <AnimatePresence>

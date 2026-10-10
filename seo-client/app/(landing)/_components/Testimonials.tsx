@@ -1,6 +1,11 @@
 import SocialProof from "./SocialProof";
 import TestimonialsGrid from "./TestimonialsGrid";
-import { SECTION_X, SECTION_Y } from "@/app/(landing)/_lib/section";
+import {
+  SECTION_HEAD_GAP,
+  SECTION_X,
+  SECTION_Y,
+} from "@/app/(landing)/_lib/section";
+import Reveal from "./Reveal";
 
 const TESTIMONIALS = [
   {
@@ -54,7 +59,7 @@ export default function Testimonials() {
       aria-labelledby="testimonials-heading"
       className={`${SECTION_X} ${SECTION_Y}`}
     >
-      <div className="mx-auto mb-16 max-w-3xl text-center">
+      <Reveal className={`mx-auto max-w-3xl text-center ${SECTION_HEAD_GAP}`}>
         <h2
           id="testimonials-heading"
           className="font-display mb-4 text-3xl font-bold text-slate-900 md:text-4xl"
@@ -64,9 +69,11 @@ export default function Testimonials() {
         <p className="text-lg font-light tracking-[-0.012em] text-slate-600">
           See what engineers and developers are saying about DaemonDoc.
         </p>
-      </div>
+      </Reveal>
 
-      <SocialProof />
+      <Reveal delay={0.1}>
+        <SocialProof />
+      </Reveal>
 
       <TestimonialsGrid testimonials={TESTIMONIALS} />
     </section>

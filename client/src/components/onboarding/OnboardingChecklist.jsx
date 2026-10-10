@@ -22,7 +22,18 @@ import { useOnboarding } from "../../context/onboarding-context";
 import { useCommitType } from "../../hooks/useCommitType";
 import { convexApi } from "@/lib/convexApi";
 import { ThinkingOrb } from "@/components/ui/thinking-orb";
-import { DokuSwap } from "./Doku";
+import Doku, { DokuSwap } from "@/components/doku/Doku";
+import {
+  EASE_OUT,
+  EXIT,
+  LINK_PRESS,
+  PRESS,
+  SPRING,
+  SWAP_SPRING,
+  chunkVariants,
+  staggerVariants,
+  useBlur,
+} from "@/lib/motion";
 
 const STEP_KEYS = ["commitType", "firstRepo", "firstReadme"];
 
@@ -63,50 +74,13 @@ const MORE_TO_TRY = [
   },
 ];
 
-/* ── Motion ───────────────────────────────────────────────────────────────
-   Entrances arrive fast and settle (strong ease-out or a critically damped
-   spring); exits are shorter and smaller than entrances; state swaps
-   cross-fade with a little blur. Movement, scale and blur all drop out under
-   reduced motion, leaving the opacity fades. */
-const EASE_OUT = [0.23, 1, 0.32, 1];
-const SPRING = { type: "spring", duration: 0.35, bounce: 0 };
-const SWAP_SPRING = { type: "spring", duration: 0.3, bounce: 0 };
-const EXIT = { duration: 0.15, ease: EASE_OUT };
-
-// One press for everything you can click: a 0.96 squeeze that never plays on
-// a disabled control.
-const PRESS =
-  "[-webkit-tap-highlight-color:transparent] transition-[scale,background-color,border-color,color,box-shadow,opacity] duration-150 ease-out-strong motion-safe:enabled:active:scale-[0.96]";
-const LINK_PRESS =
-  "[-webkit-tap-highlight-color:transparent] transition-[scale,color] duration-150 ease-out-strong motion-safe:active:scale-[0.96]";
-
 const EYEBROW =
   "font-mono text-[10px] font-black tracking-[0.24em] text-slate-400 uppercase";
 const TEXT_LINK = `group inline-flex cursor-pointer items-center gap-1 text-xs font-bold text-blue-700 hover:text-blue-900 ${LINK_PRESS}`;
 const LINK_ARROW =
   "transition-[translate] duration-150 ease-out-strong group-hover:translate-x-0.5";
 
-const useBlur = () => {
-  const reduceMotion = useReducedMotion();
-  return (px) => (reduceMotion ? "blur(0px)" : `blur(${px}px)`);
-};
-
-// A view's parts arrive in order (header, steps, footer), 100ms apart.
-const viewVariants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.06 } },
-  exit: { opacity: 0, transition: EXIT },
-};
-
-const chunkVariants = (blur) => ({
-  hidden: { opacity: 0, transform: "translateY(12px)", filter: blur(4) },
-  visible: {
-    opacity: 1,
-    transform: "translateY(0px)",
-    filter: blur(0),
-    transition: { duration: 0.3, ease: EASE_OUT },
-  },
-});
+const viewVariants = staggerVariants;
 
 // The panel and the launcher grow out of the same corner, so folding and
 // reopening read as one object changing shape.
@@ -848,13 +822,10 @@ const Launcher = ({ doneCount, onOpen }) => (
     aria-label={`Open the getting started checklist, ${doneCount} of 3 done`}
     className={`group shadow-raised hover:shadow-overlay fixed right-4 bottom-4 z-30 flex cursor-pointer items-center gap-2 rounded-full border border-slate-200 bg-white/95 py-1.5 pr-4 pl-1.5 backdrop-blur-sm hover:border-blue-200 sm:right-6 sm:bottom-6 ${PRESS}`}
   >
-    <img
-      src="/mascot-bust.png"
-      alt=""
-      width={216}
-      height={256}
-      className="ease-out-strong h-9 w-auto transition-[translate] duration-200 group-hover:-translate-y-0.5"
-    />
+    {/* Doku rests while the checklist waits, and lifts on hover. */}
+    <span className="ease-out-strong block w-9 transition-[translate] duration-200 group-hover:-translate-y-0.5">
+      <Doku pose="resting" className="w-full" />
+    </span>
     <span className="text-xs font-bold text-slate-700">Getting started</span>
     <span className="font-mono text-[11px] font-black text-blue-700">
       {doneCount}/3

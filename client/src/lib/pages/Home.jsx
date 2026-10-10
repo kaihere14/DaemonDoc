@@ -2,13 +2,15 @@ import React, { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import RepoCard from "@/components/repos/RepoCard";
 import RepoCardSkeleton from "@/components/repos/RepoCardSkeleton";
-import { Github, AlertCircle, RefreshCw, Search, X } from "lucide-react";
+import { RefreshCw, Search, X } from "lucide-react";
 import SEO from "@/components/common/SEO";
 import { useRequireAuth } from "../../hooks/useRequireAuth";
 import { useRepos } from "../../hooks/useRepos";
 import { usePostHog } from "@posthog/react";
 import { useOnboarding } from "../../context/onboarding-context";
 import CleanupFeatureSpotlight from "@/components/repos/CleanupFeatureSpotlight";
+import DokuState from "@/components/doku/DokuState";
+import { repoEmptyState, repoErrorState } from "@/components/doku/dokuStates";
 import ProviderPriorityControl from "@/components/repos/ProviderPriorityControl";
 import CommitTypeToggle from "@/components/repos/CommitTypeToggle";
 import { APP_ORIGIN } from "../urls";
@@ -311,23 +313,11 @@ const Home = () => {
                 ))}
               </div>
             ) : error ? (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="rounded-panel-lg border border-rose-200 bg-white p-8 text-center shadow-[0_16px_40px_-30px_rgba(244,63,94,0.35)]"
-              >
-                <AlertCircle size={48} className="mx-auto mb-4 text-rose-500" />
-                <h3 className="mb-2 text-lg font-semibold text-rose-900">
-                  Failed to load repositories
-                </h3>
-                <p className="mb-4 text-rose-700">{error}</p>
-                <button
-                  onClick={fetchRepos}
-                  className="bg-primary cursor-pointer rounded-full px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-800"
-                >
-                  Try Again
-                </button>
-              </motion.div>
+              <div className="rounded-panel-lg border border-rose-100 bg-white px-6 py-12 shadow-[0_16px_40px_-30px_rgba(244,63,94,0.35)]">
+                <DokuState
+                  {...repoErrorState({ error, onRetry: fetchRepos })}
+                />
+              </div>
             ) : filteredRepos.length > 0 ? (
               <>
                 <motion.div
@@ -430,23 +420,24 @@ const Home = () => {
                 </div>
               </>
             ) : (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="rounded-panel-lg shadow-panel border border-dashed border-slate-300 bg-white/90 p-12 text-center"
-              >
-                <Github size={64} className="mx-auto mb-4 text-blue-300" />
-                <h3 className="mb-2 text-xl font-black tracking-tight text-slate-900 uppercase">
-                  No repositories found
-                </h3>
-                <p className="text-slate-600">
-                  {filter === "active"
-                    ? "You haven't activated any repositories yet. Toggle the switch on a repository to enable AI updates."
-                    : filter === "inactive"
-                      ? "All your repositories have AI updates enabled!"
-                      : "Connect your GitHub account to see your repositories here."}
-                </p>
-              </motion.div>
+              <div className="rounded-panel-lg shadow-panel border border-dashed border-slate-300 bg-white/90 px-6 py-12">
+                <DokuState
+                  {...repoEmptyState({
+                    repoCount: repos.length,
+                    filter,
+                    searchQuery,
+                    onClearSearch: () => {
+                      setSearchQuery("");
+                      setReposPage(1);
+                    },
+                    onShowAll: () => {
+                      setFilter("all");
+                      setReposPage(1);
+                    },
+                    onRefresh: fetchRepos,
+                  })}
+                />
+              </div>
             )}
           </div>
         </div>

@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { SECTION_X, SECTION_Y } from "@/app/(landing)/_lib/section";
+import Reveal from "./Reveal";
 
 const QUESTIONS = [
   {
@@ -49,7 +50,7 @@ export default function Faq() {
       className={`${SECTION_X} ${SECTION_Y}`}
     >
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-16 xl:gap-24">
-        <div className="lg:col-span-5">
+        <Reveal className="lg:col-span-5">
           <p className="text-primary mb-4 text-sm font-medium tracking-wide">
             Questions, answered
           </p>
@@ -62,7 +63,7 @@ export default function Faq() {
           <p className="mt-5 max-w-md text-base leading-relaxed text-slate-600">
             A quick look at how DaemonDoc fits into your GitHub workflow.
           </p>
-        </div>
+        </Reveal>
 
         <div className="lg:col-span-7">
           <div className="border-t border-slate-200">
@@ -71,7 +72,15 @@ export default function Faq() {
               const contentId = `${panelId}-${index}`;
 
               return (
-                <div key={item.question} className="border-b border-slate-200">
+                // Small rise, low blur: rows are thin, and a long travel
+                // would make the list look like it is still loading.
+                <Reveal
+                  key={item.question}
+                  delay={index * 0.06}
+                  blur={4}
+                  y={12}
+                  className="border-b border-slate-200"
+                >
                   <h3>
                     <button
                       type="button"
@@ -117,7 +126,7 @@ export default function Faq() {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </div>
+                </Reveal>
               );
             })}
           </div>

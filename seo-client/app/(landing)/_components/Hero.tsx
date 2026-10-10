@@ -20,6 +20,7 @@ import {
 import Image from "next/image";
 import { SECTION_X } from "@/app/(landing)/_lib/section";
 import { CandyLink } from "@/components/ui/candy-button";
+import Reveal from "./Reveal";
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? "https://app.daemondoc.online";
@@ -144,93 +145,101 @@ export default function Hero() {
         <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-48 bg-linear-to-b from-slate-950/32 via-slate-950/8 to-transparent" />
 
         <div className={`relative text-center ${SECTION_X}`}>
-          {/* Eyebrow pill */}
-          <a
-            href="#engine"
-            className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/25 bg-white/15 py-2 pr-2.5 pl-3 text-xs font-medium text-white backdrop-blur-md transition-colors hover:bg-white/25 sm:gap-3 sm:pr-3 sm:pl-4 sm:text-sm"
-          >
-            <Sparkles size={15} className="shrink-0 text-sky-200" />
-            <span className="h-4 w-px shrink-0 bg-white/30" />
-            <span className="truncate">
-              Synced on every push
-              <span className="hidden sm:inline"> — no manual edits</span>
-            </span>
-            <ChevronRight size={15} className="shrink-0 opacity-70" />
-          </a>
+          {/* Eyebrow, headline and prompt card come in one after another,
+              ~0.12s apart, so the eye lands on each in reading order. */}
+          <Reveal delay={0.1}>
+            {/* Eyebrow pill */}
+            <a
+              href="#engine"
+              className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/25 bg-white/15 py-2 pr-2.5 pl-3 text-xs font-medium text-white backdrop-blur-md transition-colors hover:bg-white/25 sm:gap-3 sm:pr-3 sm:pl-4 sm:text-sm"
+            >
+              <Sparkles size={15} className="shrink-0 text-sky-200" />
+              <span className="h-4 w-px shrink-0 bg-white/30" />
+              <span className="truncate">
+                Synced on every push
+                <span className="hidden sm:inline"> — no manual edits</span>
+              </span>
+              <ChevronRight size={15} className="shrink-0 opacity-70" />
+            </a>
+          </Reveal>
 
           {/* Headline. Reference proportions: ~64px desktop, regular weight —
               the display face carries the line, no bold and no ornament. */}
-          <h1 className="font-display mx-auto mt-10 max-w-3xl text-[1.75rem] leading-[1.16] font-normal tracking-[-0.022em] text-white [text-shadow:0_1px_2px_rgba(3,17,48,0.7),0_3px_18px_rgba(3,17,48,0.55)] sm:mt-12 sm:text-5xl lg:text-[4rem]">
-            From git push{" "}
-            {/* Sized in em so the mascot tracks the headline at every breakpoint.
+          <Reveal delay={0.22} blur={10}>
+            <h1 className="font-display mx-auto mt-10 max-w-3xl text-[1.75rem] leading-[1.16] font-normal tracking-[-0.022em] text-white [text-shadow:0_1px_2px_rgba(3,17,48,0.7),0_3px_18px_rgba(3,17,48,0.55)] sm:mt-12 sm:text-5xl lg:text-[4rem]">
+              From git push{" "}
+              {/* Sized in em so the mascot tracks the headline at every breakpoint.
                 The wrapper clips its bottom and right edges — the mascot slides
                 in from that corner, and its overshoot can still clear the top
                 and left. */}
-            <span
-              aria-hidden="true"
-              className="inline-block -translate-y-[0.06em] align-middle [clip-path:inset(-50%_0_0_-50%)]"
-            >
-              <Image
-                src="/mascot-bust.png"
-                alt=""
-                width={216}
-                height={256}
-                priority
-                className="animate-mascot-peek block h-[1em] w-auto drop-shadow-[0_3px_10px_rgba(3,17,48,0.5)]"
-              />
-            </span>{" "}
-            to current docs in seconds.
-          </h1>
+              <span
+                aria-hidden="true"
+                className="inline-block -translate-y-[0.06em] align-middle [clip-path:inset(-50%_0_0_-50%)]"
+              >
+                <Image
+                  src="/mascot-bust.png"
+                  alt=""
+                  width={216}
+                  height={256}
+                  priority
+                  className="animate-mascot-peek block h-[1em] w-auto drop-shadow-[0_3px_10px_rgba(3,17,48,0.5)]"
+                />
+              </span>{" "}
+              to current docs in seconds.
+            </h1>
+          </Reveal>
 
           {/* Prompt card. A still of the product, not a form — there is nothing
               to submit from the marketing site, so the only live control is the
               link into the app. The mock is inert and out of the tab order. */}
-          <div className="mx-auto mt-14 w-full max-w-2xl rounded-[22px] bg-white/25 p-1 shadow-[var(--shadow-overlay)] ring-1 ring-white/40 backdrop-blur-md">
-            <div className="rounded-[18px] bg-slate-950/90 p-4 text-left select-none">
-              <p
-                aria-hidden="true"
-                className="px-2 pt-2 pb-10 font-mono text-sm text-slate-500 sm:pb-12 sm:text-lg"
-              >
-                github.com/your-org/your-repo
-                <span className="ml-0.5 inline-block h-[1.1em] w-[2px] translate-y-[0.18em] bg-slate-500/80 align-baseline" />
-              </p>
-
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div
+          <Reveal delay={0.36}>
+            <div className="mx-auto mt-14 w-full max-w-2xl rounded-[22px] bg-white/25 p-1 shadow-[var(--shadow-overlay)] ring-1 ring-white/40 backdrop-blur-md">
+              <div className="rounded-[18px] bg-slate-950/90 p-4 text-left select-none">
+                <p
                   aria-hidden="true"
-                  className="flex items-center justify-center gap-1 rounded-full bg-white/[0.06] p-1"
+                  className="px-2 pt-2 pb-10 font-mono text-sm text-slate-500 sm:pb-12 sm:text-lg"
                 >
-                  {MODES.map(({ id, label, Icon }, i) => (
-                    <span
-                      key={id}
-                      className={`flex flex-1 items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-medium whitespace-nowrap sm:flex-none sm:px-4 ${
-                        i === 0 ? "bg-white/12 text-white" : "text-slate-400"
-                      }`}
-                    >
-                      <Icon size={15} className="hidden shrink-0 sm:block" />
-                      {label}
-                    </span>
-                  ))}
-                </div>
+                  github.com/your-org/your-repo
+                  <span className="ml-0.5 inline-block h-[1.1em] w-[2px] translate-y-[0.18em] bg-slate-500/80 align-baseline" />
+                </p>
 
-                <CandyLink
-                  href={`${APP_URL}/login`}
-                  className="w-full gap-2 px-5 py-2.5 text-base sm:w-auto"
-                >
-                  Connect repo
-                  <Sparkles size={16} className="shrink-0" />
-                </CandyLink>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div
+                    aria-hidden="true"
+                    className="flex items-center justify-center gap-1 rounded-full bg-white/[0.06] p-1"
+                  >
+                    {MODES.map(({ id, label, Icon }, i) => (
+                      <span
+                        key={id}
+                        className={`flex flex-1 items-center justify-center gap-2 rounded-full px-3 py-2 text-sm font-medium whitespace-nowrap sm:flex-none sm:px-4 ${
+                          i === 0 ? "bg-white/12 text-white" : "text-slate-400"
+                        }`}
+                      >
+                        <Icon size={15} className="hidden shrink-0 sm:block" />
+                        {label}
+                      </span>
+                    ))}
+                  </div>
+
+                  <CandyLink
+                    href={`${APP_URL}/login`}
+                    className="w-full gap-2 px-5 py-2.5 text-base sm:w-auto"
+                  >
+                    Connect repo
+                    <Sparkles size={16} className="shrink-0" />
+                  </CandyLink>
+                </div>
               </div>
             </div>
-          </div>
+          </Reveal>
         </div>
       </motion.section>
 
       {/* ── Demo, in its own band below the photo ─────────────────────────── */}
-      <section
-        className={`relative pt-20 pb-14 lg:pt-28 lg:pb-20 ${SECTION_X}`}
-      >
-        <div className="relative mx-auto max-w-5xl">
+      <section className={`relative pt-24 lg:pt-36 ${SECTION_X}`}>
+        {/* A big surface: less blur than text, and a longer rise to match its
+            size. */}
+        <Reveal blur={6} y={40} className="relative mx-auto max-w-5xl">
           <div className="animate-pulse-slow absolute -inset-1 top-0 right-0 left-0 rounded-2xl bg-linear-to-r from-[#209BFF] to-[#54A1FD] opacity-20 blur" />
 
           <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl">
@@ -289,15 +298,20 @@ export default function Hero() {
               </div>
             </div>
           </div>
-        </div>
+        </Reveal>
 
-        <p className="mx-auto mt-12 max-w-2xl text-center text-lg leading-relaxed font-light tracking-[-0.012em] text-slate-600">
-          DaemonDoc reads your repository, writes the README, and patches only
-          the sections your code actually changed.
-        </p>
+        <Reveal>
+          <p className="mx-auto mt-16 max-w-2xl text-center text-lg leading-relaxed font-light tracking-[-0.012em] text-slate-600 lg:mt-20">
+            DaemonDoc reads your repository, writes the README, and patches only
+            the sections your code actually changed.
+          </p>
+        </Reveal>
 
         {/* Language strip */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <Reveal
+          delay={0.08}
+          className="mt-8 flex flex-wrap items-center justify-center gap-3"
+        >
           <span className="text-sm font-medium text-slate-500">
             Reads the whole repo:
           </span>
@@ -320,9 +334,12 @@ export default function Hero() {
               />
             </div>
           ))}
-        </div>
+        </Reveal>
 
-        <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <Reveal
+          delay={0.16}
+          className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
+        >
           <a
             href="#features"
             className="hover:text-primary flex items-center justify-center gap-1 rounded-xl px-6 py-3 font-medium text-slate-600 transition-colors"
@@ -330,7 +347,7 @@ export default function Hero() {
             View capabilities
             <ArrowRight size={16} />
           </a>
-        </div>
+        </Reveal>
       </section>
     </main>
   );

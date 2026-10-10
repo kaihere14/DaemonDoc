@@ -4,6 +4,8 @@ import { AnimateIcon } from "../_animate-ui/icons/icon";
 import { Unplug } from "../_animate-ui/icons/unplug";
 import { Activity } from "../_animate-ui/icons/activity";
 import { ClipboardCheck } from "../_animate-ui/icons/clipboard-check";
+import { SECTION_X, SECTION_Y } from "@/app/(landing)/_lib/section";
+import Reveal from "./Reveal";
 
 const STEPS = [
   {
@@ -31,31 +33,33 @@ const Steps: FC = () => {
     <section
       id="how-it-works"
       aria-labelledby="hero-steps"
-      className="mx-auto mt-16 max-w-4xl"
+      className={`${SECTION_X} ${SECTION_Y}`}
     >
       <h2 id="hero-steps" className="sr-only">
         How DaemonDoc works
       </h2>
-      <div className="relative grid grid-cols-1 gap-10 text-center md:grid-cols-3">
+      <div className="relative mx-auto grid max-w-4xl grid-cols-1 gap-10 text-center md:grid-cols-3">
         {STEPS.map((step, i) => (
-          <AnimateIcon key={i} animateOnHover asChild>
-            <div className="group relative z-10 border-neutral-200 bg-white p-4">
-              <div className="pointer-events-none absolute top-0 -left-4 w-[calc(100%+2rem)] border border-dashed border-neutral-200"></div>
-              <div className="pointer-events-none absolute -top-4 left-0 h-[calc(100%+2rem)] border border-dashed border-neutral-200"></div>
-              <div className="pointer-events-none absolute -top-4 right-0 h-[calc(100%+2rem)] border border-dashed border-neutral-200"></div>
-              <div className="pointer-events-none absolute bottom-0 -left-4 w-[calc(100%+2rem)] border border-dashed border-neutral-200"></div>
+          <Reveal key={i} delay={i * 0.1}>
+            <AnimateIcon animateOnHover asChild>
+              <div className="group relative z-10 border-neutral-200 bg-white p-4">
+                <div className="pointer-events-none absolute top-0 -left-4 w-[calc(100%+2rem)] border border-dashed border-neutral-200"></div>
+                <div className="pointer-events-none absolute -top-4 left-0 h-[calc(100%+2rem)] border border-dashed border-neutral-200"></div>
+                <div className="pointer-events-none absolute -top-4 right-0 h-[calc(100%+2rem)] border border-dashed border-neutral-200"></div>
+                <div className="pointer-events-none absolute bottom-0 -left-4 w-[calc(100%+2rem)] border border-dashed border-neutral-200"></div>
 
-              <div
-                className={`h-12 w-12 ${step.iconClass} mx-auto mb-3 flex items-center justify-center rounded-full border shadow-sm transition-shadow group-hover:shadow-md`}
-              >
-                <step.Icon size={24} />
+                <div
+                  className={`h-12 w-12 ${step.iconClass} mx-auto mb-3 flex items-center justify-center rounded-full border shadow-sm transition-shadow group-hover:shadow-md`}
+                >
+                  <step.Icon size={24} />
+                </div>
+                <h3 className="font-display font-bold text-slate-900">
+                  {i + 1}. {step.title}
+                </h3>
+                <p className="mt-1 text-sm text-slate-500">{step.desc}</p>
               </div>
-              <h3 className="font-display font-bold text-slate-900">
-                {i + 1}. {step.title}
-              </h3>
-              <p className="mt-1 text-sm text-slate-500">{step.desc}</p>
-            </div>
-          </AnimateIcon>
+            </AnimateIcon>
+          </Reveal>
         ))}
       </div>
     </section>

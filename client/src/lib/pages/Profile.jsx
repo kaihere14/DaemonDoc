@@ -20,6 +20,7 @@ import { api, ENDPOINTS } from "../api";
 import { APP_ORIGIN, MARKETING_URL } from "../urls";
 import { usePostHog } from "@posthog/react";
 import { ThinkingOrb } from "@/components/ui/thinking-orb";
+import DeleteAccountModal from "@/components/profile/DeleteAccountModal";
 import { useDialog } from "../../hooks/useDialog";
 
 const Profile = () => {
@@ -475,99 +476,14 @@ const Profile = () => {
           </motion.div>
         </div>
 
-        <AnimatePresence>
-          {showDeleteModal && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md"
-              onClick={closeDeleteModal}
-            >
-              <motion.div
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="delete-account-title"
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                className="rounded-panel-lg shadow-overlay w-full max-w-md border border-slate-200 bg-white p-8 text-center sm:p-10"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="mb-6 text-center">
-                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-rose-100 text-rose-600">
-                    <AlertTriangle className="h-8 w-8" />
-                  </div>
-                  <h3
-                    id="delete-account-title"
-                    className="mb-2 text-xl font-black tracking-tight text-slate-900 uppercase"
-                  >
-                    Delete Account
-                  </h3>
-                  <p className="text-sm text-slate-500">
-                    This action cannot be undone. All your data will be
-                    permanently deleted.
-                  </p>
-                </div>
-
-                <div className="mb-6">
-                  <label
-                    htmlFor="delete-confirm"
-                    className="mb-2 block text-left font-mono text-[10px] font-black tracking-[0.22em] text-slate-400 uppercase"
-                  >
-                    Type <span className="text-rose-600">delete</span> to
-                    confirm
-                  </label>
-                  <input
-                    id="delete-confirm"
-                    type="text"
-                    value={deleteConfirmText}
-                    onChange={(e) => setDeleteConfirmText(e.target.value)}
-                    placeholder="Type 'delete' here"
-                    className="rounded-control w-full border border-slate-200 px-4 py-3 text-slate-900 transition-colors focus:border-rose-500 focus:ring-2 focus:ring-rose-500/40 focus:outline-none"
-                    autoFocus
-                  />
-                </div>
-
-                <div className="flex gap-3">
-                  <button
-                    onClick={closeDeleteModal}
-                    className="rounded-control flex-1 cursor-pointer bg-slate-100 px-4 py-3 font-semibold text-slate-700 transition-colors hover:bg-slate-200"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleDelete}
-                    disabled={
-                      deleteConfirmText.toLowerCase() !== "delete" || isDeleting
-                    }
-                    className={`rounded-control flex flex-1 items-center justify-center gap-2 px-4 py-3 font-semibold transition-colors ${
-                      deleteConfirmText.toLowerCase() === "delete" &&
-                      !isDeleting
-                        ? "cursor-pointer bg-rose-600 text-white hover:bg-rose-700"
-                        : "cursor-not-allowed bg-rose-200 text-rose-400"
-                    }`}
-                  >
-                    {isDeleting ? (
-                      <>
-                        <ThinkingOrb
-                          preset="working"
-                          showLabel={false}
-                          tone="ghost"
-                          size="sm"
-                          className="h-auto p-0 text-current [--orb-size:1.25rem]"
-                        />
-                        <span>Deleting...</span>
-                      </>
-                    ) : (
-                      "Delete Account"
-                    )}
-                  </button>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <DeleteAccountModal
+          open={showDeleteModal}
+          confirmText={deleteConfirmText}
+          onConfirmTextChange={setDeleteConfirmText}
+          deleting={isDeleting}
+          onClose={closeDeleteModal}
+          onConfirm={handleDelete}
+        />
       </div>
     </>
   );
