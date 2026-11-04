@@ -3,6 +3,15 @@ name: CI
 on:
   push:
     branches: [main]
+    # Deploy only when something that ships to the EC2 box changes. The Docker
+    # build context is server/, so nothing outside it can reach the VPS.
+    paths:
+      - "server/**"
+      - "!server/**/__tests__/**"
+      - "!server/vitest.config.js"
+      - "!server/eslint.config.js"
+      - "!server/docker-compose.local.yml"
+      - ".github/workflows/ci.yml"
   workflow_dispatch:
 
 concurrency:
