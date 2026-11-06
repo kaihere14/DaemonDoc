@@ -61,6 +61,27 @@ export function WebsiteShowBadge() {
   );
 }
 
+export function LaunchYourGemBadge() {
+  return (
+    <a
+      href="https://launchyourgem.com/products/daemondoc?ref=badge"
+      target="_blank"
+      rel="noopener"
+      className={DIRECTORY_BADGE}
+    >
+      {/* Plain <img> for the same reason as the UsefulShelf badge. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="https://launchyourgem.com/light-badge.png"
+        alt="Featured on Launchyourgem"
+        width={250}
+        height={69}
+        className="h-6 w-auto"
+      />
+    </a>
+  );
+}
+
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -89,6 +110,7 @@ export default function Footer() {
             <div className="flex flex-wrap items-center gap-3 self-start">
               <UsefulShelfBadge />
               <WebsiteShowBadge />
+              <LaunchYourGemBadge />
             </div>
           </div>
 
